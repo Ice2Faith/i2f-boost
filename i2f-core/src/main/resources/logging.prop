@@ -1,0 +1,6 @@
+log.level.test.*=warn
+log.level.i2f.core.*=error
+log.level.i2f.core.*.doHttp=debug
+
+log.writer.STDOUT=i2f.core.zplugin.log.impl.StdoutLogWriter
+

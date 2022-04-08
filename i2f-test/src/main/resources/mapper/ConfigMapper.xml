@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="com.i2f.test.modules.mybatis.mapper.ConfigMapper">
+
+	<sql id="qryProxy">
+		select
+		group_key ,
+		group_name ,
+
+		type_key ,
+		type_name ,
+
+		entry_desc ,
+
+		entry_id ,
+		entry_key ,
+		entry_name
+
+		from sys_config
+		where
+			 valid_time &lt;= now()
+			and invalid_time &gt;= now()
+			<if test="groupKey!=null and groupKey!=''">
+				and group_key = #{groupKey}
+			</if>
+		<if test="typeKey!=null and typeKey!=''">
+			and type_key = #{typeKey}
+		</if>
+		order by entry_order asc,entry_id asc,entry_name asc
+	</sql>
+
+	<select id="qryConfig" resultType="java.util.Map">
+		<include refid="qryProxy"></include>
+	</select>
+
+	<select id="qryDomain" resultType="com.i2f.test.modules.mybatis.domain.ConfigDomain">
+		<include refid="qryProxy"></include>
+	</select>
+
+</mapper>

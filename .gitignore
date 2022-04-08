@@ -23,10 +23,10 @@
 hs_err_pid*
 
 out/
+test/
 target/
 .idea/
 .mvn/
 log/
 logs/
-.iml
-
+*.iml
