@@ -65,7 +65,7 @@ public class DynamicDataSourceConfig implements BeanFactoryAware {
                 log.info("datasource construct...");
                 //创建数据源对象
                 HikariDataSource dataSource = (HikariDataSource) DataSourceBuilder.create().build();
-                String dataSourceId = entry.getKey();
+                String dataSourceId = entry.getKey()+"DataSource";
                 configDataSource(entry, dataSource);
                 log.info("datasource registry:"+dataSourceId);
                 /*bean工厂注册每个数据源bean*/

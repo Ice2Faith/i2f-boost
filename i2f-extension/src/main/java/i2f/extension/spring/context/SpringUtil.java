@@ -8,10 +8,12 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.*;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +23,7 @@ import java.util.Map;
  * @date 2022/3/26 15:29
  * @desc
  */
+@Component
 public class SpringUtil implements
         ApplicationContextAware,
         BeanFactoryAware,
@@ -132,6 +135,10 @@ public class SpringUtil implements
         return registerBean((ConfigurableApplicationContext) applicationContext,name,clazz,args);
     }
 
+    public static void registerSingletonBean(String name,Object bean){
+        registerSingletonBean((DefaultListableBeanFactory)beanFactory,name,bean);
+    }
+
     public static <T> T removeBean(String name){
         return removeBean((ConfigurableApplicationContext) applicationContext,name);
     }
@@ -144,6 +151,10 @@ public class SpringUtil implements
             beanFactory.removeBeanDefinition(name);
         }
         return ret;
+    }
+
+    public static void registerSingletonBean(DefaultListableBeanFactory beanFactory,String name,Object bean){
+        beanFactory.registerSingleton(name,bean);
     }
 
     public static <T> T registerBean(ConfigurableApplicationContext applicationContext, String name, Class<T> clazz,
@@ -165,5 +176,7 @@ public class SpringUtil implements
         beanFactory.registerBeanDefinition(name, beanDefinition);
         return applicationContext.getBean(name, clazz);
     }
+
+
 }
 

@@ -21,6 +21,11 @@ import java.util.List;
 public abstract class AbstractSqlLogStatementProxyHandler extends BasicStatementProxyHandler {
 
     @Override
+    public Object initContext() {
+        return System.currentTimeMillis();
+    }
+
+    @Override
     public Object after(Object context,Object ivkObj, IInvokable invokable, Object retVal, Object... args) {
         if(!valid(ivkObj)){
             return retVal;
