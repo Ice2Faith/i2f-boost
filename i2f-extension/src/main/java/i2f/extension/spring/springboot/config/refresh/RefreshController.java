@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @desc
  */
 @ConditionalOnBean(RefreshConfig.class)
-@ConditionalOnExpression("${i2f.springboot.config.refresh.api-refresh.enable:true}")
+@ConditionalOnExpression("${i2f.springboot.config.refresh.api-refresh.enable:false}")
 @Slf4j
 @Data
 @NoArgsConstructor

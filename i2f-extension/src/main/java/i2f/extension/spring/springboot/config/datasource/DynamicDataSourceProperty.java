@@ -41,6 +41,10 @@ public class DynamicDataSourceProperty implements InitializingBean {
            log.info("datasource is:"+item.getValue());
        }
 
+       if(!properties.containsKey(DataSourceType.MASTER)){
+           resolveDefaultSpringDatasourceAsMaster(properties);
+       }
+
         if(!properties.containsKey(DataSourceType.MASTER)){
             throw new BeanInitializationException("datasource ["+DataSourceType.MASTER+"] not found config.please config properties like as:\n" +
                     "\t"+MULTIPLY_DATASOURCE_PREFIX+"master.url=jdbc:xxx\n" +
@@ -54,5 +58,18 @@ public class DynamicDataSourceProperty implements InitializingBean {
 
     public Map<String, Map<String,Object>> getDatasource() {
         return properties;
+    }
+
+    private void resolveDefaultSpringDatasourceAsMaster(Map<String, Map<String,Object>> properties){
+        Map<String,Object> map=EnvironmentUtil.getPropertiesWithPrefix(environment,false,"spring.datasource.");
+        Map<String,Object> res=new HashMap<>();
+        if(!map.containsKey("url")){
+            return;
+        }
+        res.put("url",map.get("url"));
+        res.put("username",map.get("username"));
+        res.put("password",map.get("password"));
+        res.put("driver",map.get("driver-class-name"));
+        properties.put(DataSourceType.MASTER,res);
     }
 }

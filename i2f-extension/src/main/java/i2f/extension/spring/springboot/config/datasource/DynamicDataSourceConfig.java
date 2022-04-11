@@ -66,7 +66,7 @@ public class DynamicDataSourceConfig implements BeanFactoryAware {
                 //创建数据源对象
                 HikariDataSource dataSource = (HikariDataSource) DataSourceBuilder.create().build();
                 String dataSourceId = entry.getKey();
-                configeDataSource(entry, dataSource);
+                configDataSource(entry, dataSource);
                 log.info("datasource registry:"+dataSourceId);
                 /*bean工厂注册每个数据源bean*/
                 listableBeanFactory.registerSingleton(dataSourceId, dataSource);
@@ -78,7 +78,7 @@ public class DynamicDataSourceConfig implements BeanFactoryAware {
         return new DynamicDataSource(beanFactory.getBean(DataSourceType.MASTER, DataSource.class),          dataSourceMap);
     }
 
-    private void configeDataSource(Map.Entry<String , Map<String,Object>> entry, HikariDataSource dataSource) {
+    private void configDataSource(Map.Entry<String , Map<String,Object>> entry, HikariDataSource dataSource) {
         Map<String, Object> dataSourceConfig =  entry.getValue();
         dataSource.setJdbcUrl(String.valueOf(dataSourceConfig.get("url")));
         dataSource.setDriverClassName(String.valueOf(dataSourceConfig.get("driver")));
