@@ -12,12 +12,28 @@
     <name>i2f-boost</name>
     <description>i2f develop boost center</description>
 
+    <!-- 渐进式模块 -->
     <modules>
+        <!-- 仅依赖jdk1.8,javase -->
         <module>i2f-core</module>
+
+        <!-- 仅依赖jdk1.5,javax,javaee -->
         <module>i2f-core-j2ee</module>
+
+
+        <!-- 仅依赖spring5 -->
+        <module>i2f-spring</module>
+
+        <!-- 仅依赖springboot -->
+        <module>i2f-springboot</module>
+
+
+        <!-- 常用的其他开发组件 -->
         <module>i2f-extension</module>
+
         <module>i2f-test</module>
         <module>i2f-agent</module>
+
     </modules>
 
     <properties>
@@ -48,6 +64,18 @@
             <dependency>
                 <groupId>i2f.boost</groupId>
                 <artifactId>i2f-core-j2ee</artifactId>
+                <version>${i2f.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>i2f.boost</groupId>
+                <artifactId>i2f-spring</artifactId>
+                <version>${i2f.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>i2f.boost</groupId>
+                <artifactId>i2f-springboot</artifactId>
                 <version>${i2f.version}</version>
             </dependency>
 
