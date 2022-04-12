@@ -32,8 +32,8 @@ echo "logDir: $LOG_DIR"
 echo "logPath: $LOG_PATH"
 echo "-----------------------"
 
-if [ "$ctrlOption" = "" ];
-then
+function help()
+{
     echo -e "\033[0;31m please input 2nd arg:option \033[0m  \033[0;34m {start|stop|restart|shutdown|reboot|status|log|snapshot|backup|recovery|clean} \033[0m"
     echo -e "\033[0;34m start \033[0m : to run a jar which called AppName"
     echo -e "\033[0;34m stop \033[0m : to stop a jar which called AppName"
@@ -47,6 +47,11 @@ then
     echo -e "\033[0;34m recovery \033[0m : to recovery from ./backup and save current to ./newest for a jar which called AppName"
     echo -e "\033[0;34m clean \033[0m : to clean dirs ./backup ./snapshot ./newest ./logs for a jar which called AppName"
     exit 1
+}
+
+if [ "$ctrlOption" = "" ];
+then
+    help
 fi
 
 if [ "$AppName" = "" ];
@@ -54,6 +59,13 @@ then
     echo -e "\033[0;31m please input 1st arg:appName \033[0m"
     exit 1
 fi
+
+PID=""
+function query()
+{
+  PID=""
+  PID=`ps -ef |grep java|grep $AppName|grep -v grep|awk '{print $2}'`
+}
 
 CMD=""
 function mkcmd()
@@ -68,7 +80,7 @@ function mkcmd()
 
 function start()
 {
-    PID=`ps -ef |grep java|grep $AppName|grep -v grep|awk '{print $2}'`
+    query
 
     if [ x"$PID" != x"" ]; then
         echo "$AppName is running..."
@@ -78,6 +90,13 @@ function start()
         nohup java -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 &
         chmod a+r $LOG_DIR/*.log
         echo "Start $AppName success..."
+        sleep 3
+        query
+        if [ x"$PID" != x"" ]; then
+          echo "$AppName is running ok."
+        else
+          echo "$AppName maybe Interrupted!"
+        fi
     fi
 
     CMD="start"
@@ -89,12 +108,8 @@ function stop()
     echo "Stop $AppName"
 
     PID=""
-    query(){
-      PID=""
-        PID=`ps -ef |grep java|grep $AppName|grep -v grep|awk '{print $2}'`
-    }
-
     query
+
     if [ x"$PID" != x"" ]; then
         kill -TERM $PID
         echo "$AppName (pid:$PID) exiting..."
@@ -263,5 +278,5 @@ case $ctrlOption in
     pack)
     pack;;
     *)
-
+    help;;
 esac
