@@ -19,6 +19,7 @@ JVM_OPTS="-Dname=$AppName  -Duser.timezone=Asia/Shanghai -Xms512M -Xmx512M -XX:P
 APP_HOME=`pwd`
 LOG_DIR=${APP_HOME}/logs
 LOG_PATH=${LOG_DIR}/${AppName}.log
+PID_PATH=${APP_HOME}/pid.$AppName
 
 echo "-----------------------"
 echo "jarctrl.sh running..."
@@ -30,6 +31,7 @@ echo "jvmOpts: $JVM_OPTS"
 echo "appHome: $APP_HOME"
 echo "logDir: $LOG_DIR"
 echo "logPath: $LOG_PATH"
+echo "pidPath: $PID_PATH"
 echo "-----------------------"
 
 function help()
@@ -46,6 +48,11 @@ function help()
     echo -e "\033[0;34m backup \033[0m : to backup to ./backup a jar which called AppName"
     echo -e "\033[0;34m recovery \033[0m : to recovery from ./backup and save current to ./newest for a jar which called AppName"
     echo -e "\033[0;34m clean \033[0m : to clean dirs ./backup ./snapshot ./newest ./logs for a jar which called AppName"
+    echo -e "\033[0;34m pack \033[0m : zip upk_AppName to AppName and backup source AppName to src_AppName"
+    echo -e "\033[0;34m unpack \033[0m : unzip AppName to upk_AppName"
+    echo -e "\033[0;34m pidstop \033[0m : stop AppName by pid file called pid.AppName"
+    echo -e "\033[0;34m pidstart \033[0m : start AppName and save pid to file called pid.AppName"
+    echo -e "\033[0;34m pidreboot \033[0m : reboot AppName rely pidstop and then pidstart"
     exit 1
 }
 
@@ -250,6 +257,52 @@ function pack()
   echo "$AppName has pack."
 }
 
+
+function pidstop()
+{
+  if [ -d ${PID_PATH} ]; then
+    echo "not pid file found:$PID_PATH"
+    return
+  fi
+
+  FPID=$(cat ${PID_PATH})
+  if [[ "$FPID" -ne "" ]]; then
+      echo "kill pid is:$FPID"
+      kill -9 $FPID
+      echo "" > $PID_PATH
+  else
+    echo "not pid found."
+  fi
+}
+
+function pidstart()
+{
+  if [ ! -d ${PID_PATH} ]; then
+    echo "not pid file,create..."
+    touch ${PID_PATH}
+  fi
+
+  FPID=$(cat ${PID_PATH})
+  if [[ "$FPID" -ne "" ]]; then
+      echo "process has running ..."
+      return
+  fi
+
+  echo "" > $PID_PATH
+  chmod a+x $AppName
+  mkdir ${LOG_DIR}
+  nohup java -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 & echo $! > $PID_PATH
+  chmod a+r $LOG_DIR/*.log
+  echo "Start $AppName success..."
+}
+
+function pidreboot()
+{
+    pidstop
+    sleep 2
+    pidstart
+}
+
 case $ctrlOption in
     start)
     start;;
@@ -277,6 +330,12 @@ case $ctrlOption in
     unpack;;
     pack)
     pack;;
+    pidstop)
+    pidstop;;
+    pidstart)
+    pidstart;;
+    pidreboot)
+    pidreboot;;
     *)
     help;;
 esac
