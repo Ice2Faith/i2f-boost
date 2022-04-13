@@ -57,6 +57,11 @@
             <artifactId>i2f-core-j2ee</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>i2f.boost</groupId>
+            <artifactId>i2f-spring</artifactId>
+        </dependency>
+
         <!-- i2f.web -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -351,23 +356,6 @@
             <version>1.21</version>
         </dependency>
 
-        <!-- 引入zookeeper -->
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-framework</artifactId>
-            <version>4.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
-            <version>3.4.11</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-recipes</artifactId>
-            <version>4.0.0</version>
-        </dependency>
-
         <!-- swagger2-->
         <dependency>
             <groupId>io.springfox</groupId>
@@ -414,6 +402,25 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-context</artifactId>
+        </dependency>
+
+        <!-- zookeeper -->
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>3.6.3</version>
+        </dependency>
+
+        <!-- zookeeper distribute lock -->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-recipes</artifactId>
+            <version>4.0.0</version>
         </dependency>
     </dependencies>
 
