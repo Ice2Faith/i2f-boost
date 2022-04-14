@@ -40,6 +40,8 @@ public class AspectjProxy {
             return (T)ret;
         }catch(Throwable e){
             throw handler.except(context,null,invokable,e,args);
+        }finally {
+            handler.onFinally(context,null,invokable,args);
         }
     }
 }

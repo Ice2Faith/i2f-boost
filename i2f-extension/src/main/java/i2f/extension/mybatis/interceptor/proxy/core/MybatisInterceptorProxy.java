@@ -31,6 +31,8 @@ public class MybatisInterceptorProxy {
             return handler.after(context,ivkObj,invoker,retVal,args);
         }catch(Throwable e){
             throw handler.except(context,ivkObj,invoker,e,args);
+        }finally {
+            handler.onFinally(context,ivkObj,invoker,args);
         }
     }
 }

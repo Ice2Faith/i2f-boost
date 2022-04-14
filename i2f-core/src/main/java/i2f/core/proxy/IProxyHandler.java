@@ -51,4 +51,15 @@ public interface IProxyHandler {
      */
     @Remark("hook on exception raise,usually,return value should equals ex.")
     Throwable except(@Name("context") Object context,@Name("ivkObj") Object ivkObj,@Name("invokable") IInvokable invokable,@Name("ex") Throwable ex,Object ... args);
+
+    /**
+     * 调用完毕之后执行finally块
+     * 主要是提供完成的代理流程
+     * @param ivkObj
+     * @param invokable
+     * @param args
+     * @return
+     */
+    @Remark("hook on exception raise,usually,return value should equals ex.")
+    void onFinally(@Name("context") Object context, @Name("ivkObj") Object ivkObj, @Name("invokable") IInvokable invokable, @Name("args") Object ... args);
 }

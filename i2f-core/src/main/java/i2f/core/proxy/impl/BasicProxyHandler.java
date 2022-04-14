@@ -32,4 +32,9 @@ public class BasicProxyHandler implements IProxyHandler {
     public Throwable except(Object context,Object ivkObj, IInvokable invokable, Throwable ex, Object... args) {
         return ex;
     }
+
+    @Override
+    public void onFinally(Object context, Object ivkObj, IInvokable invokable, Object... args) {
+
+    }
 }

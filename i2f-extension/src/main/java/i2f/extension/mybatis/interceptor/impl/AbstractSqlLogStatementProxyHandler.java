@@ -12,6 +12,7 @@ import org.apache.ibatis.mapping.ParameterMapping;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author ltb
@@ -19,16 +20,45 @@ import java.util.List;
  * @desc
  */
 public abstract class AbstractSqlLogStatementProxyHandler extends BasicStatementProxyHandler {
+    protected MybatisLog ann;
+
+    protected Method method;
+    protected String sql;
+    protected List<MybatisSqlLogData> params;
+
+    protected String seqId;
+
+    protected Throwable ex;
+    protected long useMillSecond;
+    protected Integer retCount;
+    protected Number retNum;
 
     @Override
     public Object initContext() {
-        return System.currentTimeMillis();
+        long btime= System.currentTimeMillis();
+        seqId=btime+"_"+Thread.currentThread().getId()+"_"+new Random().nextInt(1024);
+        return btime;
     }
 
     @Override
     public Object after(Object context,Object ivkObj, IInvokable invokable, Object retVal, Object... args) {
         if(!valid(ivkObj)){
             return retVal;
+        }
+        if(ann==null || !ann.value()){
+            return retVal;
+        }
+        long curr=System.currentTimeMillis();
+        long diff=curr-(Long)context;
+        this.useMillSecond=diff;
+
+        if(retVal instanceof List){
+            int size=((List)retVal).size();
+            this.retCount=size;
+        }
+        if(retVal instanceof Number){
+            Number num=(Number)retVal;
+            this.retNum=num;
         }
 
         return retVal;
@@ -41,6 +71,7 @@ public abstract class AbstractSqlLogStatementProxyHandler extends BasicStatement
         }
         Method method=findMapperMethod(ivkObj);
         MybatisLog ann= ReflectResolver.findElementAnnotation(method, MybatisLog.class,true,false,false);
+        this.ann=ann;
         if(ann==null || !ann.value()){
             return null;
         }
@@ -53,8 +84,20 @@ public abstract class AbstractSqlLogStatementProxyHandler extends BasicStatement
         for(ParameterMapping item : params){
             paramsList.add(new MybatisSqlLogData(item.getProperty(),item.getJavaType(),item.getJdbcTypeName(),ValueResolver.get(paramObj,item.getProperty())));
         }
-        writeLog(method,sql,paramsList);
+
+        this.method=method;
+        this.sql=sql;
+        this.params=paramsList;
         return null;
+    }
+
+    @Override
+    public Throwable except(Object context, Object ivkObj, IInvokable invokable, Throwable ex, Object... args) {
+        if(ann==null || !ann.value()){
+            return ex;
+        }
+        this.ex=ex;
+        return ex;
     }
 
     public static class MybatisSqlLogData{
@@ -71,6 +114,12 @@ public abstract class AbstractSqlLogStatementProxyHandler extends BasicStatement
         }
     }
 
-    protected abstract void writeLog(Method method,String sql,List<MybatisSqlLogData> params);
+    @Override
+    public void onFinally(Object context, Object ivkObj, IInvokable invokable, Object... args) {
+        if(ann!=null && ann.value()){
+            writeFinallyLog(seqId,method,sql,params,ex,retCount,retNum,useMillSecond);
+        }
+    }
 
+    protected abstract void writeFinallyLog(String seqId, Method method, String sql, List<MybatisSqlLogData> params, Throwable ex, Integer retCount, Number retNum, long useMillSecond);
 }

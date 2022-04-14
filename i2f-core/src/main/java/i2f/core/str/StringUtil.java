@@ -18,6 +18,9 @@ import java.util.regex.Pattern;
 
 @Author("i2f")
 public class StringUtil {
+    public static String removeWhiteLine(String str){
+        return str.replaceAll("\\n\\s*\\n","\n");
+    }
     public static String subMore(String str,int maxLen){
         return subMore(str,maxLen,"...");
     }

@@ -3,6 +3,7 @@ package i2f.core.reflect.convert;
 
 import i2f.core.annotations.remark.Author;
 import i2f.core.check.CheckUtil;
+import i2f.core.reflect.type.TypeResolver;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -32,22 +33,7 @@ public class ConvertResolver {
         return (BigDecimal) tryConvertible(srcObj, BigDecimal.class);
     }
     public static boolean isInTypes(Class ckType,Class ... tarTypes){
-        if(ckType==null){
-            return false;
-        }
-        if(tarTypes==null || tarTypes.length==0){
-            return false;
-        }
-        for(Class item : tarTypes){
-            if(ckType.equals(item)){
-                return true;
-            }
-            //该方法用于判定，父类target是否派生出了子类item
-            if(item.isAssignableFrom(ckType)){
-                return true;
-            }
-        }
-        return false;
+        return TypeResolver.isInTypes(ckType, tarTypes);
     }
 
     public static boolean isValueConvertible(Object val,Class dstType){
@@ -60,28 +46,29 @@ public class ConvertResolver {
             if(isInteger(dstType) && sval.matches("^\\d+$")){
                 return true;
             }
-            if(isFloat(dstType) && sval.matches("^\\d+(.\\d+)?$")){
+            if(isFloat(dstType) && sval.matches("^\\d+(\\.\\d+)?$")){
                 return true;
             }
-            if(isBoolean(dstType) && sval.toLowerCase().matches("^[true|false]$")){
+            if(isBoolean(dstType) && sval.toLowerCase().matches("^true|false$")){
+                return true;
+            }
+            if(isCharacter(dstType) && sval.length()==1){
                 return true;
             }
         }
         return isConvertible(clazz,dstType);
     }
 
+    public static boolean isCharacter(Class clazz){
+        return isInTypes(clazz,char.class,Character.class);
+    }
+
     public static boolean isInteger(Class clazz){
-        return isInTypes(clazz,int.class,Integer.class,
-                short.class,Short.class,
-                long.class,Long.class,
-                byte.class,Byte.class,
-                BigInteger.class);
+        return TypeResolver.isBigIntegerCompatibleType(clazz);
     }
 
     public static boolean isFloat(Class clazz){
-        return isInTypes(clazz,float.class,Float.class,
-                double.class,Double.class,
-                BigDecimal.class);
+        return TypeResolver.isBigDecimalCompatibleType(clazz);
     }
 
     public static boolean isBoolean(Class clazz){
@@ -172,16 +159,19 @@ public class ConvertResolver {
                 val=new BigInteger(sval);
                 srcType=val.getClass();
             }
-            if(isFloat(dstType) && sval.matches("^\\d+(.\\d+)?$")){
+            if(isFloat(dstType) && sval.matches("^\\d+(\\.\\d+)?$")){
                 val=new BigDecimal(sval);
                 srcType=val.getClass();
             }
-            if(isBoolean(dstType) && sval.toLowerCase().matches("^[true|false]$")){
+            if(isBoolean(dstType) && sval.toLowerCase().matches("^true|false$")){
                 if("true".equals(sval.toLowerCase())){
                     return true;
                 }else if("false".equals(sval.toLowerCase())){
                     return false;
                 }
+            }
+            if(isCharacter(dstType) && sval.length()==1){
+                return sval.charAt(0);
             }
         }
         if(isInteger(srcType)

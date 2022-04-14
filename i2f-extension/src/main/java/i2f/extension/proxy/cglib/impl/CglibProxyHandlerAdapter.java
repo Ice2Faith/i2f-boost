@@ -35,6 +35,8 @@ public class CglibProxyHandlerAdapter implements MethodInterceptor {
             return ret;
         }catch(Throwable e){
             throw handler.except(context,obj,invokable,e,args);
+        }finally {
+            handler.onFinally(context,obj,invokable,args);
         }
     }
 }

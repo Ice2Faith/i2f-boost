@@ -37,6 +37,8 @@ public class JdkProxyHandlerAdapter<T> implements InvocationHandler {
             return retVal;
         }catch(Throwable e){
             throw handler.except(context,instance,invokable,e,args);
+        }finally {
+            handler.onFinally(context,instance,invokable,args);
         }
     }
 }

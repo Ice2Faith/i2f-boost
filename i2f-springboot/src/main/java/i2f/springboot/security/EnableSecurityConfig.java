@@ -1,13 +1,11 @@
 package i2f.springboot.security;
 
-import i2f.extension.spring.springboot.config.security.def.*;
 import i2f.springboot.security.def.DefaultUnAuthorizedHandler;
 import i2f.springboot.security.def.DefaultUserDetailsService;
 import i2f.springboot.security.def.token.DefaultAuthenticationSuccessHandler;
 import i2f.springboot.security.def.token.DefaultAuthenticationTokenFilter;
 import i2f.springboot.security.def.token.DefaultLogoutSuccessHandler;
 import i2f.springboot.security.def.token.DefaultTokenHolder;
-import i2f.extension.spring.springboot.config.security.impl.*;
 import i2f.springboot.security.impl.SecurityForwardController;
 import org.springframework.context.annotation.Import;
 
