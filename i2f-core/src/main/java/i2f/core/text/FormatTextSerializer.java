@@ -16,7 +16,7 @@ public class FormatTextSerializer implements ITextSerializer{
         this.processor=processor;
     }
     @Override
-    public String serialize(Object obj) {
+    public String serializeAsText(Object obj) {
         if(obj==null){
             return "null:";
         }
@@ -33,7 +33,7 @@ public class FormatTextSerializer implements ITextSerializer{
     }
 
     @Override
-    public Object deserialize(String str) {
+    public Object deserializeFromText(String str) {
         int idx=str.indexOf(":");
         if(idx<=0){
             throw new TextSerializeException("not valid text serialize format:"+str);

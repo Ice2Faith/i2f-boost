@@ -1,13 +1,13 @@
 package i2f.core.text.exception;
 
-import i2f.core.exception.BoostException;
+import i2f.core.serialize.exception.SerializeException;
 
 /**
  * @author ltb
  * @date 2022/4/14 10:18
  * @desc
  */
-public class TextSerializeException extends BoostException {
+public class TextSerializeException extends SerializeException {
     public TextSerializeException() {
     }
 

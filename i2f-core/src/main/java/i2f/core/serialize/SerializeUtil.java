@@ -12,6 +12,7 @@ import java.io.*;
  */
 @Author("i2f")
 public class SerializeUtil {
+    private static volatile ISerializer serializer=new JdkSerializer();
     public static byte[] objs2Bytes(Object ... objs) throws IOException {
         if(CheckUtil.isEmptyArray(objs)){
             return new byte[]{};
@@ -28,32 +29,14 @@ public class SerializeUtil {
     }
 
     public static<T extends Serializable> byte[] obj2Bytes(T obj) throws IOException {
-        if(CheckUtil.isNull(obj)){
-            return new byte[]{};
-        }
-        ByteArrayOutputStream bos=new ByteArrayOutputStream();
-        ObjectOutputStream oos=new ObjectOutputStream(bos);
-        oos.writeObject(obj);
-        oos.flush();
-        oos.close();
-
-        return bos.toByteArray();
+        return serializer.serialize(obj);
     }
 
     public static<T extends Serializable> T bytes2Obj(byte[] bytes) throws IOException, ClassNotFoundException {
-        if(CheckUtil.isEmptyArray(bytes)){
-            return null;
-        }
-        ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ObjectInputStream(is);
-        T ret = (T) ois.readObject();
-        ois.close();
-        return ret;
+        return (T)serializer.deserialize(bytes);
     }
 
     public static <T extends Serializable> T serializeCopy(T obj) throws IOException, ClassNotFoundException {
-        byte[] data = obj2Bytes(obj);
-        T ret=bytes2Obj(data);
-        return ret;
+        return (T)serializer.serializeCopy(obj);
     }
 }
