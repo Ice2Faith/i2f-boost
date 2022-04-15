@@ -38,8 +38,6 @@ public class ObjectMapperConfig {
         }else{
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         }
-//        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-//        objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         log.info("ObjectMapper config done.");
         return objectMapper;
     }

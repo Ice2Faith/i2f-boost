@@ -1,8 +1,9 @@
 package i2f.springboot.redis;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,8 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.text.SimpleDateFormat;
 
 /**
  * @author ltb
@@ -27,8 +30,19 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableRedisRepositories
 public class RedisConfig {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    String dateFormat="yyyy-MM-dd HH:mm:ss SSS";
+
+    @Bean
+    public Jackson2JsonRedisSerializer getRedisSerializer(){
+        ObjectMapper objectMapper=new ObjectMapper();
+        objectMapper.setDateFormat(new SimpleDateFormat(dateFormat));
+        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
+        log.info("Jackson2JsonRedisSerializer config done.");
+        return jackson2JsonRedisSerializer;
+    }
 
     // 1.项目启动时此方法先被注册成bean被spring管理,如果没有这个bean，则redis可视化工具中的中文内容（key或者value）都会以二进制存储，不易检查。
     @ConditionalOnExpression("${i2f.springboot.config.redis.enable-lettuce-factory:false}")
@@ -36,17 +50,16 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, Object> template = new RedisTemplate<String, Object>();
         template.setConnectionFactory(factory);
-        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
-        jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
+
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
         // key采用String的序列化方式
         template.setKeySerializer(stringRedisSerializer);
         // hash的key也采用String的序列化方式
         template.setHashKeySerializer(stringRedisSerializer);
         // value序列化方式采用jackson
-        template.setValueSerializer(jackson2JsonRedisSerializer);
+        template.setValueSerializer(getRedisSerializer());
         // hash的value序列化方式采用jackson
-        template.setHashValueSerializer(jackson2JsonRedisSerializer);
+        template.setHashValueSerializer(getRedisSerializer());
         template.afterPropertiesSet();
         log.info("RedisConfig RedisTemplate<String, Object> bean has build.");
         return template;
@@ -68,6 +81,7 @@ public class RedisConfig {
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
         redisTemplate.setConnectionFactory(factory);
+        log.info("RedisConfig RedisTemplate<String, Object> lettuce bean has build.");
         return redisTemplate;
     }
 
