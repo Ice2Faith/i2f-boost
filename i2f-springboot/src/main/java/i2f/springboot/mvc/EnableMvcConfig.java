@@ -16,8 +16,7 @@ import java.lang.annotation.*;
         SpringMvcConfig.class,
         ObjectMapperConfig.class,
         LogAop.class,
-        PublicExceptionResolver.class,
-        PublicReturnValueAdvice.class
+        PublicExceptionResolver.class
 })
 public @interface EnableMvcConfig {
 

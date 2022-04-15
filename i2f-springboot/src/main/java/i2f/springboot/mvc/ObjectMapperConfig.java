@@ -1,8 +1,6 @@
 package i2f.springboot.mvc;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import i2f.spring.jackson.JacksonJsonProcessor;
 import lombok.Data;
@@ -40,8 +38,8 @@ public class ObjectMapperConfig {
         }else{
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         }
-        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+//        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+//        objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         log.info("ObjectMapper config done.");
         return objectMapper;
     }
