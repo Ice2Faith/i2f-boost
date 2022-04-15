@@ -14,7 +14,9 @@ import java.lang.annotation.*;
 @Documented
 @Import({
         RedisConfig.class,
-        RedisCacheConfig.class
+        ConnectRedisTemplateConfig.class,
+        LettuceRedisTemplateConfig.class,
+        RedisCacheConfig.class,
 })
 public @interface EnableRedisConfig {
 

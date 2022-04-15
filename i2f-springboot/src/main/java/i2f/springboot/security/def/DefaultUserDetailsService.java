@@ -1,5 +1,6 @@
 package i2f.springboot.security.def;
 
+import i2f.springboot.security.model.SecurityUser;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,7 +40,7 @@ public class DefaultUserDetailsService implements UserDetailsService, Initializi
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("DefaultUserDetailsService load user:"+username);
         if(username.equals(username)){
-            UserDetails details=new User(username, passwordEncoder.encode(password), new ArrayList<GrantedAuthority>());
+            UserDetails details=new SecurityUser(username, passwordEncoder.encode(password), new ArrayList<GrantedAuthority>());
             return details;
         }
         throw new UsernameNotFoundException("user["+username+"] not found in system");

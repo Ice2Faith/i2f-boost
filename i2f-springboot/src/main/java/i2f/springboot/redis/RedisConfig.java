@@ -8,13 +8,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.text.SimpleDateFormat;
 
@@ -43,46 +38,4 @@ public class RedisConfig {
         log.info("Jackson2JsonRedisSerializer config done.");
         return jackson2JsonRedisSerializer;
     }
-
-    // 1.项目启动时此方法先被注册成bean被spring管理,如果没有这个bean，则redis可视化工具中的中文内容（key或者value）都会以二进制存储，不易检查。
-    @ConditionalOnExpression("${i2f.springboot.config.redis.enable-lettuce-factory:false}")
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<String, Object>();
-        template.setConnectionFactory(factory);
-
-        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-        // key采用String的序列化方式
-        template.setKeySerializer(stringRedisSerializer);
-        // hash的key也采用String的序列化方式
-        template.setHashKeySerializer(stringRedisSerializer);
-        // value序列化方式采用jackson
-        template.setValueSerializer(getRedisSerializer());
-        // hash的value序列化方式采用jackson
-        template.setHashValueSerializer(getRedisSerializer());
-        template.afterPropertiesSet();
-        log.info("RedisConfig RedisTemplate<String, Object> bean has build.");
-        return template;
-    }
-
-    /**
-     * springboot2.x 使用LettuceConnectionFactory 代替 RedisConnectionFactory
-     * application.yml配置基本信息后,springboot2.x  RedisAutoConfiguration能够自动装配
-     * LettuceConnectionFactory 和 RedisConnectionFactory 及其 RedisTemplate
-     * @param factory
-     * @return
-     */
-    @ConditionalOnExpression("${i2f.springboot.config.redis.enable-lettuce-factory:true}")
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory factory){
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-        redisTemplate.setConnectionFactory(factory);
-        log.info("RedisConfig RedisTemplate<String, Object> lettuce bean has build.");
-        return redisTemplate;
-    }
-
 }
