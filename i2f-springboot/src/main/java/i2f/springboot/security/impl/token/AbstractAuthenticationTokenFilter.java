@@ -1,5 +1,6 @@
 package i2f.springboot.security.impl.token;
 
+import i2f.core.j2ee.web.ServletContextUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,7 +25,7 @@ public abstract class AbstractAuthenticationTokenFilter extends AuthenticationTo
         log.info("AbstractAuthenticationTokenFilter get token auth.");
         String tokenName=getTokenName();
         log.info("AbstractAuthenticationTokenFilter tokenName:"+tokenName);
-        String token=getToken(request,tokenName);
+        String token= ServletContextUtil.getToken(request,tokenName);
         if(token==null || "".equals(token)){
             return null;
         }
@@ -45,13 +46,4 @@ public abstract class AbstractAuthenticationTokenFilter extends AuthenticationTo
 
     protected abstract UserDetails getUserDetailByToken(String token,HttpServletRequest request, HttpServletResponse response);
 
-    public static String getToken(HttpServletRequest request,String tokenName){
-        String token=request.getHeader(tokenName);
-        log.info("AbstractAuthenticationTokenFilter token in header:"+token);
-        if(token==null || "".equals(token)){
-            token=request.getParameter(tokenName);
-            log.info("AbstractAuthenticationTokenFilter token in parameter:"+token);
-        }
-        return token;
-    }
 }

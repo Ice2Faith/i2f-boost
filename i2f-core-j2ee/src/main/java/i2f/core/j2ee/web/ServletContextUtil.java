@@ -24,6 +24,21 @@ import java.util.ArrayList;
  * @desc
  */
 public class ServletContextUtil {
+    public static final String FORWARD_DATA_ATTR_KEY="forward-data";
+    public static String getToken(HttpServletRequest request,String tokenName){
+        String token="";
+        token=request.getHeader(tokenName);
+        if(token==null || "".equals(token)){
+            token=request.getParameter(tokenName);
+        }
+        if(token==null || "".equals(token)){
+            token=(String) request.getSession().getAttribute(tokenName);
+        }
+        if(token==null || "".equals(token)){
+            token=(String) request.getAttribute(tokenName);
+        }
+        return token;
+    }
     public static HttpSession getSession(HttpServletRequest request){
         return request.getSession();
     }
@@ -48,6 +63,15 @@ public class ServletContextUtil {
         return request.getRequestDispatcher(target);
     }
     public static void forward(HttpServletRequest request, HttpServletResponse response,String target) throws ServletException, IOException {
+        getDispatcher(request,target).forward(request,response);
+    }
+
+    public static void forward(HttpServletRequest request, HttpServletResponse response,String target,Object attrObj) throws ServletException, IOException {
+        request.setAttribute(FORWARD_DATA_ATTR_KEY,attrObj);
+        getDispatcher(request,target).forward(request,response);
+    }
+    public static void forward(HttpServletRequest request, HttpServletResponse response,String target,String attrKey,Object attrObj) throws ServletException, IOException {
+        request.setAttribute(attrKey,attrObj);
         getDispatcher(request,target).forward(request,response);
     }
 
