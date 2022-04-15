@@ -23,10 +23,10 @@ public class SecurityUser implements UserDetails {
     private String password;
     private  String username;
     private  Set<SecurityGrantedAuthority> authorities;
-    private  boolean accountNonExpired;
-    private  boolean accountNonLocked;
-    private  boolean credentialsNonExpired;
-    private  boolean enabled;
+    private  boolean accountNonExpired=true;
+    private  boolean accountNonLocked=true;
+    private  boolean credentialsNonExpired=true;
+    private  boolean enabled=true;
 
     public SecurityUser(User user){
         this(user.getUsername(),user.getPassword(),user.isEnabled(),user.isAccountNonExpired(),user.isCredentialsNonExpired(),user.isAccountNonLocked(),user.getAuthorities());
