@@ -14,7 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @Data
 @NoArgsConstructor
 @Remark("same as SimpleGrantedAuthority,but provide serializable")
-public class SecurityGrantedAuthority implements GrantedAuthority {
+public class SecurityGrantedAuthority implements GrantedAuthority,Comparable<GrantedAuthority> {
     private String authority;
 
     public SecurityGrantedAuthority(SimpleGrantedAuthority authority){
@@ -22,5 +22,10 @@ public class SecurityGrantedAuthority implements GrantedAuthority {
     }
     public SecurityGrantedAuthority(String authority){
         this.authority=authority;
+    }
+
+    @Override
+    public int compareTo(GrantedAuthority o) {
+        return this.getAuthority().compareTo(o.getAuthority());
     }
 }

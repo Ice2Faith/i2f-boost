@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.net.URLEncoder;
 
 @ConditionalOnExpression("${i2f.springboot.config.mvc.global-exception-handler.enable:true}")
 @Configuration
@@ -27,9 +28,15 @@ public class PublicExceptionResolver implements HandlerExceptionResolver {
         System.out.println("---------ex:"+e.getMessage());
         System.out.println("---Global Exception:");
         e.printStackTrace();
+        String exceptionClassName=e.getClass().getName();
 
         ModelAndView mv=new ModelAndView();
-        if(e instanceof NoHandlerFoundException){ //404 页面异常
+        if("org.springframework.security.access.AccessDeniedException".equals(exceptionClassName)){
+            responseException(httpServletResponse,
+                    ApiResp.error(401,"401,访问被拒了，你没有相应的权限."),e,
+                    mv);
+        }
+        else if(e instanceof NoHandlerFoundException){ //404 页面异常
             responseException(httpServletResponse,
                     ApiResp.error(404,"404,连接走丢了，请检查URL是否正确或联系管理员."),e,
                     mv);
@@ -43,7 +50,7 @@ public class PublicExceptionResolver implements HandlerExceptionResolver {
                     ApiResp.error("业务异常:"+e.getMessage()),e,
                     mv);
         }else{  //其他异常
-            mv.setViewName("redirect:http://www.baidu.com/s?wd="+e.getMessage());
+            mv.setViewName("redirect:http://www.baidu.com/s?wd="+ URLEncoder.encode(e.getMessage()));
             //mv.setViewName("redirect:https://so.csdn.net/so/search/s.do?q="+e.getMessage());
         }
         return mv;
@@ -52,6 +59,7 @@ public class PublicExceptionResolver implements HandlerExceptionResolver {
     private void responseException(HttpServletResponse response,ApiResp data,Throwable ex,ModelAndView mv){
         try {
             ex.printStackTrace();
+            response.setContentType("application/json;charset=utf-8");
             response.setStatus(200);
             response.getWriter().write(processor.toText(data));
         } catch (IOException ioException) {
