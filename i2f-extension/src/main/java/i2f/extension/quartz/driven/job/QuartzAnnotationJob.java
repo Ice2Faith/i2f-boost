@@ -14,8 +14,8 @@ import java.lang.reflect.Modifier;
 public class QuartzAnnotationJob implements Job {
     @SneakyThrows
     @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        Method method=(Method) QuartzUtil.getJobData(jobExecutionContext,"method");
+    public void execute(JobExecutionContext context) throws JobExecutionException {
+        Method method=(Method) QuartzUtil.getJobData(context,"method");
         if(Modifier.isStatic(method.getModifiers())){
             ReflectResolver.staticInvoke(method.getDeclaringClass(),method.getName());
         }else{

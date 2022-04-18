@@ -206,7 +206,7 @@ function status()
 
 function log()
 {
-    tail -f $LOG_PATH
+    tail -f -n 500 $LOG_PATH
 }
 
 function snapshot()
