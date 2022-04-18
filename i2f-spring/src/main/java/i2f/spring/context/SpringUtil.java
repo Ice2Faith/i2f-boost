@@ -177,6 +177,5 @@ public class SpringUtil implements
         return applicationContext.getBean(name, clazz);
     }
 
-
 }
 

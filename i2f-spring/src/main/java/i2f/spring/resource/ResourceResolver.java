@@ -12,8 +12,9 @@ import java.util.Set;
  * @desc
  */
 public class ResourceResolver {
+    public static volatile PathMatchingResourcePatternResolver resolver=new PathMatchingResourcePatternResolver();
+
     public static Resource[] resourceResolve(String location) throws Exception {
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         Set<Resource> resourceSet = new HashSet<>();
         if (location == null || "".equals(location)) {
             return new Resource[0];

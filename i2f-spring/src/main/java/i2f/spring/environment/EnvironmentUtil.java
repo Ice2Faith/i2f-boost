@@ -13,7 +13,8 @@ import java.util.Map;
  * @date 2022/3/26 16:57
  * @desc
  */
-public class EnvironmentUtil {
+public class EnvironmentUtil  {
+
     /**
      * 将环境处理为一个方便理解的数据结构
      * key表示每一个环境

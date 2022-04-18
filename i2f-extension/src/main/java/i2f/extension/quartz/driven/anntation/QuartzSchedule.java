@@ -1,5 +1,7 @@
 package i2f.extension.quartz.driven.anntation;
 
+import i2f.extension.quartz.driven.enums.ScheduleType;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -9,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface QuartzSchedule {
-    public enum ScheduleType{Interval,Cron};
 
     boolean value() default true;
 
@@ -23,6 +24,7 @@ public @interface QuartzSchedule {
 
     String cron() default "* * * * * ? *";
 
-    String id() ;
+    String name() ;
+
     String group() ;
 }
