@@ -26,5 +26,5 @@ public @interface QuartzSchedule {
 
     String name() ;
 
-    String group() ;
+    String group() default "";
 }

@@ -58,6 +58,9 @@ public class QuartzJobMeta {
         this.intervalCount=ann.intervalCount();
         this.cron=ann.cron();
 
+        if("".equals(this.group)){
+            this.group=null;
+        }
         return this;
     }
 
