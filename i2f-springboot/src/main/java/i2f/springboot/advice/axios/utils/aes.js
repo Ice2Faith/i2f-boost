@@ -2,15 +2,23 @@ import CryptoJS from 'crypto-js'
 import B64 from "./base64";
 
 const AES={
-  genKey(key){
+  genKey(key,minLen=16){
     if(!key || key==''){
       return 'A1B2C3D4E5F67870';
     }
+    if(minLen<16){
+      minLen=16;
+    }
+    let pi=0;
+    while(pi<minLen){
+      pi=pi+16;
+    }
+    minLen=pi;
     let idx=0;
     let adlen=0;
     let klen=key.length;
-    while((klen+adlen)%16!=0){
-      idx=((idx+3)*7)%klen;
+    while((klen+adlen)<minLen){
+      idx=((idx+3)*7)%(klen+adlen);
       key=key+key[idx];
       adlen++;
     }

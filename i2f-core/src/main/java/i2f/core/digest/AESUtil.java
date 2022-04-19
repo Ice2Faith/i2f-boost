@@ -1,6 +1,7 @@
 package i2f.core.digest;
 
 
+import i2f.core.annotations.notice.CloudBe;
 import i2f.core.annotations.notice.Nullable;
 import i2f.core.annotations.remark.Author;
 
@@ -15,15 +16,26 @@ import javax.crypto.spec.SecretKeySpec;
 public class AESUtil {
     public static final String CHAR_SET="UTF-8";
     public static String genKey(@Nullable String key){
+        return genKey(key,16);
+    }
+    public static String genKey(@Nullable String key,@CloudBe("<16") int minLen){
         if(key==null || "".equals(key)){
             return "A1B2C3D4E5F67870";
         }
+        if(minLen<16){
+            minLen=16;
+        }
+        int pi=0;
+        while(pi<minLen){
+            pi=pi+16;
+        }
+        minLen=pi;
         StringBuilder builder=new StringBuilder(key);
         int idx=0;
         int adlen=0;
         int klen=key.length();
-        while((klen+adlen)%16!=0){
-            idx=((idx+3)*7)%klen;
+        while((klen+adlen)<minLen){
+            idx=((idx+3)*7)%(klen+adlen);
             builder.append(key.charAt(idx));
             adlen++;
         }
@@ -61,7 +73,7 @@ public class AESUtil {
         }
         return null;
     }
-    public static String encryptJson(String json,String key){
+    public static String encryptAfterBase64(String json, String key){
         try{
             json=Base64Util.encode(json.getBytes(CHAR_SET));
             return encrypt(json.getBytes(CHAR_SET),key);
@@ -71,7 +83,7 @@ public class AESUtil {
         return null;
     }
 
-    public static String decryptJson(String data,String key){
+    public static String decryptBeforeBase64(String data, String key){
         try{
             byte[] sdata=decrypt(data, key);
             String json=new String(sdata,CHAR_SET);

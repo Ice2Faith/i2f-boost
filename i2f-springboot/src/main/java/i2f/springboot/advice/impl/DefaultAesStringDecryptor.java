@@ -29,6 +29,6 @@ public class DefaultAesStringDecryptor implements IStringDecryptor, Initializing
 
     @Override
     public String decrypt(String text) {
-        return AESUtil.decryptJson(text,adviceConfig.getAesKey());
+        return AESUtil.decryptBeforeBase64(text,adviceConfig.getAesKey());
     }
 }
