@@ -1,6 +1,7 @@
 package i2f.springboot.advice.impl;
 
 import i2f.core.digest.AESUtil;
+import i2f.spring.jackson.JacksonJsonProcessor;
 import i2f.springboot.advice.IStringDecryptor;
 import i2f.springboot.advice.RequestResponseAdviceConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,9 @@ import org.springframework.stereotype.Component;
 public class DefaultAesStringDecryptor implements IStringDecryptor, InitializingBean {
 
     @Autowired
+    private JacksonJsonProcessor processor;
+
+    @Autowired
     private RequestResponseAdviceConfig adviceConfig;
 
     @Override
@@ -29,6 +33,10 @@ public class DefaultAesStringDecryptor implements IStringDecryptor, Initializing
 
     @Override
     public String decrypt(String text) {
-        return AESUtil.decryptBeforeBase64(text,adviceConfig.getAesKey());
+        String json=AESUtil.decryptJsonBeforeBase64(text,adviceConfig.getAesKey());
+        if(json.startsWith("\"")){
+            json=processor.parseText(json,String.class);
+        }
+        return json;
     }
 }

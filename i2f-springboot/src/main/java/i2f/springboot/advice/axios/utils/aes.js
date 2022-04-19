@@ -2,7 +2,7 @@ import CryptoJS from 'crypto-js'
 import B64 from "./base64";
 
 const AES={
-  genKey(key,minLen=16){
+  genKey(key,minLen=32){
     if(!key || key==''){
       return 'A1B2C3D4E5F67870';
     }

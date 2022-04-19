@@ -16,7 +16,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class AESUtil {
     public static final String CHAR_SET="UTF-8";
     public static String genKey(@Nullable String key){
-        return genKey(key,16);
+        return genKey(key,32);
     }
     public static String genKey(@Nullable String key,@CloudBe("<16") int minLen){
         if(key==null || "".equals(key)){
@@ -73,7 +73,7 @@ public class AESUtil {
         }
         return null;
     }
-    public static String encryptAfterBase64(String json, String key){
+    public static String encryptJsonAfterBase64(String json, String key){
         try{
             json=Base64Util.encode(json.getBytes(CHAR_SET));
             return encrypt(json.getBytes(CHAR_SET),key);
@@ -83,7 +83,7 @@ public class AESUtil {
         return null;
     }
 
-    public static String decryptBeforeBase64(String data, String key){
+    public static String decryptJsonBeforeBase64(String data, String key){
         try{
             byte[] sdata=decrypt(data, key);
             String json=new String(sdata,CHAR_SET);

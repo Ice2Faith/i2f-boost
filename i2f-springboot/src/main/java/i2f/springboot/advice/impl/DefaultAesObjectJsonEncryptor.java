@@ -33,6 +33,6 @@ public class DefaultAesObjectJsonEncryptor implements IObjectEncryptor, Initiali
 
     @Override
     public String encrypt(Object obj) {
-        return AESUtil.encryptAfterBase64(processor.toText(obj),adviceConfig.getAesKey());
+        return AESUtil.encryptJsonAfterBase64(processor.toText(obj),adviceConfig.getAesKey());
     }
 }
