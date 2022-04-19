@@ -34,6 +34,7 @@ public class DefaultAesStringDecryptor implements IStringDecryptor, Initializing
     @Override
     public String decrypt(String text) {
         String json=AESUtil.decryptJsonBeforeBase64(text,adviceConfig.getAesKey());
+        // 当js直接使用JSON.stringify对string进行转换时，转换结果是带有双引号的，因此此处检测后去除
         if(json.startsWith("\"")){
             json=processor.parseText(json,String.class);
         }
