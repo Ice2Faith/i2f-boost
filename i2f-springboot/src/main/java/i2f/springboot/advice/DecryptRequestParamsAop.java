@@ -2,6 +2,7 @@ package i2f.springboot.advice;
 
 import i2f.core.annotations.remark.Remark;
 import i2f.core.reflect.core.ReflectResolver;
+import i2f.spring.jackson.JacksonJsonProcessor;
 import i2f.springboot.advice.annotation.SecureParams;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -29,6 +30,9 @@ public class DecryptRequestParamsAop implements InitializingBean {
 
     @Autowired
     private IStringDecryptor decryptor;
+
+    @Autowired
+    private JacksonJsonProcessor processor;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -66,6 +70,7 @@ public class DecryptRequestParamsAop implements InitializingBean {
             }
 
             String ddata=decryptor.decrypt(data);
+            ddata=processor.parseText(ddata,String.class);
             args[i]=ddata;
             hasProcess=true;
         }

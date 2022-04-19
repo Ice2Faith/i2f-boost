@@ -2,12 +2,12 @@ package i2f.extension.query;
 
 import i2f.core.reflect.ValueResolver;
 import i2f.core.reflect.core.ReflectResolver;
-import i2f.extension.json.jackson.JacksonUtil;
 import i2f.extension.query.annotation.EsField;
 import i2f.extension.query.annotation.EsId;
 import i2f.extension.query.annotation.EsIndex;
 import i2f.extension.query.annotation.EsQuery;
 import i2f.extension.query.enums.EsQueryType;
+import i2f.spring.jackson.JacksonUtil;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
