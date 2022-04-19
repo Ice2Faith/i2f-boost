@@ -36,7 +36,7 @@ public class AESUtil {
         int klen=key.length();
         while((klen+adlen)<minLen){
             idx=((idx+3)*7)%(klen+adlen);
-            builder.append(key.charAt(idx));
+            builder.append(builder.charAt(idx));
             adlen++;
         }
         return builder.toString();
