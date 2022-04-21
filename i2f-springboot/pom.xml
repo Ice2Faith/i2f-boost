@@ -151,5 +151,13 @@
             <artifactId>c3p0</artifactId>
             <version>0.9.5.4</version>
         </dependency>
+
+        <!-- shiro -->
+        <!-- 已经有shiro-starter,但是这里不用 -->
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-spring</artifactId>
+            <version>1.8.0</version>
+        </dependency>
     </dependencies>
 </project>
