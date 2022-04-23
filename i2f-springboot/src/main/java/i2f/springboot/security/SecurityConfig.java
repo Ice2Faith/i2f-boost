@@ -1,7 +1,5 @@
 package i2f.springboot.security;
 
-import i2f.core.api.ApiResp;
-import i2f.core.net.http.HttpStatus;
 import i2f.springboot.security.impl.JsonSupportUsernamePasswordAuthenticationFilter;
 import i2f.springboot.security.impl.LoginPasswordDecoder;
 import i2f.springboot.security.impl.UnAuthorizedHandler;
@@ -17,7 +15,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -31,8 +28,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author ltb
@@ -48,20 +43,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @ControllerAdvice
 @ConfigurationProperties(prefix = "i2f.springboot.config.security")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    @Value("${i2f.springboot.config.security.access-deny-exception-handler.enable:true}")
-    private boolean enableAccessDenyExceptionHandle;
-
-    // 处理权限不足异常
-    @ExceptionHandler(AccessDeniedException.class)
-    @ResponseBody
-    public Object exceptCatch(Exception e) throws Exception {
-        if(!enableAccessDenyExceptionHandle){
-            throw e;
-        }
-        e.printStackTrace();
-        return ApiResp.error(HttpStatus.FORBIDDEN,"access deny for access resource,permission missing!");
-    }
 
     @Value("${i2f.springboot.config.security.csrf.enable:false}")
     private boolean enableCsrf=false;

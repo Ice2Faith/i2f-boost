@@ -6,6 +6,7 @@ import i2f.spring.jackson.JacksonJsonProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -18,11 +19,13 @@ import java.net.URLEncoder;
 
 @ConditionalOnExpression("${i2f.springboot.config.mvc.global-exception-handler.enable:true}")
 @Configuration
+@Order(20000)
 public class PublicExceptionResolver implements HandlerExceptionResolver {
 
     @Autowired
     private JacksonJsonProcessor processor;
 
+    // 返回值不为null，表示已经处理，不会再进入其他处理器处理
     @Override
     public ModelAndView resolveException(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) {
         System.out.println("---------ex:"+e.getMessage());

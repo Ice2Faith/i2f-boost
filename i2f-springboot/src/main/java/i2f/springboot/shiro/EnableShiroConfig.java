@@ -16,6 +16,7 @@ import java.lang.annotation.*;
 @Documented
 @Import({
         ShiroConfig.class,
+        ShiroExceptionHandler.class,
 
         DefaultUsernamePasswordRealm.class,
 

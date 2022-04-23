@@ -4,12 +4,13 @@ import i2f.springboot.shiro.HashedCredentialsMatcherEncoder;
 import i2f.springboot.shiro.IShiroUser;
 import i2f.springboot.shiro.impl.UsernamePasswordRealm;
 import i2f.springboot.shiro.model.ShiroUser;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,7 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @ConditionalOnMissingBean(UsernamePasswordRealm.class)
 @Slf4j
-@Component
+@Data
+@Configuration
 @ConfigurationProperties("i2f.springboot.config.shiro.default")
 public class DefaultUsernamePasswordRealm extends UsernamePasswordRealm implements InitializingBean {
 

@@ -17,9 +17,10 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
-import org.apache.shiro.mgt.*;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.mgt.*;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,12 +131,22 @@ public class ShiroConfig  {
         return manager;
     }
 
+    // 支持session-less配置的subjectFactory
     @Bean
     public SubjectFactory subjectFactory(){
         SessionControlWebSubjectFactory factory=new SessionControlWebSubjectFactory(enableSession);
+        log.info("ShiroConfig SessionControlWebSubjectFactory config done.");
         return factory;
     }
 
+    // 得到支持注解权限验证的处理切面类，如：@RequiresRoles
+    @Bean
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(){
+        AuthorizationAttributeSourceAdvisor advisor=new AuthorizationAttributeSourceAdvisor();
+        advisor.setSecurityManager(securityManager());
+        log.info("ShiroConfig AuthorizationAttributeSourceAdvisor config done.");
+        return advisor;
+    }
 
     // 得到用户名密码登录方式的密码匹配器
     @Bean

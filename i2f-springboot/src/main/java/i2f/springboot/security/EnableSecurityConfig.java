@@ -21,6 +21,8 @@ import java.lang.annotation.*;
 @Documented
 @Import({
         SecurityConfig.class,PasswordEncoderConfig.class,
+        SecurityExceptionHandler.class,
+
         DisableSecurityConfig.class,
 
         SecurityForwardController.class,
