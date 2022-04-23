@@ -1,0 +1,12 @@
+# 此配置适用于nacos进行配置
+# 这将会在nacos对应的名称空间中，查找i2f-dev的配置
+# 配置文件规则：${spring.application.name}-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+# 遵循此配置查找配置文件
+spring:
+  application:
+    name: i2f
+  profiles:
+    active: dev
+  # 开启spring的aop配置
+  aop:
+    auto: true
