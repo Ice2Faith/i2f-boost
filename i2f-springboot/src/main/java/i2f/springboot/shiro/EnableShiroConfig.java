@@ -1,6 +1,7 @@
 package i2f.springboot.shiro;
 
-import i2f.springboot.shiro.def.DefaultUsernamePasswordRealm;
+import i2f.springboot.security.impl.SecurityForwardController;
+import i2f.springboot.shiro.def.*;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -16,7 +17,15 @@ import java.lang.annotation.*;
 @Import({
         ShiroConfig.class,
 
-        DefaultUsernamePasswordRealm.class
+        DefaultUsernamePasswordRealm.class,
+
+        SecurityForwardController.class,
+
+        DefaultCustomerTokenRealm.class,
+
+        DefaultLoginFailureHandler.class,
+        DefaultLoginSuccessHandler.class,
+        DefaultLogoutHandler.class
 })
 public @interface EnableShiroConfig {
 

@@ -39,6 +39,7 @@ public class DefaultUsernamePasswordRealm extends UsernamePasswordRealm implemen
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        log.info("DefaultUsernamePasswordRealm config done.");
         if(users==null || "".equals(users)){
             return;
         }

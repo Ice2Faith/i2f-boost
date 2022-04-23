@@ -3,6 +3,7 @@ package i2f.springboot.shiro.token;
 import i2f.springboot.shiro.IShiroUser;
 import i2f.springboot.shiro.impl.BasicShiroUserRealm;
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UnknownAccountException;
 
@@ -12,6 +13,11 @@ import org.apache.shiro.authc.UnknownAccountException;
  * @desc
  */
 public abstract class CustomerTokenRealm extends BasicShiroUserRealm {
+
+    @Override
+    protected void assertCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) throws AuthenticationException {
+        // token 验证方式不再需要检验匹配
+    }
 
     @Override
     public boolean isSupportToken(AuthenticationToken token) {

@@ -2,7 +2,12 @@ package i2f.springboot.shiro;
 
 import i2f.core.reflect.core.ReflectResolver;
 import i2f.spring.environment.EnvironmentUtil;
-import i2f.springboot.shiro.filter.ShiroTokenFilter;
+import i2f.springboot.security.impl.LoginPasswordDecoder;
+import i2f.springboot.shiro.def.DefaultLogoutHandler;
+import i2f.springboot.shiro.filter.ShiroCoreFilter;
+import i2f.springboot.shiro.handler.ILoginFailureHandler;
+import i2f.springboot.shiro.handler.ILoginSuccessHandler;
+import i2f.springboot.shiro.handler.ILogoutHandler;
 import i2f.springboot.shiro.impl.UsernamePasswordRealm;
 import i2f.springboot.shiro.token.CustomerTokenRealm;
 import lombok.Data;
@@ -41,7 +46,7 @@ import java.util.Map;
 @Configuration
 @ConfigurationProperties(prefix = "i2f.springboot.config.shiro")
 public class ShiroConfig  {
-    public static final String SHIRO_TOKEN_FILTER_NAME="tokenLoginFiler";
+    public static final String SHIRO_CORE_FILTER_NAME ="shiroCoreFiler";
     public static final String SHIRO_FILTER_CONF_PREFIX="i2f.springboot.config.shiro.filters.";
 
     @Autowired
@@ -62,8 +67,23 @@ public class ShiroConfig  {
     private String unauthorizedUrl="/unauth";
     private String logoutUrl="/logout";
 
+    private String usernameParameter ="username";
+    private String passwordParameter ="password";
+
     private String staticResourceWhiteList;
     private String customerWhiteList;
+
+    @Autowired(required = false)
+    private LoginPasswordDecoder passwordDecoder;
+
+    @Autowired
+    private ILoginSuccessHandler loginSuccessHandler;
+
+    @Autowired
+    private ILoginFailureHandler loginFailureHandler;
+
+    @Autowired
+    private ILogoutHandler logoutHandler;
 
     // 得到核心安全控制器
     @Bean
@@ -156,13 +176,38 @@ public class ShiroConfig  {
         bean.setFilterChainDefinitions(chains.toString());
 
         Map<String, Filter> filters=new HashMap<>();
-        if(customerTokenRealm!=null){
-            log.info("ShiroConfig filters "+SHIRO_TOKEN_FILTER_NAME+" config done.");
-            filters.put(SHIRO_TOKEN_FILTER_NAME,new ShiroTokenFilter(tokenName));
+        log.info("ShiroConfig filters "+ SHIRO_CORE_FILTER_NAME +" config done.");
+
+        if(logoutHandler instanceof DefaultLogoutHandler){
+            DefaultLogoutHandler handler=(DefaultLogoutHandler)logoutHandler;
+            handler.setTokenName(tokenName);
         }
-        filters.putAll(getFilters());
+
+        ShiroCoreFilter tokenFilter=new ShiroCoreFilter()
+                .setTokenName(tokenName)
+                .setLoginUrl(loginUrl)
+                .setUsernameParameter(usernameParameter)
+                .setPasswordParameter(passwordParameter)
+                .setPasswordDecoder(passwordDecoder)
+                .setLoginSuccessHandler(loginSuccessHandler)
+                .setLoginFailureHandler(loginFailureHandler)
+                .setLogoutUrl(logoutUrl)
+                .setLogoutHandler(logoutHandler)
+                .setEnableProcessToken(customerTokenRealm!=null);
+
+        filters.put(SHIRO_CORE_FILTER_NAME,tokenFilter);
+        Map<String,Filter> filterMap=getFilters();
+        filters.putAll(filterMap);
 
         bean.setFilters(filters);
+
+        List<String> globalFilters=new ArrayList<>();
+        globalFilters.add(SHIRO_CORE_FILTER_NAME);
+        for(String item : filterMap.keySet()){
+            globalFilters.add(item);
+        }
+
+        bean.setGlobalFilters(globalFilters);
         log.info("ShiroConfig ShiroFilterFactoryBean config done.");
         return bean;
     }
