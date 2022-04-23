@@ -7,6 +7,7 @@ import i2f.springboot.security.impl.LoginPasswordDecoder;
 import i2f.springboot.shiro.handler.ILoginFailureHandler;
 import i2f.springboot.shiro.handler.ILoginSuccessHandler;
 import i2f.springboot.shiro.handler.ILogoutHandler;
+import i2f.springboot.shiro.token.AbstractShiroTokenHolder;
 import i2f.springboot.shiro.token.CustomerAuthToken;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -49,6 +50,8 @@ public class ShiroCoreFilter extends OncePerRequestFilter {
     private ILogoutHandler logoutHandler;
 
     private boolean enableProcessToken=true;
+
+    private AbstractShiroTokenHolder tokenHolder;
 
     public ShiroCoreFilter setTokenName(String tokenName) {
         this.tokenName = tokenName;
@@ -100,6 +103,11 @@ public class ShiroCoreFilter extends OncePerRequestFilter {
         return this;
     }
 
+    public ShiroCoreFilter setTokenHolder(AbstractShiroTokenHolder tokenHolder) {
+        this.tokenHolder = tokenHolder;
+        return this;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         Subject subject=SecurityUtils.getSubject();
@@ -127,17 +135,16 @@ public class ShiroCoreFilter extends OncePerRequestFilter {
             return;
         }
 
-        if(!subject.isAuthenticated()){
-            if(enableProcessToken){
-                String token=ServletContextUtil.getToken(request,tokenName);
-                if(token!=null && !"".equals(token)){
-                    CustomerAuthToken authToken=new CustomerAuthToken(token);
-                    try{
-                        subject.login(authToken);
-                    }catch(AuthenticationException e){
-                        loginFailureHandler.handle(e,request,response);
-                        return;
-                    }
+        if(enableProcessToken){
+            String token=ServletContextUtil.getToken(request,tokenName);
+            if(token!=null && !"".equals(token)){
+                CustomerAuthToken authToken=new CustomerAuthToken(token);
+                try{
+                    subject.login(authToken);
+                    tokenHolder.refreshToken(token);
+                }catch(AuthenticationException e){
+                    loginFailureHandler.handle(e,request,response);
+                    return;
                 }
             }
         }

@@ -3,18 +3,21 @@ package i2f.springboot.shiro;
 import i2f.core.reflect.core.ReflectResolver;
 import i2f.spring.environment.EnvironmentUtil;
 import i2f.springboot.security.impl.LoginPasswordDecoder;
+import i2f.springboot.shiro.def.DefaultLoginSuccessHandler;
 import i2f.springboot.shiro.def.DefaultLogoutHandler;
 import i2f.springboot.shiro.filter.ShiroCoreFilter;
 import i2f.springboot.shiro.handler.ILoginFailureHandler;
 import i2f.springboot.shiro.handler.ILoginSuccessHandler;
 import i2f.springboot.shiro.handler.ILogoutHandler;
 import i2f.springboot.shiro.impl.UsernamePasswordRealm;
+import i2f.springboot.shiro.token.AbstractShiroTokenHolder;
 import i2f.springboot.shiro.token.CustomerTokenRealm;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.mgt.*;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -58,6 +61,11 @@ public class ShiroConfig  {
     @Autowired(required = false)
     private CustomerTokenRealm customerTokenRealm;
 
+    @Autowired(required = false)
+    private AbstractShiroTokenHolder tokenHolder;
+
+    private boolean enableSingleLogin=true;
+
     private String tokenName="token";
 
     private String matcherAlgoName="MD5";
@@ -72,6 +80,8 @@ public class ShiroConfig  {
 
     private String staticResourceWhiteList;
     private String customerWhiteList;
+
+    private boolean enableSession=false;
 
     @Autowired(required = false)
     private LoginPasswordDecoder passwordDecoder;
@@ -104,8 +114,26 @@ public class ShiroConfig  {
         DefaultWebSecurityManager manager=new DefaultWebSecurityManager();
         manager.setRealms(realms);
 
+        // 配置无状态session控制器
+        manager.setSubjectFactory(subjectFactory());
+        SubjectDAO subjectDAO=manager.getSubjectDAO();
+        if(subjectDAO instanceof DefaultSubjectDAO){
+            DefaultSubjectDAO dao=(DefaultSubjectDAO)subjectDAO;
+            SessionStorageEvaluator evaluator=dao.getSessionStorageEvaluator();
+            if(evaluator instanceof DefaultSessionStorageEvaluator){
+                DefaultSessionStorageEvaluator def=(DefaultSessionStorageEvaluator)evaluator;
+                def.setSessionStorageEnabled(enableSession);
+            }
+        }
+
         log.info("ShiroConfig SecurityManager config done.");
         return manager;
+    }
+
+    @Bean
+    public SubjectFactory subjectFactory(){
+        SessionControlWebSubjectFactory factory=new SessionControlWebSubjectFactory(enableSession);
+        return factory;
     }
 
 
@@ -183,6 +211,11 @@ public class ShiroConfig  {
             handler.setTokenName(tokenName);
         }
 
+        if(loginSuccessHandler instanceof DefaultLoginSuccessHandler){
+            DefaultLoginSuccessHandler handler=(DefaultLoginSuccessHandler)loginSuccessHandler;
+            handler.setEnableSingleLogin(enableSingleLogin);
+        }
+
         ShiroCoreFilter tokenFilter=new ShiroCoreFilter()
                 .setTokenName(tokenName)
                 .setLoginUrl(loginUrl)
@@ -193,7 +226,8 @@ public class ShiroConfig  {
                 .setLoginFailureHandler(loginFailureHandler)
                 .setLogoutUrl(logoutUrl)
                 .setLogoutHandler(logoutHandler)
-                .setEnableProcessToken(customerTokenRealm!=null);
+                .setEnableProcessToken(customerTokenRealm!=null)
+                .setTokenHolder(tokenHolder);
 
         filters.put(SHIRO_CORE_FILTER_NAME,tokenFilter);
         Map<String,Filter> filterMap=getFilters();

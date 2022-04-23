@@ -22,6 +22,7 @@ import java.lang.annotation.*;
         SecurityForwardController.class,
 
         DefaultCustomerTokenRealm.class,
+        DefaultShiroTokenHolder.class,
 
         DefaultLoginFailureHandler.class,
         DefaultLoginSuccessHandler.class,
