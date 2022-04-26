@@ -1,6 +1,6 @@
 package i2f.agent;
 
-import i2f.core.str.StringMatcher;
+import i2f.core.match.StringMatcher;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -62,7 +62,7 @@ public class InvokeTimeSysPrintClassesTransformer implements ClassFileTransforme
                 if (classNamePattens != null && classNamePattens.length > 0) {
                     boolean match = false;
                     for (String str : classNamePattens) {
-                        if (StringMatcher.match(str, fullName)) {
+                        if (StringMatcher.antClass().match(fullName, str)) {
                             match = true;
                             break;
                         }
