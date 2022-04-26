@@ -1,12 +1,11 @@
 #!/bin/bash
 
-
 # jar name
 AppName=$1
 # control option
 ctrlOption=$2
 
-# max wait timeout
+# max wait kill force timeout
 MAX_WAIT=30
 # enable shortcut shell
 ENUM_SHORTCUT_ENABLE=1
@@ -14,29 +13,58 @@ ENUM_SHORTCUT_DISABLE=0
 
 ENABLE_SHORTCUT=$ENUM_SHORTCUT_DISABLE
 
-#JVM参数
-JVM_OPTS="-Dname=$AppName  -Duser.timezone=Asia/Shanghai -Xms512M -Xmx512M -XX:PermSize=256M -XX:MaxPermSize=512M -XX:+HeapDumpOnOutOfMemoryError -XX:+PrintGCDateStamps  -XX:+PrintGCDetails -XX:NewRatio=1 -XX:SurvivorRatio=30 -XX:+UseParallelGC -XX:+UseParallelOldGC"
+# 个性化启动参数
+# springboot 环境变量配置
+# app.name
+APP_NAME=
+# app.env
+APP_ENV=
+# max.size
+LOG_MAX_SIZE=20MB
+# logging.config
+LOG_CONFIG_FILE=logback-spring.xml
+
+# jvm 配置
+# java home,use system default when empty
+JAVA_HOME=
+# not as opts when empty
+USER_TIME_ZONE=Asia/Shanghai
+# not as opts when empty
+XMS_SIZE=512M
+# not as opts when empty
+XMX_SIZE=512M
+# not as opts when empty
+PERM_SIZE=256M
+# not as opts when empty
+MAX_PERM_SIZE=512M
+# not as opts when empty
+DUMP_OOM=1
+# not as opts when empty
+PRINT_GC=1
+# not as opts when empty
+PARALLEL_GC=1
+# not as opts when empty
+NEW_RATIO=1
+# not as opts when empty
+SURVIVOR_RATIO=30
+
+# java executable path
+JAVA_PATH=java
+# use point java when java home not empty
+if [[ "$JAVA_HOME" -ne "" ]]; then
+  JAVA_PATH=${JAVA_HOME}/bin/java
+fi
+
 APP_HOME=`pwd`
+# jvm opts
+JVM_OPTS="-Dname=$AppName"
 LOG_DIR=${APP_HOME}/logs
 LOG_PATH=${LOG_DIR}/${AppName}.log
-PID_PATH=${APP_HOME}/pid.$AppName
-
-echo "-----------------------"
-echo "jarctrl.sh running..."
-echo "AppName: $AppName"
-echo "ctrlOption: $ctrlOption"
-echo "maxWait: $MAX_WAIT"
-echo "enableShortcut: $ENABLE_SHORTCUT"
-echo "jvmOpts: $JVM_OPTS"
-echo "appHome: $APP_HOME"
-echo "logDir: $LOG_DIR"
-echo "logPath: $LOG_PATH"
-echo "pidPath: $PID_PATH"
-echo "-----------------------"
+PID_PATH=${APP_HOME}/pid.$AppName.txt
 
 function help()
 {
-    echo -e "\033[0;31m please input 2nd arg:option \033[0m  \033[0;34m {start|stop|restart|shutdown|reboot|status|log|snapshot|backup|recovery|clean} \033[0m"
+    echo -e "\033[0;31m please input 2nd arg:option \033[0m  \033[0;34m {start|stop|restart|shutdown|reboot|status|log|snapshot|backup|recovery|clean|pack|unpack|pidstop|pidstart|pidreboot} \033[0m"
     echo -e "\033[0;34m start \033[0m : to run a jar which called AppName"
     echo -e "\033[0;34m stop \033[0m : to stop a jar which called AppName"
     echo -e "\033[0;34m restart \033[0m : to stop and run a jar which called AppName"
@@ -56,6 +84,70 @@ function help()
     exit 1
 }
 
+function prepareBootJvmOpts()
+{
+  if [[ "$USER_TIME_ZONE" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -Duser.timezone=$USER_TIME_ZONE"
+  fi
+  if [[ "$XMS_SIZE" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -Xms$XMS_SIZE"
+  fi
+  if [[ "$XMX_SIZE" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -Xmx$XMX_SIZE"
+  fi
+  if [[ "$PERM_SIZE" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -XX:PermSize=$PERM_SIZE"
+  fi
+  if [[ "$MAX_PERM_SIZE" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -XX:MaxPermSize=$MAX_PERM_SIZE"
+  fi
+  if [[ "$DUMP_OOM" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -XX:+HeapDumpOnOutOfMemoryError"
+  fi
+  if [[ "$PRINT_GC" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -XX:+PrintGCDateStamps  -XX:+PrintGCDetails"
+  fi
+  if [[ "$PARALLEL_GC" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -XX:+UseParallelGC -XX:+UseParallelOldGC"
+  fi
+  if [[ "$PARALLEL_GC" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -XX:+UseParallelGC -XX:+UseParallelOldGC"
+  fi
+  if [[ "$NEW_RATIO" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -XX:NewRatio=$NEW_RATIO"
+  fi
+  if [[ "$SURVIVOR_RATIO" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -XX:SurvivorRatio=$SURVIVOR_RATIO"
+  fi
+  if [[ "$APP_NAME" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -Dapp.name=$APP_NAME"
+  fi
+  if [[ "$APP_ENV" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -Dapp.env=$APP_ENV"
+  fi
+  if [[ "$LOG_MAX_SIZE" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -Dmax.size=$LOG_MAX_SIZE"
+  fi
+  if [[ "$LOG_CONFIG_FILE" -ne "" ]]; then
+    JVM_OPTS="$JVM_OPTS -Dlogging.config=$LOG_CONFIG_FILE"
+  fi
+}
+
+prepareBootJvmOpts
+
+echo "-----------------------"
+echo "jarctrl.sh running..."
+echo "AppName: $AppName"
+echo "ctrlOption: $ctrlOption"
+echo "maxWait: $MAX_WAIT"
+echo "enableShortcut: $ENABLE_SHORTCUT"
+echo "jvmOpts: $JVM_OPTS"
+echo "appHome: $APP_HOME"
+echo "logDir: $LOG_DIR"
+echo "logPath: $LOG_PATH"
+echo "pidPath: $PID_PATH"
+echo "-----------------------"
+
 if [ "$ctrlOption" = "" ];
 then
     help
@@ -66,6 +158,7 @@ then
     echo -e "\033[0;31m please input 1st arg:appName \033[0m"
     exit 1
 fi
+
 
 PID=""
 function query()
@@ -94,7 +187,7 @@ function start()
     else
         chmod a+x $AppName
         mkdir ${LOG_DIR}
-        nohup java -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 &
+        nohup $JAVA_PATH -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 &
         chmod a+r $LOG_DIR/*.log
         echo "Start $AppName success..."
         sleep 3
@@ -273,6 +366,9 @@ function pidstop()
   else
     echo "not pid found."
   fi
+
+  CMD="pidstop"
+  mkcmd
 }
 
 function pidstart()
@@ -291,9 +387,12 @@ function pidstart()
   echo "" > $PID_PATH
   chmod a+x $AppName
   mkdir ${LOG_DIR}
-  nohup java -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 & echo $! > $PID_PATH
+  nohup JAVA_PATH -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 & echo $! > $PID_PATH
   chmod a+r $LOG_DIR/*.log
   echo "Start $AppName success..."
+
+  CMD="pidstart"
+  mkcmd
 }
 
 function pidreboot()
@@ -301,6 +400,9 @@ function pidreboot()
     pidstop
     sleep 2
     pidstart
+
+  CMD="pidreboot"
+  mkcmd
 }
 
 case $ctrlOption in
