@@ -5,6 +5,11 @@ AppName=$1
 # control option
 ctrlOption=$2
 
+# AppName jar relative this bash's location
+# when jar in parent dir
+# it should be ..
+jarRelativePath=
+
 # max wait kill force timeout
 MAX_WAIT=30
 # enable shortcut shell
@@ -56,6 +61,11 @@ if [[ "$JAVA_HOME" -ne "" ]]; then
 fi
 
 APP_HOME=`pwd`
+if [[ "$jarRelativePath" -ne "" ]]; then
+  APP_HOME="$(cd `dirname $0`/$jarRelativePath; pwd)"
+  cd ${APP_HOME}
+fi
+
 # jvm opts
 JVM_OPTS="-Dname=$AppName"
 LOG_DIR=${APP_HOME}/logs
