@@ -56,7 +56,7 @@ public class BloomFilter<T> implements ICheckFilter<T>{
         cleanBits();
     }
 
-    protected void cleanBits(){
+    public void cleanBits(){
         for(int i=0;i<bits.length;i++){
             bits[i]=0;
         }
