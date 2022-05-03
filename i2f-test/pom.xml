@@ -159,6 +159,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+            <version>7.10.0.Final</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -190,7 +196,7 @@
                             <!-- 添加classpath,指定classpath前缀，指定启动类 -->
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.i2f.test.I2fTestApplication</mainClass>
+                            <mainClass>com.i2f.demo.I2fTestApplication</mainClass>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>

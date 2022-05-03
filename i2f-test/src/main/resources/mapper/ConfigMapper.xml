@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-    <mapper namespace="com.i2f.test.modules.mybatis.mapper.ConfigMapper">
+    <mapper namespace="com.i2f.demo.modules.mybatis.mapper.ConfigMapper">
 
 	<sql id="qryProxy">
 		select
@@ -33,7 +33,7 @@
 		<include refid="qryProxy"></include>
 	</select>
 
-	<select id="qryDomain" resultType="com.i2f.test.modules.mybatis.domain.ConfigDomain">
+	<select id="qryDomain" resultType="com.i2f.demo.modules.mybatis.domain.ConfigDomain">
 		<include refid="qryProxy"></include>
 	</select>
 

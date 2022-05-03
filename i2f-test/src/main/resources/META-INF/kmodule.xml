@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<kmodule xmlns="http://www.drools.org/xsd/kmodule">
+
+    <!--
+    指定kbase名称name,唯一即可；
+    指定扫描规则的路径drools,也就是在resources下面的drools路径下；
+    指定为默认kbase
+     -->
+    <kbase name="defaultBase" packages="drools" default="true">
+        <!--
+         指定ksession名称name，唯一即可；
+         指定为默认ksession
+         -->
+        <ksession name="defaultSession" default="true"/>
+    </kbase>
+</kmodule>

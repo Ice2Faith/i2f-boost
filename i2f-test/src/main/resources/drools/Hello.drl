@@ -1,0 +1,45 @@
+// 逻辑的包，其实就是命名空间的概念
+package drools.hello
+// 导入引用的包
+import com.i2f.demo.console.drools.model.HelloDto
+
+// 定义多个规则，名称唯一即可
+rule "规则(-&,10)"
+    when
+        // 规则的匹配条件
+        // 匹配输入为HelloDto类型的，其中匹配到input值小于10的，在规则内引用别名为$dto
+        // 因此，条件为：类型为HelloDto,并且HelloDto.input<10时，将这个HelloDto起别名为$dto
+        $dto:HelloDto(input<10)
+    then
+        // 当匹配到此规则时，要执行的操作
+        // 前面建立了别名引用，因此直接使用即可
+        // 同时，这里也是允许写java代码的
+        $dto.setOutput($dto.getInput());
+        System.out.println("规则匹配：规则(-&,10)，输入="+$dto.getInput()+"，输出="+$dto.getOutput());
+end
+
+// 再定义其他几个规则
+rule "规则[10,20)"
+    when
+        $dto:HelloDto(input>=10 && input<20)
+    then
+        $dto.setOutput($dto.getInput()-5);
+        System.out.println("规则匹配：规则[10,20)，输入="+$dto.getInput()+"，输出="+$dto.getOutput());
+end
+
+
+rule "规则[20,30)"
+    when
+        $dto:HelloDto(input>=20 && input<30)
+    then
+        $dto.setOutput($dto.getInput()-(Math.random()*5));
+        System.out.println("规则匹配：规则[20,30)，输入="+$dto.getInput()+"，输出="+$dto.getOutput());
+end
+
+rule "规则[30,+&)"
+    when
+        $dto:HelloDto(input>=30)
+    then
+        $dto.setOutput($dto.getInput()-(Math.random()*10));
+        System.out.println("规则匹配：规则[30,+&)，输入="+$dto.getInput()+"，输出="+$dto.getOutput());
+end
