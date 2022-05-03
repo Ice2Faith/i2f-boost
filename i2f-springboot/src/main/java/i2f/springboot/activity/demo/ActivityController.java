@@ -20,6 +20,8 @@ import java.util.Map;
  * @author ltb
  * @date 2022/5/3 16:01
  * @desc 流程引擎测试启动控制类
+ * 注意，这里的返回值都是用了从新包装一个Map进行返回
+ * 一个主要原因是，原始的返回值中，存在JSON序列化问题，导致接口返回信息失败！
  */
 //@RestController
 @RequestMapping("activity")
