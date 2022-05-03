@@ -3,6 +3,7 @@ package i2f.springboot.shiro.def;
 import i2f.core.api.ApiResp;
 import i2f.springboot.security.SecurityForwardUtil;
 import i2f.springboot.shiro.IShiroUser;
+import i2f.springboot.shiro.ShiroConfig;
 import i2f.springboot.shiro.handler.ILoginSuccessHandler;
 import i2f.springboot.shiro.token.AbstractShiroTokenHolder;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +26,7 @@ import java.util.UUID;
  * @date 2022/4/23 17:46
  * @desc
  */
+@ConditionalOnBean(ShiroConfig.class)
 @ConditionalOnMissingBean(ILoginSuccessHandler.class)
 @Component
 @Slf4j

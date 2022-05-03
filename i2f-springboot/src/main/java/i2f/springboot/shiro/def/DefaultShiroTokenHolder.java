@@ -2,8 +2,10 @@ package i2f.springboot.shiro.def;
 
 import i2f.core.cache.ICache;
 import i2f.core.cache.MemCache;
+import i2f.springboot.shiro.ShiroConfig;
 import i2f.springboot.shiro.token.AbstractShiroTokenHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2022/4/7 11:05
  * @desc
  */
+@ConditionalOnBean(ShiroConfig.class)
 @ConditionalOnMissingBean(AbstractShiroTokenHolder.class)
 @Slf4j
 @Component
