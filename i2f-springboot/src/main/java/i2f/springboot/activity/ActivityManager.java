@@ -341,4 +341,172 @@ public class ActivityManager {
 
         repositoryService.deleteDeployment(deploymentId, cascade);
     }
+
+    /**
+     * 挂起所有流程实例
+     * @param key 流程定义key
+     * @return  被挂起的流程实例数量
+     */
+    public int suspendAllInstance(String key){
+        RepositoryService repositoryService= processEngine.getRepositoryService();
+
+        List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey(key)
+                .list();
+        int cnt=0;
+        for(ProcessDefinition item : list){
+            if(!item.isSuspended()){
+                String defId=item.getId();
+                repositoryService.suspendProcessDefinitionById(defId,true,null);
+                cnt++;
+            }
+        }
+
+        return cnt;
+    }
+
+    /**
+     * 激活所有流程实例
+     * @param key 流程定义key
+     * @return 被激活的实例数量
+     */
+    public int activeAllInstance(String key){
+        RepositoryService repositoryService= processEngine.getRepositoryService();
+
+        List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey(key)
+                .list();
+        int cnt=0;
+        for(ProcessDefinition item : list){
+            if(item.isSuspended()){
+                String defId=item.getId();
+                repositoryService.activateProcessDefinitionById(defId,true,null);
+                cnt++;
+            }
+        }
+
+        return cnt;
+    }
+
+    /**
+     * 挂起一个指定的流程
+     * @param instanceId 流程实例ID
+     * @return 找到的流程对象，如果返回值为null,则该流程不存在
+     */
+    public ProcessInstance suspendInstance(String instanceId){
+        RuntimeService runtimeService= processEngine.getRuntimeService();
+
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(instanceId)
+                .singleResult();
+
+        if(instance!=null && !instance.isSuspended()){
+            runtimeService.suspendProcessInstanceById(instanceId);
+        }
+        return instance;
+    }
+
+    /**
+     * 激活一个指定的流程
+     * @param instanceId 流程实例ID
+     * @return 找到的流程对象，如果返回值为null,则该流程不存在
+     */
+    public ProcessInstance activeInstance(String instanceId){
+        RuntimeService runtimeService= processEngine.getRuntimeService();
+
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(instanceId)
+                .singleResult();
+
+        if(instance!=null && instance.isSuspended()){
+            runtimeService.activateProcessInstanceById(instanceId);
+        }
+        return instance;
+    }
+
+    /**
+     * 获取候选人可处理的组任务列表
+     * @param key 流程定义key
+     * @param candidateUser 候选人
+     * @return
+     */
+    public List<Task> queryGroupTaskByCandidateUser(String key,String candidateUser){
+        TaskService taskService= processEngine.getTaskService();
+
+        List<Task> list = taskService.createTaskQuery()
+                .processDefinitionKey(key)
+                .taskCandidateUser(candidateUser)
+                .list();
+
+        return list;
+    }
+
+    /**
+     * 拾取任务，从组任务中拾取任务
+     * @param taskId 任务ID
+     * @param assignee 负责人
+     * @return 如果不能够拾取，则返回值为null
+     */
+    public Task claimGroupTask(String taskId,String assignee){
+        TaskService taskService= processEngine.getTaskService();
+
+        Task task = taskService.createTaskQuery()
+                .taskId(taskId)
+                .taskCandidateUser(assignee)
+                .singleResult();
+
+        if(task!=null){
+            taskService.claim(taskId,assignee);
+        }
+
+        return task;
+    }
+
+    /**
+     * 归还任务，将任务重新归还到组任务中
+     * @param taskId 任务ID
+     * @param assignee 现在的负责人
+     * @return
+     */
+    public Task returnGroupTask(String taskId,String assignee){
+        TaskService taskService= processEngine.getTaskService();
+
+        Task task = taskService.createTaskQuery()
+                .taskId(taskId)
+                .taskAssignee(assignee)
+                .singleResult();
+
+        if(task!=null){
+            taskService.setAssignee(taskId,null);
+        }
+
+        return task;
+    }
+
+    /**
+     * 任务转派，将任务从新派发给另一个人处理
+     * @param taskId 任务ID
+     * @param oldAssignee 原负责人
+     * @param newAssignee 新负责人
+     * @return
+     */
+    public Task redirectGroupTask(String taskId,String oldAssignee,String newAssignee){
+        TaskService taskService= processEngine.getTaskService();
+
+        Task task = taskService.createTaskQuery()
+                .taskId(taskId)
+                .taskAssignee(oldAssignee)
+                .singleResult();
+
+        Task ntask = taskService.createTaskQuery()
+                .taskId(taskId)
+                .taskCandidateUser(newAssignee)
+                .singleResult();
+
+        if(task!=null && ntask!=null){
+            taskService.setAssignee(taskId,newAssignee);
+        }
+
+        return task;
+    }
 }

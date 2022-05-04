@@ -6,14 +6,18 @@ Content-Type: application/x-www-form-urlencoded
 
 # 开始一个流程，并设置初始的流程节点人员
 # 注意，这里为了展示动态负责人修改，后面的人员名称会被修改
+# 注意，这里增加了一个分支判断，当days的值大于等于3时，需要部门经理审批
+# 小于3时，直接二级主管审批之后直接到人事归档
 POST http://localhost:8090/activity/start
 Content-Type: application/json
 
 {
   "gm": "gm",
   "dm": "dm",
-  "hr": "hr"
+  "hr": "hr",
+  "days": 3
 }
+
 
 ###
 # 查询实例列表，应该有一条流程
@@ -26,7 +30,8 @@ Content-Type: application/x-www-form-urlencoded
 POST http://localhost:8090/activity/instance/history
 Content-Type: application/x-www-form-urlencoded
 
-instanceId=10001
+instanceId=19
+
 
 ###
 # 查询gm这个人的任务列表，因为流程开始之后，第一个负责人就是gm
@@ -36,23 +41,30 @@ Content-Type: application/x-www-form-urlencoded
 
 who=gm
 
+
 ###
 # gm完成他的任务，并且变更下一个负责人为ndm
-POST http://localhost:8090/activity/task/complete/10008
+# 完成这一个任务之后的下一个任务将会根据条件进行选择分支
+# 所以，在这里可以更新days的值，使得分支发生变化
+# 如果 days >= 3,则需要部门经理审批之后，再到人事归档
+# 如果 days < 3,则直接人事归档
+POST http://localhost:8090/activity/task/complete/27
 Content-Type: application/json
 
 {
   "gm": "gm",
   "dm": "ndm",
-  "hr": "hr"
+  "hr": "nhr",
+  "days": 3
 }
+
 
 ###
 # 可以在此查看进度，流程流转
 POST http://localhost:8090/activity/instance/history
 Content-Type: application/x-www-form-urlencoded
 
-instanceId=10001
+instanceId=19
 
 
 ###
@@ -65,13 +77,15 @@ who=ndm
 
 ###
 # ndm 也完成自己的任务，并重新交给nhr负责
-POST http://localhost:8090/activity/task/complete/12502
+# 此时分支处理已经结束，再次变更days的值已经无效
+POST http://localhost:8090/activity/task/complete/30
 Content-Type: application/json
 
 {
   "gm": "gm",
   "dm": "ndm",
-  "hr": "nhr"
+  "hr": "nhr",
+  "days": 3
 }
 
 
@@ -80,7 +94,7 @@ Content-Type: application/json
 POST http://localhost:8090/activity/instance/history
 Content-Type: application/x-www-form-urlencoded
 
-instanceId=10001
+instanceId=19
 
 ###
 # nhr查看自己的任务
@@ -89,25 +103,31 @@ Content-Type: application/x-www-form-urlencoded
 
 who=nhr
 
+
 ###
 # nhr完成自己的任务，流程结束
-POST http://localhost:8090/activity/task/complete/15002
+# 一样的，此时流程的分支已经处理了，再更新days值没有影响
+POST http://localhost:8090/activity/task/complete/33
 Content-Type: application/json
 
 {
   "gm": "gm",
   "dm": "ndm",
-  "hr": "nhr"
+  "hr": "nhr",
+  "days": 3
 }
+
 
 ###
 # 可以看到所有流程结束
 POST http://localhost:8090/activity/instance/history
 Content-Type: application/x-www-form-urlencoded
 
-instanceId=10001
+instanceId=19
+
 
 ###
 # 此时查询实例列表，已经没有记录了
 POST http://localhost:8090/activity/instance/list
 Content-Type: application/x-www-form-urlencoded
+

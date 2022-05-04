@@ -11,17 +11,25 @@
         <!-- 一个流程至少有开始和结束，也就是startEvent和endEvent -->
         <!-- 流程中可以有若干和任务，比如用户任务userTask和服务任务serviceTask -->
         <!-- 每个任务之间通过有向连线表示关联关系，也就是sequenceFlow，从原点sourceRef连接到终点targetRef -->
+
         <endEvent id="endRequest" name="结束请假流程"/>
         <sequenceFlow sourceRef="startRequest" targetRef="secondManageAduit" id="startRequest-secondManageAduit"/>
+        <sequenceFlow sourceRef="humanResourceRecords" targetRef="endRequest" id="humanResourceRecords-endRequest"/>
         <sequenceFlow sourceRef="secondManageAduit" targetRef="departmentManageAduit"
-                      id="secondManageAduit-departmentManageAduit"/>
+                      id="secondManageAduit-departmentManageAduit">
+                <conditionExpression xsi:type="tFormalExpression"><![CDATA[ ${days >= 3} ]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow sourceRef="secondManageAduit" targetRef="humanResourceRecords"
+                      id="secondManageAduit-humanResourceRecords">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[ ${days < 3} ]]></conditionExpression>
+        </sequenceFlow>
         <sequenceFlow sourceRef="departmentManageAduit" targetRef="humanResourceRecords"
                       id="departmentManageAduit-humanResourceRecords"/>
-        <sequenceFlow sourceRef="humanResourceRecords" targetRef="endRequest" id="humanResourceRecords-endRequest"/>
 
         <!-- 对于一个用户任务来说，最重要的就是负责人，也就是谁来处理这个任务，就是assignee -->
         <!-- 在这里的负责人，使用UEL表达式取值，从流程变量中获取变量 -->
         <!-- 比如这里的${gm}就表示从流程变量中获取叫做gm的变量，流程变量实际是一个map,所以就等于map.gm -->
+
         <userTask id="secondManageAduit" name="二级主管审批" activiti:assignee="${gm}" />
         <userTask id="departmentManageAduit" name="部门经理审批" activiti:assignee="${dm}"/>
         <userTask id="humanResourceRecords" name="人事归档" activiti:assignee="${hr}"/>
@@ -41,7 +49,7 @@
                 <omgdc:Bounds height="48.0" width="120.0" x="174.0" y="154.0"/>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="departmentManageAduit">
-                <omgdc:Bounds height="48.0" width="120.0" x="180.0" y="282.0"/>
+                <omgdc:Bounds height="48.0" width="120.0" x="380.0" y="282.0"/>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="humanResourceRecords">
                 <omgdc:Bounds height="48.0" width="120.0" x="181.0" y="412.0"/>
@@ -51,17 +59,21 @@
                 <omgdi:waypoint x="247.0" y="58.0"/>
                 <omgdi:waypoint x="234.0" y="178.0"/>
             </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="secondManageAduit-departmentManageAduit">
-                <omgdi:waypoint x="234.0" y="178.0"/>
-                <omgdi:waypoint x="240.0" y="306.0"/>
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="departmentManageAduit-humanResourceRecords">
-                <omgdi:waypoint x="240.0" y="306.0"/>
-                <omgdi:waypoint x="241.0" y="436.0"/>
-            </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="humanResourceRecords-endRequest">
                 <omgdi:waypoint x="241.0" y="436.0"/>
                 <omgdi:waypoint x="205.0" y="589.0"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="secondManageAduit-departmentManageAduit">
+                <omgdi:waypoint x="234.0" y="178.0"/>
+                <omgdi:waypoint x="440.0" y="306.0"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="secondManageAduit-humanResourceRecords">
+                <omgdi:waypoint x="234.0" y="178.0"/>
+                <omgdi:waypoint x="241.0" y="436.0"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="departmentManageAduit-humanResourceRecords">
+                <omgdi:waypoint x="440.0" y="306.0"/>
+                <omgdi:waypoint x="241.0" y="436.0"/>
             </bpmndi:BPMNEdge>
         </bpmndi:BPMNPlane>
     </bpmndi:BPMNDiagram>
