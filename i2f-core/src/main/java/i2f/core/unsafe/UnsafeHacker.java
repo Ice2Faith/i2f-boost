@@ -1,6 +1,7 @@
 package i2f.core.unsafe;
 
 import i2f.core.exception.BoostException;
+import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -53,6 +54,9 @@ public class UnsafeHacker {
     }
     public static String addressHexOf(Object obj){
         return String.format("0x%08X",addressOf(obj));
+    }
+    public static long sizeOf(Object obj){
+        return ObjectSizeCalculator.getObjectSize(obj);
     }
 
 }
