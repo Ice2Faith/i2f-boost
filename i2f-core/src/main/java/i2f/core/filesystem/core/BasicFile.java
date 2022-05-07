@@ -2,6 +2,8 @@ package i2f.core.filesystem.core;
 
 import i2f.core.filesystem.IFile;
 import i2f.core.filesystem.IFileSystem;
+import i2f.core.thread.impl.ArgsRunnable;
+import i2f.core.thread.impl.ParallelTaskRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -180,8 +182,48 @@ public class BasicFile implements IFile {
             List<IFile> files=listFiles();
             for(IFile item : files){
                 dstPath=dstPath+fileSystem.getPathOperator()+item.getName();
-                item.copyAllTo(dstPath,overwrite);
+                item.copyTo(dstPath,overwrite);
             }
+        }
+        return true;
+    }
+
+    public boolean parallelCopyAllTo(String dstPath, boolean overwrite) throws IOException, InterruptedException {
+        IFileSystem fileSystem=getFileSystem();
+        if(!fileSystem.exists(path)){
+            return true;
+        }
+        if(fileSystem.isFile(path)){
+            return fileSystem.copyTo(path,dstPath,overwrite);
+        }
+        if(fileSystem.isDirectory(path)){
+            dstPath=dstPath+fileSystem.getPathOperator()+fileSystem.getName(path);
+            if(!fileSystem.exists(dstPath)){
+                fileSystem.mkdirs(dstPath);
+            }
+            List<IFile> dirs=listDirectories();
+            for(IFile item : dirs){
+                item.copyAllTo(dstPath, overwrite);
+            }
+            List<IFile> files=listFiles();
+            ParallelTaskRunner runner=new ParallelTaskRunner();
+            for(IFile item : files){
+                dstPath=dstPath+fileSystem.getPathOperator()+item.getName();
+                runner.addTask(new ArgsRunnable(dstPath,item,overwrite) {
+                    @Override
+                    public void doTask(Object... args) {
+                        String dstPath=(String)args[0];
+                        IFile item=(IFile)args[1];
+                        boolean overwrite=(Boolean) args[2];
+                        try{
+                            item.copyTo(dstPath,overwrite);
+                        }catch(Exception e){
+
+                        }
+                    }
+                });
+            }
+            runner.parallel();
         }
         return true;
     }
@@ -207,8 +249,51 @@ public class BasicFile implements IFile {
             List<IFile> files=listFiles();
             for(IFile item : files){
                 dstPath=dstPath+fileSystem.getPathOperator()+item.getName();
-                item.moveAllTo(dstPath,overwrite);
+                item.moveTo(dstPath,overwrite);
             }
+
+            fileSystem.delete(path);
+        }
+        return true;
+    }
+
+    public boolean parallelMoveAllTo(String dstPath,boolean overwrite) throws IOException, InterruptedException {
+        IFileSystem fileSystem=getFileSystem();
+        if(!fileSystem.exists(path)){
+            return true;
+        }
+        if(fileSystem.isFile(path)){
+            return fileSystem.moveTo(path,dstPath,overwrite);
+        }
+        if(fileSystem.isDirectory(path)){
+            dstPath=dstPath+fileSystem.getPathOperator()+fileSystem.getName(path);
+            if(!fileSystem.exists(dstPath)){
+                fileSystem.mkdirs(dstPath);
+            }
+            List<IFile> dirs=listDirectories();
+            for(IFile item : dirs){
+                item.moveAllTo(dstPath, overwrite);
+            }
+            List<IFile> files=listFiles();
+
+            ParallelTaskRunner runner=new ParallelTaskRunner();
+            for(IFile item : files){
+                dstPath=dstPath+fileSystem.getPathOperator()+item.getName();
+                runner.addTask(new ArgsRunnable(dstPath,item,overwrite) {
+                    @Override
+                    public void doTask(Object... args) {
+                        String dstPath=(String)args[0];
+                        IFile item=(IFile)args[1];
+                        boolean overwrite=(Boolean) args[2];
+                        try{
+                            item.moveTo(dstPath,overwrite);
+                        }catch(Exception e){
+
+                        }
+                    }
+                });
+            }
+            runner.parallel();
             fileSystem.delete(path);
         }
         return true;
