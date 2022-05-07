@@ -30,7 +30,15 @@ public class ParallelTaskRunner{
         return this;
     }
     public void parallel() throws InterruptedException {
-        latch=new CountDownLatch(runs.size());
+        parallelCount(Integer.MAX_VALUE);
+    }
+
+    public void parallelOne() throws InterruptedException {
+        parallelCount(1);
+    }
+
+    private void parallelCount(int count) throws InterruptedException {
+        latch=new CountDownLatch(Math.min(runs.size(),count));
         for(Runnable item : runs){
             ParallelTaskProxyRunnable task=new ParallelTaskProxyRunnable(item,latch);
             if(pool!=null){
