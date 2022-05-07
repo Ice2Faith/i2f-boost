@@ -5,6 +5,7 @@ import i2f.core.collection.adapter.EnumerationIteratorAdapter;
 import i2f.core.collection.adapter.IterableIteratorAdapter;
 import i2f.core.collection.adapter.ReflectArrayIteratorAdapter;
 
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -303,4 +304,44 @@ public class Appender<T extends Appendable> {
         return adds(new ArrayIteratorAdapter<>(arr),separator,open,close);
     }
 
+    public Appender<T> addStrBytes(byte[] bytes){
+        return add(new String(bytes));
+    }
+    public Appender<T> addStrBytes(byte[] bytes,String charset) throws UnsupportedEncodingException {
+        return add(new String(bytes,charset));
+    }
+    public Appender<T> addHexBytes(byte[] bytes){
+        return addHexBytes(bytes,"0x",",");
+    }
+    public Appender<T> addHexBytes(byte[] bytes,Object prefix,Object separator){
+        for (int i = 0; i < bytes.length; i++) {
+            if(i!=0){
+                if(separator!=null){
+                    add(separator);
+                }
+            }
+            if(prefix!=null){
+                add(prefix);
+            }
+            addFormat("%02X",bytes[i]&0x0ff);
+        }
+        return this;
+    }
+    public Appender<T> addOtcBytes(byte[] bytes){
+        return addOtcBytes(bytes,"0",",");
+    }
+    public Appender<T> addOtcBytes(byte[] bytes,Object prefix,Object separator){
+        for (int i = 0; i < bytes.length; i++) {
+            if(i!=0){
+                if(separator!=null){
+                    add(separator);
+                }
+            }
+            if(prefix!=null){
+                add(prefix);
+            }
+            addFormat("%03o",bytes[i]&0x0ff);
+        }
+        return this;
+    }
 }
