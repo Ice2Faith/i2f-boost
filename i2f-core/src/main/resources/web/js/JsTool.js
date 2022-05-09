@@ -2325,7 +2325,7 @@ window.$dlg={
             max:100,
             step:1,
 
-            modal: false
+            modal: true
         }
 
         $obj.copyObj2(config,defaultConfig);
