@@ -1,6 +1,8 @@
 package i2f.extension.aspectj;
 
 import i2f.core.proxy.IProxyHandler;
+import i2f.core.zplugin.inject.InjectProxyHandler;
+import i2f.core.zplugin.inject.core.InjectProvider;
 import i2f.core.zplugin.validate.ValidateProxyHandler;
 import i2f.extension.aspectj.core.AspectjProxy;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -20,6 +22,14 @@ public class AspectjUtil {
     }
     public static Object validate(ProceedingJoinPoint pjp) throws Throwable{
         AspectjProxy proxy=proxy(new ValidateProxyHandler());
+        return proxy.invoke(pjp);
+    }
+    public static Object inject(ProceedingJoinPoint pjp, InjectProvider provider) throws Throwable{
+        AspectjProxy proxy=proxy(new InjectProxyHandler(provider));
+        return proxy.invoke(pjp);
+    }
+    public static Object inject(ProceedingJoinPoint pjp) throws Throwable{
+        AspectjProxy proxy=proxy(new InjectProxyHandler(InjectProvider.provider()));
         return proxy.invoke(pjp);
     }
 }
