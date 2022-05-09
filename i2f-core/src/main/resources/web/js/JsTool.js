@@ -1939,6 +1939,8 @@ window.$dlg={
             attachDom:null,
             ctrlHeight:20,
             background:'white',
+
+            modal:true
         };
 
         $obj.copyObj2(config,defaultConfig);
@@ -1961,15 +1963,33 @@ window.$dlg={
         if(ckDom){
             ckDom.parentNode.removeChild(ckDom);
         }
-        let containDom=document.createElement('div');
-        containDom.id=virtualId;
-        document.body.appendChild(containDom);
+        let containDom=null;
+
+        if(defaultConfig.modal){
+            let modalDom=document.createElement('div');
+            modalDom.id=virtualId;
+            document.body.appendChild(modalDom);
+            modalDom.style.position='absolute';
+            modalDom.style.left='0px';
+            modalDom.style.top='0px';
+            modalDom.style.right='0px';
+            modalDom.style.bottom='0px';
+            modalDom.style.background='rgba(0,0,0,0.6)';
+
+            containDom=document.createElement('div');
+            containDom.id=virtualId+"_contain";
+            modalDom.appendChild(containDom);
+        }else{
+            containDom=document.createElement('div');
+            containDom.id=virtualId;
+            document.body.appendChild(containDom);
+        }
 
         containDom.style.position='absolute';
         containDom.style.left=(window.innerWidth/2)+'px';
         containDom.style.top=(window.innerHeight/2)+'px';
         containDom.style.width=defaultConfig.width+'px';
-        containDom.style.height=(defaultConfig.height+defaultConfig.ctrlHeight)+'px';
+        // containDom.style.height=(defaultConfig.height+defaultConfig.ctrlHeight)+'px';
         containDom.style.transform='translate(-50%,-50%)';
         containDom.style.zIndex=2000;
         containDom.style.display='block';
@@ -2043,7 +2063,10 @@ window.$dlg={
         }
         ctrlDom.addEventListener('click',function (event){
             containDom.style.display='none';
-            containDom.parentNode.removeChild(containDom);
+            ckDom=document.getElementById(virtualId);
+            if(ckDom){
+                ckDom.parentNode.removeChild(ckDom);
+            }
             okEventHandler(event);
         });
 
@@ -2257,7 +2280,10 @@ window.$dlg={
             if(type=='mouseup'){
                 okEventHandler(event);
                 containDom.style.display='none';
-                containDom.parentNode.removeChild(containDom);
+                ckDom=document.getElementById(virtualId);
+                if(ckDom){
+                    ckDom.parentNode.removeChild(ckDom);
+                }
             }
             if(type=='mousemove'){
 
@@ -2298,6 +2324,8 @@ window.$dlg={
             min:0,
             max:100,
             step:1,
+
+            modal: false
         }
 
         $obj.copyObj2(config,defaultConfig);
@@ -2317,9 +2345,27 @@ window.$dlg={
         if(ckDom){
             ckDom.parentNode.removeChild(ckDom);
         }
-        let containDom=document.createElement('div');
-        containDom.id=virtualId;
-        document.body.appendChild(containDom);
+        let containDom=null;
+
+        if(defaultConfig.modal){
+            let modalDom=document.createElement('div');
+            modalDom.id=virtualId;
+            document.body.appendChild(modalDom);
+            modalDom.style.position='fixed';
+            modalDom.style.left='0px';
+            modalDom.style.top='0px';
+            modalDom.style.right='0px';
+            modalDom.style.bottom='0px';
+            modalDom.style.background='rgba(0,0,0,0.6)';
+
+            containDom=document.createElement('div');
+            containDom.id=virtualId+"_contain";
+            modalDom.appendChild(containDom);
+        }else{
+            containDom=document.createElement('div');
+            containDom.id=virtualId;
+            document.body.appendChild(containDom);
+        }
 
         containDom.style.position='absolute';
         containDom.style.left=(window.innerWidth/2)+'px';
@@ -2376,7 +2422,10 @@ window.$dlg={
         }
         ctrlDom.addEventListener('click',function (event){
             containDom.style.display='none';
-            containDom.parentNode.removeChild(containDom);
+            ckDom=document.getElementById(virtualId);
+            if(ckDom){
+                ckDom.parentNode.removeChild(ckDom);
+            }
             okEventHandler(event);
         });
 
@@ -2420,7 +2469,10 @@ window.$dlg={
                        inputText.valid=defaultConfig.validator(inputText.text);
                    }
                    containDom.style.display='none';
-                   containDom.parentNode.removeChild(containDom);
+                   ckDom=document.getElementById(virtualId);
+                   if(ckDom){
+                       ckDom.parentNode.removeChild(ckDom);
+                   }
                    okEventHandler(event);
                }
             });
@@ -2443,7 +2495,10 @@ window.$dlg={
                 inputText.valid=defaultConfig.validator(inputText.text);
             }
             containDom.style.display='none';
-            containDom.parentNode.removeChild(containDom);
+            ckDom=document.getElementById(virtualId);
+            if(ckDom){
+                ckDom.parentNode.removeChild(ckDom);
+            }
             okEventHandler(event);
         });
 
