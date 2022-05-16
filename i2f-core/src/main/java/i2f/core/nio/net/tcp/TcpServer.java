@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -48,7 +47,6 @@ public class TcpServer implements ITcpConnector{
             int cnt=selector.select();
             Set<SelectionKey> keys = selector.selectedKeys();
             Iterator<SelectionKey> iterator=keys.iterator();
-            ByteBuffer testBuf=ByteBuffer.allocate(0);
             while(iterator.hasNext()){
                 SelectionKey item= iterator.next();
                 try{

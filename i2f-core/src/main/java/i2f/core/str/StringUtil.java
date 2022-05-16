@@ -5,6 +5,7 @@ import i2f.core.annotations.remark.Author;
 import i2f.core.array.ArrayUtil;
 import i2f.core.check.CheckUtil;
 import i2f.core.data.Pair;
+import i2f.core.interfaces.IMap;
 import i2f.core.str.data.RegexFindPartMeta;
 import i2f.core.str.data.RegexMatchItem;
 
@@ -377,6 +378,32 @@ public class StringUtil {
         ret.add(oth);
 
         return ret;
+    }
+
+    /**
+     * 对匹配到的内容进行使用Map进行转换后重新恢复完整串
+     * 例如：
+     * str=a1b2c3
+     * regex=\d+
+     * mapper=(str)->String.format("0x%x",Integer.parseInf(str))
+     * 则返回值为
+     * ret=a0x1b0x2c0x3
+     * @param str
+     * @param regex
+     * @param mapper
+     * @return
+     */
+    public static String regexFindAndReplace(String str, String regex, IMap<String,String> mapper){
+        List<RegexFindPartMeta> list= regexFindParts(str,regex);
+        StringBuilder builder=new StringBuilder();
+        for(RegexFindPartMeta item : list){
+            if(!item.isMatch){
+                builder.append(item.part);
+            }else{
+                builder.append(mapper.map(item.part));
+            }
+        }
+        return builder.toString();
     }
 
     /**
