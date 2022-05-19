@@ -15,6 +15,7 @@ public class DateUtil {
     public static ThreadLocal<SimpleDateFormat> formatter=ThreadLocal.withInitial(()->{
         return new SimpleDateFormat(FMT_DATE_TIME_MILL);
     });
+
     public static String[] SUPPORT_PARSE_DATE_FORMATS={
             "yyyy-MM-dd HH:mm:ss",
             "yyyy-MM-dd",
