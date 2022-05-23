@@ -42,14 +42,28 @@ public class Lambdas {
     public static <T, R,V> String fieldName(IBuilder<T,R,V> fn)  {
         return trimPrefixAndFirstLower(fn,"set","build","add");
     }
+    public static String fieldGetter(String methodName){
+        return trimPrefixAndFirstLower(methodName,"get","is");
+    }
+
+    public static String fieldSetter(String methodName){
+        return trimPrefixAndFirstLower(methodName,"set","build","add");
+    }
 
     public static String trimPrefixAndFirstLower(ILambdaArgs fn,String ... prefixes)  {
         String name=trimPrefix(fn,prefixes);
         return firstLower(name);
     }
+    public static String trimPrefixAndFirstLower(String name,String ... prefixes)  {
+        name=trimPrefix(name,prefixes);
+        return firstLower(name);
+    }
 
     public static String trimPrefix(ILambdaArgs fn,String ... prefixes)  {
         String name=methodNameProxy(fn);
+        return trimPrefix(name,prefixes);
+    }
+    public static String trimPrefix(String name,String ... prefixes)  {
         for(String item : prefixes){
             if(name.startsWith(item)){
                 name=name.substring(item.length());
@@ -158,6 +172,14 @@ public class Lambdas {
         SerializedLambda lambda = getSerializedLambda(fn);
         String methodName = lambda.getImplMethodName();
         return methodName;
+    }
+
+    public static SerializedLambda getSerializedLambdaNoExcept(Serializable fn) {
+        try{
+            return getSerializedLambda(fn);
+        }catch(Exception e){
+            throw new BoostException(e.getMessage(),e);
+        }
     }
 
     /**

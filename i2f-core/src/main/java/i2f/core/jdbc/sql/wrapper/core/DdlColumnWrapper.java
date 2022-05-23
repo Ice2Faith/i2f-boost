@@ -1,0 +1,49 @@
+package i2f.core.jdbc.sql.wrapper.core;
+
+import i2f.core.data.Triple;
+import i2f.core.jdbc.sql.core.DbFinder;
+import i2f.core.lambda.funcs.IBuilder;
+import i2f.core.lambda.funcs.IGetter;
+import i2f.core.lambda.funcs.ISetter;
+import i2f.core.str.Appender;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author ltb
+ * @date 2022/5/23 17:19
+ * @desc
+ */
+public class DdlColumnWrapper<N> implements INextWrapper<N> {
+    protected N next;
+    public List<Triple<String,String,Object>> columns=new ArrayList<>();
+
+    public DdlColumnWrapper(N next){
+        this.next=next;
+    }
+
+    @Override
+    public N next(){
+        return next;
+    }
+    //////////////////////////////////////
+    public DdlColumnWrapper<N> col(String name, String type, String ... restricts){
+        String restrict = Appender.builder().addArgsArray(" ", null, null, restricts).get();
+        columns.add(new Triple<>(name,type,restrict));
+        return this;
+    }
+    public<T,R> DdlColumnWrapper<N> col(IGetter<T,R> getter, String type, String ... restricts){
+        String name= DbFinder.dbFieldName(getter);
+        return col(name,type,restricts);
+    }
+    public<T,V1> DdlColumnWrapper<N> col(ISetter<T,V1> setter, String type, String ... restricts){
+        String name= DbFinder.dbFieldName(setter);
+        return col(name,type,restricts);
+    }
+    public<T,R,V1> DdlColumnWrapper<N> col(IBuilder<T,R,V1> builder, String type, String ... restricts){
+        String name= DbFinder.dbFieldName(builder);
+        return col(name,type,restricts);
+    }
+
+}

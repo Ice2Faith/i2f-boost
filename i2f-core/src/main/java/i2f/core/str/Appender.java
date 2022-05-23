@@ -132,6 +132,9 @@ public class Appender<T extends Appendable> {
     public Appender<T> tab(){
         return add("\n");
     }
+    public Appender<T> blank(){
+        return add(" ");
+    }
     public Appender<T> line(int count){
         for (int i = 0; i < count; i++) {
             line();
@@ -141,6 +144,12 @@ public class Appender<T extends Appendable> {
     public Appender<T> tab(int count){
         for (int i = 0; i < count; i++) {
             tab();
+        }
+        return this;
+    }
+    public Appender<T> blank(int count){
+        for (int i = 0; i < count; i++) {
+            blank();
         }
         return this;
     }
