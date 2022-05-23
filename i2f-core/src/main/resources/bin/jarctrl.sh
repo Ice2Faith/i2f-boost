@@ -397,7 +397,7 @@ function pidstart()
   echo "" > $PID_PATH
   chmod a+x $AppName
   mkdir ${LOG_DIR}
-  nohup JAVA_PATH -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 & echo $! > $PID_PATH
+  nohup $JAVA_PATH -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 & echo $! > $PID_PATH
   chmod a+r $LOG_DIR/*.log
   echo "Start $AppName success..."
 

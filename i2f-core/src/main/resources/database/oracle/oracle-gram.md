@@ -54,4 +54,18 @@ create index idx_login_name_status
 on tb_user(login_name,status)
 using btree;
 ```
+- 修改表字段类型
+```sql
+alter table tb_user
+rename column tar_col to tmp_col;
 
+alter table tb_user
+add tar_col Long;
+
+update tb_user
+set tar_col=tmp_col
+where 1=1;
+
+alter table tb_user
+drop column tmp_col;
+```

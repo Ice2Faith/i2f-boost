@@ -7,8 +7,8 @@ package i2f.core.algo;
  */
 public class Algos {
     public static void main(String[] args){
-        String str1="love";
-        String str2="succ";
+        String str1="when str1[i-1]=str2[j-1] then d[i-1][j-1]";
+        String str2="when str1[i-1]!=str2[j-1] then min(d[i-1][j],d[i][j-1],d[i-1][j-1])+1";
         int dis=editDistance(str1,str2);
         System.out.println(dis);
     }
