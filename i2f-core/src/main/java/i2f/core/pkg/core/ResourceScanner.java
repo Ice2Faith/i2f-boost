@@ -21,7 +21,7 @@ import java.util.jar.JarInputStream;
 public class ResourceScanner {
 
     public static void main(String[] args) throws IOException {
-        List<ResourceMetaData> list = scanClassNamesBasePackages("langs", "database", "web","i2f/core/pkg");
+        List<ResourceMetaData> list = resources("langs", "database", "web","i2f/core/pkg");
         for(Object item : list){
             System.out.println(item);
         }
@@ -29,11 +29,11 @@ public class ResourceScanner {
 
     public static final int CLASS_NAMES_COUNT = 1024*10;
 
-    public static List<ResourceMetaData> scanClassNamesBasePackages(String ... basePackages) throws IOException {
-        if(basePackages==null || basePackages.length==0){
-            return scanAllClassNames();
+    public static List<ResourceMetaData> resources(String ... paths) throws IOException {
+        if(paths==null || paths.length==0){
+            return scanAllResources();
         }
-        List<String> items=getShortlyPrefixes(basePackages);
+        List<String> items=getShortlyPrefixes(paths);
         Map<URL,String> urls=new HashMap<>(64);
         for(String pkg : items){
             try{
@@ -48,16 +48,16 @@ public class ResourceScanner {
 
         List<ResourceMetaData> list=new ArrayList<>(CLASS_NAMES_COUNT);
         for(Map.Entry<URL,String> item : urls.entrySet()){
-            scanAllClassNamesByURL(item.getKey(),item.getValue(),list);
+            scanAllResourcesByURL(item.getKey(),item.getValue(),item.getValue(),list);
         }
         return list;
     }
 
-    public static List<ResourceMetaData> scanAllClassNamesByURL(URL url, String pkg, List<ResourceMetaData> list){
+    public static List<ResourceMetaData> scanAllResourcesByURL(URL url, String relativePath,String basePath, List<ResourceMetaData> list){
         String protocol = url.getProtocol().toLowerCase();
         if ("file".equals(protocol)) {
             File file = new File(url.getFile());
-            scanAllInPath(file, pkg, list);
+            scanAllInPath(file, relativePath,basePath, list);
         } else if ("jar".equals(protocol)) {
             String ufile = url.getFile();
             String fileName = ufile.substring("file:/".length());
@@ -67,22 +67,22 @@ public class ResourceScanner {
             }
             String jarFile = fileName.substring(0, idx);
             File file = new File(jarFile);
-            scanAllInJar(file, pkg, list);
+            scanAllInJar(file, relativePath,basePath, list);
         }
         return list;
     }
-    public static List<ResourceMetaData> scanAllClassNames() throws IOException {
+    public static List<ResourceMetaData> scanAllResources() throws IOException {
         List<ResourceMetaData> list = new ArrayList<>(CLASS_NAMES_COUNT);
         URL url = ResourceUtil.getResource("");
 
-        scanAllClassNamesByURL(url,null,list);
+        scanAllResourcesByURL(url,null,"",list);
 
         return list;
     }
 
-    public static List<ResourceMetaData> scanAllInPath(File path, String pkg, List<ResourceMetaData> list) {
+    public static List<ResourceMetaData> scanAllInPath(File path, String relativePath,String basePath, List<ResourceMetaData> list) {
         if (path.isFile()) {
-            processFile(path, pkg, list);
+            processFile(path, relativePath,basePath, list);
             return list;
         }
         File[] allFiles = path.listFiles();
@@ -91,14 +91,14 @@ public class ResourceScanner {
                 String fileName = item.getName();
                 String className = getName(fileName);
                 String npkg = null;
-                if (pkg == null) {
+                if (relativePath == null) {
                     npkg = className;
                 } else {
-                    npkg = pkg + "/" + className;
+                    npkg = relativePath + "/" + className;
                 }
-                scanAllInPath(item, npkg, list);
+                scanAllInPath(item, npkg,basePath, list);
             } else if (item.isFile()) {
-                processFile(item, pkg, list);
+                processFile(item, relativePath,basePath, list);
             }
         }
         return list;
@@ -112,17 +112,17 @@ public class ResourceScanner {
         return fileName;
     }
 
-    public static List<ResourceMetaData> processFile(File file, String pkg, List<ResourceMetaData> list) {
+    public static List<ResourceMetaData> processFile(File file, String relativePath,String basePath, List<ResourceMetaData> list) {
         String fileName = file.getName();
         String className = getName(fileName);
         String npkg = null;
-        if (pkg == null) {
+        if (relativePath == null) {
             npkg = className;
         } else {
-            npkg = pkg + "/" + className;
+            npkg = relativePath + "/" + className;
         }
         if (isJarFile(fileName)) {
-            scanAllInJar(file, pkg, list);
+            scanAllInJar(file, relativePath,basePath, list);
         } else if (file.isFile()) {
             ResourceMetaData data = new ResourceMetaData();
             data.setName(fileName);
@@ -139,9 +139,9 @@ public class ResourceScanner {
         return list;
     }
 
-    public static List<ResourceMetaData> scanAllInJar(File jar, String pkg, List<ResourceMetaData> list) {
+    public static List<ResourceMetaData> scanAllInJar(File jar, String relativePath,String basePath, List<ResourceMetaData> list) {
         if (!isJarFile(jar.getName())) {
-            scanAllInPath(jar, pkg, list);
+            scanAllInPath(jar, relativePath,basePath, list);
             return list;
         }
 
@@ -174,9 +174,9 @@ public class ResourceScanner {
                         tfile.getParentFile().mkdirs();
                     }
                     unpackJar(jarFile,entry,tfile);
-                    scanAllInJar(tfile,pkg,list);
+                    scanAllInJar(tfile,relativePath,basePath,list);
                     tfile.delete();
-                }else if (!entry.isDirectory() && name.startsWith(pkg)) {
+                }else if (!entry.isDirectory() && name.startsWith(basePath)) {
                     ResourceMetaData data = new ResourceMetaData();
                     data.setName(className);
                     data.setFullName(name);
