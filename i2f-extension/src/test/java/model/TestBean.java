@@ -12,4 +12,5 @@ public class TestBean {
     private String name;
     private int age;
     private double weight;
+
 }
