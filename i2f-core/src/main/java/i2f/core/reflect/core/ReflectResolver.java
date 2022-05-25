@@ -1,6 +1,7 @@
 package i2f.core.reflect.core;
 
 
+import i2f.core.annotations.notice.Name;
 import i2f.core.annotations.remark.Author;
 import i2f.core.check.CheckUtil;
 import i2f.core.collection.CollectionUtil;
@@ -43,6 +44,9 @@ public class ReflectResolver {
     protected static volatile ConcurrentHashMap<Class,List<PropertyAccessor>> logicalReadWriteFields=new ConcurrentHashMap<>();
 
     protected static volatile ConcurrentHashMap<Class, Set<Field>> cacheForceFields = new ConcurrentHashMap<>();
+
+    protected static volatile ConcurrentHashMap<Method,String[]> cacheParameterNames=new ConcurrentHashMap<>();
+
     public static String getClassName(Class clazz){
         return clazz.getSimpleName();
     }
@@ -232,6 +236,23 @@ public class ReflectResolver {
         return ret;
     }
 
+    protected static String[] getParameterNames(Method method){
+        if(cacheParameterNames.containsKey(method)){
+            return cacheParameterNames.get(method);
+        }
+        Parameter[] params = method.getParameters();
+        String[] names=new String[params.length];
+        for(int i=0;i<params.length;i+=1){
+            names[i]=params[i].getName();
+            Name ann=findAnnotation(params[i],Name.class,false);
+            if(ann!=null && !"".equals(ann.value())){
+                names[i]=ann.value();
+            }
+        }
+
+        cacheParameterNames.put(method,names);
+        return names;
+    }
 
     protected static boolean containsFastGetterProxy(Class clazz, String fieldName) {
         if (fastGetter.containsKey(clazz)) {

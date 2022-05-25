@@ -62,6 +62,12 @@ public class DbBeanResolver {
             boolean isDbField=false;
             TableColumnMeta col=new TableColumnMeta();
             for(Annotation ann : fieldAnns){
+                if(ann instanceof DbExclude){
+                    DbExclude dban=(DbExclude)ann;
+                    if(dban.value()){
+                        isDbField=false;
+                    }
+                }
                 if(ann instanceof DbName){
                     DbName dban=(DbName)ann;
                     col.setName(dban.value());
