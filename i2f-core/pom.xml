@@ -45,6 +45,11 @@
                     <archive>
                         <!-- 去除maven描述信息 -->
                         <addMavenDescriptor>false</addMavenDescriptor>
+
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>i2f.core.pkg.core.ResourceScanner</mainClass>
+                        </manifest>
                     </archive>
                 </configuration>
             </plugin>

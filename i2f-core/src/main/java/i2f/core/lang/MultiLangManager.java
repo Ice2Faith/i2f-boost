@@ -1,16 +1,16 @@
 package i2f.core.lang;
 
+import i2f.core.match.impl.AntMatcher;
 import i2f.core.properties.PropertiesUtil;
 import i2f.core.resource.ResourceUtil;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
 
 /**
  * @author ltb
@@ -18,6 +18,16 @@ import java.util.jar.JarInputStream;
  * @desc
  */
 public class MultiLangManager {
+    public static void main(String[] args) throws IOException {
+        MultiLangManager manager=loadProperties("classpath:langs","lang");
+        String hello = manager.get("hello", defaultLang);
+        System.out.println("default:"+hello);
+        hello = manager.get("hello", "cn");
+        System.out.println("cn:"+hello);
+        hello = manager.get("hello", "en");
+        System.out.println("en:"+hello);
+        System.out.println("done");
+    }
     public static final String defaultLang = "default";
     protected volatile ConcurrentHashMap<String, ConcurrentHashMap<String, String>> strs = new ConcurrentHashMap<>();
 
@@ -53,70 +63,28 @@ public class MultiLangManager {
     }
 
     public static MultiLangManager loadProperties(String path, String langName) throws IOException {
-        URL[] urls = ResourceUtil.getResources(path);
-        Map<String, InputStream> resources=new HashMap<>();
-        for (URL url : urls) {
-            String protocol = url.getProtocol().toLowerCase();
-            if ("file".equals(protocol)) {
-                File file = new File(url.getFile());
-                File[] files = file.listFiles();
-                for(File item : files){
-                    String fname=item.getName();
-                    if(fname.startsWith(langName) && fname.endsWith(".properties")){
-                        if(!resources.containsKey(fname)){
-                            resources.put(fname,new FileInputStream(item));
-                        }
-                    }
-                }
-            } else if ("jar".equals(protocol)) {
-                String ufile = url.getFile();
-                String fileName = ufile.substring("file:/".length());
-                int idx = fileName.indexOf("!");
-                if (idx < 0) {
-                    idx = fileName.length();
-                }
-                String jarFile = fileName.substring(0, idx);
-                try {
-                    JarInputStream jis = new JarInputStream(new BufferedInputStream(new FileInputStream(jarFile)));
+        Map<URL,String> urls = ResourceUtil.resources(path,langName+"*.properties",new AntMatcher());
 
-                    JarEntry entry = jis.getNextJarEntry();
-                    while (entry != null) {
-                        String name = entry.getName();
-
-                        if (name.startsWith(path)) {
-                            int pidx=name.lastIndexOf("/");
-                            String fname=name.substring(pidx+1);
-                            if(fname.startsWith(langName) && fname.endsWith(".properties")){
-                                URL res=ResourceUtil.getClasspathResource(name);
-                                if(!resources.containsKey(fname)){
-                                    resources.put(fname,res.openStream());
-                                }
-                            }
-                        }
-                        entry = jis.getNextJarEntry();
-                    }
-                    jis.close();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-            }
-        }
         MultiLangManager manager=new MultiLangManager();
-        for(Map.Entry<String,InputStream> item : resources.entrySet()){
-            String fname=item.getKey();
+        for(Map.Entry<URL,String> item : urls.entrySet()){
+            String fname=item.getValue();
             String lang=fname.substring(langName.length());
             lang=lang.substring(0,lang.length()-".properties".length());
             if("".equals(lang)){
                 lang=defaultLang;
             }
-            InputStream is=item.getValue();
-            Properties prop = PropertiesUtil.load(is);
+            if(lang.startsWith("-")){
+                lang=lang.substring(1);
+            }
+            InputStream is=item.getKey().openStream();
+            InputStreamReader reader=new InputStreamReader(is,"UTF-8");
+            Properties prop = PropertiesUtil.load(reader);
             ConcurrentHashMap<String,String> map=new ConcurrentHashMap<>();
             for(Map.Entry<Object,Object> entry : prop.entrySet()){
                 map.put(String.valueOf(entry.getKey()),String.valueOf(entry.getValue()));
             }
             manager.strs.put(lang,map);
-            is.close();
+            reader.close();
         }
         return manager;
     }

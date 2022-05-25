@@ -19,7 +19,7 @@ import i2f.core.match.IMatcher;
 public class AntMatcher implements IMatcher {
     protected String sep;
     public AntMatcher(){
-
+        sep="/";
     }
     public AntMatcher(String sep){
         this.sep=sep;

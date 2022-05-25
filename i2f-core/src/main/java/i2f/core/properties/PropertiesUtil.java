@@ -9,6 +9,12 @@ import java.util.Properties;
 
 @Author("i2f")
 public class PropertiesUtil {
+    public static Properties load(Reader reader) throws IOException {
+        Properties properties=new Properties();
+        properties.load(reader);
+        reader.close();
+        return properties;
+    }
     public static Properties load(InputStream is) throws IOException {
         Properties properties=new Properties();
         properties.load(is);
