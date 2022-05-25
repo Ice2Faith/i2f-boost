@@ -19,6 +19,7 @@ import java.util.HashSet;
  */
 @Author("i2f")
 public class ResourceUtil {
+
     public static final String CLASSPATH_PREFIX="classpath:";
 
     public static ClassLoader getLoader() {
@@ -52,6 +53,9 @@ public class ResourceUtil {
         String lloc=location.toLowerCase();
         if(lloc.startsWith(CLASSPATH_PREFIX)){
             lloc = location.substring(CLASSPATH_PREFIX.length());
+            if(lloc.startsWith("/")){
+                lloc=lloc.substring(1);
+            }
             Enumeration<URL> enums=getLoader().getResources(lloc);
             return ArrayUtil.toArray(CollectionUtil.toCollection(new HashSet<URL>(),enums),URL[].class);
         }else{

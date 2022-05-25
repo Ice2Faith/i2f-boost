@@ -7,10 +7,11 @@ import i2f.core.collection.adapter.ReflectArrayIteratorAdapter;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Iterator;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * @author ltb
@@ -19,6 +20,7 @@ import java.util.Iterator;
  */
 public class Appender<T extends Appendable> {
     protected volatile T appender;
+
     public Appender(T appender){
         this.appender = appender;
     }
@@ -28,6 +30,7 @@ public class Appender<T extends Appendable> {
     public static Appender<StringBuilder> builder(){
         return new Appender<>(new StringBuilder());
     }
+
     ////////////////////////////////////////////////////
     public Appender<T> set(Object obj){
         clear();
@@ -125,6 +128,15 @@ public class Appender<T extends Appendable> {
     public Appender<T> addDateFormat(Date date, String format){
         SimpleDateFormat fmt=new SimpleDateFormat(format);
         return add(fmt.format(date));
+    }
+    public Appender<T> addDateFormat(LocalDate date, DateTimeFormatter formatter){
+        return add(date.format(formatter));
+    }
+    public Appender<T> addDateFormat(LocalDateTime date,DateTimeFormatter formatter){
+        return add(date.format(formatter));
+    }
+    public Appender<T> addDateFormat(LocalTime date,DateTimeFormatter formatter){
+        return add(date.format(formatter));
     }
     public Appender<T> line(){
         return add("\n");
@@ -297,20 +309,86 @@ public class Appender<T extends Appendable> {
     public Appender<T> addIterable(Iterable<?> col,Object separator,Object open,Object close){
         return adds(new IterableIteratorAdapter<>(col),separator,open,close);
     }
+    public Appender<T> addIterable(Iterable<?> col,Object separator){
+        return adds(new IterableIteratorAdapter<>(col),separator,null,null);
+    }
+    public Appender<T> addIterable(Iterable<?> col){
+        return adds(new IterableIteratorAdapter<>(col),null,null,null);
+    }
     public Appender<T> addCollection(Collection<?> col, Object separator, Object open, Object close){
         return adds(new IterableIteratorAdapter<>(col),separator,open,close);
+    }
+    public Appender<T> addCollection(Collection<?> col, Object separator){
+        return adds(new IterableIteratorAdapter<>(col),separator,null,null);
+    }
+    public Appender<T> addCollection(Collection<?> col){
+        return adds(new IterableIteratorAdapter<>(col),null,null,null);
     }
     public Appender<T> addEnumeration(Enumeration<?> enu,Object separator,Object open,Object close){
         return adds(new EnumerationIteratorAdapter<>(enu),separator,open,close);
     }
+    public Appender<T> addEnumeration(Enumeration<?> enu,Object separator){
+        return adds(new EnumerationIteratorAdapter<>(enu),separator,null,null);
+    }
+    public Appender<T> addEnumeration(Enumeration<?> enu){
+        return adds(new EnumerationIteratorAdapter<>(enu),null,null,null);
+    }
     public<E> Appender<T> addArray(E[] arr,Object separator,Object open,Object close){
         return adds(new ArrayIteratorAdapter<>(arr),separator,open,close);
+    }
+    public<E> Appender<T> addArray(E[] arr,Object separator){
+        return adds(new ArrayIteratorAdapter<>(arr),separator,null,null);
+    }
+    public<E> Appender<T> addArray(E[] arr){
+        return adds(new ArrayIteratorAdapter<>(arr),null,null,null);
     }
     public Appender<T> addReflectArray(Object arr,Object separator,Object open,Object close){
         return adds(new ReflectArrayIteratorAdapter<>(arr),separator,open,close);
     }
+    public Appender<T> addReflectArray(Object arr,Object separator){
+        return adds(new ReflectArrayIteratorAdapter<>(arr),separator,null,null);
+    }
+    public Appender<T> addReflectArray(Object arr){
+        return adds(new ReflectArrayIteratorAdapter<>(arr),null,null,null);
+    }
+    public Appender<T> addArgsArray(Object ... arr){
+        return adds(new ArrayIteratorAdapter<>(arr),null,null,null);
+    }
+    public Appender<T> addArgsArray(Object separator,Object ... arr){
+        return adds(new ArrayIteratorAdapter<>(arr),separator,null,null);
+    }
     public Appender<T> addArgsArray(Object separator,Object open,Object close,Object ... arr){
         return adds(new ArrayIteratorAdapter<>(arr),separator,open,close);
+    }
+
+    public<K,V> Appender<T> addMap(Map<K,V> map,Object kvSeparator,Object entrySeparator,Object open,Object close){
+        if(open!=null){
+            add(open);
+        }
+
+        if(close!=null){
+            add(close);
+        }
+
+        boolean isFirst=true;
+        for(Map.Entry<K,V> item : map.entrySet()){
+            if(!isFirst){
+                if(entrySeparator!=null){
+                    add(entrySeparator);
+                }
+            }
+            add(item.getKey());
+            if(kvSeparator!=null){
+                add(kvSeparator);
+            }
+            add(item.getValue());
+            isFirst=false;
+        }
+
+        return this;
+    }
+    public<K,V> Appender<T> addMap(Map<K,V> map,Object kvSeparator,Object entrySeparator){
+        return addMap(map,kvSeparator,entrySeparator,null,null);
     }
 
     public Appender<T> addStrBytes(byte[] bytes){
