@@ -4,6 +4,7 @@ package i2f.core.j2ee.web;
 import i2f.core.check.CheckUtil;
 import i2f.core.collection.CollectionUtil;
 import i2f.core.file.FileUtil;
+import i2f.core.net.http.HttpHeaders;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -97,6 +98,14 @@ public class ServletContextUtil {
 
     public static Object requestGet(HttpServletRequest request,String key){
         return request.getAttribute(key);
+    }
+
+    public static String getUserAgent(HttpServletRequest request){
+        String userAgent=request.getHeader(HttpHeaders.UserAgent);
+        if(userAgent==null){
+            userAgent="";
+        }
+        return userAgent;
     }
 
     public static String getIp(HttpServletRequest request){

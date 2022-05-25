@@ -18,4 +18,22 @@ public interface HttpHeaders {
 
     String AcceptRanges="Accept-Ranges";
 
+    String UserAgent="User-Agent";
+
+    String Connection="Connection";
+
+    String ContentEncoding="Content-Encoding";
+    String Server="Server";
+    String Date="Date";
+    String SetCookie="Set-Cookie";
+
+    String XFrameOptions="X-Frame-Options";
+    String XUaCompatible="X-Ua-Compatible";
+
+    String AcceptEncoding="Accept-Encoding";
+    String AcceptLanguage="Accept-Language";
+
+    String Cookie="Cookie";
+    String Host="Host";
+
 }
