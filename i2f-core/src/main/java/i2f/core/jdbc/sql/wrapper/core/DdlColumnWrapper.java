@@ -29,7 +29,7 @@ public class DdlColumnWrapper<N> implements INextWrapper<N> {
     }
     //////////////////////////////////////
     public DdlColumnWrapper<N> col(String name, String type, String ... restricts){
-        String restrict = Appender.builder().addArgsArray(" ", null, null, restricts).get();
+        String restrict = Appender.builder().addArgsArrayFull(" ", null, null, restricts).get();
         columns.add(new Triple<>(name,type,restrict));
         return this;
     }

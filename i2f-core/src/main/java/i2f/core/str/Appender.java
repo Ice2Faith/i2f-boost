@@ -354,10 +354,10 @@ public class Appender<T extends Appendable> {
     public Appender<T> addArgsArray(Object ... arr){
         return adds(new ArrayIteratorAdapter<>(arr),null,null,null);
     }
-    public Appender<T> addArgsArray(Object separator,Object ... arr){
+    public Appender<T> addArgsArraySep(Object separator, Object ... arr){
         return adds(new ArrayIteratorAdapter<>(arr),separator,null,null);
     }
-    public Appender<T> addArgsArray(Object separator,Object open,Object close,Object ... arr){
+    public Appender<T> addArgsArrayFull(Object separator, Object open, Object close, Object ... arr){
         return adds(new ArrayIteratorAdapter<>(arr),separator,open,close);
     }
 

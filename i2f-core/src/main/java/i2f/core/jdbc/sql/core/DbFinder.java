@@ -33,6 +33,7 @@ public class DbFinder {
     public static String dbFileNameProxy(Serializable lmb){
         SerializedLambda meta = Lambdas.getSerializedLambdaNoExcept(lmb);
         String className=meta.getImplClass();
+        className=className.replaceAll("/",".");
         String methodName=meta.getImplMethodName();
         if(!cacheClasses.containsKey(className)){
             cacheClasses.put(className,ReflectResolver.getClazz(className));
