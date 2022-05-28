@@ -31,10 +31,14 @@
         <!-- 常用的其他开发组件 -->
         <module>i2f-extension</module>
 
+        <!-- springcloud -->
+        <module>i2f-springcloud</module>
+
         <module>i2f-test</module>
         <module>i2f-agent</module>
 
-<!--        <module>i2f-backup</module>-->
+
+        <!--        <module>i2f-backup</module>-->
 
     </modules>
 

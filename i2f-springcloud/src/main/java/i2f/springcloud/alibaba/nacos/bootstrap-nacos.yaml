@@ -1,0 +1,77 @@
+server:
+  port: 8080
+
+
+spring:
+  application:
+    # 配置项目名称，可以使用负载均衡进行服务调用
+    # 如果是restTemplate的话，在创建bean方法上添加
+    # @LoadBalanced 注解，使得restTemplate支持负载均衡
+    # 这样就可以在URL中写服务名，而不是地址了
+    # 主要原因是默认集成了ribbon
+    name: nacos-client
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      # 配置nacos的地址，这个地址将提供给discovery和config作为默认地址
+      # 除非在他们各自中特别指定
+      server-addr: 127.0.0.1:8848
+      # 当指明了权限验证配置的时候，就需要指明用户名和密码
+      # 默认情况下，权限验证是关闭的，因此不用添加
+      # 同样的，也是提供给discovery和config作为默认值
+      username: nacos
+      password: nacos
+      # 旧版本的discovery需要添加 @EnableDiscoveryClient 注解
+      # 现在，新版本可以不用添加了
+      discovery:
+        # 这里也可以单独配置
+        # username: nacos
+        # password: nacos
+        # 指定服务发现的命名空间
+        namespace: public
+        # 可以单独配置服务发现的地址，一般不这样配置
+        # server-addr: 127.0.0.1:8848
+        # 配置服务的权重，一般结合负载均衡器NacosRule进行使用
+        weight: 1.0
+      config:
+        # 可以单独配置配置中心的地址，一般不这样配置
+        # server-addr: 127.0.0.1:8848
+        # 指定配置中心的命名空间
+        namespace: public
+        # 同样的，不再说明
+        username: nacos
+        password: nacos
+        # 指定配置文件的类型，默认是properties
+        # 配置文件默认会去查找
+        # ${spring.application.name}-{spring.profiles.active}.${file-extension}
+        # 这样的配置文件
+        # 这个文件后缀，仅针对默认配置文件才有效
+        file-extension: yaml
+        # 如果有配置不同的GROUP，可以在这里指定，默认为DEFAULT_GROUP
+        # group: DEFAULT_GROUP
+        # 一般来说，一个微服务系统，可能配置是相同的，具有公共配置
+        # 可以使用拓展配置来指定
+        # extension-configs[0]这种下标的形式也行，这是yaml文件的格式
+        # 实际中，这一项有一个简写：ext-config
+        extension-configs:
+            # 需要完整的名称
+          - data-id: file-dev.yaml
+            # 是否支持动态配置刷新，也就是 @RefreshScope 注解能够感知
+            # 默认不开启，只有主配置会开启
+            refresh: true
+          - data-id: redis-dev.properties
+            refresh: true
+        # 也可以使用shared-configs来指定其他配置文件
+        # 如果extension-configs中也存在，则会被extension-configs中的覆盖
+        # 也就是说，extension-configs的配置优先级更高
+        # 某种意义上来说就是，后取到extension-configs，因此shared-configs被覆盖
+        # 然而都低于默认配置中的
+        # 因此，在spring-cloud环境中，配置文件取值优先级为：
+        # application-profile>application>bootstrap-profile>bootstrap>remote-profile>remote>ext-config>shared-config
+        shared-configs[0]:
+          data-id: redis-dev.yaml
+          refresh: true
+          # group: DEFAULT_GROUP
+
+
