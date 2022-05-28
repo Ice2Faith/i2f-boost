@@ -1,4 +1,4 @@
-package i2f.springboot.feign;
+package i2f.springcloud.netflix.feign;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,14 +15,14 @@ import org.springframework.context.annotation.Configuration;
  * @date 2022/3/27 14:06
  * @desc
  */
-@ConditionalOnExpression("${i2f.springboot.config.feign.enable:true}")
+@ConditionalOnExpression("${i2f.springcloud.config.feign.enable:true}")
 @Slf4j
 @Data
 @NoArgsConstructor
 @EnableFeignClients
 @EnableHystrix
 @Configuration
-@ConfigurationProperties(prefix = "i2f.springboot.feign.schedule")
+@ConfigurationProperties(prefix = "i2f.springcloud.config.feign")
 public class FeignConfig implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {

@@ -56,6 +56,7 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+
         </dependency>
 
         <!-- 配置拉取与刷新 -->
@@ -70,6 +71,27 @@
             <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
         </dependency>
 
+        <!--
+         如果在cloud-alibaba中要使用loadbalancer
+         则需要从discovery中排除掉默认的ribbon
+         <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+                </exclusion>
+            </exclusions>
+            或者在配置中禁用掉
+            spring.cloud.loadbalancer.ribbon.enabled=false
+         -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
 
         <!-- Http客户端 openfeign -->
         <dependency>

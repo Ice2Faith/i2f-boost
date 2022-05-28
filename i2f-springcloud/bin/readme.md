@@ -3,8 +3,9 @@
 ---
 ## 介绍
 - nacos是基于CS模式的，也就是各个微服务都是客户端，向nacos的服务端注册和获取配置信息
+    - 下载：https://github.com/alibaba/nacos/releases
 - sentinel也是基于CS模式的，但是没有那么强制需要服务端，服务端指示能够更好的进行可视化配置
-
+    - 下载：https://github.com/alibaba/Sentinel/releases
 ---
 ## nacos-server
 - 对于nacos而言，提供了.zip包和.tar.gz包
