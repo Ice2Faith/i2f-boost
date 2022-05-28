@@ -30,13 +30,13 @@ public class HtmlUtil {
         return plainTxt;
     }
     public static String jsCode(String srcCode){
-        return AppendUtil.str("<script>\n",srcCode,"</script>\n");
+        return Appender.str("<script>\n",srcCode,"</script>\n");
     }
     public static String cssCode(String srcCode){
-        return AppendUtil.str("<style>\n",srcCode,"</style>\n");
+        return Appender.str("<style>\n",srcCode,"</style>\n");
     }
     public static String jsAlert(String content){
-        return jsCode(AppendUtil.str("alert('", content,"');\n"));
+        return jsCode(Appender.str("alert('", content,"');\n"));
     }
     public static String html2PlainTxt(String html){
         html=html.replaceAll("<br\\s*\\/>","\n");

@@ -7,9 +7,18 @@ package i2f.core.jdbc.sql.consts;
  */
 public interface Sql {
     String SELECT="select";
+    String SELECT_1="select 1";
+
     String AS="as";
     String FROM="from";
     String WHERE="where";
+    String DISTINCT="distinct";
+
+    String IF="if";
+    String IF_EXISTS="if exists";
+
+    String DUAL="dual";
+    String FROM_DUAL="from dual";
 
     String JOIN="join";
     String LEFT="left";
@@ -94,5 +103,9 @@ public interface Sql {
     String LTE="<=";
 
     String AUTO_INCREMENT="auto_increment";
+
+    String COUNT="count";
+    String COUNT_ALL="count(*)";
+    String COUNT_1="count(1)";
 
 }

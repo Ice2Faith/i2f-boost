@@ -38,4 +38,24 @@ public class BindSql {
         String sql= Appender.builder().addCollection(parts,separator,open,close).get();
         return new BindSql(sql,params);
     }
+
+    public String show(){
+        return Appender.builder()
+                .addRepeat("-",20)
+                .line()
+                .add("sql:")
+                .line()
+                .add(sql)
+                .line()
+                .addRepeat("-",20)
+                .line()
+                .add("args:")
+                .line()
+                .addCollection(params, ",\n", "[\n", "\n]",(Object val)->{
+                    return Appender.builder().adds(val,"(",(val==null?null:val.getClass().getSimpleName()),")").get();
+                })
+                .line()
+                .addRepeat("-",20)
+                .get();
+    }
 }

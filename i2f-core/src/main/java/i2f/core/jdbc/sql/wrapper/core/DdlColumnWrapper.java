@@ -29,7 +29,7 @@ public class DdlColumnWrapper<N> implements INextWrapper<N> {
     }
     //////////////////////////////////////
     public DdlColumnWrapper<N> col(String name, String type, String ... restricts){
-        String restrict = Appender.builder().addArgsArrayFull(" ", null, null, restricts).get();
+        String restrict = Appender.builder().addsFull(" ", null, null, restricts).get();
         columns.add(new Triple<>(name,type,restrict));
         return this;
     }
@@ -44,6 +44,14 @@ public class DdlColumnWrapper<N> implements INextWrapper<N> {
     public<T,R,V1> DdlColumnWrapper<N> col(IBuilder<T,R,V1> builder, String type, String ... restricts){
         String name= DbFinder.dbFieldName(builder);
         return col(name,type,restricts);
+    }
+
+    public String columnDefines(){
+
+        return Appender.builder().addCollection(columns, ",\n\t",null,null,(Object val)->{
+            Triple<String,String,Object> tval=(Triple<String,String,Object>)val;
+            return Appender.builder().addsSep(" ",tval.fst,tval.sec,tval.trd).get();
+        }).get();
     }
 
 }

@@ -34,7 +34,7 @@ public class DropTableWrapper
     @Override
     public BindSql prepare() {
         String sql = Appender.builder()
-                .add(Sql.DROP_TABLE).tab().add(table.table).add(";")
+                .addsSep(" ",Sql.DROP_TABLE,table.fullTable(),";")
                 .get();
         return new BindSql(sql);
     }

@@ -1,6 +1,13 @@
 package i2f.core.jdbc.sql.wrapper;
 
+import i2f.core.collection.CollectionUtil;
+import i2f.core.data.Triple;
+import i2f.core.jdbc.sql.consts.Sql;
 import i2f.core.jdbc.sql.wrapper.core.*;
+import i2f.core.str.Appender;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author ltb
@@ -36,6 +43,25 @@ public class InsertWrapper
 
     @Override
     public BindSql prepare() {
-        return null;
+        String sql = Appender.builder()
+                .addsSep(" ", Sql.INSERT_INTO, table.fullTable())
+                .line().add("(").line().tab()
+                .addCollection(kvs.kvs, ",\n\t", null, null, (Object val) -> {
+                    Triple<String, String, Object> item = (Triple<String, String, Object>) val;
+                    return item.fst;
+                })
+                .line().add(")").line()
+                .add(Sql.VALUES)
+                .line().add("(").line().tab()
+                .addCollection(kvs.kvs, ",\n\t", null, null, (Object val) -> {
+                    return "?";
+                })
+                .line().add(")").line()
+                .get();
+        List<Object> params=new ArrayList<>();
+        CollectionUtil.toCollection(params,kvs.kvs,0,-1,null,(Triple<String,String,Object> item)->{
+            return item.trd;
+        });
+        return new BindSql(sql,params);
     }
 }

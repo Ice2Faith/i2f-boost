@@ -1,6 +1,11 @@
 package i2f.core.jdbc.sql.wrapper;
 
+import i2f.core.jdbc.sql.consts.Sql;
 import i2f.core.jdbc.sql.wrapper.core.*;
+import i2f.core.str.Appender;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author ltb
@@ -21,6 +26,8 @@ public class QueryWrapper
     protected ConditionWrapper<QueryWrapper> having=new ConditionWrapper<QueryWrapper>(this);
 
     protected OrderWrapper<QueryWrapper> orders=new OrderWrapper<>(this);
+
+    protected PageWrapper<QueryWrapper> page=new PageWrapper<>(this);
 
     private QueryWrapper(){
 
@@ -64,8 +71,51 @@ public class QueryWrapper
         return this;
     }
 
+    public PageWrapper<QueryWrapper> page(){
+        return page;
+    }
+
     @Override
     public BindSql prepare() {
-        return null;
+        List<Object> params=new ArrayList<>();
+        Appender<StringBuilder> builder = Appender.builder()
+                .add(Sql.SELECT)
+                .line()
+                .add(columns.selectColumns())
+                .line()
+                .addsSep(" ", Sql.FROM, table.aliasTable())
+                .line()
+                .add(join.joinTables());
+        BindSql condBindSql=condition.prepare();
+        if(condBindSql.sql!=null && !"".equals(condBindSql.sql)){
+            builder.line()
+                    .add(Sql.WHERE)
+                    .line()
+                    .add(condBindSql.sql);
+            params.addAll(condBindSql.params);
+        }
+
+        String groupSql=groups.groupColumns();
+        if(groupSql!=null && !"".equals(groupSql)){
+            builder.line()
+                    .addsSep(" ",Sql.GROUP_BY,groupSql);
+
+            BindSql havingBindSql=having.prepare();
+            if(havingBindSql.sql!=null && !"".equals(havingBindSql.sql)){
+                builder.line()
+                        .add(Sql.HAVING)
+                        .line()
+                        .add(havingBindSql.sql);
+                params.addAll(havingBindSql.params);
+            }
+        }
+
+        String orderSql=orders.orderColumns();
+        if(orderSql!=null && !"".equals(orderSql)){
+            builder.line()
+                    .addsSep(" ",Sql.ORDER_BY,orderSql);
+        }
+
+        return new PageBindSql(builder.get(),params).page(page.index, page.size);
     }
 }

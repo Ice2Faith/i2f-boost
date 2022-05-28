@@ -4,7 +4,7 @@ package i2f.core.trace;
 import i2f.core.annotations.remark.Author;
 import i2f.core.check.CheckUtil;
 import i2f.core.reflect.core.ReflectResolver;
-import i2f.core.str.AppendUtil;
+import i2f.core.str.Appender;
 import i2f.core.thread.ThreadUtil;
 
 import java.lang.reflect.Method;
@@ -65,7 +65,7 @@ public class TraceUtil {
     }
 
     public String getFullMethodName(){
-        return AppendUtil.str(getClassFullName(),".",getMehodName());
+        return Appender.str(getClassFullName(),".",getMehodName());
     }
 
     private void prepare() {
@@ -150,7 +150,7 @@ public class TraceUtil {
 
     @Override
     public String toString() {
-        String ret = AppendUtil.buffer(null,
+        String ret = Appender.buffer().adds(
         "Tracer -> Class:",lastTraceElem.getClassName()
                 , "\n\tMethod:" , lastTraceElem.getMethodName()
                 ,(msg==null?"":"\n\tTag:"+msg)
@@ -159,12 +159,12 @@ public class TraceUtil {
                 , "\n\tTime:" , sdf.format(emitDate)
                 , "\n\tLocation:" , lastTraceElem
                 , "\n\tParent:" , (parentTraceElem == null ? "none" : parentTraceElem)
-                , "\n").done();
+                , "\n").get();
 
         String param = "";
         String retStr = "";
 
-        AppendUtil.AppendBuilder prototype= AppendUtil.builder();
+        Appender<StringBuilder> prototype= Appender.builder();
         if (CheckUtil.isNull(lastMethod)) {
             prototype.adds("unknown " ,lastTraceElem.getMethodName() , "(unknown args)");
         } else {
@@ -188,12 +188,12 @@ public class TraceUtil {
         }
 
 
-        retStr += AppendUtil.builder().adds(methodRetVal
+        retStr += Appender.builder().adds(methodRetVal
                 ,"[" , (methodRetVal == null ? (lastMethod == null ? "null/void" : lastMethod.getReturnType().getSimpleName()) : methodRetVal.getClass().getSimpleName()) , "]"
                 ,"\tDetail:"
-                ,"\n\t\tPrototype:" , prototype.done()
+                ,"\n\t\tPrototype:" , prototype.get()
                 ,"\n\t\tReturnVal:" , retStr
-                ,"\n").done();
+                ,"\n").get();
 
         return ret;
     }

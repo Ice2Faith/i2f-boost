@@ -1,6 +1,13 @@
 package i2f.core.jdbc.sql.wrapper;
 
+import i2f.core.collection.CollectionUtil;
+import i2f.core.data.Triple;
+import i2f.core.jdbc.sql.consts.Sql;
 import i2f.core.jdbc.sql.wrapper.core.*;
+import i2f.core.str.Appender;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author ltb
@@ -43,7 +50,30 @@ public class UpdateWrapper
 
     @Override
     public BindSql prepare() {
-        return null;
+        BindSql condBindSql=condition.prepare();
+        Appender<StringBuilder> builder = Appender.builder()
+                .addsSep(" ", Sql.UPDATE, table.fullTable())
+                .line().add(Sql.SET).line().tab()
+                .addCollection(kvs.kvs, ",\n\t", null, null, (Object val) -> {
+                    Triple<String, String, Object> item = (Triple<String, String, Object>) val;
+                    return Appender.builder().addsSep(" ", item.fst, item.sec, "?").get();
+                });
+
+        List<Object> params=new ArrayList<>();
+        CollectionUtil.toCollection(params,kvs.kvs,0,-1,null,(Triple<String,String,Object> item)->{
+            return item.trd;
+        });
+
+        if(condBindSql.sql != null && !"".equals(condBindSql.sql)){
+            builder.line()
+                    .add(Sql.WHERE)
+                    .line()
+                    .add(condBindSql.sql);
+            params.addAll(condBindSql.params);
+        }
+        String sql = builder.get();
+
+        return new BindSql(sql,params);
     }
 }
 

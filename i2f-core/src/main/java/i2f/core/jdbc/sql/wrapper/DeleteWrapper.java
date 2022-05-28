@@ -1,6 +1,10 @@
 package i2f.core.jdbc.sql.wrapper;
 
+import i2f.core.jdbc.sql.consts.Sql;
 import i2f.core.jdbc.sql.wrapper.core.*;
+import i2f.core.str.Appender;
+
+import java.util.List;
 
 /**
  * @author ltb
@@ -38,6 +42,16 @@ public class DeleteWrapper
 
     @Override
     public BindSql prepare() {
-        return null;
+        BindSql condBindSql=condition.prepare();
+        Appender<StringBuilder> builder = Appender.builder().addsSep(" ", Sql.DELETE_FORM, table.fullTable());
+        if(condBindSql.sql!=null && !"".equals(condBindSql.sql)){
+            builder.line()
+                    .add(Sql.WHERE)
+                    .line()
+                    .add(condBindSql.sql);
+        }
+        String sql=builder.get();
+        List<Object> params=condBindSql.params;
+        return new BindSql(sql,params);
     }
 }

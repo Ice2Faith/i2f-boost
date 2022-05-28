@@ -1,7 +1,6 @@
 package i2f.core.tool;
 
-
-import i2f.core.str.AppendUtil;
+import i2f.core.str.Appender;
 import i2f.core.trace.TraceUtil;
 
 import java.io.PrintStream;
@@ -14,13 +13,13 @@ public class Sysout {
     public static PrintStream out=System.out;
     public static String DEFAULT_SEPARATOR=",";
     public static void line(Object ... args){
-        out.println(AppendUtil.builder().adds(args).done());
+        out.println(Appender.str(args));
     }
     public static void lineSep(Object ... args){
-        out.println(AppendUtil.builder().addsSep(DEFAULT_SEPARATOR,args).done());
+        out.println(Appender.sepStr(DEFAULT_SEPARATOR,args));
     }
     public static void lineSep(String sep,Object ... args){
-        out.println(AppendUtil.builder().addsSep(sep,args).done());
+        out.println(Appender.sepStr(sep,args));
     }
     public static void val(String valName, Object val){
         String type="";
@@ -28,18 +27,18 @@ public class Sysout {
             Class clazz=val.getClass();
             type= clazz.getSimpleName();
         }
-        out.println(AppendUtil.builder().adds(valName,"(",type,")","=",val).done());
+        out.println(Appender.str(valName,"(",type,")","=",val));
     }
     public static void log(Object ... args){
         StackTraceElement elem= TraceUtil.getHereInvokerTrace();
-        out.println(AppendUtil.builder().adds(elem.getClassName(),"->",elem.getMethodName()," line:"+elem.getLineNumber()," : ").adds(args).done());
+        out.println(Appender.builder().adds(elem.getClassName(),"->",elem.getMethodName()," line:"+elem.getLineNumber()," : ").adds(args).get());
     }
     public static void logSep(Object ... args){
         StackTraceElement elem= TraceUtil.getHereInvokerTrace();
-        out.println(AppendUtil.builder().adds(elem.getClassName(),"->",elem.getMethodName()," line:"+elem.getLineNumber()," : ").addsSep(DEFAULT_SEPARATOR,args).done());
+        out.println(Appender.builder().adds(elem.getClassName(),"->",elem.getMethodName()," line:"+elem.getLineNumber()," : ").adds(DEFAULT_SEPARATOR,args).get());
     }
     public static void logSep(String sep,Object ... args){
         StackTraceElement elem= TraceUtil.getHereInvokerTrace();
-        out.println(AppendUtil.builder().adds(elem.getClassName(),"->",elem.getMethodName()," line:"+elem.getLineNumber()," : ").addsSep(sep,args).done());
+        out.println(Appender.builder().adds(elem.getClassName(),"->",elem.getMethodName()," line:"+elem.getLineNumber()," : ").addsSep(sep,args).get());
     }
 }

@@ -1,11 +1,13 @@
 package i2f.core.jdbc.sql.wrapper.core;
 
 import i2f.core.data.Pair;
+import i2f.core.jdbc.sql.consts.Sql;
 import i2f.core.jdbc.sql.core.DbFinder;
 import i2f.core.lambda.Lambdas;
 import i2f.core.lambda.funcs.IBuilder;
 import i2f.core.lambda.funcs.IGetter;
 import i2f.core.lambda.funcs.ISetter;
+import i2f.core.str.Appender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,5 +72,14 @@ public class SelectWrapper<N> implements INextWrapper<N> {
             col(item);
         }
         return this;
+    }
+
+    public String selectColumns(){
+        return Appender.builder()
+                .addWhen(distinct, Sql.DISTINCT)
+                .blank().addCollection(cols,",\n\t",null,null,(Object val)->{
+            Pair<String, String> item=(Pair<String,String>) val;
+            return Appender.builder().addsSep(" ",item.key,Sql.AS,item.val).get();
+        }).get();
     }
 }

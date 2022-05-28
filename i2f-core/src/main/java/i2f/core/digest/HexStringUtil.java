@@ -3,7 +3,7 @@ package i2f.core.digest;
 
 import i2f.core.annotations.remark.Author;
 import i2f.core.collection.CollectionUtil;
-import i2f.core.str.AppendUtil;
+import i2f.core.str.Appender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,39 +20,37 @@ public class HexStringUtil {
         return toHexString(data,null);
     }
     public static String toHexString(byte[] data,String separator){
-        AppendUtil.AppendBuilder builder=AppendUtil.builder();
+        Appender<StringBuilder> builder = Appender.builder();
         for (int i = 0; i < data.length; i++) {
             if(i!=0){
                 if(separator!=null){
                     builder.add(separator);
                 }
             }
-            String bhex=String.format("%02X",(int)(data[i]&0x0ff));
-            builder.add(bhex);
+            builder.addFormat("%02X",(int)(data[i]&0x0ff));
         }
-        return builder.done();
+        return builder.get();
     }
     public static String toOtcString(byte[] data){
         return toOtcString(data,null);
     }
     public static String toOtcString(byte[] data,String separator){
-        AppendUtil.AppendBuilder builder=AppendUtil.builder();
+        Appender<StringBuilder> builder = Appender.builder();
         for (int i = 0; i < data.length; i++) {
             if(i!=0){
                 if(separator!=null){
                     builder.add(separator);
                 }
             }
-            String bhex=String.format("%03o",(int)(data[i]&0x0ff));
-            builder.add(bhex);
+            builder.addFormat("%03o",(int)(data[i]&0x0ff));
         }
-        return builder.done();
+        return builder.get();
     }
     public static String toBinString(byte[] data){
         return toBinString(data,null);
     }
     public static String toBinString(byte[] data,String separator){
-        AppendUtil.AppendBuilder builder=AppendUtil.builder();
+        Appender<StringBuilder> builder = Appender.builder();
         for (int i = 0; i < data.length; i++) {
             if(i!=0){
                 if(separator!=null){
@@ -65,24 +63,23 @@ public class HexStringUtil {
                 builder.add(dt);
             }
         }
-        return builder.done();
+        return builder.get();
     }
     public static String toDecString(byte[] data){
         return toDecString(data,null);
     }
     public static String toDecString(byte[] data,String separator){
-        AppendUtil.AppendBuilder builder=AppendUtil.builder();
+        Appender<StringBuilder> builder = Appender.builder();
         for (int i = 0; i < data.length; i++) {
             if(i!=0){
                 if(separator!=null){
                     builder.add(separator);
                 }
             }
-            String bhex=String.format("%03d",(int)(data[i]&0x0ff));
-            builder.add(bhex);
+            builder.addFormat("%03d",(int)(data[i]&0x0ff));
 
         }
-        return builder.done();
+        return builder.get();
     }
     public static byte[] parseHexString(String data){
         return parseHexString(data,null);

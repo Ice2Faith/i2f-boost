@@ -4,6 +4,7 @@ import i2f.core.jdbc.sql.core.DbFinder;
 import i2f.core.lambda.funcs.IBuilder;
 import i2f.core.lambda.funcs.IGetter;
 import i2f.core.lambda.funcs.ISetter;
+import i2f.core.str.Appender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,5 +57,11 @@ public class ColumnWrapper<N> implements INextWrapper<N> {
             col(item);
         }
         return this;
+    }
+
+    public String groupColumns(){
+        return Appender.builder()
+                .addCollection(cols,", ")
+                .get();
     }
 }

@@ -10,7 +10,7 @@ import i2f.core.file.core.FileSpecies;
 import i2f.core.interfaces.IFilter;
 import i2f.core.interfaces.IMap;
 import i2f.core.resource.ResourceUtil;
-import i2f.core.str.AppendUtil;
+import i2f.core.str.Appender;
 import i2f.core.str.StringUtil;
 import i2f.core.stream.StreamUtil;
 
@@ -109,7 +109,7 @@ public class FileUtil {
             if (!item.exists()) {
                 continue;
             }
-            String fileName = AppendUtil.strSep("/", rootPath, item.getName());
+            String fileName = Appender.builder().addsSep("/", rootPath, item.getName()).get();
             if (item.isFile()) {
                 if (checkWhenFilter(item, filter)) {
                     if (CheckUtil.isNull(os)) {

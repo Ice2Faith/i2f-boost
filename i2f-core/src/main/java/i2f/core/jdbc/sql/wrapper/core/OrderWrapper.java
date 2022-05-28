@@ -6,6 +6,7 @@ import i2f.core.jdbc.sql.enums.SqlOrder;
 import i2f.core.lambda.funcs.IBuilder;
 import i2f.core.lambda.funcs.IGetter;
 import i2f.core.lambda.funcs.ISetter;
+import i2f.core.str.Appender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,5 +70,13 @@ public class OrderWrapper<N> implements INextWrapper<N> {
             col(item);
         }
         return this;
+    }
+
+    public String orderColumns(){
+        return Appender.builder()
+                .addCollection(cols,", ",null,null,(Object val)->{
+                    Pair<String,String> item=(Pair<String,String>)val;
+                    return Appender.builder().addsSep(" ",item.key,item.val).get();
+                }).get();
     }
 }

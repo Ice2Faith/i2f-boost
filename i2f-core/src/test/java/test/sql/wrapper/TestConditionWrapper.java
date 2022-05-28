@@ -6,6 +6,7 @@ import i2f.core.jdbc.sql.wrapper.DeleteWrapper;
 import i2f.core.jdbc.sql.wrapper.InsertWrapper;
 import i2f.core.jdbc.sql.wrapper.QueryWrapper;
 import i2f.core.jdbc.sql.wrapper.UpdateWrapper;
+import i2f.core.jdbc.sql.wrapper.core.BindSql;
 import i2f.core.jdbc.sql.wrapper.ddl.CreateTableWrapper;
 import i2f.core.jdbc.sql.wrapper.ddl.DropTableWrapper;
 import test.lambda.SysUser;
@@ -50,7 +51,14 @@ public class TestConditionWrapper {
                 .order()
                 .asc().prefix("a.").col(SysUser::getUserName)
                 .next()
+
+                .page()
+                .page(0L,20L)
+                .next()
                 .done();
+
+        BindSql queryBindSql=queryWrapper.prepare();
+        System.out.println(queryBindSql.show());
 
         UpdateWrapper updateWrapper=UpdateWrapper.builder()
                 .table().table("tb_user")
@@ -65,6 +73,9 @@ public class TestConditionWrapper {
                 .next()
                 .done();
 
+        BindSql updateBindSql=updateWrapper.prepare();
+        System.out.println(updateBindSql.show());
+
         DeleteWrapper deleteWrapper=DeleteWrapper.builder()
                 .table().table("tb_user")
                 .next()
@@ -74,6 +85,9 @@ public class TestConditionWrapper {
                 .next()
                 .done();
 
+        BindSql deleteBindSql=deleteWrapper.prepare();
+        System.out.println(deleteBindSql.show());
+
         InsertWrapper insertWrapper=InsertWrapper.builder()
                 .table().table("tb_user")
                 .next()
@@ -82,9 +96,11 @@ public class TestConditionWrapper {
                 .set(SysUser::getRealName,"找死")
                 .next()
                 .done();
+        BindSql insertBindSql=insertWrapper.prepare();
+        System.out.println(insertBindSql.show());
 
         CreateTableWrapper createTableWrapper=CreateTableWrapper.builder()
-                .table().table("tb_user")
+                .table().schema("test").table("tb_user")
                 .next()
                 .columns()
                 .col("id","BIGINT", Sql.PRIMARY_KEY,Sql.AUTO_INCREMENT)
@@ -93,10 +109,16 @@ public class TestConditionWrapper {
                 .next()
                 .done();
 
+        BindSql createTableBindSql = createTableWrapper.prepare();
+        System.out.println(createTableBindSql.sql);
+
         DropTableWrapper dropTableWrapper=DropTableWrapper.builder()
-                .table().table("tb_user")
+                .table().schema("test").table("tb_user")
                 .next()
                 .done();
+
+        BindSql dropTableBindSql=dropTableWrapper.prepare();
+        System.out.println(dropTableBindSql.sql);
 
     }
 }

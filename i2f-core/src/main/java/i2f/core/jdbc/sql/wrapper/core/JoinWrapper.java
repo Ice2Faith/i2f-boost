@@ -47,10 +47,16 @@ public class JoinWrapper<N> implements INextWrapper<N> {
     }
     //////////////////////////////////////
     public JoinWrapper<N> join(String table, String ... conditions){
-        String cond= Appender.builder().addArgsArrayFull(" ",null,null,conditions).get();
+        String cond= Appender.builder().addsFull(" ",null,null,conditions).get();
         kvs.add(new Triple<>(type,table,cond));
         return this;
     }
 
-
+    public String joinTables(){
+        return Appender.builder()
+                .addCollection(kvs,"\n",null,null,(Object val)->{
+                    Triple<String,String,Object> item=(Triple<String,String,Object>)val;
+                    return Appender.builder().addsSep(" ",item.fst,item.sec,item.trd).get();
+                }).get();
+    }
 }

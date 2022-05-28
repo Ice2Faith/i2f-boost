@@ -5,7 +5,7 @@ import i2f.core.date.DateUtil;
 import i2f.core.jdbc.data.DBResultData;
 import i2f.core.jdbc.data.PageContextData;
 import i2f.core.jdbc.data.PageMeta;
-import i2f.core.str.AppendUtil;
+import i2f.core.str.Appender;
 import lombok.Data;
 
 import java.sql.*;
@@ -27,22 +27,22 @@ public class JdbcProvider {
 
     public static void logout(Date date,Statement stat,String sql,List<Object> params){
         if(showLog){
-            String log= AppendUtil.builder()
-                    .addsLine("JdbcLogOut -> time:", DateUtil.format(date))
-                    .addsLine("\tstat: ",stat)
-                    .addsLine("\tsql : ",sql)
-                    .adds("\tparams : ")
-                    .addCollection(false,",","[","]",params)
-                    .done();
+            String log= Appender.builder()
+                    .adds("JdbcLogOut -> time:", DateUtil.format(date)).line()
+                    .adds("\tstat: ",stat).line()
+                    .adds("\tsql : ",sql).line()
+                    .add("\tparams : ")
+                    .addCollection(params,",","[","]")
+                    .get();
             System.out.println(log);
         }
     }
     public static void logout(Date date,Object ... objs){
         if(showLog){
-            String log=AppendUtil.buffer()
+            String log=Appender.builder()
                     .adds("JdbcLogOut -> time:",DateUtil.format(date)," : ")
                     .adds(objs)
-                    .done();
+                    .get();
             System.out.println(log);
         }
     }

@@ -6,7 +6,7 @@ import i2f.core.jdbc.data.DBResultData;
 import i2f.core.jdbc.data.PageContextData;
 import i2f.core.jdbc.data.PageMeta;
 import i2f.core.jdbc.type.DbType;
-import i2f.core.str.AppendUtil;
+import i2f.core.str.Appender;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -98,12 +98,12 @@ public class PageProvider {
     }
 
     private static PageContextData prepareCountSql(PageContextData ctx){
-        String sql= AppendUtil.builder()
-                .add(" select count(*) cnt ")
-                .add(" from ( ")
-                .add(ctx.prepareSql)
-                .add(" ) tmp ")
-                .done();
+        String sql= Appender.builder()
+                .addLine(" select count(*) cnt ")
+                .addLine(" from ( ")
+                .addLine(ctx.prepareSql)
+                .addLine(" ) tmp ")
+                .get();
         ctx.countSql=sql;
         if(ctx.params!=null){
             for(Object item : ctx.params){
@@ -114,10 +114,10 @@ public class PageProvider {
     }
 
     private static PageContextData prepareMySqlPage(PageContextData ctx) {
-        String sql=AppendUtil.builder()
-                .add(ctx.prepareSql)
-                .add(" limit ?,?")
-                .done();
+        String sql=Appender.builder()
+                .addLine(ctx.prepareSql)
+                .addLine(" limit ?,?")
+                .get();
         ctx.pageSql=sql;
         if(ctx.params!=null){
             for(Object item : ctx.params){
@@ -132,15 +132,15 @@ public class PageProvider {
     }
 
     private static PageContextData prepareOraclePage(PageContextData ctx) {
-        String sql=AppendUtil.builder()
-                .add(" SELECT * ")
-                .add(" FROM (SELECT TMP.*, ROWNUM ROW_ID ")
-                .add(" FROM ( ")
-                .add(ctx.prepareSql)
-                .add(" ) TMP ")
-                .add(" WHERE ROWNUM <= ?) ")
-                .add(" WHERE ROW_ID > ? ")
-                .done();
+        String sql=Appender.builder()
+                .addLine(" SELECT * ")
+                .addLine(" FROM (SELECT TMP.*, ROWNUM ROW_ID ")
+                .addLine(" FROM ( ")
+                .addLine(ctx.prepareSql)
+                .addLine(" ) TMP ")
+                .addLine(" WHERE ROWNUM <= ?) ")
+                .addLine(" WHERE ROW_ID > ? ")
+                .get();
         ctx.pageSql=sql;
         if(ctx.params!=null){
             for(Object item : ctx.params){
@@ -173,11 +173,11 @@ public class PageProvider {
         return prepareMySqlPage(ctx);
     }
     private static PageContextData preparePostgreSqlPage(PageContextData ctx) {
-        String sql=AppendUtil.builder()
-                .add(ctx.prepareSql)
-                .add(" limit ? ")
-                .add(" offset ? ")
-                .done();
+        String sql=Appender.builder()
+                .addLine(ctx.prepareSql)
+                .addLine(" limit ? ")
+                .addLine(" offset ? ")
+                .get();
         ctx.pageSql=sql;
         if(ctx.params!=null){
             for(Object item : ctx.params){
@@ -212,11 +212,11 @@ public class PageProvider {
         return prepareOraclePage(ctx);
     }
     private static PageContextData prepareOracle12cPage(PageContextData ctx) {
-        String sql=AppendUtil.builder()
-                .add(ctx.prepareSql)
-                .add(" offset ? ")
-                .add(" rows fetch next ? rows only ")
-                .done();
+        String sql=Appender.builder()
+                .addLine(ctx.prepareSql)
+                .addLine(" offset ? ")
+                .addLine(" rows fetch next ? rows only ")
+                .get();
         ctx.pageSql=sql;
         if(ctx.params!=null){
             for(Object item : ctx.params){
@@ -230,15 +230,14 @@ public class PageProvider {
         return ctx;
     }
     private static PageContextData prepareDb2Page(PageContextData ctx) {
-        String sql=AppendUtil.builder()
-                .add(" SELECT * FROM ( ")
-                .add(" SELECT TMP_PAGE.*,ROWNUMBER() OVER() AS ROW_ID FROM ( ")
-                .add(ctx.prepareSql)
-                .add(" ) AS TMP_PAGE ")
-                .add(" ) TMP_PAGE ")
-                .add(" WHERE ROW_ID BETWEEN ? AND ? ")
-
-                .done();
+        String sql=Appender.builder()
+                .addLine(" SELECT * FROM ( ")
+                .addLine(" SELECT TMP_PAGE.*,ROWNUMBER() OVER() AS ROW_ID FROM ( ")
+                .addLine(ctx.prepareSql)
+                .addLine(" ) AS TMP_PAGE ")
+                .addLine(" ) TMP_PAGE ")
+                .addLine(" WHERE ROW_ID BETWEEN ? AND ? ")
+                .get();
         ctx.pageSql=sql;
         if(ctx.params!=null){
             for(Object item : ctx.params){
@@ -252,11 +251,11 @@ public class PageProvider {
         return ctx;
     }
     private static PageContextData prepareSQLServerPage(PageContextData ctx) {
-        String sql=AppendUtil.builder()
-                .add(ctx.prepareSql)
-                .add(" offset ? ")
-                .add(" rows fetch next ? rows only ")
-                .done();
+        String sql=Appender.builder()
+                .addLine(ctx.prepareSql)
+                .addLine(" offset ? ")
+                .addLine(" rows fetch next ? rows only ")
+                .get();
         ctx.pageSql=sql;
         if(ctx.params!=null){
             for(Object item : ctx.params){

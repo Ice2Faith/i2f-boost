@@ -31,7 +31,7 @@ public class StringUtil {
             lstr=str.substring(0,maxLen-1);
         }
         if(suffix!=null){
-            return AppendUtil.str(lstr,suffix);
+            return Appender.str(lstr,suffix);
         }
         return lstr;
     }
@@ -63,7 +63,7 @@ public class StringUtil {
         }
         Vector<String> vector=new Vector<>();
         pathRoute(pathArr, vector);
-        return AppendUtil.buffer().addCollection(false,orginalPathSep,null,null,vector).done();
+        return Appender.buffer().addCollection(vector,orginalPathSep).get();
     }
     public static String pathGen(String basePath,String relativePath){
         String orginalPathSep="/";
@@ -88,7 +88,7 @@ public class StringUtil {
             vector.add(item);
         }
         pathRoute(relativeArr, vector);
-        return AppendUtil.buffer().addCollection(false,orginalPathSep,null,null,vector).done();
+        return Appender.buffer().addCollection(vector,orginalPathSep).get();
     }
 
     private static void pathRoute(String[] relativeArr, Vector<String> vector) {

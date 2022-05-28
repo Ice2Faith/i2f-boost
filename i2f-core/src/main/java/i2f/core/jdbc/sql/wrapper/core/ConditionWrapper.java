@@ -66,7 +66,7 @@ public class ConditionWrapper<N>
             name=prefix+name;
         }
         Appender<StringBuilder> builder = Appender.builder()
-                .addArgsArraySep(" ", name, ope)
+                .addsSep(" ", name, ope)
                 .blank();
         List<Object> params=new ArrayList<>();
 
@@ -145,11 +145,12 @@ public class ConditionWrapper<N>
         List<String> parts=new ArrayList<>();
         while(val.hasNext()){
             Object item=val.next();
-            parts.add(Appender.builder().addArgsArraySep(" ",col,Sql.LIKE,"concat('%',concat(?,'%'))").get());
+            parts.add(Appender.builder().addsSep(" ",col,Sql.LIKE,"concat('%',concat(?,'%'))").get());
             params.add(item);
         }
 
-        String sql= builder.addCollection(parts," or ")
+        String sql= builder.addCollection(parts,"\n\tor ")
+                .line()
                 .add(")")
                 .get();
 
@@ -173,11 +174,12 @@ public class ConditionWrapper<N>
             if(prefix!=null){
                 col=prefix+col;
             }
-            parts.add(Appender.builder().addArgsArraySep(" ",col,Sql.LIKE,"concat('%',concat(?,'%'))").get());
+            parts.add(Appender.builder().addsSep(" ",col,Sql.LIKE,"concat('%',concat(?,'%'))").get());
             params.add(val);
         }
 
-        String sql= builder.addCollection(parts," or ")
+        String sql= builder.addCollection(parts,"\n\tor ")
+                .line()
                 .add(")")
                 .get();
 
@@ -383,6 +385,6 @@ public class ConditionWrapper<N>
 
     @Override
     public BindSql prepare() {
-        return BindSql.merge(conditions," "+link.linker()+" ");
+        return BindSql.merge(conditions,"\n"+link.linker()+" ");
     }
 }

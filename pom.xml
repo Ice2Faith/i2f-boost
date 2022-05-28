@@ -34,6 +34,8 @@
         <module>i2f-test</module>
         <module>i2f-agent</module>
 
+<!--        <module>i2f-backup</module>-->
+
     </modules>
 
     <properties>

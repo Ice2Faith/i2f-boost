@@ -1,6 +1,6 @@
 package i2f.springboot.mvc;
 
-import i2f.core.str.AppendUtil;
+import i2f.core.str.Appender;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +31,7 @@ public class AopLogUtil {
             url="get:"+anng.value()[0];
         }
 
-        AppendUtil.AppendBuilder buffer= AppendUtil.buffer()
+        Appender<StringBuffer> buffer= Appender.buffer()
         .addsLine("$$-aop-ivk-controller:")
         .addsLine("\tmap url:",url)
         .addsLine("\tin class:",clazz.getSimpleName())
@@ -44,7 +44,7 @@ public class AopLogUtil {
                 buffer.addsLine("\t\t",param.getName(),"(",param.getType().getSimpleName(),"):",item);
             }
         }
-        System.out.println(buffer.done());
+        System.out.println(buffer.get());
         Object rs=joinPoint.proceed(args);
 
         System.out.println("\t$$-aop-controller-result:"+(rs==null?method.getReturnType().getSimpleName():rs.getClass().getSimpleName())+":"+rs);
@@ -60,7 +60,7 @@ public class AopLogUtil {
         Parameter[] params=method.getParameters();
         Object[] args=joinPoint.getArgs();
 
-        AppendUtil.AppendBuilder buffer= AppendUtil.buffer()
+        Appender<StringBuffer> buffer= Appender.buffer()
         .addsLine("$$-aop-ivk-service:")
         .addsLine("\tin class:",clazz.getSimpleName())
         .addsLine("\tivk method:",method.getName());
@@ -72,7 +72,7 @@ public class AopLogUtil {
                 buffer.addsLine("\t\t",param.getName(),"(",param.getType().getSimpleName(),"):",item);
             }
         }
-        System.out.println(buffer.done());
+        System.out.println(buffer.get());
         Object rs=joinPoint.proceed(args);
 
         System.out.println("\t$$-aop-service-result:"+(rs==null?method.getReturnType().getSimpleName():rs.getClass().getSimpleName())+":"+rs);
@@ -88,7 +88,7 @@ public class AopLogUtil {
         Parameter[] params=method.getParameters();
         Object[] args=joinPoint.getArgs();
 
-        AppendUtil.AppendBuilder buffer= AppendUtil.buffer()
+        Appender<StringBuffer> buffer= Appender.buffer()
         .addsLine("$$-aop-ivk-dao:")
         .addsLine("\tin class:",clazz.getSimpleName())
         .addsLine("\tivk method:",method.getName());
@@ -101,7 +101,7 @@ public class AopLogUtil {
             }
         }
 
-        System.out.println(buffer.done());
+        System.out.println(buffer.get());
 
         Object rs=joinPoint.proceed(args);
 

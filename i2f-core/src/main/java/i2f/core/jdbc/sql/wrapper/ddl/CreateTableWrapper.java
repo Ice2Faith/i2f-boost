@@ -1,6 +1,8 @@
 package i2f.core.jdbc.sql.wrapper.ddl;
 
+import i2f.core.jdbc.sql.consts.Sql;
 import i2f.core.jdbc.sql.wrapper.core.*;
+import i2f.core.str.Appender;
 
 /**
  * @author ltb
@@ -36,6 +38,11 @@ public class CreateTableWrapper
 
     @Override
     public BindSql prepare() {
-        return null;
+        Appender<StringBuilder> builder = Appender.builder()
+                .addsSep(" ", Sql.CREATE_TABLE, table.fullTable(), "(","\n\t")
+                .add(columns.columnDefines())
+                .add("\n);");
+        String sql= builder.get();
+        return new BindSql(sql);
     }
 }

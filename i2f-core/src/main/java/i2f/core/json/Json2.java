@@ -4,7 +4,7 @@ import i2f.core.annotations.remark.Author;
 import i2f.core.check.CheckUtil;
 import i2f.core.reflect.core.ReflectResolver;
 import i2f.core.reflect.interfaces.PropertyAccessor;
-import i2f.core.str.AppendUtil;
+import i2f.core.str.Appender;
 
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
@@ -93,7 +93,7 @@ public class Json2 {
         return num.toString();
     }
     private static String whenDate(Date date){
-        return AppendUtil.str(quote,fmt.format(date),quote);
+        return Appender.str(quote,fmt.format(date),quote);
     }
     private static String whenCollection(Collection col){
         StringBuffer buffer=new StringBuffer();
@@ -139,7 +139,7 @@ public class Json2 {
         return buffer.toString();
     }
     private static String whenMap(Map map){
-        AppendUtil.AppendBuilder buffer= AppendUtil.buffer();
+        Appender<StringBuffer> buffer= Appender.buffer();
         buffer.add("{");
         if(CheckUtil.notNull(map)){
             boolean isFirst=true;
@@ -156,10 +156,10 @@ public class Json2 {
             }
         }
         buffer.add("}");
-        return buffer.done();
+        return buffer.get();
     }
     private static String whenBean(Object obj){
-        AppendUtil.AppendBuilder buffer= AppendUtil.buffer();
+        Appender<StringBuffer> buffer= Appender.buffer();
         buffer.add("{");
         if(CheckUtil.notNull(obj)){
             Class clazz=obj.getClass();
@@ -180,6 +180,6 @@ public class Json2 {
             }
         }
         buffer.add("}");
-        return buffer.done();
+        return buffer.get();
     }
 }
