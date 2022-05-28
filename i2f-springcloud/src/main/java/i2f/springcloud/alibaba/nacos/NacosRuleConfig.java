@@ -2,6 +2,7 @@ package i2f.springcloud.alibaba.nacos;
 
 import com.alibaba.cloud.nacos.ribbon.NacosRule;
 import com.netflix.loadbalancer.IRule;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
  * @date 2022/5/28 19:40
  * @desc
  */
+@Slf4j
 @ConditionalOnBean(NacosConfig.class)
 @ConditionalOnExpression("${i2f.springcloud.config.nacos.lb-nacos.enable:true}")
 @Configuration
@@ -27,6 +29,7 @@ public class NacosRuleConfig {
      */
     @Bean
     public IRule iRule(){
+        log.info("NacosRuleConfig config done.");
         return new NacosRule();
     }
 }

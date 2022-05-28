@@ -3,6 +3,7 @@ package i2f.springcloud.alibaba.nacos;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -20,7 +21,10 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "i2f.springcloud.config.nacos")
 @Configuration
 @EnableDiscoveryClient
-public class NacosConfig {
+public class NacosConfig implements InitializingBean {
 
-
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        log.info("NacosConfig config done.");
+    }
 }
