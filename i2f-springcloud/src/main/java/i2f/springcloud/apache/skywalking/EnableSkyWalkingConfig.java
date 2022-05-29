@@ -1,4 +1,4 @@
-package i2f.springcloud.alibaba.skywalking;
+package i2f.springcloud.apache.skywalking;
 
 import org.springframework.context.annotation.Import;
 

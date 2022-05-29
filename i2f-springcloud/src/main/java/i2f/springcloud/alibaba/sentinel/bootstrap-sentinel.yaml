@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: sentinel-client
+  profiles:
+    active: dev
+  cloud:
+    sentinel:
+      transport:
+        # 配置dashboard地址
+        dashboard: 127.0.0.1:8080
+      # 默认是收敛链路的，因此关闭收敛，展开链路
+      web-context-unify: false
+      datasource:
+        # 规则ID，可以自定义
+        flow-rule:
+          server-addr: 127.0.0.1:8847
+          username: naocs
+          password: nacos
+          data-id: flow-rule.json
+          namespace: public
+          data-type: json
+          rule-type: flow
+
+# 开启openfeign与sentinel的降级整合
+feign:
+  sentinel:
+    enabled: true

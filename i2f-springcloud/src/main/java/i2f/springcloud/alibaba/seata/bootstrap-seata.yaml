@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+
+spring:
+  application:
+    name: seata-client
+  profiles:
+    active: dev
+  cloud:
+    alibaba:
+      seata:
+        # 配置事务分组
+        tx-service-group: default_tx_group
+
+# 配置seata-server信息
+seata:
+  # 注册中心
+  registry:
+    type: nacos
+    nacos:
+      # seata-server所在的nacos主机，服务名，用户名，密码，分组
+      server-addr: 127.0.0.1:8848
+      application: seata-server
+      username: nacos
+      password: nacos
+      group: SETA_GROUP
+  # 配置中心
+  config:
+    type: nacos
+    nacos:
+      # 配置所在的nacos信息
+      server-addr: 127.0.0.1:8848
+      username: nacos
+      password: nacos
+      group: SETA_GROUP
+
+
