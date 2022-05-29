@@ -77,3 +77,27 @@ configuration:
 - 找到下面的nacos节点，修改为对应的nacos配置即可
 
 
+## 自定义链路跟踪
+- 默认不会去记录执行的方法的链路，也就是只保留了网络请求部分
+- 通过自定义链路方式，可以将普通方法加入到链路中
+- 同时也能够支持入参和返回值的记录
+
+- 添加依赖
+```xml
+<dependency>
+    <groupId>org.apache.skywalking</groupId>
+    <artifactId>apm-toolkit-trace</artifactId>
+    <version>8.6.0</version>
+</dependency>
+```
+- 在需要追踪的方法上添加注解 @Trace 即可
+- 在方法上添加 @Tag/@Tags 注解可以实现入参返回值的监控
+- key 返回值时，一般写为方法名，为入参时，一般为参数名
+```java
+@Trace
+@Tag(key="hello",value="returnedObj") // 记录hello返回值
+//@Tag(key="hello",value="arg[0]") // 记录hello第一个入参
+public Object hello(String id){
+    return "";
+}
+```
