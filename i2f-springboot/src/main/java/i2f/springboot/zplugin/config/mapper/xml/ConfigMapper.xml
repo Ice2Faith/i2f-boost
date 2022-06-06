@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="i2f.springboot.zplugin.config.mapper.ConfigMapper">
+
+
+	<select id="qryConfig" resultType="i2f.springboot.zplugin.config.dto.ConfigDto">
+		select
+		<choose>
+			<when test='filterType!=null and filterType=="1"'>
+				entry_key entryKey,
+				entry_desc entryDesc,
+				entry_tag entryTag,
+			</when>
+			<when test='filterType!=null and filterType=="2"'>
+				entry_key entryKey,
+				entry_desc entryDesc,
+				entry_tag entryTag,
+				group_id groupId,
+				type_id typeId,
+			</when>
+			<when test='filterType!=null and filterType=="2"'>
+				entry_key entryKey,
+				entry_desc entryDesc,
+				entry_tag entryTag,
+				group_id groupId,
+				type_id typeId,
+				status,
+				level,
+			</when>
+		</choose>
+		entry_id entryId,
+		entry_name entryName,
+		parent_entry_id parentEntryId
+
+		from sys_config
+		<where>
+			<choose>
+				<when test="status!=null and status!=''">
+					and status=#{status}
+				</when>
+				<otherwise>
+					and status!=0
+				</otherwise>
+			</choose>
+			<choose>
+				<when test="validTime!=null and validTime!=''">
+					and valid_time &lt;= #{validTime}
+				</when>
+				<otherwise>
+					and valid_time &lt;= now()
+				</otherwise>
+			</choose>
+			<choose>
+				<when test="invalidTime!=null and invalidTime!=''">
+					and invalid_time &gt;= #{invalidTime}
+				</when>
+				<otherwise>
+					and invalid_time &gt;= now()
+				</otherwise>
+			</choose>
+			<choose>
+				<when test="maxLevel!=null and maxLevel!=''">
+					and level &lt;= #{maxLevel}
+				</when>
+			</choose>
+			<choose>
+				<when test="minLevel!=null and minLevel!=''">
+					and level &gt;= #{minLevel}
+				</when>
+			</choose>
+			<if test="level!=null and level!=''">
+				and level = #{level}
+			</if>
+			<if test="groupId!=null and groupId!=''">
+				and group_id in
+				<foreach collection="groupId.split(',')" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+			<if test="typeId!=null and typeId!=''">
+				and type_id in
+				<foreach collection="typeId.split(',')" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+			<if test="entryKey!=null and entryKey!=''">
+				and entry_key in
+				<foreach collection="entryKey.split(',')" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+			<if test="entryId!=null and entryId!=''">
+				and entry_id in
+				<foreach collection="entryId.split(',')" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+			<if test="parentEntryId!=null and parentEntryId!=''">
+				and parent_entry_id in
+				<foreach collection="parentEntryId.split(',')" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		order by entry_order desc,entry_name asc
+	</select>
+
+
+</mapper>
