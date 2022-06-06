@@ -28,19 +28,19 @@ public class JacksonUtil {
         mapper.getMapper().setSerializationInclusion(JsonInclude.Include.ALWAYS);
         return mapper;
     }
-    public static String toJson(Object obj) throws Exception {
+    public static String toJson(Object obj)  {
         return getMapper().toText(obj);
     }
-    public static<T> T parseObj(String json,Class<T> clazz) throws Exception {
+    public static<T> T parseObj(String json,Class<T> clazz)   {
         return getMapper().parseText(json,clazz);
     }
-    public static<T> T parseRef(String json, TypeReference<T> ref) throws Exception {
+    public static<T> T parseRef(String json, TypeReference<T> ref)   {
         return getMapper().parseTextRef(json,ref);
     }
-    public static Map<String,Object> bean2Map(Object bean) throws Exception {
+    public static Map<String,Object> bean2Map(Object bean)   {
         return getMapper().bean2Map(bean);
     }
-    public static<T> T map2Bean(Map<String,Object> map,Class<T> clazz) throws Exception {
+    public static<T> T map2Bean(Map<String,Object> map,Class<T> clazz)   {
         return getMapper().map2Bean(map,clazz);
     }
 }
