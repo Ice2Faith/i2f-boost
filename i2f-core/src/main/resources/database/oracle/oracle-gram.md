@@ -13,6 +13,20 @@ select
     to_char(sysdate,'yyyy-MM-dd hh24:mi:ss')
 from dual;
 ```
+- 转换为日期时间
+```sql
+to_date(#{createTime,jdbcType=VARCHAR},'yyyy-MM-dd hh24:mi:ss')
+```
+- 时间加减
+- {date} [+|-] INTERVAL {value} [ YEAR | MONTH | DAY | HOUR | MINUTE | SECODE ]
+```sql
+select 
+    sysdate + INTERVAL '1' day
+from dual;
+select 
+    sysdate - INTERVAL '2' hour
+from dual;
+```
 
 ---
 ## DDL

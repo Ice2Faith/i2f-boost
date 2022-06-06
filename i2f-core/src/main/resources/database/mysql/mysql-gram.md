@@ -14,6 +14,7 @@ select
 from dual;
 ```
 - 时间加减
+- [ MICROSECOND | SECOND | MINUTE | HOUR | DAY | WEEK | MONTH | QUARTER | YEAR | ...]
 ```
 select 
     date_sub(now(),interval 3 day)

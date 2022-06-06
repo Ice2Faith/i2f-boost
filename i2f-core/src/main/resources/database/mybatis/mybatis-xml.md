@@ -30,3 +30,112 @@ case
     else ''
 end statusDesc,
 ```
+- 选择插入
+```xml
+insert into tb_user
+(
+<trim prefixOverrides="," suffixOverrides=",">
+    <if test="id!=null and id!=''">
+        ,id
+    </if>
+    <if test="status!=null and status!=''">
+        ,status
+    </if>
+    <if test="name!=null and name!=''">
+        ,name
+    </if>
+    
+    <if test="createUserId!=null and createUserId!=''">
+        ,CREATE_USER_ID
+    </if>
+    <choose>
+        <when test="createTime!=null and createTime!=''">
+            ,CREATE_TIME
+        </when>
+        <otherwise>
+            ,CREATE_TIME
+        </otherwise>
+    </choose>
+
+    <!--
+    <if test="modifyUserId!=null and modifyUserId!=''">
+        ,MODIFY_USER_ID
+    </if>
+    <if test="modifyTime!=null and modifyTime!=''">
+        ,MODIFY_TIME
+    </if>
+    -->
+</trim>
+)
+values
+(
+<trim prefixOverrides="," suffixOverrides=",">
+    <if test="id!=null and id!=''">
+        ,#{id,jdbcType=NUMERIC}
+    </if>
+    <if test="status!=null and status!=''">
+        ,#{status,jdbcType=NUMERIC}
+    </if>
+    <if test="name!=null and name!=''">
+        ,#{name,jdbcType=VARCHAR}
+    </if>
+    
+    <if test="createUserId!=null and createUserId!=''">
+        ,#{createUserId}
+    </if>
+    <choose>
+        <when test="createTime!=null and createTime!=''">
+            ,to_date(#{createTime,jdbcType=VARCHAR},'yyyy-MM-dd hh24:mi:ss')
+        </when>
+        <otherwise>
+            ,sysdate
+        </otherwise>
+    </choose>
+    <!--
+    <if test="modifyUserId!=null and modifyUserId!=''">
+        ,MODIFY_USER_ID = #{modifyUserId}
+    </if>
+    <if test="modifyTime!=null and modifyTime!=''">
+        ,MODIFY_TIME = to_date(#{modifyTime,jdbcType=VARCHAR},'yyyy-MM-dd hh24:mi:ss')
+    </if>
+    -->
+</trim>
+)
+```
+- 选择更新
+```xml
+update tb_user
+set
+<trim prefixOverrides="," suffixOverrides=",">
+<!--            <if test="id!=null and id!=''">-->
+<!--                ,#{id}-->
+<!--            </if>-->
+    <if test="status!=null and status!=''">
+        ,status=#{status,jdbcType=NUMERIC}
+    </if>
+    <if test="name!=null and name!=''">
+        ,name=#{name,jdbcType=VARCHAR}
+    </if>
+    
+    <!--
+    <if test="createUserId!=null and createUserId!=''">
+        ,CREATE_USER_ID = #{createUserId}
+    </if>
+    <if test="createTime!=null and createTime!=''">
+        ,CREATE_TIME =to_date(#{createTime,jdbcType=VARCHAR},'yyyy-MM-dd hh24:mi:ss')
+    </if>
+    -->
+    <if test="modifyUserId!=null and modifyUserId!=''">
+        ,MODIFY_USER_ID = #{modifyUserId}
+    </if>
+    <choose>
+        <when test="modifyTime!=null and modifyTime!=''">
+            ,MODIFY_TIME = to_date(#{modifyTime,jdbcType=VARCHAR},'yyyy-MM-dd hh24:mi:ss')
+        </when>
+        <otherwise>
+            ,MODIFY_TIME = sysdate
+        </otherwise>
+    </choose>
+</trim>
+where id=#{id,jdbcType=NUMERIC}
+```
