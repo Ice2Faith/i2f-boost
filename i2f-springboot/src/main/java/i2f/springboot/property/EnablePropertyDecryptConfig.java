@@ -13,7 +13,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import({
-        PropertyDecryptConfig.class
+        PropertyDecryptConfig.class,
+        DefaultPropertyDecryptorConfig.class
 })
 public @interface EnablePropertyDecryptConfig {
 
