@@ -24,7 +24,14 @@ select
     date_add(now(),interval 3 day)
 from dual;
 ```
-
+- group concat
+```sql
+select a.qu_id , count(*) repo_cnt,
+         group_concat(distinct b.title order by b.title asc SEPARATOR ',') repo_strs
+        from exam_qu_repo_ref a
+        left join exam_qu_repo b on b.id =a.repo_id
+        group by a.qu_id
+```
 ---
 ## DDL
 - 创建表

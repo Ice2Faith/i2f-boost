@@ -27,7 +27,14 @@ select
     sysdate - INTERVAL '2' hour
 from dual;
 ```
-
+- group concat
+```sql
+select a.qu_id , count(*) repo_cnt,
+        LISTAGG( b.title, ',') WITHIN GROUP(ORDER BY b.title asc) AS repo_strs
+        from exam_qu_repo_ref a
+        left join exam_qu_repo b on b.id =a.repo_id
+        group by a.qu_id
+```
 ---
 ## DDL
 - 创建表
