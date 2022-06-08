@@ -89,6 +89,76 @@
         </dependency>
 
         <dependency>
+            <groupId>i2f.boost</groupId>
+            <artifactId>i2f-springcloud</artifactId>
+            <exclusions>
+                <!-- 服务注册与发现 -->
+                <exclusion>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+
+                </exclusion>
+
+                <!-- 配置拉取与刷新 -->
+                <exclusion>
+                    <groupId>com.alibaba.cloud</groupId>
+                    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+                </exclusion>
+
+                <!-- 流控与熔断 -->
+                <exclusion>
+                    <groupId>com.alibaba.cloud</groupId>
+                    <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+                </exclusion>
+                <!-- sentinel从nacos拉取规则，实现规则的持久化 -->
+                <exclusion>
+                    <groupId>com.alibaba.csp</groupId>
+                    <artifactId>sentinel-datasource-nacos</artifactId>
+                </exclusion>
+
+                <!-- 分布式事务 -->
+                <exclusion>
+                    <groupId>com.alibaba.cloud</groupId>
+                    <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+                </exclusion>
+
+                <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+                </exclusion>
+
+                <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-gateway</artifactId>
+                </exclusion>
+
+                <!-- sentinel与gateway的整合 -->
+                <exclusion>
+                    <groupId>com.alibaba.cloud</groupId>
+                    <artifactId>spring-cloud-alibaba-sentinel-gateway</artifactId>
+                </exclusion>
+
+                <!-- Http客户端 openfeign -->
+                <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-openfeign</artifactId>
+                </exclusion>
+
+                <!--熔断降级 -->
+                <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+                </exclusion>
+
+                <!-- skywalking 方法级跟踪工具 -->
+                <exclusion>
+                    <groupId>org.apache.skywalking</groupId>
+                    <artifactId>apm-toolkit-trace</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.16</version>

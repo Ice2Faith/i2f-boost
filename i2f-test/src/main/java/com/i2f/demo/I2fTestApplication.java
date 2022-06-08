@@ -7,7 +7,6 @@ import i2f.springboot.application.WarBootApplication;
 import i2f.springboot.asyn.EnableAsyncConfig;
 import i2f.springboot.cors.EnableCorsConfig;
 import i2f.springboot.datasource.EnableDynamicDatasourceConfig;
-import i2f.springboot.feign.EnableFeignConfig;
 import i2f.springboot.mvc.EnableMvcConfig;
 import i2f.springboot.mybatis.EnableMybatisConfig;
 import i2f.springboot.quartz.EnableQuartzConfig;
@@ -19,7 +18,7 @@ import i2f.springboot.security.EnableSecurityConfig;
 import i2f.springboot.shiro.EnableShiroConfig;
 import i2f.springboot.swagger.EnableSwaggerConfig;
 import i2f.springboot.websocket.EnableWebsocketConfig;
-import org.springframework.boot.SpringApplication;
+import i2f.springcloud.netflix.feign.EnableFeignConfig;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -47,7 +46,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class I2fTestApplication extends WarBootApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(I2fTestApplication.class, args);
+		String log= startup(I2fTestApplication.class, args);
+		System.out.println(log);
 	}
 
 }
