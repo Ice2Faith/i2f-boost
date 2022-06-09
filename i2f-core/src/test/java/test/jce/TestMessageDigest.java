@@ -1,7 +1,9 @@
 package test.jce;
 
 import i2f.core.digest.HexStringUtil;
+import i2f.core.jce.encrypt.EncryptUtil;
 import i2f.core.jce.md.IMessageDigestor;
+import i2f.core.jce.md.MessageDigestUtil;
 import i2f.core.jce.md.md.MdMessageDigestor;
 import i2f.core.jce.md.md.MdType;
 import i2f.core.jce.md.sha.ShaMessageDigestor;
@@ -28,6 +30,11 @@ public class TestMessageDigest {
                 "\n" +
                 "关于PKCS#1 padding规范可参考：RFC2313 chapter 8.1，咱们在把明文送给RSA加密器前，要确认这个值是否是大于n，也就是若是接近n位长，那么须要先padding再分段加密。除非咱们是“定长定量本身可控可理解”的加密不须要padding。";
 
+        byte[] data = EncryptUtil.aesKgen("hello".getBytes()).encrypt("hello".getBytes());
+        System.out.println(HexStringUtil.toHexString(data,",0x"));
+
+        byte[] mdd = MessageDigestUtil.sha(ShaType.SHA384).mds("hello".getBytes());
+        System.out.println(HexStringUtil.toHexString(mdd));
 
         IMessageDigestor digestor = new MdMessageDigestor();
         doTest(digestor,str);
