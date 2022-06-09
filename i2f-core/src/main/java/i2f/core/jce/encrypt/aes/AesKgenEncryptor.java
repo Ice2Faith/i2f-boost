@@ -10,7 +10,7 @@ import i2f.core.jce.encrypt.BasicKgenEncryptor;
 public class AesKgenEncryptor extends BasicKgenEncryptor {
 
     public AesKgenEncryptor(byte[] secretBytes) {
-        super(AesType.CBC_NO_PADDING,secretBytes);
+        super(AesType.ECB_PKCS5PADDING,secretBytes);
     }
 
     public AesKgenEncryptor(AesType type, byte[] secretBytes) {

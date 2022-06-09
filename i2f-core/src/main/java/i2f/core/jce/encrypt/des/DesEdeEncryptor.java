@@ -10,7 +10,7 @@ import i2f.core.jce.encrypt.BasicEncryptor;
 public class DesEdeEncryptor extends BasicEncryptor {
 
     public DesEdeEncryptor(byte[] secretBytes) {
-        super(DesEdeType.CBC_NO_PADDING,secretBytes);
+        super(DesEdeType.ECB_PKCS5PADDING,secretBytes);
     }
 
     public DesEdeEncryptor(DesEdeType type, byte[] secretBytes) {

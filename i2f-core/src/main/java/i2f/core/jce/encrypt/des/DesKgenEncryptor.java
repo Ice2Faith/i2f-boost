@@ -10,7 +10,7 @@ import i2f.core.jce.encrypt.BasicKgenEncryptor;
 public class DesKgenEncryptor extends BasicKgenEncryptor {
 
     public DesKgenEncryptor(byte[] secretBytes) {
-        super(DesType.CBC_NO_PADDING,secretBytes);
+        super(DesType.ECB_PKCS5PADDING,secretBytes);
     }
 
     public DesKgenEncryptor(DesType type, byte[] secretBytes) {
@@ -20,5 +20,6 @@ public class DesKgenEncryptor extends BasicKgenEncryptor {
     public DesKgenEncryptor(DesType type, byte[] secretBytes, byte[] vectorBytes) {
         super(type,secretBytes,vectorBytes);
     }
+
 
 }

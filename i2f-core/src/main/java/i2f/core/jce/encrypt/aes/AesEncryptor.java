@@ -10,7 +10,7 @@ import i2f.core.jce.encrypt.BasicEncryptor;
 public class AesEncryptor extends BasicEncryptor {
 
     public AesEncryptor(byte[] secretBytes) {
-        super(AesType.CBC_NO_PADDING,secretBytes);
+        super(AesType.ECB_PKCS5PADDING,secretBytes);
     }
 
     public AesEncryptor(AesType type, byte[] secretBytes) {
