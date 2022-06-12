@@ -151,3 +151,12 @@ boost java develop
     - ribbon http load balance @EnableRibbonConfig
     - gateway micro-service gateway @EnableGatewayConfig
     - loadbanlancer http load balance @EnableLoadBalancerConfig
+    - actuator health spy @EnableActuatorClientConfig / @EnableActuatorServerConfig
+    - config center @EnableConfigClientConfig / @EnableConfigServerConfig
+    - sleuth trace @EnableSleuthConfig
+    - zipkin link relation @EnableZipkinConfig
+- includes:
+    - eureka registry and discovery @EnableEurekaClientConfig / @EnableEurekaServerConfig
+    - hystrix fallback @EnableHystrixConfig
+    - zuul gateway @EnableZuulConfig
+    
