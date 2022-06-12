@@ -1,30 +1,29 @@
-package i2f.springboot.cors;
+package i2f.springcloud.spring.gateway;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import java.util.Arrays;
 
 /**
  * @author ltb
- * @date 2022/3/27 13:40
+ * @date 2022/6/12 18:45
  * @desc
  */
 @Slf4j
 @Data
-@NoArgsConstructor
-@ConditionalOnExpression("${i2f.springboot.config.cors.enable:true}")
-@ConfigurationProperties(prefix = "i2f.springboot.config.cors")
+@ConditionalOnExpression("${i2f.springcloud.config.gateway.cors.enable:true}")
+@ConfigurationProperties(prefix = "i2f.springcloud.config.gateway.cors")
 @Configuration
-public class CorsConfig {
+public class GatewayCorsConfig {
     private String urlPatten="/**";
 
     private String allowOrigins="*";
@@ -34,12 +33,9 @@ public class CorsConfig {
     private boolean allowCredentials=true;
     private long maxAge=6000L;
 
-
     @Bean
-    public CorsFilter corsFilter()
-    {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
+    public CorsWebFilter corsFilter(){
+        CorsConfiguration config=new CorsConfiguration();
         config.setAllowedMethods(Arrays.asList(allowMethods.split(",")));
         config.setAllowedOrigins(Arrays.asList(allowOrigins.split(",")));
         config.setAllowedHeaders(Arrays.asList(allowHeaders.split(",")));
@@ -47,9 +43,10 @@ public class CorsConfig {
         config.setAllowCredentials(allowCredentials);
 
         config.setMaxAge(maxAge);
-        // 对接口配置跨域设置
-        source.registerCorsConfiguration(urlPatten, config);
-        log.info("CorsConfig CorsFilter config done.");
-        return new CorsFilter(source);
+        UrlBasedCorsConfigurationSource source=new UrlBasedCorsConfigurationSource(new PathPatternParser());
+        source.registerCorsConfiguration(urlPatten,config);
+
+        log.info("GatewayCorsConfig CorsWebFilter config done.");
+        return new CorsWebFilter(source);
     }
 }

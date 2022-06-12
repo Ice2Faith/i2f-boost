@@ -1,0 +1,82 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-svc
+  cloud:
+    # gateway配置
+    gateway:
+      # 配置路由规则，是一个列表，属性见 RouteDefinition.class
+      routes:
+        # 路由的唯一标识,一般直接使用微服务名称，方便识别
+
+        # 直接转发方式
+        - id: hello-svc
+          # 需要转发到的地址
+          uri: http://localhost:8081
+          # 配置断言规则，匹配上才进行转发
+          predicates:
+            # 以hello-svc为前缀时，就转发
+            # 当请求网关的http://localhost:8080/hello-svc开头的请求时
+            # 就进行转发到uri中配置的http://localhost:8081
+            # 但是，会带上路径前缀，所以转发的结果是http://localhost:8081/hello-svc
+            # 这样很明显不行，需要去除掉hello-svc这一层前缀
+            # 这就通过filters指定StripPrefix去除前缀的个数
+            - Path=/hello-svc/**
+          # 配置转发的过滤器
+          filters:
+            # 因为要转发，所以要把前缀给去除掉
+            # 前面说了，会多一层hello-svc的前缀，因此这里去除掉一层前缀
+            - StripPrefix=1
+
+        # 结合负载均衡lb的微服务常用方式
+        - id: admin-svc
+          # 以lb开头的uri表示使用loadbanlance进行负载均衡
+          # 这就是lb提供的一种uri
+          # 这样就可以结合注册中心的服务发现能力和负载均衡能力进行使用
+          uri: lb://admin-svc
+          predicates:
+            # 这里就是配置了，以/api/admin-svc/为前缀的，跳转到admin-svc这一个微服务
+            - Path=/api/admin-svc/**
+          filters:
+            # 同时，上面的前缀时2层，去除这个前缀
+            - StripPrefix=2
+
+      # 如果你的断言规则和转发规则就是微服务服务名
+      # 则可以使用这种简写的方式
+      # 也就是说，会自动根据服务发现中所有的服务名
+      # 配置以服务名为前缀的自动转发规则
+      # 例如有微服务名为：user-svc
+      # 则相当于配置了这样的规则
+      # id: user-svc
+      # uri: lb://user-svc
+      # predicates:
+      #    - Path=/user-svc/**
+      # filters:
+      #    - StripPrefix=1
+      # 显然很快速，但是缺乏灵活性，因此实际使用中不常使用
+      discovery:
+        locator:
+          enabled: true
+
+      # 配置全局跨域支持，可以配置多个
+      # 这里就配置一个全部允许跨域为例
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTION
+
+    # 服务发现能力的整合，这里使用整合nacos为例
+    # 其实就是直接引入nacos即可，配置上服务发现discovery
+    nacos:
+        discovery:
+          server-addr: 127.0.0.1:8848
+          namespace: public
+
