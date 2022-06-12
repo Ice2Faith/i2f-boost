@@ -37,6 +37,8 @@
         <module>i2f-test</module>
         <module>i2f-agent</module>
 
+        <!-- springcloud netflix -->
+
 
         <!--        <module>i2f-backup</module>-->
 
