@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Painter>
+    <Edges>
+        <Line id="e10001" formId="s1000" toId="s1001" text="" />
+
+    </Edges>
+    <Shapes>
+        <Rectangle  id="s1000" posX="10" posY="10" width="120" height="80" text="考试" />
+        <Ellipse    id="s1001" posX="20" posY="20" width="120" height="80" text="ID" />
+
+
+    </Shapes>
+</Painter>

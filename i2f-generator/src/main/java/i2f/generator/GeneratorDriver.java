@@ -50,4 +50,8 @@ public class GeneratorDriver {
         TableMeta table = DbBeanResolver.getTableMeta(beanClass);
         batch(table,templatePath,outputPath,codeCtx);
     }
+
+
+
+
 }
