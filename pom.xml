@@ -37,6 +37,8 @@
         <module>i2f-test</module>
         <module>i2f-agent</module>
 
+        <module>i2f-generator</module>
+
         <!-- springcloud netflix -->
 
 
@@ -99,6 +101,12 @@
                 <version>${i2f.version}</version>
             </dependency>
 
+
+            <dependency>
+                <groupId>i2f.boost</groupId>
+                <artifactId>i2f-generator</artifactId>
+                <version>${i2f.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

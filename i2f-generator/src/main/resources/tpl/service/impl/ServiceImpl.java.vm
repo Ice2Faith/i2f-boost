@@ -1,0 +1,54 @@
+#filename ${table.pascalName}ServiceImpl
+package ${code.pkg}.service.impl;
+
+import ${code.pkg}.service.${table.pascalName}Service;
+import ${code.pkg}.dao.${table.pascalName}Dao;
+import ${code.pkg}.model.${table.pascalName}Bean;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.lang.*;
+import java.util.*;
+
+/**
+ * @author ${code.author}
+ * @date ${_vm.format(${_vm.now()},"yyyy-MM-dd HH:mm:ss")}
+ * @desc ${table.name} ${table.comment}
+ */
+@Service
+@Transactional
+public class ${table.pascalName}ServiceImpl implements ${table.pascalName}Service {
+
+    @Resource
+    private ${table.pascalName}Dao ${table.camelName}Dao;
+
+    @Override
+    public List<${table.pascalName}Bean> getList(${table.pascalName}Bean post){
+        return ${table.camelName}Dao.getList(post);
+    }
+
+    @Override
+    public ${table.pascalName}Bean detail(${table.pascalName}Bean post){
+        List<${table.pascalName}Bean> list=${table.camelName}Dao.getList(post);
+        if(list.size()>0){
+            return list.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public int insertSelective(${table.pascalName}Bean post){
+        return ${table.camelName}Dao.insertSelective(post);
+    }
+
+    @Override
+    public int updateSelective(${table.pascalName}Bean post){
+        return ${table.camelName}Dao.updateSelective(post);
+    }
+
+    @Override
+    public int delete(${table.pascalName}Bean post){
+        return ${table.camelName}Dao.delete(post);
+    }
+}

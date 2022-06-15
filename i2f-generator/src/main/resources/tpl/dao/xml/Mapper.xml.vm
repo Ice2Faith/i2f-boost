@@ -1,0 +1,147 @@
+#filename ${table.pascalName}Mapper
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${code.pkg}.dao.${table.pascalName}Dao">
+
+    <resultMap id="beanMap" type="${code.pkg}.model.${table.pascalName}Bean">
+        #foreach( ${item} in ${table.columns})
+            <result property="${item.camelName}" column="${item.name}"/>
+        #end
+    </resultMap>
+
+    <select id="getList" resultMap="beanMap">
+        select
+        #foreach(${item} in ${table.columns})
+            a.${item.name}
+            #if($velocityCount < $table.columns.size())
+                ,
+            #end
+        #end
+        from ${table.name} a
+        <where>
+            #foreach(${item} in ${table.columns})
+                #if(${item.javaType}=="String")
+                    <if test="${item.camelName}!=null and ${item.camelName}!=''">
+                        and a.${item.name} like concat('%',concat( #{${item.camelName},jdbcType=${item.jdbcType}} ,'%'))
+                    </if>
+                #else
+                    <if test="${item.camelName}!=null">
+                        and a.${item.name} = #{${item.camelName},jdbcType=${item.jdbcType}}
+                    </if>
+                #end
+            #end
+        </where>
+    </select>
+
+    <insert id="insert">
+
+        insert into ${table.name}
+        (
+        <trim prefixOverrides="," suffixOverrides=",">
+            #foreach(${item} in ${table.columns})
+                ,${item.name}
+            #end
+        </trim>
+        )
+        values
+        (
+        <trim prefixOverrides="," suffixOverrides=",">
+            #foreach(${item} in ${table.columns})
+                ,#{${item.camelName},jdbcType=${item.jdbcType}}
+            #end
+        </trim>
+        )
+    </insert>
+
+    <insert id="insertSelective">
+
+        insert into ${table.name}
+        (
+        <trim prefixOverrides="," suffixOverrides=",">
+            #foreach(${item} in ${table.columns})
+                #if(${item.javaType}=="String")
+                    <if test="${item.camelName}!=null and ${item.camelName}!=''">
+                        ,${item.name}
+                    </if>
+                #else
+                    <if test="${item.camelName}!=null">
+                        ,${item.name}
+                    </if>
+                #end
+
+            #end
+        </trim>
+        )
+        values
+        (
+        <trim prefixOverrides="," suffixOverrides=",">
+            #foreach(${item} in ${table.columns})
+                #if(${item.javaType}=="String")
+                <if test="${item.camelName}!=null and ${item.camelName}!=''">
+                    ,#{${item.camelName},jdbcType=${item.jdbcType}}
+                </if>
+                #else
+                    <if test="${item.camelName}!=null">
+                        ,#{${item.camelName},jdbcType=${item.jdbcType}}
+                    </if>
+                #end
+            #end
+        </trim>
+        )
+    </insert>
+
+    <update id="update">
+        update ${table.name}
+        <set>
+            #foreach(${item} in ${table.columns})
+                #{${item.camelName},jdbcType=${item.jdbcType}}
+            #end
+        </set>
+        where
+        <trim prefixOverrides="and|or" suffixOverrides="and|or">
+            #foreach(${item} in ${table.columns})
+                #if(${item.isPrimaryKey}=="YES")
+                    and ${item.name} = #{${item.camelName},jdbcType=${item.jdbcType}}
+                #end
+            #end
+        </trim>
+    </update>
+
+    <update id="updateSelective">
+        update ${table.name}
+        <set>
+            #foreach(${item} in ${table.columns})
+                #if(${item.javaType}=="String")
+                    <if test="${item.camelName}!=null and ${item.camelName}!=''">
+                        ,#{${item.camelName},jdbcType=${item.jdbcType}}
+                    </if>
+                #else
+                    <if test="${item.camelName}!=null">
+                        ,#{${item.camelName},jdbcType=${item.jdbcType}}
+                    </if>
+                #end
+            #end
+        </set>
+        where
+        <trim prefixOverrides="and|or" suffixOverrides="and|or">
+            #foreach(${item} in ${table.columns})
+                #if(${item.isPrimaryKey}=="YES")
+                    and ${item.name} = #{${item.camelName},jdbcType=${item.jdbcType}}
+                #end
+            #end
+        </trim>
+    </update>
+
+    <delete id="delete">
+        delete from ${table.name}
+        where
+        <trim prefixOverrides="and|or" suffixOverrides="and|or">
+            #foreach(${item} in ${table.columns})
+                #if(${item.isPrimaryKey}=="YES")
+                    and ${item.name} = #{${item.camelName},jdbcType=${item.jdbcType}}
+                #end
+            #end
+        </trim>
+    </delete>
+</mapper>

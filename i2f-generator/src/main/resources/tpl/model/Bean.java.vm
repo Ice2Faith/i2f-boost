@@ -1,0 +1,29 @@
+#filename ${table.pascalName}Bean
+package ${code.pkg}.model;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.lang.*;
+import java.util.*;
+
+/**
+ * @author ${code.author}
+ * @date ${_vm.format(${_vm.now()},"yyyy-MM-dd HH:mm:ss")}
+ * @desc ${table.name} ${table.comment}
+ */
+@Data
+@NoArgsConstructor
+public class ${table.pascalName}Bean {
+
+    #foreach( ${item} in ${table.columns})
+        #if(${item.isPrimaryKey}=="YES")
+            // [primary]
+        #end
+        #if(${item.isAutoincrement}=="YES")
+            // [auto]
+        #end
+        //${item.name} ${item.comment}
+        private ${item.javaType} ${item.camelName};
+    #end
+}

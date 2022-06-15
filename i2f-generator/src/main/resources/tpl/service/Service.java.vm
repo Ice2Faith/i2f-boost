@@ -1,0 +1,25 @@
+#filename ${table.pascalName}Service
+package ${code.pkg}.service;
+
+import ${code.pkg}.model.${table.pascalName}Bean;
+
+import java.lang.*;
+import java.util.*;
+
+/**
+ * @author ${code.author}
+ * @date ${_vm.format(${_vm.now()},"yyyy-MM-dd HH:mm:ss")}
+ * @desc ${table.name} ${table.comment}
+ */
+public interface ${table.pascalName}Service {
+
+    List<${table.pascalName}Bean> getList(${table.pascalName}Bean post);
+
+    ${table.pascalName}Bean detail(${table.pascalName}Bean post);
+
+    int insertSelective(${table.pascalName}Bean post);
+
+    int updateSelective(${table.pascalName}Bean post);
+
+    int delete(${table.pascalName}Bean post);
+}

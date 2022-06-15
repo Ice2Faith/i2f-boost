@@ -1,0 +1,29 @@
+#filename ${table.pascalName}Dao
+package ${code.pkg}.dao;
+
+import ${code.pkg}.model.${table.pascalName}Bean;
+
+import org.apache.ibatis.annotations.Param;
+
+import java.lang.*;
+import java.util.*;
+
+/**
+ * @author ${code.author}
+ * @date ${_vm.format(${_vm.now()},"yyyy-MM-dd HH:mm:ss")}
+ * @desc ${table.name} ${table.comment}
+ */
+public interface ${table.pascalName}Dao {
+
+    List<${table.pascalName}Bean> getList(@Param("post")${table.pascalName}Bean post);
+
+    int insert(@Param("post")${table.pascalName}Bean post);
+
+    int insertSelective(@Param("post")${table.pascalName}Bean post);
+
+    int update(@Param("post")${table.pascalName}Bean post);
+
+    int updateSelective(@Param("post")${table.pascalName}Bean post);
+
+    int delete(@Param("post")${table.pascalName}Bean post);
+}

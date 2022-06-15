@@ -1,0 +1,72 @@
+#filename ${table.pascalName}Api
+${_vm.sharp}${_vm.sharp} module
+- date ${_vm.format(${_vm.now()},"yyyy-MM-dd HH:mm:ss")}
+- desc ${table.comment}
+
+---
+${_vm.sharp}${_vm.sharp} vo
+```js
+{
+  #foreach( ${item} in ${table.columns})
+    #if(${item.isPrimaryKey}=="YES")
+            // [ID]
+        #end
+         "${item.camelName}":"", // ${item.javaType} ${item.comment}
+    #end
+}
+```
+
+---
+${_vm.sharp}${_vm.sharp} api
+${_vm.sharp}${_vm.sharp}${_vm.sharp} list
+- path
+```bash
+POST /${table.camelName}/list
+```
+- request json
+    - reference vo
+
+${_vm.sharp}${_vm.sharp}${_vm.sharp} detail
+```bash
+POST /${table.camelName}/detail
+```
+- request json
+```json
+{
+ #foreach(${item} in ${table.columns})
+    #if(${item.isPrimaryKey}=="YES")
+        "${item.camelName}":"",
+    #end
+#end
+
+}
+```
+
+${_vm.sharp}${_vm.sharp}${_vm.sharp} add
+```bash
+POST /${table.camelName}/add
+```
+- request json
+    - reference vo
+
+${_vm.sharp}${_vm.sharp}${_vm.sharp} update
+```bash
+POST /${table.camelName}/update
+```
+- request json
+    - reference vo
+
+${_vm.sharp}${_vm.sharp}${_vm.sharp} delete
+```bash
+POST /${table.camelName}/delete
+```
+```json
+{
+ #foreach(${item} in ${table.columns})
+    #if(${item.isPrimaryKey}=="YES")
+        "${item.camelName}":"",
+    #end
+#end
+
+}
+```

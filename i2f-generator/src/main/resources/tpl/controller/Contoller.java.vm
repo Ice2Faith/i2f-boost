@@ -1,0 +1,50 @@
+#filename ${table.pascalName}Controller
+package ${code.pkg}.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import ${code.pkg}.service.${table.pascalName}Service;
+import ${code.pkg}.model.${table.pascalName}Bean;
+import java.lang.*;
+import java.util.*;
+
+/**
+ * @author ${code.author}
+ * @date ${_vm.format(${_vm.now()},"yyyy-MM-dd HH:mm:ss")}
+ * @desc ${table.name} ${table.comment}
+ */
+@RestController
+@RequestMapping("${table.camelName}")
+public class ${table.pascalName}Controller {
+
+    @Autowired
+    private ${table.pascalName}Service ${table.camelName}Service;
+
+    @PostMapping("list")
+    public List<${table.pascalName}Bean> getList(${table.pascalName}Bean post){
+        return ${table.camelName}Service.getList(post);
+    }
+
+    @PostMapping("detail")
+    public ${table.pascalName}Bean detail(${table.pascalName}Bean post){
+        return ${table.camelName}Service.detail(post);
+    }
+
+    @PostMapping("add")
+    public int add(@RequestBody ${table.pascalName}Bean post){
+        return ${table.camelName}Service.insertSelective(post);
+    }
+
+    @PostMapping("update")
+    public int update(@RequestBody ${table.pascalName}Bean post){
+        return ${table.camelName}Service.updateSelective(post);
+    }
+
+    @PostMapping("delete")
+    public int delete(@RequestBody ${table.pascalName}Bean post){
+        return ${table.camelName}Service.delete(post);
+    }
+}
