@@ -1,5 +1,6 @@
 package com.i2f.demo.modules.generate;
 
+import i2f.core.resource.ResourceUtil;
 import i2f.generator.GeneratorDriver;
 import i2f.generator.data.JavaCodeContext;
 import lombok.SneakyThrows;
@@ -30,9 +31,38 @@ public class Generator implements ApplicationListener<ApplicationEvent> {
         code.setPkg("com.i2f.agen");
         code.setAuthor("i2f");
 
-        String templatePath="D:\\IDEA_ROOT\\DevCenter\\i2f-boost\\i2f-generator\\src\\main\\resources\\tpl";
+        String templatePath="D:\\IDEA_ROOT\\DevCenter\\i2f-boost\\i2f-generator\\src\\main\\resources\\tpl\\code";
         String outputPath="D:\\IDEA_ROOT\\DevCenter\\i2f-boost\\i2f-test\\src\\main\\java\\com\\i2f\\agen";
         GeneratorDriver.batch(conn, "sys_config",templatePath,outputPath,code);
+
+
+        String erTpl= ResourceUtil.getClasspathResourceAsString("tpl/er/er.xml.vm","UTF-8");
+
+        String er = GeneratorDriver.doc(conn, erTpl,
+                "ACT_RE_DEPLOYMENT",
+                "ACT_RE_MODEL",
+                "ACT_RE_PROCDEF",
+                "ACT_RU_EXECUTION",
+                "ACT_RU_JOB",
+                "ACT_RU_TASK",
+                "ACT_RU_TIMER_JOB");
+
+
+        System.out.println(er);
+
+
+        String docTpl= ResourceUtil.getClasspathResourceAsString("tpl/doc/doc.html.vm","UTF-8");
+
+        String doc = GeneratorDriver.doc(conn, docTpl,
+                "ACT_RE_DEPLOYMENT",
+                "ACT_RE_MODEL",
+                "ACT_RE_PROCDEF",
+                "ACT_RU_EXECUTION",
+                "ACT_RU_JOB",
+                "ACT_RU_TASK",
+                "ACT_RU_TIMER_JOB");
+
+        System.out.println(doc);
 
         conn.close();
 

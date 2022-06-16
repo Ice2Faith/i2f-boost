@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>table doc</title>
+</head>
+<body>
+    <h1>table design doc</h1>
+    #foreach(${table} in ${tables})
+        <hr/>
+        <hr/>
+        <h2>table:   ${table.table}</h2>
+        <h3>remark:  ${table.remark}</h3>
+        <h3>schema:  ${_vm.ifnull(${table.schema},"")}</h3>
+        <h3>catalog: ${_vm.ifnull(${table.catalog},"")}</h3>
+        <table border="1" cellspacing="0" style="width:100%;">
+            <tr style="background-color: #ddd;">
+                <th style="width: 5%;">
+                    number
+                </th>
+                <th style="width: 20%;">
+                    name
+                </th>
+                <th style="width: 20%;">
+                    type
+                </th>
+                <th style="width: 5%;">
+                    precision
+                </th>
+                <th style="width: 5%;">
+                    scale
+                </th>
+                <th style="width: 5%;">
+                    nullable
+                </th>
+                <th style="width: 5%;">
+                    default
+                </th>
+                <th style="width: 5%;">
+                    primary
+                </th>
+                <th style="width: 5%;">
+                    unique
+                </th>
+                <th style="width: 5%;">
+                    index
+                </th>
+                <th style="width: 20%;">
+                    comment
+                </th>
+            </tr>
+            #foreach(${column} in ${table.columns})
+            <tr>
+                <td style="background-color: #eee;">
+                    $velocityCount
+                </td>
+                <td>
+                    ${column.name}
+                </td>
+                <td>
+                    ${column.typeName}
+                    #if(${column.precision}>0)
+                        (
+                        ${column.precision}
+                        #if(${column.scale}>0)
+                            ,${column.scale}
+                        #end
+                        )
+                    #end
+                </td>
+                <td>
+                    ${column.precision}
+                </td>
+                <td>
+                    ${column.scale}
+                </td>
+                <td>
+                    #if(${column.nullable}==1)
+                        YES
+                    #else
+                        NO
+                    #end
+                </td>
+                <td>
+                    ${_vm.ifnull(${column.columnDef},"")}
+                </td>
+                <td>
+                    ${column.isPrimaryKey}
+                </td>
+                <td>
+                    ${column.isUnique}
+                </td>
+                <td>
+                    ${column.isIndex}
+                </td>
+                <td>
+                    ${_vm.ifnull(${column.remark},"")}
+                </td>
+            </tr>
+            #end
+        </table>
+    #end
+
+
+</body>
+</html>

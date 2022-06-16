@@ -127,4 +127,42 @@ public class StreamUtil {
         }
         bos.flush();
     }
+
+    public static byte[] readBytes(InputStream is,boolean closeIs) throws IOException {
+        ByteArrayOutputStream bos=new ByteArrayOutputStream();
+        streamCopy(is,bos,true,closeIs);
+        return bos.toByteArray();
+    }
+    public static String readString(Reader reader,boolean closeIs) throws IOException {
+        StringBuilder builder=new StringBuilder();
+        int ch=0;
+        while((ch=reader.read())>=0){
+            builder.append((char)ch);
+        }
+        if(closeIs){
+            reader.close();
+        }
+        return builder.toString();
+    }
+    public static String readString(InputStream is,String charset,boolean closeIs) throws IOException {
+        InputStreamReader reader=new InputStreamReader(is,charset);
+        return readString(reader,closeIs);
+    }
+
+    public static void writeBytes(byte[] data,OutputStream os,boolean closeOs) throws IOException {
+        ByteArrayInputStream bis=new ByteArrayInputStream(data);
+        streamCopy(bis,os,closeOs,true);
+    }
+
+    public static void writeString(String str,OutputStream os,String charset,boolean closeOs) throws IOException {
+        byte[] data=str.getBytes(charset);
+        writeBytes(data,os,closeOs);
+    }
+
+    public static void writeString(String str,Writer os,boolean closeOs) throws IOException {
+        os.write(str);
+        if(closeOs){
+            os.close();
+        }
+    }
 }

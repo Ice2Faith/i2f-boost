@@ -5,6 +5,7 @@ import i2f.core.array.ArrayUtil;
 import i2f.core.collection.CollectionUtil;
 import i2f.core.match.IMatcher;
 import i2f.core.match.impl.AntMatcher;
+import i2f.core.stream.StreamUtil;
 
 import java.io.*;
 import java.net.URL;
@@ -81,6 +82,20 @@ public class ResourceUtil {
             throw new FileNotFoundException("could not found resource as:"+location);
         }
         return urls[0].openStream();
+    }
+
+    public static byte[] getResourceAsBytes(String location) throws IOException{
+        return StreamUtil.readBytes(getResourceAsStream(location),true);
+    }
+    public static String getResourceAsString(String location,String charset) throws IOException{
+        return StreamUtil.readString(getResourceAsStream(location),charset,true);
+    }
+
+    public static byte[] getClasspathResourceAsBytes(String location) throws IOException{
+        return StreamUtil.readBytes(getClasspathResourceAsStream(location),true);
+    }
+    public static String getClasspathResourceAsString(String location,String charset) throws IOException{
+        return StreamUtil.readString(getClasspathResourceAsStream(location),charset,true);
     }
 
     /**

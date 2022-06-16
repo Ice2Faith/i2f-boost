@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -27,4 +29,19 @@ public class TableMeta {
     private String typeName;
     private String selfReferencingColName;
     private String refGeneration;
+
+    public static class ColumnNameComparator implements Comparator<TableColumnMeta>{
+        @Override
+        public int compare(TableColumnMeta o1, TableColumnMeta o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    }
+
+    public TableMeta sortColumns(){
+        if(columns==null){
+            return this;
+        }
+        Collections.sort(columns,new ColumnNameComparator());
+        return this;
+    }
 }

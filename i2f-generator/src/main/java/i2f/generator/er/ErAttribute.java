@@ -16,15 +16,15 @@ import java.util.List;
 public class ErAttribute {
     private String id;
     private int posX;
-    private int poxY;
+    private int posY;
     private int width;
     private int height;
     private String text;
     public static ErAttribute parse(TableColumnMeta meta){
         ErAttribute ret=new ErAttribute();
         ret.id= CodeUtil.makeUUID();
-        ret.width=120;
-        ret.height=80;
+        ret.width=100;
+        ret.height=60;
         ret.text=meta.getRemark();
         return ret;
     }

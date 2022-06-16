@@ -16,7 +16,7 @@ import java.util.List;
 public class ErEntity {
     private String id;
     private int posX;
-    private int poxY;
+    private int posY;
     private int width;
     private int height;
     private String text;
@@ -25,7 +25,7 @@ public class ErEntity {
     public static ErEntity parse(TableMeta meta){
         ErEntity ret=new ErEntity();
         ret.id= CodeUtil.makeUUID();
-        ret.width=120;
+        ret.width=160;
         ret.height=80;
         ret.text=meta.getRemark();
         ret.attrs=ErAttribute.parse(meta.getColumns());
