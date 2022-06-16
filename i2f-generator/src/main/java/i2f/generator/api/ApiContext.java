@@ -4,6 +4,8 @@ import i2f.core.annotations.remark.Remark;
 import i2f.core.db.data.TableMeta;
 import i2f.core.reflect.core.ReflectResolver;
 import i2f.core.str.Appender;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import org.springframework.web.bind.annotation.*;
 
@@ -130,7 +132,37 @@ public class ApiContext {
             String comment= Appender.sepStr(" \n",ann.value());
             ret.comment=comment;
         }
-        ret.lines=ApiJoinLine.parseMethod(method);
+
+        if(swaggerSupport()){
+            Api apiann=ReflectResolver.findAnnotation(clazz,Api.class,false);
+            ApiOperation opeann=ReflectResolver.findAnnotation(method,ApiOperation.class,false);
+            String comment=Appender.builder()
+                    .addWhen(apiann!=null,apiann.value())
+                    .keepEnd(" ")
+                    .addWhen(opeann!=null,opeann.value())
+                    .keepEnd(" ")
+                    .addsWhen(apiann!=null,apiann.tags())
+                    .keepEnd(" ")
+                    .addsWhen(opeann!=null,opeann.tags())
+                    .get();
+            ret.comment=comment;
+        }
+
+        ret.lines=ApiJoinLine.parseMethod(method,true);
         return ret;
+    }
+
+    public static boolean swaggerSupport(){
+        boolean swaggerFind=false;
+        try{
+            String swaggerAnnName="io.swagger.annotations.ApiModelProperty";
+            Class<?> aClass = Class.forName(swaggerAnnName);
+            if(aClass!=null){
+                swaggerFind=true;
+            }
+        }catch(Exception e){
+
+        }
+        return swaggerFind;
     }
 }
