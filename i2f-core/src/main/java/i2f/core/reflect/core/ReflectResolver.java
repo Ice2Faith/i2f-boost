@@ -573,8 +573,10 @@ public class ReflectResolver {
         Set<Field> fds = getAllFields(clazz);
         ret.addAll(fds);
         Class sclazz = clazz.getSuperclass();
-        Set<Field> sfds = forceAllFields(sclazz);
-        ret.addAll(sfds);
+        if(sclazz!=null){
+            Set<Field> sfds = forceAllFields(sclazz);
+            ret.addAll(sfds);
+        }
         cacheForceFields.put(clazz, ret);
         return CollectionUtil.toCollection(new HashSet<Field>(),ret);
     }
@@ -631,7 +633,9 @@ public class ReflectResolver {
             if (!Object.class.equals(locClass)) {
                 Set<Class> supers = new HashSet<>();
                 Class superClass = locClass.getSuperclass();
-                supers.add(superClass);
+                if(superClass!=null){
+                    supers.add(superClass);
+                }
                 Class[] interfaces = locClass.getInterfaces();
                 for (Class item : interfaces) {
                     supers.add(item);

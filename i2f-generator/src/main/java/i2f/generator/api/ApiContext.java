@@ -136,15 +136,21 @@ public class ApiContext {
         if(swaggerSupport()){
             Api apiann=ReflectResolver.findAnnotation(clazz,Api.class,false);
             ApiOperation opeann=ReflectResolver.findAnnotation(method,ApiOperation.class,false);
-            String comment=Appender.builder()
-                    .addWhen(apiann!=null,apiann.value())
-                    .keepEnd(" ")
-                    .addWhen(opeann!=null,opeann.value())
-                    .keepEnd(" ")
-                    .addsWhen(apiann!=null,apiann.tags())
-                    .keepEnd(" ")
-                    .addsWhen(opeann!=null,opeann.tags())
-                    .get();
+            Appender<StringBuilder> builder = Appender.builder();
+            if(apiann!=null){
+                builder.adds(apiann.value());
+                builder.keepEnd(" ");
+                builder.adds(apiann.tags());
+                builder.keepEnd(" ");
+            }
+            if(opeann!=null){
+                builder.adds(opeann.value());
+                builder.keepEnd(" ");
+                builder.adds(opeann.tags());
+                builder.keepEnd(" ");
+            }
+            String comment= builder.get();
+
             ret.comment=comment;
         }
 

@@ -83,6 +83,9 @@ public abstract class AbstractClassFilter implements IClassFilter{
         if(isMask(code, FilterType.SUPERCLASS)){
             try{
                 Class suClazz=clazz.getSuperclass();
+                if(suClazz==null){
+                    return false;
+                }
                 if(onSuperClass(suClazz)){
                     return true;
                 }
