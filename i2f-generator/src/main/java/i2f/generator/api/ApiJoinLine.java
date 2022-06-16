@@ -113,6 +113,9 @@ public class ApiJoinLine {
         List<PropertyAccessor> fields = ReflectResolver.getLogicalReadWriteFields(clazz);
         for(PropertyAccessor item : fields){
             Field field = item.getField();
+            if(field==null){
+                continue;
+            }
             Class<?> type = field.getType();
             ApiJoinLine join=new ApiJoinLine();
             join.parent=parent;

@@ -171,6 +171,9 @@ public class BeanTagResolver {
         }
         for(PropertyAccessor item : list){
             Field field=item.getField();
+            if(field==null){
+                continue;
+            }
             BeanTag tag=ReflectResolver.findAnnotation(field, BeanTag.class,false);
             if(tag==null){
                 continue;

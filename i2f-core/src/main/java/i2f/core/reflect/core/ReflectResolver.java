@@ -225,6 +225,9 @@ public class ReflectResolver {
         }
         for(PropertyAccessor item : list){
             Field field=item.getField();
+            if(field==null){
+                continue;
+            }
             for(Class ann : annTypes){
                 Annotation tag=ReflectResolver.findAnnotation(field, ann,ckAnnotatedAnn);
                 if(tag!=null){

@@ -99,6 +99,9 @@ public class EsBeanManager {
         List<PropertyAccessor> ret=new ArrayList<>();
         for(PropertyAccessor item : list){
             Field field=item.getField();
+            if(field==null){
+                continue;
+            }
             EsField ann= ReflectResolver.findAnnotation(field,EsField.class,false);
             if(ann!=null){
                 if(!ann.value()){
