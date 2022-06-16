@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
@@ -114,6 +115,10 @@ public class ApiJoinLine {
         for(PropertyAccessor item : fields){
             Field field = item.getField();
             if(field==null){
+                continue;
+            }
+            int mod=field.getModifiers();
+            if(Modifier.isStatic(mod) && Modifier.isFinal(mod)){
                 continue;
             }
             Class<?> type = field.getType();
