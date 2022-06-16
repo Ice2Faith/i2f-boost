@@ -99,6 +99,9 @@ public class DbResolver {
         ResultSet rs = stat.executeQuery(sql);
         ResultSetMetaData meta = rs.getMetaData();
         TableMeta ret = inflateTableMeta(conn,meta);
+        if(ret.getTable()==null || "".equals(ret.getTable())){
+            ret.setTable(tableName);
+        }
         rs.close();
         stat.close();
         return ret;

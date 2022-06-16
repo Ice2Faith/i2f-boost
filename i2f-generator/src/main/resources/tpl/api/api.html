@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>api doc</title>
+</head>
+<body>
+<h1>api doc</h1>
+<hr/>
+<hr/>
+<h2>comment:   GET的接口</h2>
+<h3>url:  gen/get</h3>
+<h3>method:  GET</h3>
+<h3>contentType: </h3>
+<table border="1" cellspacing="0" style="width:100%;">
+    <tr style="background-color: #ddd;">
+        <th style="width: 5%;">
+            number
+        </th>
+        <th style="width: 20%;">
+            parent
+        </th>
+        <th style="width: 20%;">
+            name
+        </th>
+        <th style="width: 10%;">
+            restrict
+        </th>
+        <th style="width: 10%;">
+            type
+        </th>
+        <th style="width: 5%;">
+            width
+        </th>
+        <th style="width: 20%;">
+            comment
+        </th>
+        <th style="width: 10%;">
+            remark
+        </th>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            1
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            isIndex
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            2
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            isPrimaryKey
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            3
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            indexKeyName
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            4
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            isNullable
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            5
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            schemaName
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            6
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            isGeneratedColumn
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            7
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            uniqueKeyName
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            8
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            sourceDataType
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            9
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            primaryKeyName
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            10
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            ordinalPosition
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            11
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            javaTypeString
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            12
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            decimalDigits
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            13
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            indexType
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            14
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            indexUsing
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            15
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            dataType
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            16
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            catalogName
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            17
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            isUnique
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            18
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            label
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            19
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            isAutoincrement
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            20
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            name
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            21
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            tableName
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            22
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            sqlDataType
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            23
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            remark
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            24
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            nullable
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            25
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            bufferLength
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            26
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            columnSize
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            27
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            charOctetLength
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            28
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            numPrecRadix
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            29
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            columnDef
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            30
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            typeName
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            31
+        </td>
+        <td>
+            column
+        </td>
+        <td>
+            javaType
+        </td>
+        <td>
+
+        </td>
+        <td>
+            Class
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            32
+        </td>
+        <td>
+
+        </td>
+        <td>
+            userId
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+</table>
+<hr/>
+<hr/>
+<h2>comment:   DELETE的接口</h2>
+<h3>url:  gen/delete</h3>
+<h3>method:  DELETE</h3>
+<h3>contentType: </h3>
+<table border="1" cellspacing="0" style="width:100%;">
+    <tr style="background-color: #ddd;">
+        <th style="width: 5%;">
+            number
+        </th>
+        <th style="width: 20%;">
+            parent
+        </th>
+        <th style="width: 20%;">
+            name
+        </th>
+        <th style="width: 10%;">
+            restrict
+        </th>
+        <th style="width: 10%;">
+            type
+        </th>
+        <th style="width: 5%;">
+            width
+        </th>
+        <th style="width: 20%;">
+            comment
+        </th>
+        <th style="width: 10%;">
+            remark
+        </th>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            1
+        </td>
+        <td>
+            line
+        </td>
+        <td>
+            parent
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            2
+        </td>
+        <td>
+            line
+        </td>
+        <td>
+            comment
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            3
+        </td>
+        <td>
+            line
+        </td>
+        <td>
+            width
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            4
+        </td>
+        <td>
+            line
+        </td>
+        <td>
+            restrict
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            5
+        </td>
+        <td>
+            line
+        </td>
+        <td>
+            type
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            6
+        </td>
+        <td>
+            line
+        </td>
+        <td>
+            name
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            7
+        </td>
+        <td>
+            line
+        </td>
+        <td>
+            remark
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            8
+        </td>
+        <td>
+
+        </td>
+        <td>
+            userId
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+</table>
+<hr/>
+<hr/>
+<h2>comment:   ALL的接口</h2>
+<h3>url:  gen/request</h3>
+<h3>method:  ALL</h3>
+<h3>contentType: </h3>
+<table border="1" cellspacing="0" style="width:100%;">
+    <tr style="background-color: #ddd;">
+        <th style="width: 5%;">
+            number
+        </th>
+        <th style="width: 20%;">
+            parent
+        </th>
+        <th style="width: 20%;">
+            name
+        </th>
+        <th style="width: 10%;">
+            restrict
+        </th>
+        <th style="width: 10%;">
+            type
+        </th>
+        <th style="width: 5%;">
+            width
+        </th>
+        <th style="width: 20%;">
+            comment
+        </th>
+        <th style="width: 10%;">
+            remark
+        </th>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            1
+        </td>
+        <td>
+            er
+        </td>
+        <td>
+            text
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            2
+        </td>
+        <td>
+            er
+        </td>
+        <td>
+            id
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            3
+        </td>
+        <td>
+            er
+        </td>
+        <td>
+            attrs
+        </td>
+        <td>
+
+        </td>
+        <td>
+            List
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            4
+        </td>
+        <td>
+            er
+        </td>
+        <td>
+            lines
+        </td>
+        <td>
+
+        </td>
+        <td>
+            List
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            5
+        </td>
+        <td>
+
+        </td>
+        <td>
+            userId
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+</table>
+<hr/>
+<hr/>
+<h2>comment:   多个映射的接口</h2>
+<h3>url:  gen/calc/add | gen/calc/sub</h3>
+<h3>method:  ALL</h3>
+<h3>contentType: </h3>
+<table border="1" cellspacing="0" style="width:100%;">
+    <tr style="background-color: #ddd;">
+        <th style="width: 5%;">
+            number
+        </th>
+        <th style="width: 20%;">
+            parent
+        </th>
+        <th style="width: 20%;">
+            name
+        </th>
+        <th style="width: 10%;">
+            restrict
+        </th>
+        <th style="width: 10%;">
+            type
+        </th>
+        <th style="width: 5%;">
+            width
+        </th>
+        <th style="width: 20%;">
+            comment
+        </th>
+        <th style="width: 10%;">
+            remark
+        </th>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            1
+        </td>
+        <td>
+            er
+        </td>
+        <td>
+            text
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            2
+        </td>
+        <td>
+            er
+        </td>
+        <td>
+            id
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            3
+        </td>
+        <td>
+            er
+        </td>
+        <td>
+            attrs
+        </td>
+        <td>
+
+        </td>
+        <td>
+            List
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            4
+        </td>
+        <td>
+            er
+        </td>
+        <td>
+            lines
+        </td>
+        <td>
+
+        </td>
+        <td>
+            List
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            5
+        </td>
+        <td>
+
+        </td>
+        <td>
+            userId
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+</table>
+<hr/>
+<hr/>
+<h2>comment:   欢迎接口</h2>
+<h3>url:  gen/hello</h3>
+<h3>method:  POST</h3>
+<h3>contentType: </h3>
+<table border="1" cellspacing="0" style="width:100%;">
+    <tr style="background-color: #ddd;">
+        <th style="width: 5%;">
+            number
+        </th>
+        <th style="width: 20%;">
+            parent
+        </th>
+        <th style="width: 20%;">
+            name
+        </th>
+        <th style="width: 10%;">
+            restrict
+        </th>
+        <th style="width: 10%;">
+            type
+        </th>
+        <th style="width: 5%;">
+            width
+        </th>
+        <th style="width: 20%;">
+            comment
+        </th>
+        <th style="width: 10%;">
+            remark
+        </th>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            1
+        </td>
+        <td>
+            meta
+        </td>
+        <td>
+            type
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            2
+        </td>
+        <td>
+            meta
+        </td>
+        <td>
+            schema
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            3
+        </td>
+        <td>
+            meta
+        </td>
+        <td>
+            typeSchema
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            4
+        </td>
+        <td>
+            meta
+        </td>
+        <td>
+            typeCatalog
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            5
+        </td>
+        <td>
+            meta
+        </td>
+        <td>
+            typeName
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            6
+        </td>
+        <td>
+            meta
+        </td>
+        <td>
+            catalog
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            7
+        </td>
+        <td>
+            meta
+        </td>
+        <td>
+            remark
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            8
+        </td>
+        <td>
+            meta
+        </td>
+        <td>
+            refGeneration
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            9
+        </td>
+        <td>
+            meta
+        </td>
+        <td>
+            table
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            10
+        </td>
+        <td>
+            meta
+        </td>
+        <td>
+            columns
+        </td>
+        <td>
+
+        </td>
+        <td>
+            List
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            11
+        </td>
+        <td>
+            meta
+        </td>
+        <td>
+            selfReferencingColName
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            12
+        </td>
+        <td>
+
+        </td>
+        <td>
+            userId
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+</table>
+<hr/>
+<hr/>
+<h2>comment:   PUT的接口</h2>
+<h3>url:  gen/put</h3>
+<h3>method:  PUT</h3>
+<h3>contentType: </h3>
+<table border="1" cellspacing="0" style="width:100%;">
+    <tr style="background-color: #ddd;">
+        <th style="width: 5%;">
+            number
+        </th>
+        <th style="width: 20%;">
+            parent
+        </th>
+        <th style="width: 20%;">
+            name
+        </th>
+        <th style="width: 10%;">
+            restrict
+        </th>
+        <th style="width: 10%;">
+            type
+        </th>
+        <th style="width: 5%;">
+            width
+        </th>
+        <th style="width: 20%;">
+            comment
+        </th>
+        <th style="width: 10%;">
+            remark
+        </th>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            1
+        </td>
+        <td>
+            ctx
+        </td>
+        <td>
+            contentType
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            2
+        </td>
+        <td>
+            ctx
+        </td>
+        <td>
+            comment
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            3
+        </td>
+        <td>
+            ctx
+        </td>
+        <td>
+            url
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            4
+        </td>
+        <td>
+            ctx
+        </td>
+        <td>
+            lines
+        </td>
+        <td>
+
+        </td>
+        <td>
+            List
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            5
+        </td>
+        <td>
+            ctx
+        </td>
+        <td>
+            method
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color: #eee;">
+            6
+        </td>
+        <td>
+
+        </td>
+        <td>
+            userId
+        </td>
+        <td>
+
+        </td>
+        <td>
+            String
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+</table>
+
+
+</body>
+</html>

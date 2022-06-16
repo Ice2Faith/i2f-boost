@@ -1,0 +1,7 @@
+- html2doc
+- 使用word打开html文件
+- 另存为doc文件为a.doc
+- 新建一个空的doc文件为b.doc
+- 打开这两个doc文件a.doc,b.doc
+- 将另存为的a.doc中内容全选
+- 复制到空的b.doc中即可保持页面不变

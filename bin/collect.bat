@@ -1,3 +1,4 @@
+@echo off
 echo begin...
 set BACKUP_PATH=.\backup
 set DEPLOY_PATH=.\deploy
