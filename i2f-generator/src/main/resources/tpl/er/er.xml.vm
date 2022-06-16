@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Painter>
+    <Edges>
+        #foreach(${item} in ${er.lines})
+            <Line id="${item.id}" formId="${item.formId}" toId="${item.toId}" text="${item.text}" />
+        #end
+
+    </Edges>
+    <Shapes>
+        #foreach(${item} in ${er.entities})
+            <Rectangle  id="${item.id}" posX="${item.posX}" posY="${item.posY}" width="${item.width}" height="${item.height}" text="${item.text}" />
+        #end
+
+        #foreach(${item} in ${er.attrs})
+            <Ellipse    id="${item.id}" posX="${item.posX}" posY="${item.posY}" width="${item.width}" height="${item.height}" text="${item.text}" />
+        #end
+    </Shapes>
+</Painter>
