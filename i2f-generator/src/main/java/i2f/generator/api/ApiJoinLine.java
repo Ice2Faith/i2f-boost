@@ -11,6 +11,7 @@ import i2f.core.str.Appender;
 import i2f.extension.template.velocity.GeneratorTool;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiParam;
 import lombok.Data;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -51,6 +52,12 @@ public class ApiJoinLine {
 
         return ret;
     }
+    public static boolean isSimpleType(Class clazz){
+        if(clazz.getName().startsWith("java.lang.") || clazz.getName().startsWith("java.util.")){
+            return true;
+        }
+        return false;
+    }
     public static List<ApiJoinLine> parseMethod(Method method){
         return parseMethod(method,false);
     }
@@ -88,10 +95,17 @@ public class ApiJoinLine {
                     join.comment = apiann.value();
                     join.remark=apiann.description();
                 }
+                ApiParam apipar=ReflectResolver.findAnnotation(item,ApiParam.class,false);
+                if(apipar!=null){
+                    join.comment= apipar.value();
+                    join.remark=apipar.example();
+                }
             }
             ret.add(join);
-            List<ApiJoinLine> lines=parseVo(item.getType(),name);
-            ret.addAll(lines);
+            if(!isSimpleType(item.getType())){
+                List<ApiJoinLine> lines=parseVo(item.getType(),name);
+                ret.addAll(lines);
+            }
         }
 
         return ret;
@@ -99,7 +113,7 @@ public class ApiJoinLine {
 
     public static List<ApiJoinLine> parseVo(Class clazz,String parent){
         List<ApiJoinLine> ret=new ArrayList<>();
-        if(clazz.getName().startsWith("java.lang.") || clazz.getName().startsWith("java.util.")){
+        if(isSimpleType(clazz)){
             ApiJoinLine join=new ApiJoinLine();
             join.parent=null;
             join.name= parent;
@@ -147,7 +161,7 @@ public class ApiJoinLine {
             }
             join.remark=null;
             ret.add(join);
-            if(!type.getName().startsWith("java.lang.") && !type.getName().startsWith("java.util.")){
+            if(!isSimpleType(type)){
                 List<ApiJoinLine> nexts=parseVo(type, field.getName());
                 ret.addAll(nexts);
             }

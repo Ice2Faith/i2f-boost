@@ -25,7 +25,8 @@ public class ApiContext {
     private String method;
     private String comment;
     private String contentType;
-    private List<ApiJoinLine> lines;
+    private List<ApiJoinLine> lines=new ArrayList<>();
+    private List<ApiJoinLine> returns=new ArrayList<>();
 
     public static ApiContext parse(TableMeta meta){
         ApiContext ret=new ApiContext();
@@ -51,6 +52,8 @@ public class ApiContext {
     public static ApiContext parse(Method method){
         ApiContext ret=new ApiContext();
         ret.lines=ApiJoinLine.parseMethod(method);
+        ret.returns = ApiJoinLine.parseVo(method.getReturnType(),null);
+
         return ret;
     }
 
@@ -155,6 +158,7 @@ public class ApiContext {
         }
 
         ret.lines=ApiJoinLine.parseMethod(method,true);
+        ret.returns=ApiJoinLine.parseVo(method.getReturnType(),null);
         return ret;
     }
 

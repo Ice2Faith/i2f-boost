@@ -13,6 +13,7 @@
         <h3>url:  ${_vm.ifnull(${api.url},"")}</h3>
         <h3>method:  ${_vm.ifnull(${api.method},"")}</h3>
         <h3>contentType: ${_vm.ifnull(${api.contentType},"")}</h3>
+        <h3>request:</h3>
         <table border="1" cellspacing="0" style="width:100%;">
             <tr style="background-color: #ddd;">
                 <th style="width: 5%;">
@@ -69,6 +70,63 @@
             </tr>
             #end
         </table>
+    <h3>response:</h3>
+    <table border="1" cellspacing="0" style="width:100%;">
+        <tr style="background-color: #ddd;">
+            <th style="width: 5%;">
+                number
+            </th>
+            <th style="width: 20%;">
+                parent
+            </th>
+            <th style="width: 20%;">
+                name
+            </th>
+            <th style="width: 10%;">
+                restrict
+            </th>
+            <th style="width: 10%;">
+                type
+            </th>
+            <th style="width: 5%;">
+                width
+            </th>
+            <th style="width: 20%;">
+                comment
+            </th>
+            <th style="width: 10%;">
+                remark
+            </th>
+        </tr>
+        #foreach(${line} in ${api.returns})
+            <tr>
+                <td style="background-color: #eee;">
+                    $velocityCount
+                </td>
+                <td>
+                    ${_vm.ifnull(${line.parent},"")}
+                </td>
+                <td>
+                    ${_vm.ifnull(${line.name},"")}
+                </td>
+                <td>
+                    ${_vm.ifnull(${line.restrict},"")}
+                </td>
+                <td>
+                    ${_vm.ifnull(${line.type},"")}
+                </td>
+                <td>
+                    ${_vm.ifnull(${line.width},"")}
+                </td>
+                <td>
+                    ${_vm.ifnull(${line.comment},"")}
+                </td>
+                <td>
+                    ${_vm.ifnull(${line.remark},"")}
+                </td>
+            </tr>
+        #end
+    </table>
     #end
 
 
