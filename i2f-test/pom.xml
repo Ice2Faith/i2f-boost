@@ -155,6 +155,16 @@
                     <groupId>org.apache.skywalking</groupId>
                     <artifactId>apm-toolkit-trace</artifactId>
                 </exclusion>
+
+                <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+                </exclusion>
+
+                <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 

@@ -92,7 +92,7 @@ public class Generator implements ApplicationListener<ApplicationEvent> {
 
         String apiVo = GeneratorDriver.apiVo(ApiContext.class,apiVoTpl);
 
-        System.out.println(apiVo);
+//        System.out.println(apiVo);
 
         String apiMethodTpl= ResourceUtil.getClasspathResourceAsString("tpl/api/api.html.vm","UTF-8");
 
@@ -100,7 +100,7 @@ public class Generator implements ApplicationListener<ApplicationEvent> {
 
         String apiMethod = GeneratorDriver.apiMethod(method,apiMethodTpl);
 
-        System.out.println(apiMethod);
+//        System.out.println(apiMethod);
 
 
 
@@ -109,7 +109,7 @@ public class Generator implements ApplicationListener<ApplicationEvent> {
 
         String apiMvc = GeneratorDriver.apiMvc(this.getClass(),apiMvcTpl);
 
-        System.out.println(apiMvc);
+//        System.out.println(apiMvc);
 
         conn.close();
 
