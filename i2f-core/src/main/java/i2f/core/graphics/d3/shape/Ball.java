@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class Sphere{
+public class Ball {
     public double radius;
 
-    public Sphere(D3Point center, double radius) {
+    public Ball(D3Point center, double radius) {
         this.radius = radius;
     }
 

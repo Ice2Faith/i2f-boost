@@ -1,0 +1,38 @@
+package i2f.core.graphics.d3.transform.impl;
+
+import i2f.core.graphics.d3.D3Point;
+import i2f.core.graphics.d3.transform.ITransform;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * @author ltb
+ * @date 2022/6/18 21:27
+ * @desc 旋转变换，坐标依次绕x,y,z轴旋转sx,sy,sz角度（弧度制）,相对于轴右手向旋转
+ */
+@Data
+@NoArgsConstructor
+public class SpinTransform implements ITransform {
+    protected boolean enableMatrix=false;
+    protected double sx;
+    protected double sy;
+    protected double sz;
+
+
+    public SpinTransform(boolean enableMatrix, double sx, double sy, double sz) {
+        this.enableMatrix = enableMatrix;
+        this.sx = sx;
+        this.sy = sy;
+        this.sz = sz;
+    }
+
+    @Override
+    public D3Point transform(D3Point point) {
+        ITransform trans=new SpinXTransform(enableMatrix,sx);
+        D3Point p=trans.transform(point);
+        trans=new SpinYTransform(enableMatrix,sy);
+        p=trans.transform(p);
+        trans=new SpinZTransform(enableMatrix,sz);
+        return trans.transform(p);
+    }
+}

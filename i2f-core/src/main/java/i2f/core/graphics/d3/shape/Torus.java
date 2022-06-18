@@ -7,15 +7,15 @@ import lombok.NoArgsConstructor;
 /**
  * @author ltb
  * @date 2022/6/18 0:11
- * @desc 圆环
+ * @desc 环体
  */
 @Data
 @NoArgsConstructor
-public class Ring {
+public class Torus {
     public double mainRadius;
     public double subRadius;
 
-    public Ring(double mainRadius, double subRadius) {
+    public Torus(double mainRadius, double subRadius) {
         this.mainRadius = mainRadius;
         this.subRadius = subRadius;
     }

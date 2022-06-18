@@ -1,13 +1,9 @@
 package i2f.core.graphics.d3;
 
-import i2f.core.graphics.d2.Point;
-import i2f.core.graphics.d2.shape.Polygon;
+import i2f.core.graphics.d2.Flat;
 import i2f.core.graphics.d3.projection.IProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -18,21 +14,32 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class D3Flat {
-    public D3Point loc1;
-    public D3Point loc2;
-    public D3Point loc3;
+    public D3Point p1;
+    public D3Point p2;
+    public D3Point p3;
 
-    public D3Flat(D3Point loc1, D3Point loc2, D3Point loc3) {
-        this.loc1 = loc1;
-        this.loc2 = loc2;
-        this.loc3 = loc3;
+    public D3Flat(D3Point p1, D3Point p2, D3Point p3) {
+        this.p1 = p1;
+        this.p2 = p2;
+        this.p3 = p3;
     }
 
-    public Polygon projection(IProjection proj){
-        List<Point> points=new ArrayList<>();
-        points.add(loc1.projection(proj));
-        points.add(loc2.projection(proj));
-        points.add(loc3.projection(proj));
-        return new Polygon(points);
+    public Flat projection(IProjection proj){
+        Flat ret=new Flat();
+        ret.p1=p1.projection(proj);
+        ret.p2=p2.projection(proj);
+        ret.p3=p3.projection(proj);
+        return ret;
+    }
+
+    public D3Vector normalLine(){
+        D3Vector v1=D3Vector.vector(p1,p2);
+        D3Vector v2=D3Vector.vector(p2,p3);
+        return v1.normalLine(v2);
+    }
+
+    public D3Vector unitizationNormalLine(){
+        D3Vector nl=normalLine();
+        return nl.unitization();
     }
 }

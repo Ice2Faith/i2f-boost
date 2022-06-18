@@ -16,6 +16,13 @@ public class D3Point {
     public double x;
     public double y;
     public double z;
+
+    public D3Point(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
     public Point projection(IProjection proj){
         return proj.projection(this);
     }
