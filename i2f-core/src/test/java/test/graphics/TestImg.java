@@ -1,8 +1,9 @@
-package i2f.core.graphics.image;
+package test.graphics;
 
 import i2f.core.command.CmdLineExecutor;
 import i2f.core.graphics.color.Rgba;
 import i2f.core.graphics.d2.Point;
+import i2f.core.graphics.image.ImageUtil;
 import i2f.core.graphics.image.filter.IImageFilter;
 import i2f.core.graphics.image.filter.impl.*;
 
@@ -17,7 +18,7 @@ import java.io.IOException;
  */
 public class TestImg {
     public static void main(String[] args) throws IOException, InterruptedException {
-        BufferedImage simg=ImageUtil.load(new File("E:\\MySystemDefaultFiles\\Desktop\\疫情大屏_20220309162306.png"));
+        BufferedImage simg= ImageUtil.load(new File("E:\\MySystemDefaultFiles\\Desktop\\疫情大屏_20220309162306.png"));
         IImageFilter filter=new GrayImageFilter();
 
         filter=new DoubleValueImageFilter();
