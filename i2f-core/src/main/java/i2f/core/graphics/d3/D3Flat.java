@@ -1,7 +1,14 @@
 package i2f.core.graphics.d3;
 
+import i2f.core.graphics.d2.Point;
+import i2f.core.graphics.d2.shape.Polygon;
+import i2f.core.graphics.d3.projection.IProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * @author ltb
@@ -19,5 +26,13 @@ public class D3Flat {
         this.loc1 = loc1;
         this.loc2 = loc2;
         this.loc3 = loc3;
+    }
+
+    public Polygon projection(IProjection proj){
+        List<Point> points=new ArrayList<>();
+        points.add(loc1.projection(proj));
+        points.add(loc2.projection(proj));
+        points.add(loc3.projection(proj));
+        return new Polygon(points);
     }
 }

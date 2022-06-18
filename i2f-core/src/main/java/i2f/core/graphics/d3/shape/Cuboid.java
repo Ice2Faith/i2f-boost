@@ -1,9 +1,8 @@
 package i2f.core.graphics.d3.shape;
 
-import i2f.core.graphics.d3.D3Point;
-import i2f.core.graphics.d3.D3Scope;
-import i2f.core.graphics.d3.D3Size;
+import i2f.core.graphics.d3.data.D3Model;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author ltb
@@ -11,11 +10,19 @@ import lombok.Data;
  * @desc 长方体
  */
 @Data
-public class Cuboid extends D3Scope {
-    public Cuboid() {
+@NoArgsConstructor
+public class Cuboid {
+    public double dx;
+    public double dy;
+    public double dz;
+
+    public Cuboid(double dx, double dy, double dz) {
+        this.dx = dx;
+        this.dy = dy;
+        this.dz = dz;
     }
 
-    public Cuboid(D3Point point, D3Size size) {
-        super(point, size);
+    public D3Model makeModel(int xcnt, int ycnt, int zcnt){
+        return null;
     }
 }

@@ -1,5 +1,7 @@
 package i2f.core.graphics.d3;
 
+import i2f.core.graphics.d2.Point;
+import i2f.core.graphics.d3.projection.IProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,4 +16,7 @@ public class D3Point {
     public double x;
     public double y;
     public double z;
+    public Point projection(IProjection proj){
+        return proj.projection(this);
+    }
 }
