@@ -22,7 +22,7 @@ import java.util.List;
 public class Ball {
     public double radius;
 
-    public Ball(D3Point center, double radius) {
+    public Ball( double radius) {
         this.radius = radius;
     }
 
@@ -52,7 +52,7 @@ public class Ball {
 
 
         D3Model icosdata=new Icosahedron().makeModel(a);
-        List<D3Point> pointsVec=new ArrayList<>();
+        List<D3Point> pointsVec=new LinkedList<>();
         List<D3ModelFlat> tranglesVec=new LinkedList<>();
 
         //数据拷贝
@@ -62,6 +62,9 @@ public class Ball {
         for(int n=0;n<level;n++)//进行递归划分
         {
             D3Point[] prePoints=new D3Point[6];//一个三角形三个点加上三个中点存储
+            for (int i = 0; i < prePoints.length; i++) {
+                prePoints[i]=new D3Point();
+            }
             int[] preIndexs=new int[6];//6个点的下标
             int preTranglesCount=tranglesVec.size();
             for(int i=0;i<preTranglesCount;i++)
@@ -124,6 +127,7 @@ public class Ball {
             }
 
         }
+
         ret.points.addAll(pointsVec);
         ret.flats.addAll(tranglesVec);
 
