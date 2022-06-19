@@ -1,7 +1,7 @@
 package i2f.core.graphics.d3.transform.impl;
 
 import i2f.core.graphics.d3.D3Point;
-import i2f.core.graphics.d3.transform.ITransform;
+import i2f.core.graphics.d3.transform.ID3Transform;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class ReflectFlatTransform implements ITransform {
+public class ReflectFlatTransform implements ID3Transform {
     protected boolean enableMatrix=false;
-    protected boolean xoy;
-    protected boolean yoz;
-    protected boolean xoz;
+    public boolean xoy;
+    public boolean yoz;
+    public boolean xoz;
 
     public ReflectFlatTransform(boolean enableMatrix, boolean xoy, boolean yoz, boolean xoz) {
         this.enableMatrix = enableMatrix;
@@ -29,15 +29,15 @@ public class ReflectFlatTransform implements ITransform {
     public D3Point transform(D3Point point) {
         D3Point p=new D3Point(point.x,point.y,point.z);
         if(xoy){
-            ITransform trans=new ReflectFlatXoYTransform(enableMatrix);
+            ID3Transform trans=new ReflectFlatXoYTransform(enableMatrix);
             p=trans.transform(p);
         }
         if(yoz){
-            ITransform trans=new ReflectFlatYoZTransform(enableMatrix);
+            ID3Transform trans=new ReflectFlatYoZTransform(enableMatrix);
             p=trans.transform(p);
         }
         if(xoz){
-            ITransform trans=new ReflectFlatXoZTransform(enableMatrix);
+            ID3Transform trans=new ReflectFlatXoZTransform(enableMatrix);
             p=trans.transform(p);
         }
         return p;

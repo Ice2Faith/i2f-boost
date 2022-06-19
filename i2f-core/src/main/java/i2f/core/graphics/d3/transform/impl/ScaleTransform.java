@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ScaleTransform extends AbstractMatrixTransform{
-    protected double sx;
-    protected double sy;
-    protected double sz;
+    public double sx;
+    public double sy;
+    public double sz;
 
     public ScaleTransform(boolean enableMatrix, double sx, double sy, double sz) {
         super(enableMatrix);

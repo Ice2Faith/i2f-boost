@@ -8,6 +8,6 @@ import i2f.core.graphics.d3.D3Point;
  * @date 2022/6/18 0:27
  * @desc 定义投影的标准接口
  */
-public interface IProjection {
+public interface ID3Projection {
     Point projection(D3Point point);
 }

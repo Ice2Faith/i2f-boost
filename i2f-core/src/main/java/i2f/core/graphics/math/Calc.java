@@ -8,7 +8,9 @@ package i2f.core.graphics.math;
 public class Calc {
     public static final double PI=3.141592653549626;
     public static final double PI_RADIAN=PI;
+    public static final double PI2=PI*2;
     public static final double PI_ANGLE=180.0;
+    public static final double PI_ANGLE2=PI_ANGLE*2;
 
     /**
      * 绝对值
@@ -357,5 +359,41 @@ public class Calc {
      */
     public static double radian2angle(double radian){
         return (radian/PI_RADIAN)*PI_ANGLE;
+    }
+
+    /**
+     * 规范化为弧度0-2pi
+     * @param radian
+     * @return
+     */
+    public static double regularRadian(double radian){
+        if(radian>0){
+            while (radian>PI2){
+                radian-=PI2;
+            }
+        }else{
+            while(radian<0){
+                radian+=PI2;
+            }
+        }
+        return radian;
+    }
+
+    /**
+     * 规范化角度0-360
+     * @param angle
+     * @return
+     */
+    public static double regularAngle(double angle){
+        if(angle>0){
+            while (angle>PI_ANGLE2){
+                angle-=PI_ANGLE2;
+            }
+        }else{
+            while(angle<0){
+                angle+=PI_ANGLE2;
+            }
+        }
+        return angle;
     }
 }

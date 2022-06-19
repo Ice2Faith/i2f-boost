@@ -1,7 +1,7 @@
 package i2f.core.graphics.d3.transform.impl;
 
 import i2f.core.graphics.d3.D3Point;
-import i2f.core.graphics.d3.transform.ITransform;
+import i2f.core.graphics.d3.transform.ID3Transform;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class SpinTransform implements ITransform {
+public class SpinTransform implements ID3Transform {
     protected boolean enableMatrix=false;
-    protected double sx;
-    protected double sy;
-    protected double sz;
+    public double sx;
+    public double sy;
+    public double sz;
 
 
     public SpinTransform(boolean enableMatrix, double sx, double sy, double sz) {
@@ -28,7 +28,7 @@ public class SpinTransform implements ITransform {
 
     @Override
     public D3Point transform(D3Point point) {
-        ITransform trans=new SpinXTransform(enableMatrix,sx);
+        ID3Transform trans=new SpinXTransform(enableMatrix,sx);
         D3Point p=trans.transform(point);
         trans=new SpinYTransform(enableMatrix,sy);
         p=trans.transform(p);

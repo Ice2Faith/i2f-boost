@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class MoveTransform extends AbstractMatrixTransform{
-    protected double mx;
-    protected double my;
-    protected double mz;
+    public double mx;
+    public double my;
+    public double mz;
 
     public MoveTransform(boolean enableMatrix, double mx, double my, double mz) {
         super(enableMatrix);

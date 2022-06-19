@@ -3,7 +3,7 @@ package i2f.core.graphics.d3.projection.impl;
 import i2f.core.graphics.d2.Point;
 import i2f.core.graphics.d3.D3Point;
 import i2f.core.graphics.d3.D3VaryUtil;
-import i2f.core.graphics.d3.projection.IProjection;
+import i2f.core.graphics.d3.projection.ID3Projection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public abstract class AbstractMatrixProjection implements IProjection {
+public abstract class AbstractMatrixProjection implements ID3Projection {
     protected boolean enableMatrix;
 
     public AbstractMatrixProjection(boolean enableMatrix) {

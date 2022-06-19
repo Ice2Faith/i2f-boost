@@ -1,7 +1,7 @@
 package i2f.core.graphics.d3;
 
 import i2f.core.graphics.d2.Flat;
-import i2f.core.graphics.d3.projection.IProjection;
+import i2f.core.graphics.d3.projection.ID3Projection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,7 +24,7 @@ public class D3Flat {
         this.p3 = p3;
     }
 
-    public Flat projection(IProjection proj){
+    public Flat projection(ID3Projection proj){
         Flat ret=new Flat();
         ret.p1=p1.projection(proj);
         ret.p2=p2.projection(proj);

@@ -1,7 +1,7 @@
 package i2f.core.graphics.d3.transform.impl;
 
 import i2f.core.graphics.d3.D3Point;
-import i2f.core.graphics.d3.transform.ITransform;
+import i2f.core.graphics.d3.transform.ID3Transform;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,16 +12,16 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class MiscutAxisTransform implements ITransform {
+public class MiscutAxisTransform implements ID3Transform {
     protected boolean enableMatrix=false;
-    protected double xgz;
-    protected double xdy;
+    public double xgz;
+    public double xdy;
 
-    protected double yhz;
-    protected double ybx;
+    public double yhz;
+    public double ybx;
 
-    protected double zfy;
-    protected double zcx;
+    public double zfy;
+    public double zcx;
 
     public MiscutAxisTransform(boolean enableMatrix, double xgz, double xdy, double yhz, double ybx, double zfy, double zcx) {
         this.enableMatrix = enableMatrix;
@@ -35,7 +35,7 @@ public class MiscutAxisTransform implements ITransform {
 
     @Override
     public D3Point transform(D3Point point) {
-        ITransform trans=new MiscutAxisXTransform(enableMatrix,xgz,xdy);
+        ID3Transform trans=new MiscutAxisXTransform(enableMatrix,xgz,xdy);
         D3Point p=trans.transform(point);
         trans=new MiscutAxisYTransform(enableMatrix,yhz,ybx);
         p=trans.transform(p);

@@ -2,7 +2,7 @@ package i2f.core.graphics.d3.transform.impl;
 
 import i2f.core.graphics.d3.D3Point;
 import i2f.core.graphics.d3.D3VaryUtil;
-import i2f.core.graphics.d3.transform.ITransform;
+import i2f.core.graphics.d3.transform.ID3Transform;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public abstract class AbstractMatrixTransform implements ITransform {
+public abstract class AbstractMatrixTransform implements ID3Transform {
     protected boolean enableMatrix;
 
     public AbstractMatrixTransform(boolean enableMatrix) {
