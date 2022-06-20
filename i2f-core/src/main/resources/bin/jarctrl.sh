@@ -13,21 +13,33 @@ jarRelativePath=
 # max wait kill force timeout
 MAX_WAIT=30
 # enable shortcut shell
-ENUM_SHORTCUT_ENABLE=1
-ENUM_SHORTCUT_DISABLE=0
+BOOL_TRUE=1
+BOOL_FALSE=0
 
-ENABLE_SHORTCUT=$ENUM_SHORTCUT_DISABLE
+ENABLE_SHORTCUT=$BOOL_FALSE
 
-# 个性化启动参数
-# springboot 环境变量配置
-# app.name
-APP_NAME=
-# app.env
-APP_ENV=
-# max.size
-LOG_MAX_SIZE=20MB
+APP_HOME=`pwd`
+if [[ "$jarRelativePath" -ne "" ]]; then
+  APP_HOME="$(cd `dirname $0`/$jarRelativePath; pwd)"
+  cd ${APP_HOME}
+fi
+
+
+# jvm opts
+JVM_OPTS="-Djar.name=$AppName"
+LOG_DIR_NAME=logs
+LOG_DIR=${APP_HOME}/${LOG_DIR_NAME}
+LOG_PATH=${LOG_DIR}/${AppName}.log
+PID_PATH=${APP_HOME}/pid.$AppName.txt
+
+# logback
+ENABLE_LOGBACK=$BOOL_TRUE
 # logging.config
-LOG_CONFIG_FILE=logback-spring.xml
+LOGBACK_CONFIG_FILE=resources/logback-spring.xml
+LOGBACK_APP_NAME=$AppName
+LOGBACK_APP_ENV=
+LOGBACK_APP_LOG_MAX_SIZE=20MB
+
 
 # jvm 配置
 # java home,use system default when empty
@@ -60,17 +72,8 @@ if [[ "$JAVA_HOME" -ne "" ]]; then
   JAVA_PATH=${JAVA_HOME}/bin/java
 fi
 
-APP_HOME=`pwd`
-if [[ "$jarRelativePath" -ne "" ]]; then
-  APP_HOME="$(cd `dirname $0`/$jarRelativePath; pwd)"
-  cd ${APP_HOME}
-fi
 
-# jvm opts
-JVM_OPTS="-Dname=$AppName"
-LOG_DIR=${APP_HOME}/logs
-LOG_PATH=${LOG_DIR}/${AppName}.log
-PID_PATH=${APP_HOME}/pid.$AppName.txt
+
 
 function help()
 {
@@ -96,67 +99,89 @@ function help()
 
 function prepareBootJvmOpts()
 {
-  if [[ "$USER_TIME_ZONE" -ne "" ]]; then
+  echo "----jvm opts begin----"
+  if [[ -n "$USER_TIME_ZONE" ]]; then
     JVM_OPTS="$JVM_OPTS -Duser.timezone=$USER_TIME_ZONE"
+    echo "-Duser.timezone=$USER_TIME_ZONE"
   fi
-  if [[ "$XMS_SIZE" -ne "" ]]; then
+  if [[ -n "$XMS_SIZE" ]]; then
     JVM_OPTS="$JVM_OPTS -Xms$XMS_SIZE"
+    echo "-Xms$XMS_SIZE"
   fi
-  if [[ "$XMX_SIZE" -ne "" ]]; then
+  if [[ -n "$XMX_SIZE" ]]; then
     JVM_OPTS="$JVM_OPTS -Xmx$XMX_SIZE"
+    echo "-Xmx$XMX_SIZE"
   fi
-  if [[ "$PERM_SIZE" -ne "" ]]; then
+  if [[ -n "$PERM_SIZE" ]]; then
     JVM_OPTS="$JVM_OPTS -XX:PermSize=$PERM_SIZE"
+    echo "-XX:PermSize=$PERM_SIZE"
   fi
-  if [[ "$MAX_PERM_SIZE" -ne "" ]]; then
+  if [[ -n "$MAX_PERM_SIZE" ]]; then
     JVM_OPTS="$JVM_OPTS -XX:MaxPermSize=$MAX_PERM_SIZE"
+    echo "-XX:MaxPermSize=$MAX_PERM_SIZE"
   fi
-  if [[ "$DUMP_OOM" -ne "" ]]; then
+  if [[ -n "$DUMP_OOM" ]]; then
     JVM_OPTS="$JVM_OPTS -XX:+HeapDumpOnOutOfMemoryError"
+    echo "-XX:+HeapDumpOnOutOfMemoryError"
   fi
-  if [[ "$PRINT_GC" -ne "" ]]; then
+  if [[ -n "$PRINT_GC" ]]; then
     JVM_OPTS="$JVM_OPTS -XX:+PrintGCDateStamps  -XX:+PrintGCDetails"
+    echo "-XX:+PrintGCDateStamps  -XX:+PrintGCDetails"
   fi
-  if [[ "$PARALLEL_GC" -ne "" ]]; then
+  if [[ -n "$PARALLEL_GC" ]]; then
     JVM_OPTS="$JVM_OPTS -XX:+UseParallelGC -XX:+UseParallelOldGC"
+    echo "-XX:+UseParallelGC -XX:+UseParallelOldGC"
   fi
-  if [[ "$PARALLEL_GC" -ne "" ]]; then
+  if [[ -n "$PARALLEL_GC" ]]; then
     JVM_OPTS="$JVM_OPTS -XX:+UseParallelGC -XX:+UseParallelOldGC"
+    echo "-XX:+UseParallelGC -XX:+UseParallelOldGC"
   fi
-  if [[ "$NEW_RATIO" -ne "" ]]; then
+  if [[ -n "$NEW_RATIO" ]]; then
     JVM_OPTS="$JVM_OPTS -XX:NewRatio=$NEW_RATIO"
+    echo "-XX:NewRatio=$NEW_RATIO"
   fi
-  if [[ "$SURVIVOR_RATIO" -ne "" ]]; then
+  if [[ -n "$SURVIVOR_RATIO" ]]; then
     JVM_OPTS="$JVM_OPTS -XX:SurvivorRatio=$SURVIVOR_RATIO"
+    echo "-XX:SurvivorRatio=$SURVIVOR_RATIO"
   fi
-  if [[ "$APP_NAME" -ne "" ]]; then
-    JVM_OPTS="$JVM_OPTS -Dapp.name=$APP_NAME"
-  fi
-  if [[ "$APP_ENV" -ne "" ]]; then
-    JVM_OPTS="$JVM_OPTS -Dapp.env=$APP_ENV"
-  fi
-  if [[ "$LOG_MAX_SIZE" -ne "" ]]; then
-    JVM_OPTS="$JVM_OPTS -Dmax.size=$LOG_MAX_SIZE"
-  fi
-  if [[ "$LOG_CONFIG_FILE" -ne "" ]]; then
-    JVM_OPTS="$JVM_OPTS -Dlogging.config=$LOG_CONFIG_FILE"
-  fi
-}
 
-prepareBootJvmOpts
+  if [ $ENABLE_LOGBACK == $BOOL_TRUE ];then
+    echo "----logback begin----"
+    if [[ -n "$LOGBACK_CONFIG_FILE" ]]; then
+      JVM_OPTS="$JVM_OPTS -Dlogging.config=$LOGBACK_CONFIG_FILE"
+      echo "-Dlogging.config=$LOGBACK_CONFIG_FILE"
+    fi
+
+    if [[ -n "$LOGBACK_APP_NAME" ]]; then
+      JVM_OPTS="$JVM_OPTS -Dlogback.app.name=$LOGBACK_APP_NAME"
+      echo "-Dlogback.app.name=$LOGBACK_APP_NAME"
+    fi
+    if [[ -n "$LOGBACK_APP_ENV" ]]; then
+      JVM_OPTS="$JVM_OPTS -Dlogback.app.env=$LOGBACK_APP_ENV"
+      echo "-Dlogback.app.env=$LOGBACK_APP_ENV"
+    fi
+    if [[ -n "$LOGBACK_APP_LOG_MAX_SIZE" ]]; then
+      JVM_OPTS="$JVM_OPTS -Dlogback.app.log.max.size=$LOGBACK_APP_LOG_MAX_SIZE"
+      echo "-Dlogback.app.log.max.size=$LOGBACK_APP_LOG_MAX_SIZE"
+    fi
+    if [[ -n "$LOG_DIR_NAME" ]]; then
+      JVM_OPTS="$JVM_OPTS -Dlogback.app.log.dir.name=$LOG_DIR_NAME"
+      echo "-Dlogback.app.log.dir.name=$LOG_DIR_NAME"
+    fi
+    echo "----logback end----"
+  fi
+
+  echo "----jvm opts end----"
+}
 
 echo "-----------------------"
 echo "jarctrl.sh running..."
 echo "AppName: $AppName"
 echo "ctrlOption: $ctrlOption"
-echo "maxWait: $MAX_WAIT"
-echo "enableShortcut: $ENABLE_SHORTCUT"
-echo "jvmOpts: $JVM_OPTS"
-echo "appHome: $APP_HOME"
-echo "logDir: $LOG_DIR"
-echo "logPath: $LOG_PATH"
-echo "pidPath: $PID_PATH"
 echo "-----------------------"
+
+prepareBootJvmOpts
+
 
 if [ "$ctrlOption" = "" ];
 then
@@ -181,7 +206,7 @@ CMD=""
 function mkcmd()
 {
   if [ x"$CMD" != x"" ]; then
-    if [ $ENABLE_SHORTCUT == $ENUM_SHORTCUT_ENABLE ];then
+    if [[ $ENABLE_SHORTCUT == $BOOL_TRUE ]];then
       echo "./jarctrl.sh $CMD" > ./$CMD.sh
       chmod a+x ./$CMD.sh
     fi
@@ -197,7 +222,11 @@ function start()
     else
         chmod a+x $AppName
         mkdir ${LOG_DIR}
-        nohup $JAVA_PATH -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 &
+        if [[ $ENABLE_LOGBACK == $BOOL_TRUE ]]; then
+          nohup $JAVA_PATH -jar  $JVM_OPTS $AppName >/dev/null 2>&1 &
+        else
+          nohup $JAVA_PATH -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 &
+        fi
         chmod a+r $LOG_DIR/*.log
         echo "Start $AppName success..."
         sleep 3
@@ -397,7 +426,12 @@ function pidstart()
   echo "" > $PID_PATH
   chmod a+x $AppName
   mkdir ${LOG_DIR}
-  nohup $JAVA_PATH -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 & echo $! > $PID_PATH
+  if [[ $ENABLE_LOGBACK == $BOOL_TRUE ]]; then
+    nohup $JAVA_PATH -jar  $JVM_OPTS $AppName >/dev/null 2>&1 & echo $! > $PID_PATH
+  else
+    nohup $JAVA_PATH -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 & echo $! > $PID_PATH
+  fi
+
   chmod a+r $LOG_DIR/*.log
   echo "Start $AppName success..."
 

@@ -11,8 +11,7 @@
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </encoder>
     </appender>
-    <logger name="com.newland" level="debug" />
-    <!--<logger name="com.newland.bd.ngudap.client.EventClient" level="error"/>-->
+    <logger name="com" level="debug" />
 
     <root level="info">
         <appender-ref ref="stdout"/>
