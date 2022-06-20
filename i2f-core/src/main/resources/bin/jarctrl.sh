@@ -5,6 +5,12 @@ AppName=$1
 # control option
 ctrlOption=$2
 
+echo "-----------------------"
+echo "jarctrl.sh running..."
+echo "AppName: $AppName"
+echo "ctrlOption: $ctrlOption"
+echo "-----------------------"
+
 # AppName jar relative this bash's location
 # when jar in parent dir
 # it should be ..
@@ -12,7 +18,7 @@ jarRelativePath=
 
 # max wait kill force timeout
 MAX_WAIT=30
-# enable shortcut shell
+# const variable define
 BOOL_TRUE=1
 BOOL_FALSE=0
 
@@ -72,9 +78,6 @@ if [[ "$JAVA_HOME" -ne "" ]]; then
   JAVA_PATH=${JAVA_HOME}/bin/java
 fi
 
-
-
-
 function help()
 {
     echo -e "\033[0;31m please input 2nd arg:option \033[0m  \033[0;34m {start|stop|restart|shutdown|reboot|status|log|snapshot|backup|recovery|clean|pack|unpack|pidstop|pidstart|pidreboot} \033[0m"
@@ -85,6 +88,7 @@ function help()
     echo -e "\033[0;34m reboot \033[0m : to shutdown and run a jar which called AppName"
     echo -e "\033[0;34m status \033[0m : to check run status for a jar which called AppName"
     echo -e "\033[0;34m log \033[0m : to lookup the log for a jar which called AppName"
+    echo -e "\033[0;34m except \033[0m : to lookup the exception log for a jar which called AppName"
     echo -e "\033[0;34m snapshot \033[0m : to make a snapshot to ./snapshot for a jar which called AppName"
     echo -e "\033[0;34m backup \033[0m : to backup to ./backup a jar which called AppName"
     echo -e "\033[0;34m recovery \033[0m : to recovery from ./backup and save current to ./newest for a jar which called AppName"
@@ -173,12 +177,6 @@ function prepareBootJvmOpts()
 
   echo "----jvm opts end----"
 }
-
-echo "-----------------------"
-echo "jarctrl.sh running..."
-echo "AppName: $AppName"
-echo "ctrlOption: $ctrlOption"
-echo "-----------------------"
 
 prepareBootJvmOpts
 
@@ -341,6 +339,11 @@ function log()
     tail -f -n 500 $LOG_PATH
 }
 
+function except()
+{
+    tail -f -n 5000 $LOG_PATH | grep -inA50 exception
+}
+
 function snapshot()
 {
   mkdir ./snapshot
@@ -464,6 +467,8 @@ case $ctrlOption in
     status;;
     log)
     log;;
+    except)
+    except;;
     snapshot)
     snapshot;;
     backup)
