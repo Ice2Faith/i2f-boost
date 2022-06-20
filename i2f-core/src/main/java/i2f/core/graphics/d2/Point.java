@@ -18,4 +18,10 @@ public class Point {
         this.x = x;
         this.y = y;
     }
+
+    public Point move2(double length,double direction){
+        return D2Calc.directionMove(this,length,direction);
+    }
+
+
 }

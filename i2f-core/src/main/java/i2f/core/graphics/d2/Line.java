@@ -25,4 +25,21 @@ public class Line implements ILenght {
         return Calc.distance(this.begin.x,this.begin.y,this.end.x,this.end.y);
     }
 
+    public double dx(){
+        return end.x-begin.x;
+    }
+
+    public double dy(){
+        return end.y-begin.y;
+    }
+
+    public double direction(){
+        return D2Calc.lineDirection(begin,end);
+    }
+
+    public Line spin(double direction){
+        return D2Calc.lineSpin(this,direction);
+    }
+
+
 }

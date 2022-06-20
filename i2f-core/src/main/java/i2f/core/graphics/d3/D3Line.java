@@ -30,4 +30,17 @@ public class D3Line implements ILenght {
     public Line projection(ID3Projection proj){
         return new Line(begin.projection(proj),end.projection(proj));
     }
+
+
+    public double dx(){
+        return end.x-begin.x;
+    }
+
+    public double dy(){
+        return end.y-begin.y;
+    }
+
+    public double dz(){
+        return end.z-begin.z;
+    }
 }
