@@ -1,5 +1,7 @@
 package i2f.core.graphics.math;
 
+import java.util.Random;
+
 /**
  * @author ltb
  * @date 2022/6/17 22:56
@@ -11,6 +13,7 @@ public class Calc {
     public static final double PI2=PI*2;
     public static final double PI_ANGLE=180.0;
     public static final double PI_ANGLE2=PI_ANGLE*2;
+    public static Random rand=new Random();
 
     /**
      * 绝对值
@@ -395,5 +398,21 @@ public class Calc {
             }
         }
         return angle;
+    }
+
+    public static int rand(){
+        return rand.nextInt();
+    }
+
+    public static int rand(int max){
+        return rand.nextInt(max);
+    }
+
+    public static int rand(int min,int max){
+        return min+(rand.nextInt(max-min));
+    }
+
+    public static double randPercent(){
+        return rand.nextDouble();
     }
 }

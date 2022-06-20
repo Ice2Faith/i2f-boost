@@ -1,5 +1,7 @@
 package i2f.core.graphics.d2;
 
+import i2f.core.graphics.math.Calc;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,13 +38,25 @@ public class Bezier {
     }
 
     public static List<Point> resamples(List<Point> points, int resampleCount){
-        List<Point> ret=new ArrayList<>();
+        List<Point> ret=new ArrayList<>(resampleCount);
         for (int i = 0; i < resampleCount; i++)
         {
             Point p= Bezier.bezierPoint(1.0*i / resampleCount,points);
             ret.add(p);
         }
         return ret;
+    }
+
+    public static List<Point> samples(List<Point> points){
+        double len=0;
+        for(int i=1;i<points.size();i++){
+            Point pre=points.get(i-1);
+            Point cur=points.get(i);
+            len+= Calc.abs(cur.x-pre.x)+Calc.abs(cur.y-pre.y);
+        }
+        len*=1.2;
+        int count=(int)len;
+        return resamples(points,count);
     }
 
 }
