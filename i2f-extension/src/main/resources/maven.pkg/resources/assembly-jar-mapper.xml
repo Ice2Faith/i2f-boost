@@ -1,0 +1,33 @@
+<assembly>
+    <id>jar-mapper</id>
+    <formats>
+        <!-- 指定最终生成全量包形式 -->
+        <!-- zip,tar,tar.gz,tar.bz2,jar,dir,war -->
+        <format>tar.gz</format>
+    </formats>
+    <!-- 使用包含基本目录，包含将会带一层目录 -->
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <!-- 需要打包的文件 -->
+    <fileSets>
+
+        <!-- jar -->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory>.</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+
+        <!-- config，打包配置文件到resource文件夹，之前在pom.xml中已经排除了这些不打包到jar中，这是分离配置的第二部 -->
+        <fileSet>
+            <directory>src/main/resources</directory>
+            <outputDirectory>resources</outputDirectory>
+            <includes>
+                <include>mapper/**</include>
+            </includes>
+        </fileSet>
+
+    </fileSets>
+</assembly>

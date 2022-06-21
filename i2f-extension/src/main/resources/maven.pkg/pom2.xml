@@ -235,6 +235,20 @@
                             </descriptors>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>make-jar-mapper</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>jar-mapper</finalName>
+                            <descriptors>
+                                <descriptor>src/main/resources/assembly-jar-mapper.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

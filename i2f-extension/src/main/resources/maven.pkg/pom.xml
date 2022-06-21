@@ -177,6 +177,7 @@
                         <descriptor>src/main/resources/assembly-mapper.xml</descriptor>
                         <descriptor>src/main/resources/assembly-resource.xml</descriptor>
                         <descriptor>src/main/resources/assembly-resource-all.xml</descriptor>
+                        <descriptor>src/main/resources/assembly-jar-mapper.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <!-- 使用同一个execution,打包文件名将会统一 -->
