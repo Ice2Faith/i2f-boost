@@ -13,7 +13,7 @@ import java.util.Map;
  * @date 2022/3/26 16:57
  * @desc
  */
-public class EnvironmentUtil  {
+public class EnvironmentUtil {
 
     /**
      * 将环境处理为一个方便理解的数据结构
@@ -34,8 +34,12 @@ public class EnvironmentUtil  {
             Object src = source.getSource();
             if (src instanceof Map) {
                 for (Map.Entry<String, Object> entry : ((Map<String, Object>) src).entrySet()) {
-                    String key = entry.getKey();
-                    props.put(key, standardServletEnvironment.getProperty(key));
+                    try{
+                        String key = entry.getKey();
+                        props.put(key, standardServletEnvironment.getProperty(key));
+                    }catch(Exception e){
+
+                    }
                 }
             }
             map.put(name, props);

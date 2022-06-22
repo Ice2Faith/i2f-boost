@@ -4,6 +4,8 @@
 AppName=$1
 # control option
 ctrlOption=$2
+# control argument
+ctrlArg1=$3
 
 echo "-----------------------"
 echo "jarctrl.sh running..."
@@ -80,7 +82,7 @@ fi
 
 function help()
 {
-    echo -e "\033[0;31m please input 2nd arg:option \033[0m  \033[0;34m {start|stop|restart|shutdown|reboot|status|log|snapshot|backup|recovery|clean|pack|unpack|pidstop|pidstart|pidreboot} \033[0m"
+    echo -e "\033[0;31m please input 2nd arg:option \033[0m  \033[0;34m {start|stop|restart|shutdown|reboot|status|log|snapshot|backup|recovery|clean|pack|unpack|pidstop|pidstart|pidreboot|deploy|rollback} \033[0m"
     echo -e "\033[0;34m start \033[0m : to run a jar which called AppName"
     echo -e "\033[0;34m stop \033[0m : to stop a jar which called AppName"
     echo -e "\033[0;34m restart \033[0m : to stop and run a jar which called AppName"
@@ -98,6 +100,8 @@ function help()
     echo -e "\033[0;34m pidstop \033[0m : stop AppName by pid file called pid.AppName"
     echo -e "\033[0;34m pidstart \033[0m : start AppName and save pid to file called pid.AppName"
     echo -e "\033[0;34m pidreboot \033[0m : reboot AppName rely pidstop and then pidstart"
+    echo -e "\033[0;34m deploy \033[0m : deploy an .tar.gz file and backup current dir files to ../AppName-rollback"
+    echo -e "\033[0;34m rollback \033[0m : rollback from ../AppName-rollback to current dir and backup current dir files to ../AppName-newest"
     exit 1
 }
 
@@ -452,6 +456,27 @@ function pidreboot()
   mkcmd
 }
 
+function deploy()
+{
+  rollbackDir=../${AppName}-rollback
+  rm -rf ${rollbackDir}
+  mkdir ${rollbackDir}
+  cp ./* ${rollbackDir}
+  tar -xzvf $ctrlArg1
+}
+
+function rollback()
+{
+  rollbackDir=../${AppName}-rollback
+  newestDir=../${AppName}-newest
+  rm -rf ${newestDir}
+  mkdir ${newestDir}
+  cp -rf ./* ${newestDir}
+  rm -rf ./*
+  cp -rf ${rollbackDir}/* ./
+}
+
+
 case $ctrlOption in
     start)
     start;;
@@ -487,6 +512,10 @@ case $ctrlOption in
     pidstart;;
     pidreboot)
     pidreboot;;
+    deploy)
+    deploy;;
+    rollback)
+    rollback;;
     *)
     help;;
 esac
