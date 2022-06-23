@@ -23,9 +23,9 @@ public class D3SphericalPoint {
 
     public static D3Point spherical2point(D3SphericalPoint p){
         D3Point ret=new D3Point();
-        ret.x=p.radius*Math.sin(p.aAngle)*Math.sin(p.bAngle);
-        ret.y=p.radius*Math.cos(p.aAngle);
-        ret.z=p.radius*Math.sin(p.aAngle)*Math.cos(p.bAngle);
+        ret.y=p.radius*Math.sin(p.aAngle)*Math.sin(p.bAngle);
+        ret.z=p.radius*Math.cos(p.aAngle);
+        ret.x=p.radius*Math.sin(p.aAngle)*Math.cos(p.bAngle);
         return ret;
     }
 

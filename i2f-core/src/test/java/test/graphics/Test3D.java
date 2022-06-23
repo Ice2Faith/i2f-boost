@@ -2,15 +2,18 @@ package test.graphics;
 
 import i2f.core.graphics.color.Rgba;
 import i2f.core.graphics.d2.Point;
+import i2f.core.graphics.d3.D3Line;
 import i2f.core.graphics.d3.D3Painter;
+import i2f.core.graphics.d3.D3Point;
 import i2f.core.graphics.d3.data.D3Model;
 import i2f.core.graphics.d3.projection.ID3Projection;
 import i2f.core.graphics.d3.projection.impl.ThreePointProjection;
-import i2f.core.graphics.d3.shape.Torus;
-import i2f.core.graphics.d3.triangle.ITrianglize;
+import i2f.core.graphics.d3.shape.Cuboid;
+import i2f.core.graphics.d3.shape.D3TreeLine;
 import i2f.core.graphics.d3.triangle.impl.ShortestDistanceTrianglize;
 import i2f.core.graphics.d3.visual.D3Canvas;
 import i2f.core.graphics.d3.visual.D3Frame;
+import i2f.core.graphics.math.Calc;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -23,6 +26,9 @@ import java.util.List;
  */
 public class Test3D implements D3Frame.OnDraw{
     protected D3Model mod1= null;
+    protected D3TreeLine tree=null;
+    protected Rgba beginColor=Rgba.rgba(Calc.rand(100),Calc.rand(50),Calc.rand(50),255);
+    protected Rgba endColor=Rgba.rgba(Calc.rand(150,255),Calc.rand(150,255),Calc.rand(150,255),255);
     public Test3D() throws IOException {
         List<Point> points= Arrays.asList(
                 new Point(20,30),
@@ -35,15 +41,39 @@ public class Test3D implements D3Frame.OnDraw{
                 new Point(150,150)
         );
 
-//        mod1=new SpinBezierCube(points).makeModelSpinX(300,40);
-//        mod1=new Ball(150).makeModel(20,20);
-//        mod1=new Cone(80,120).makeModel(60,120,30);
+//        mod1=new SpinBezierCube(points).makeModelSpinX(15,20);
+//        mod1=new Ball(150).makeModel(10,10);
+//        mod1=new Cone(80,120).makeModel(10,10,5);
 //        mod1=new Ball(150).makeModel(3);
-        mod1=new Torus(150,50).makeModel(60,60);
+//        mod1=new Torus(150,50).makeModel(20,10);
+//        mod1=new Cylinder(50,150).makeModel(5,10,3);
+        mod1=new Cuboid(100,150,200).makeModel(3,3,3);
+        tree=D3TreeLine.makeTree(new D3Line(new D3Point(0,0,0),new D3Point(0,80,0)),8);
+        mod1= tree.modelize();
 //        System.out.println(mod1);
 
-        ITrianglize trianglize=new ShortestDistanceTrianglize();
-        mod1=trianglize.trianglize(mod1);
+        ShortestDistanceTrianglize trianglize=new ShortestDistanceTrianglize();
+        trianglize.pointConstructFlatCount=1;
+        trianglize.maxTriangleAngleLimit=150;
+        trianglize.enableForceFindInNextLevel=false;
+//        mod1=trianglize.trianglize(mod1);
+////
+//        trianglize.axisValue=new ShortestDistanceTrianglize.D3PointDistanceRuleValue() {
+//            @Override
+//            public double axis(D3Point p) {
+//                return p.x;
+//            }
+//        };
+//        mod1=trianglize.trianglize(mod1);
+////
+//        trianglize.axisValue=new ShortestDistanceTrianglize.D3PointDistanceRuleValue() {
+//            @Override
+//            public double axis(D3Point p) {
+//                return p.z;
+//            }
+//        };
+//        mod1=trianglize.trianglize(mod1);
+
 
 //        mod1= TmFileUtil.load(new File("D:\\IDEA_ROOT\\DevCenter\\i2f-boost\\i2f-core\\src\\test\\java\\test\\graphics\\Bunny.tm"));
 
@@ -55,12 +85,13 @@ public class Test3D implements D3Frame.OnDraw{
         painter.clean(Rgba.black());
 
         painter.setPointColor(Rgba.rgb(255,0,128));
-        painter.setLineColor(Rgba.rgb(255,255,128));
+        painter.setLineColor(Rgba.rgb(0,255,128));
         painter.setFillColor(Rgba.white());
 
         painter.drawAxis(1000);
 
-        painter.drawModelPoints(mod1);
+        tree.drawTree(painter,beginColor,endColor,10);
+//        painter.drawModelPoints(mod1);
 
 //        Thread.sleep(3000);
 //        painter.drawLine(new D3Point(200,0,0),new D3Point(0,200,0));
@@ -73,13 +104,14 @@ public class Test3D implements D3Frame.OnDraw{
 
 //        Thread.sleep(5000);
 
-        painter.drawModelLines(mod1);
+//        painter.drawModelLines(mod1);
 
 //        Thread.sleep(5000);
 //
 //        painter.drawModelFlats(mod1);
 //
 //
+
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {

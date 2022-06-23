@@ -22,6 +22,10 @@ public class D3Vector extends D3Point implements ILenght {
         super(p.x,p.y,p.z);
     }
 
+    public D3Vector(D3Line l){
+        this(l.begin,l.end);
+    }
+
     public D3Vector(D3Point p1,D3Point p2){
         super(p2.x-p1.x,p2.y-p1.y,p2.z-p1.z);
     }
@@ -32,6 +36,26 @@ public class D3Vector extends D3Point implements ILenght {
         ret.y=p2.y-p1.y;
         ret.z=p2.z-p1.z;
         return ret;
+    }
+
+    /**
+     * 获取向量的a偏转角
+     * @param v
+     * @return
+     */
+    public static double aAngle(D3Vector v){
+        D3SphericalPoint sp = v.spherical();
+        return sp.aAngle;
+    }
+
+    /**
+     * 获取向量的b偏转角
+     * @param v
+     * @return
+     */
+    public static double bAngle(D3Vector v){
+        D3SphericalPoint sp=v.spherical();
+        return sp.bAngle;
     }
 
     // 获取向量模长

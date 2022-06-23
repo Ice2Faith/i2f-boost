@@ -16,6 +16,39 @@ public class Calc {
     public static Random rand=new Random();
 
     /**
+     * 求三角形三边边长分别为lenA,lenB,lenC的三角形中
+     * lenA的对角A的弧度
+     * 因此，如果你要求B的弧度，则参数为：lenB,lenA,lenC
+     * 也就是说，想要求那条边的对角，那条边就是第一个参数，第二第三个参数为其他两边，无顺序要求
+     * 原理：
+     * 余弦定理：余弦定理公式是cosA=(b^2+c^2-a^2) /2bc，cosA=邻边比斜边
+     * A角的对边就是a边
+     * 因此，语义为：角A的cos值=(两邻边的平方和-对边的平方和)/(2被两邻边积)
+     * @param lenA
+     * @param lenB
+     * @param lenC
+     * @return
+     */
+    public static double radianTriangle(double lenA,double lenB,double lenC){
+        double cosa=(Math.pow(lenB,2.0)+Math.pow(lenC,2.0)-Math.pow(lenA,2.0))/(2*lenB*lenC);
+        double ra=Math.acos(cosa);
+        return regularRadian(ra);
+    }
+
+    /**
+     * 求三角形三边边长分别为lenA,lenB,lenC的三角形中
+     * lenA的对角A的角度
+     * @param lenA
+     * @param lenB
+     * @param lenC
+     * @return
+     */
+    public static double angleTriangle(double lenA,double lenB,double lenC){
+        double ra=radianTriangle(lenA, lenB, lenC);
+        return Calc.regularAngle(Calc.radian2angle(ra));
+    }
+
+    /**
      * 绝对值
      * @param val
      * @return

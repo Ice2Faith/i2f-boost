@@ -1,8 +1,8 @@
 package i2f.spring.environment;
 
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
-import org.springframework.core.env.StandardEnvironment;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,6 +15,93 @@ import java.util.Map;
  */
 public class EnvironmentUtil {
 
+    public static String get(Environment env,String name){
+        return env.getProperty(name);
+    }
+
+    public static int getInt(Environment env,String name,int def){
+        String str=env.getProperty(name);
+        if(str==null){
+            return def;
+        }
+        str=str.trim();
+        try{
+            return Integer.parseInt(str);
+        }catch(Exception e){
+
+        }
+        return def;
+    }
+
+    public static double getDouble(Environment env,String name,double def){
+        String str=env.getProperty(name);
+        if(str==null){
+            return def;
+        }
+        str=str.trim();
+        try{
+            return Double.parseDouble(str);
+        }catch(Exception e){
+
+        }
+        return def;
+    }
+
+    public static long getLong(Environment env,String name,long def){
+        String str=env.getProperty(name);
+        if(str==null){
+            return def;
+        }
+        str=str.trim();
+        try{
+            return Long.parseLong(str);
+        }catch(Exception e){
+
+        }
+        return def;
+    }
+
+    public static float getFloat(Environment env,String name,float def){
+        String str=env.getProperty(name);
+        if(str==null){
+            return def;
+        }
+        str=str.trim();
+        try{
+            return Float.parseFloat(str);
+        }catch(Exception e){
+
+        }
+        return def;
+    }
+
+    public static boolean getBoolean(Environment env,String name,boolean def){
+        String str=env.getProperty(name);
+        if(str==null){
+            return def;
+        }
+        str=str.trim().toLowerCase();
+        try{
+            return Boolean.parseBoolean(str);
+        }catch(Exception e){
+
+        }
+        return def;
+    }
+
+    public static String[] getArray(Environment env,String name,String splitReg,int limit){
+        String str=env.getProperty(name);
+        if(str==null){
+            return new String[0];
+        }
+        str=str.trim();
+        return str.split(splitReg,limit);
+    }
+
+    public static String[] getArray(Environment env,String name,String splitReg){
+        return getArray(env,name,splitReg,0);
+    }
+
     /**
      * 将环境处理为一个方便理解的数据结构
      * key表示每一个环境
@@ -24,8 +111,8 @@ public class EnvironmentUtil {
      */
     public static Map<String, Map<String, Object>> getEnvironmentProperties(Environment env) {
         Map<String, Map<String, Object>> map = new HashMap<>(8);
-        StandardEnvironment standardServletEnvironment = (StandardEnvironment) env;
-        Iterator<PropertySource<?>> iterator = standardServletEnvironment.getPropertySources().iterator();
+        ConfigurableEnvironment configurableEnvironment = (ConfigurableEnvironment) env;
+        Iterator<PropertySource<?>> iterator = configurableEnvironment.getPropertySources().iterator();
 
         while (iterator.hasNext()) {
             Map<String, Object> props = new HashMap<>(128);
@@ -36,7 +123,7 @@ public class EnvironmentUtil {
                 for (Map.Entry<String, Object> entry : ((Map<String, Object>) src).entrySet()) {
                     try{
                         String key = entry.getKey();
-                        props.put(key, standardServletEnvironment.getProperty(key));
+                        props.put(key, configurableEnvironment.getProperty(key));
                     }catch(Exception e){
 
                     }

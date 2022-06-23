@@ -29,9 +29,9 @@ public class Cylinder {
         ret.points=new ArrayList<>();
         ret.flats=new ArrayList<>();
         //环形曲面
-        for (int i = 0; i < heightCount; i++)
+        for (int i = 0; i <= heightCount; i++)
         {
-            for (int j = 0; j < angleCount; j++)
+            for (int j = 0; j <= angleCount; j++)
             {
                 double x = radius*Math.cos(2 * Calc.PI / angleCount* j);
                 double y = radius*Math.sin(2 * Calc.PI / angleCount*j);

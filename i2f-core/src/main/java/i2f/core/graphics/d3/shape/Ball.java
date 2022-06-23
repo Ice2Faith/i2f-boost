@@ -30,9 +30,9 @@ public class Ball {
         D3Model ret=new D3Model();
         ret.points=new ArrayList<>();
         ret.flats=new ArrayList<>();
-        for (int i = 0; i < bAngleCount; i++)
+        for (int i = 0; i <= bAngleCount; i++)
         {
-            for (int j = 0; j < aAngleCount; j++)
+            for (int j = 0; j <= aAngleCount; j++)
             {
                 double x = radius*Math.sin(2 * Calc.PI / aAngleCount* j)*Math.sin(Calc.PI / bAngleCount* i);
                 double z = radius*Math.cos(2 * Calc.PI / aAngleCount*j);

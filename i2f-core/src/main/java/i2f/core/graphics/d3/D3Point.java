@@ -26,4 +26,17 @@ public class D3Point {
     public Point projection(ID3Projection proj){
         return proj.projection(this);
     }
+
+    public static D3SphericalPoint point2spherical(D3Point p){
+        D3SphericalPoint ret=new D3SphericalPoint();
+        ret.radius=new D3Line(new D3Point(0,0,0),p).length();
+        ret.aAngle=Math.acos(p.z/ret.radius);
+        ret.bAngle=Math.atan(p.y/p.x);
+        return ret;
+    }
+
+    public D3SphericalPoint spherical(){
+        return point2spherical(this);
+    }
+
 }
