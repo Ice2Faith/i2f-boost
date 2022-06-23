@@ -8,6 +8,10 @@ import i2f.core.db.data.TableColumnMeta;
 import i2f.core.db.data.TableMeta;
 import i2f.core.db.impl.DefaultTableMetaFilter;
 import i2f.core.interfaces.IFilter;
+import i2f.core.jdbc.core.JdbcProvider;
+import i2f.core.jdbc.core.TransactionManager;
+import i2f.core.jdbc.data.DBResultData;
+import i2f.core.jdbc.type.DbType;
 
 import java.sql.*;
 import java.util.*;
@@ -19,14 +23,14 @@ import java.util.*;
 @Author("i2f")
 public class DbResolver {
 
-    public static List<TableMeta> getAllTables(Connection conn,boolean withColumns) throws SQLException {
-        return getAllTables(conn, withColumns,null);
+    public static List<TableMeta> getAllTables(Connection conn, boolean withColumns) throws SQLException {
+        return getAllTables(conn, withColumns, null);
     }
 
-    public static List<TableMeta> getAllTables(Connection conn, boolean withColumns,@Nullable @IfNull("DefaultTableMetaFilter") IFilter<TableMeta> filter) throws SQLException {
+    public static List<TableMeta> getAllTables(Connection conn, boolean withColumns, @Nullable @IfNull("DefaultTableMetaFilter") IFilter<TableMeta> filter) throws SQLException {
         List<TableMeta> ret = new ArrayList<>();
-        String srcCatalog=conn.getCatalog();
-        String srcSchema=conn.getSchema();
+        String srcCatalog = conn.getCatalog();
+        String srcSchema = conn.getSchema();
         if (filter == null) {
             filter = new DefaultTableMetaFilter();
         }
@@ -36,26 +40,27 @@ public class DbResolver {
             String schema = schemas.getString("TABLE_SCHEM");
             String catalog = schemas.getString("TABLE_CATALOG");
         }
+        schemas.close();
         ResultSet tables = dbMeta.getTables(null, null, "%", null);
         while (tables.next()) {
             TableMeta meta = new TableMeta();
             inflateTableAttributes(tables, meta);
 
             if (filter.choice(meta)) {
-                if(withColumns){
-                    try{
-                        if(meta.getCatalog()!=null){
+                if (withColumns) {
+                    try {
+                        if (meta.getCatalog() != null) {
                             conn.setCatalog(meta.getCatalog());
                         }
-                        if(meta.getSchema()!=null){
+                        if (meta.getSchema() != null) {
                             conn.setSchema(meta.getSchema());
                         }
-                        TableMeta cmeta=getTableMeta(conn,meta.getTable());
+                        TableMeta cmeta = getTableMeta(conn, meta.getTable());
                         meta.setColumns(cmeta.getColumns());
-                        if(meta.getSchema()==null){
+                        if (meta.getSchema() == null) {
                             meta.setSchema(cmeta.getSchema());
                         }
-                    }catch(Exception e){
+                    } catch (Exception e) {
 
                     }
                 }
@@ -63,6 +68,7 @@ public class DbResolver {
             }
 
         }
+        tables.close();
         conn.setCatalog(srcCatalog);
         conn.setSchema(srcSchema);
         return ret;
@@ -98,80 +104,130 @@ public class DbResolver {
         Statement stat = conn.createStatement();
         ResultSet rs = stat.executeQuery(sql);
         ResultSetMetaData meta = rs.getMetaData();
-        TableMeta ret = inflateTableMeta(conn,meta);
-        if(ret.getTable()==null || "".equals(ret.getTable())){
+        TableMeta ret = inflateTableMeta(conn, meta);
+        if (ret.getTable() == null || "".equals(ret.getTable())) {
             ret.setTable(tableName);
         }
         rs.close();
         stat.close();
+
+        JdbcProvider provider = new JdbcProvider(new TransactionManager(conn));
+        // 由于目前provider的设计上，没有开启事务，则执行一次直接关闭连接，因此使用一个事务
+        // 后续provider可能改变策略
+        provider.getTransactionManager().openTrans(true);
+        String connUrl = conn.getMetaData().getURL();
+        DbType dbType = DbType.typeOfJdbcUrl(connUrl);
+        if (ret.getRemark() == null) {
+            // 处理oracle连接获取不到表comment问题
+            if (dbType == DbType.ORACLE || dbType == DbType.ORACLE_12C) {
+                DBResultData rd = provider.query("select comments from user_tab_comments where table_name = ?", ret.getTable());
+                if (rd.hasData()) {
+                    ret.setRemark(rd.getData(0, 0));
+                }
+            }
+        }
+
+        boolean hasColumnRemark = false;
+        for (TableColumnMeta item : ret.getColumns()) {
+            if (item.getRemark() != null) {
+                hasColumnRemark = true;
+                break;
+            }
+        }
+
+        if (!hasColumnRemark) {
+            if (ret.getTable() != null && !"".equals(ret.getTable())) {
+                // 处理oracle连接获取不到列comment问题
+                if (dbType == DbType.ORACLE || dbType == DbType.ORACLE_12C) {
+                    DBResultData rd = provider.query("select column_name,comments from user_col_comments where table_name = ?", ret.getTable());
+                    Map<String, String> columnCommentMap = new HashMap<>();
+                    if (rd.hasData()) {
+                        for (int i = 0; i < rd.getDatas().size(); i++) {
+                            columnCommentMap.put(((String) rd.getData(i, 0)).toLowerCase(), (String) rd.getData(i, 1));
+                        }
+                    }
+                    for (TableColumnMeta item : ret.getColumns()) {
+                        if (item.getRemark() == null) {
+                            item.setRemark(columnCommentMap.get(item.getName().toLowerCase()));
+                        }
+                    }
+                }
+            }
+        }
+        provider.getTransactionManager().openTrans(false);
+
         return ret;
     }
 
-    public static TableMeta inflateTableMeta(Connection conn,ResultSetMetaData meta) throws SQLException {
+    public static TableMeta inflateTableMeta(Connection conn, ResultSetMetaData meta) throws SQLException {
         TableMeta ret = new TableMeta();
         String schema = meta.getSchemaName(1);
         String table = meta.getTableName(1);
-        String catalog=meta.getCatalogName(1);
+        String catalog = meta.getCatalogName(1);
         ret.setSchema(schema);
         ret.setTable(table);
         ret.setCatalog(catalog);
         DatabaseMetaData dbMeta = conn.getMetaData();
         ResultSet tables = dbMeta.getTables(catalog, schema, table, null);
         if (tables.next()) {
-            inflateTableAttributes(tables,ret);
+            inflateTableAttributes(tables, ret);
         }
-        List<TableColumnMeta> cols = inflateTableColumnMeta(dbMeta,meta);
+        tables.close();
+        List<TableColumnMeta> cols = inflateTableColumnMeta(dbMeta, meta);
         ret.setColumns(cols);
 
         return ret;
     }
 
-    public static List<TableColumnMeta> inflateTableColumnMeta(DatabaseMetaData dbMeta,ResultSetMetaData meta) throws SQLException {
+    public static List<TableColumnMeta> inflateTableColumnMeta(DatabaseMetaData dbMeta, ResultSetMetaData meta) throws SQLException {
         List<TableColumnMeta> ret = new ArrayList<>();
-        Map<String,String> primaryKeys=new HashMap<>();
-        Map<String,String> uniques=new HashMap<>();
-        Map<String,String> indexes=new HashMap<>();
-        Map<String, String> indexTypes=new HashMap<>();
-        if(dbMeta!=null){
-            ResultSet rs=dbMeta.getPrimaryKeys(meta.getCatalogName(1),meta.getSchemaName(1),meta.getTableName(1));
-            while(rs.next()){
-                String colName=rs.getString("COLUMN_NAME");
-                String pkName=rs.getString("PK_NAME");
-                String keySeq=rs.getString("KEY_SEQ");
-                primaryKeys.put(colName,pkName);
+        Map<String, String> primaryKeys = new HashMap<>();
+        Map<String, String> uniques = new HashMap<>();
+        Map<String, String> indexes = new HashMap<>();
+        Map<String, String> indexTypes = new HashMap<>();
+        if (dbMeta != null) {
+            ResultSet rs = dbMeta.getPrimaryKeys(meta.getCatalogName(1), meta.getSchemaName(1), meta.getTableName(1));
+            while (rs.next()) {
+                String colName = rs.getString("COLUMN_NAME");
+                String pkName = rs.getString("PK_NAME");
+                String keySeq = rs.getString("KEY_SEQ");
+                primaryKeys.put(colName, pkName);
             }
-            rs=dbMeta.getIndexInfo(meta.getCatalogName(1),meta.getSchemaName(1),meta.getTableName(1),true,true);
-            while(rs.next()){
-                String colName=rs.getString("COLUMN_NAME");
-                String indexName=rs.getString("INDEX_NAME");
-                short type=rs.getShort("TYPE");
-                uniques.put(colName,indexName);
+            rs.close();
+            rs = dbMeta.getIndexInfo(meta.getCatalogName(1), meta.getSchemaName(1), meta.getTableName(1), true, true);
+            while (rs.next()) {
+                String colName = rs.getString("COLUMN_NAME");
+                String indexName = rs.getString("INDEX_NAME");
+                short type = rs.getShort("TYPE");
+                uniques.put(colName, indexName);
             }
-            rs=dbMeta.getIndexInfo(meta.getCatalogName(1),meta.getSchemaName(1),meta.getTableName(1),false,true);
-            while(rs.next()){
-                String colName=rs.getString("COLUMN_NAME");
-                String indexName=rs.getString("INDEX_NAME");
-                short type=rs.getShort("TYPE");
-                String stype="";
-                switch (type){
+            rs.close();
+            rs = dbMeta.getIndexInfo(meta.getCatalogName(1), meta.getSchemaName(1), meta.getTableName(1), false, true);
+            while (rs.next()) {
+                String colName = rs.getString("COLUMN_NAME");
+                String indexName = rs.getString("INDEX_NAME");
+                short type = rs.getShort("TYPE");
+                String stype = "";
+                switch (type) {
                     case 0:
-                        stype="Statistic";
+                        stype = "Statistic";
                         break;
                     case 1:
-                        stype="Clustered";
+                        stype = "Clustered";
                         break;
                     case 2:
-                        stype="Hashed";
+                        stype = "Hashed";
                         break;
                     case 3:
-                        stype="Other";
+                        stype = "Other";
                         break;
                     default:
                         break;
                 }
-                indexes.put(colName,indexName);
-                indexTypes.put(colName,stype);
+                indexes.put(colName, indexName);
+                indexTypes.put(colName, stype);
             }
+            rs.close();
         }
         int colCount = meta.getColumnCount();
         for (int i = 1; i <= colCount; i++) {
@@ -182,11 +238,11 @@ public class DbResolver {
             String colLabel = meta.getColumnLabel(i);
             String colClassName = meta.getColumnClassName(i);
             int colDisplaySize = meta.getColumnDisplaySize(i);
-            String catalogName=meta.getCatalogName(i);
-            String tableName=meta.getTableName(i);
-            String schemaName=meta.getSchemaName(i);
-            int precision=meta.getPrecision(i);
-            int scale=meta.getScale(i);
+            String catalogName = meta.getCatalogName(i);
+            String tableName = meta.getTableName(i);
+            String schemaName = meta.getSchemaName(i);
+            int precision = meta.getPrecision(i);
+            int scale = meta.getScale(i);
 
             col.setName(colName);
             col.setType(colType);
@@ -199,40 +255,40 @@ public class DbResolver {
             col.setSchemaName(schemaName);
             col.setPrecision(precision);
             col.setScale(scale);
-            if(primaryKeys.containsKey(colName)){
+            if (primaryKeys.containsKey(colName)) {
                 col.setPrimaryKeyName(primaryKeys.get(colName));
             }
-            col.setIsPrimaryKey(primaryKeys.containsKey(colName)?"YES":"NO");
+            col.setIsPrimaryKey(primaryKeys.containsKey(colName) ? "YES" : "NO");
 
-            if(uniques.containsKey(colName)){
+            if (uniques.containsKey(colName)) {
                 col.setUniqueKeyName(uniques.get(colName));
             }
-            col.setIsUnique(uniques.containsKey(colName)?"YES":"NO");
+            col.setIsUnique(uniques.containsKey(colName) ? "YES" : "NO");
 
-            if(indexes.containsKey(colName)){
+            if (indexes.containsKey(colName)) {
                 col.setIndexKeyName(indexes.get(colName));
                 col.setIndexType(indexTypes.get(colName));
             }
-            col.setIsIndex(indexes.containsKey(colName)?"YES":"NO");
+            col.setIsIndex(indexes.containsKey(colName) ? "YES" : "NO");
 
-            if(dbMeta!=null){
-                ResultSet rs=dbMeta.getColumns(col.getCatalogName(),col.getSchemaName(),col.getTableName(),col.getName());
-                if(rs.next()){
-                    String remark=rs.getString("REMARKS");
-                    String dataType=rs.getString("DATA_TYPE");
-                    String columnSize=rs.getString("COLUMN_SIZE");
-                    String bufferLength=rs.getString("BUFFER_LENGTH");
-                    String decimalDigits=rs.getString("DECIMAL_DIGITS");
-                    String numPrecRadix=rs.getString("NUM_PREC_RADIX");
-                    String nullable=rs.getString("NULLABLE");
-                    String columnDef=rs.getString("COLUMN_DEF");
-                    String sqlDataType=rs.getString("SQL_DATA_TYPE");
-                    String charOctetLength=rs.getString("CHAR_OCTET_LENGTH");
-                    String ordinalPosition=rs.getString("ORDINAL_POSITION");
-                    String isNullable=rs.getString("IS_NULLABLE");
-                    String sourceDataType=rs.getString("SOURCE_DATA_TYPE");
-                    String isAutoincrement=rs.getString("IS_AUTOINCREMENT");
-                    String isGeneratedColumn=rs.getString("IS_GENERATEDCOLUMN");
+            if (dbMeta != null) {
+                ResultSet rs = dbMeta.getColumns(col.getCatalogName(), col.getSchemaName(), col.getTableName(), col.getName());
+                if (rs.next()) {
+                    String remark = rs.getString("REMARKS");
+                    String dataType = rs.getString("DATA_TYPE");
+                    String columnSize = rs.getString("COLUMN_SIZE");
+                    String bufferLength = rs.getString("BUFFER_LENGTH");
+                    String decimalDigits = rs.getString("DECIMAL_DIGITS");
+                    String numPrecRadix = rs.getString("NUM_PREC_RADIX");
+                    String nullable = rs.getString("NULLABLE");
+                    String columnDef = rs.getString("COLUMN_DEF");
+                    String sqlDataType = rs.getString("SQL_DATA_TYPE");
+                    String charOctetLength = rs.getString("CHAR_OCTET_LENGTH");
+                    String ordinalPosition = rs.getString("ORDINAL_POSITION");
+                    String isNullable = rs.getString("IS_NULLABLE");
+                    String sourceDataType = rs.getString("SOURCE_DATA_TYPE");
+                    String isAutoincrement = rs.getString("IS_AUTOINCREMENT");
+                    String isGeneratedColumn = rs.getString("IS_GENERATEDCOLUMN");
 
                     col.setRemark(remark);
                     col.setDataType(dataType);
@@ -250,6 +306,7 @@ public class DbResolver {
                     col.setIsAutoincrement(isAutoincrement);
                     col.setIsGeneratedColumn(isGeneratedColumn);
                 }
+                rs.close();
             }
 
             try {
