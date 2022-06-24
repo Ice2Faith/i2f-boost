@@ -18,6 +18,46 @@ import java.io.IOException;
  */
 public class TestImg {
     public static void main(String[] args) throws IOException, InterruptedException {
+//        testFilter();
+//        testEmbedImage();
+        BufferedImage img1=ImageUtil.load(new File("E:\\MySystemDefaultFiles\\Desktop\\17临时文档\\图像边缘查找\\图片测试\\l01.jpg"));
+
+        String data="算法实现 \n" +
+                "\n" +
+                "　　基本的算法思路上面已经提过了，可以说是一个相当简单的算法了。不过具体有几点需要注意：\n" +
+                "\n" +
+                "由其原理可知，隐藏图只能是黑白的，不能是彩色的，因此当遇到彩色像素时，需要将其转换成灰度。对于彩色转灰度，心理学中有一个公式：Gray = R*0.299 + G*0.587 + B*0.114，我们需要做的是根据算出来的灰度设定像素透明度。在白色背景下，黑色像素的灰度会随着像透明度增高而降低，在黑色背景下，白色像素的灰度会随着透明度增高而增高。\n" +
+                "考虑到需要合成的两张图片尺寸不一致，为了保证生成的隐藏图能够完成保留两张图片信息并且不发生变形，我们需要将最终图片的长和宽设定为两张图片尺寸中最大的长和最大的宽。";
+
+        HideData2Image.write2ImageString(img1,data);
+
+        File file=new File("E:\\MySystemDefaultFiles\\Desktop\\data.png");
+        ImageUtil.save(img1,file);
+
+        img1=ImageUtil.load(file);
+        String rdata=HideData2Image.read4ImageString(img1);
+
+        System.out.println(data.equals(rdata));
+        System.out.println(rdata);
+
+        CmdLineExecutor.runLine("explorer \""+file.getAbsolutePath()+"\"");
+    }
+
+    private static void testEmbedImage() throws IOException, InterruptedException {
+        BufferedImage img1=ImageUtil.load(new File("E:\\MySystemDefaultFiles\\Desktop\\17临时文档\\图像边缘查找\\图片测试\\l01.jpg"));
+        BufferedImage img2=ImageUtil.load(new File("E:\\MySystemDefaultFiles\\Desktop\\17临时文档\\图像边缘查找\\图片测试\\l05.jpg"));
+
+        EmbedDoubleImageFilter filter=new EmbedDoubleImageFilter(img2);
+        BufferedImage dimg=filter.filter(img1);
+
+        File file=new File("E:\\MySystemDefaultFiles\\Desktop\\hide.png");
+        ImageUtil.save(dimg,file);
+
+        CmdLineExecutor.runLine("explorer \""+file.getAbsolutePath()+"\"");
+    }
+
+    public static void testFilter() throws IOException, InterruptedException {
+
         BufferedImage simg= ImageUtil.load(new File("E:\\MySystemDefaultFiles\\Desktop\\疫情大屏_20220309162306.png"));
         IImageFilter filter=new GrayImageFilter();
 
