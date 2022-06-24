@@ -7,6 +7,8 @@ import i2f.core.reflect.type.TypeResolver;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Date;
+import java.time.*;
 
 /**
  * @author ltb
@@ -49,7 +51,7 @@ public class ConvertResolver {
             if(isFloat(dstType) && sval.matches("^\\d+(\\.\\d+)?$")){
                 return true;
             }
-            if(isBoolean(dstType) && sval.toLowerCase().matches("^true|false$")){
+            if(isBoolean(dstType) && sval.toLowerCase().matches("^true|false|yes|no|1|0$")){
                 return true;
             }
             if(isCharacter(dstType) && sval.length()==1){
@@ -129,9 +131,11 @@ public class ConvertResolver {
         }
 
         // 时间类型之间可以转换
-        if(isInTypes(srcType,java.util.Date.class,java.sql.Timestamp.class,java.sql.Date.class)
+        if(isInTypes(srcType,java.util.Date.class,java.sql.Timestamp.class,java.sql.Date.class, java.util.Calendar.class,
+                java.time.LocalDate.class,java.time.LocalDateTime.class)
          &&
-                isInTypes(srcType,java.util.Date.class,java.sql.Timestamp.class,java.sql.Date.class)
+                isInTypes(srcType,java.util.Date.class,java.sql.Timestamp.class,java.sql.Date.class, java.util.Calendar.class,
+                        java.time.LocalDate.class,java.time.LocalDateTime.class)
         ){
             return true;
         }
@@ -163,10 +167,18 @@ public class ConvertResolver {
                 val=new BigDecimal(sval);
                 srcType=val.getClass();
             }
-            if(isBoolean(dstType) && sval.toLowerCase().matches("^true|false$")){
+            if(isBoolean(dstType) && sval.toLowerCase().matches("^true|false|yes|no|1|0$")){
                 if("true".equals(sval.toLowerCase())){
                     return true;
                 }else if("false".equals(sval.toLowerCase())){
+                    return false;
+                }else if("yes".equals(sval.toLowerCase())){
+                    return true;
+                }else if("no".equals(sval.toLowerCase())){
+                    return false;
+                }else if("1".equals(sval.toLowerCase())){
+                    return true;
+                }else if("0".equals(sval.toLowerCase())){
                     return false;
                 }
             }
@@ -223,17 +235,45 @@ public class ConvertResolver {
             return cval;
         }
 
-        if(isInTypes(srcType,java.util.Date.class,java.sql.Timestamp.class,java.sql.Date.class)
+        if(isInTypes(srcType,java.util.Date.class,java.sql.Timestamp.class,java.sql.Date.class, java.util.Calendar.class,
+                java.time.LocalDate.class,java.time.LocalDateTime.class)
                 &&
-                isInTypes(srcType,java.util.Date.class,java.sql.Timestamp.class,java.sql.Date.class)
+                isInTypes(srcType,java.util.Date.class,java.sql.Timestamp.class,java.sql.Date.class, java.util.Calendar.class,
+                        java.time.LocalDate.class,java.time.LocalDateTime.class)
         ){
-            long tval=((java.util.Date)val).getTime();
+            Object pval=val;
+
+            if(val instanceof LocalDate){
+                ZoneId zone=ZoneId.systemDefault();
+                Instant instant = ((LocalDate)val).atStartOfDay().atZone(zone).toInstant();
+                pval= Date.from(instant);
+            }else if(val instanceof LocalDateTime){
+                ZoneId zone=ZoneId.systemDefault();
+                Instant instant = ((LocalDateTime)val).atZone(zone).toInstant();
+                pval= Date.from(instant);
+            }else if(val instanceof java.util.Calendar){
+                pval=((java.util.Calendar)val).getTime();
+            }
+
+            long tval=((java.util.Date)pval).getTime();
             if(isInTypes(dstType,java.sql.Timestamp.class)){
                 return new java.sql.Timestamp(tval);
             }else if(isInTypes(dstType,java.sql.Date.class)){
                 return new java.sql.Date(tval);
             }else if(isInTypes(dstType,java.util.Date.class)){
                 return new java.util.Date(tval);
+            }else if(isInTypes(dstType,java.time.LocalDate.class)){
+                Instant instant = new java.util.Date(tval).toInstant();
+                ZoneId zone=ZoneId.systemDefault();
+                return LocalDateTime.ofInstant(instant, zone).toLocalDate();
+            }else if(isInTypes(dstType,java.time.LocalDateTime.class)){
+                Instant instant = new java.util.Date(tval).toInstant();
+                ZoneId zone=ZoneId.systemDefault();
+                return LocalDateTime.ofInstant(instant, zone);
+            }else if(isInTypes(dstType,java.util.Calendar.class)){
+                java.util.Calendar ret=java.util.Calendar.getInstance();
+                ret.setTime(new java.util.Date(tval));
+                return ret;
             }
         }
 

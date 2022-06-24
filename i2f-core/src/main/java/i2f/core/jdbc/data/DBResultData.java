@@ -1,14 +1,12 @@
 package i2f.core.jdbc.data;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.reflect.exception.base.ReflectException;
+import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.reflect.interfaces.PropertyAccessor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 作为数据库查询返回结果集存在
@@ -39,8 +37,17 @@ public class DBResultData{
     public boolean hasData(){
         return datas.size()!=0;
     }
+    public int getColumnCount(){
+        return cols.size();
+    }
     public String getColumnName(int index){
         return cols.get(index);
+    }
+    public<T> T getSingle(){
+        return getData(0,0);
+    }
+    public Map<String,Object> getOne(){
+        return this.datas.get(0);
     }
     public<T> T getData(int line,int col){
         return (T)(datas.get(line).get(cols.get(col)));
@@ -59,130 +66,78 @@ public class DBResultData{
     }
 
     /**
-     * 将此结果集转换为对应的实体类列表，也是列名和属性进行匹配实现
-     * 列名属性名相同则赋值
-     * 否则不处理
-     * 原则上来说，查询结果对应实体类直接映射是最好的
-     * 但是，如果结果里面存在实体里面多余的列，也是可以进行解析的，只不过可能效果不好
-     * 极端情况下，结果不可用
-     * 用法：
-     * List<Admin> list=result.parserBeans(Admin.class,true);
-     * 这样，就尝试将结果集转换为Admin的列表，并且忽略列名大小写进行匹配
-     * @param clazz 类类型
-     * @param ignoreCase 是否忽略属性名列名大小写匹配
-     * @param <T> 类型
-     * @return 实体列表
+     * 宽松匹配字段映射
+     * 将给定的列名，映射为目标bean的字段名
+     * 使用宽松比较的情况下，将会优先equals,其次是ignoreEquals,最后是忽略所有符号的仅英文字符的匹配
+     * 也就是说，如下情况将都会匹配到：
+     * java字段：userId
+     * 列名可以是：userId,userid,USERID,user_id,USER_ID,user-ID
+     * @param namings 具有的列名
+     * @param beanClass 目标bean的类型
+     * @return
      */
-    public<T> List<T> parserBeans(Class<T> clazz,boolean ignoreCase) {
-        List<T> ret=new ArrayList<>();
-        try{
-            int colCount=cols.size();
-            Field[] fields=clazz.getDeclaredFields();
-            for(Map<String,Object> item : datas){
-                T obj=clazz.newInstance();
-                for(int i=0;i<colCount;i++){
-                    String colName=cols.get(i);
-                    Object colValue=item.get(colName);
-
-                    for(Field field : fields){
-                        field.setAccessible(true);
-                        String attName=field.getName();
-                        try{
-                            if(ignoreCase){
-                                if(colName.equalsIgnoreCase(attName) && colValue!=null){
-                                    field.set(obj,colValue);
-                                }
-                            }else{
-                                if(colName.equals(attName) && colValue!=null){
-                                    field.set(obj,colValue);
-                                }
-                            }
-                        }catch(Exception e){
-                            //ignore error
-                        }
-
-                    }
-
+    public static Map<String,PropertyAccessor> looseNamingMapping(List<String> namings,Class beanClass){
+        List<PropertyAccessor> fields = ReflectResolver.getLogicalReadWriteFields(beanClass);
+        Map<String,PropertyAccessor> columnMapping=new HashMap<>(namings.size()*2);
+        for(String col : namings){
+            // 根据匹配权重得到的匹配映射表
+            TreeMap<Integer,PropertyAccessor> waitMap=new TreeMap<>(new Comparator<Integer>() {
+                @Override
+                public int compare(Integer o1, Integer o2) {
+                    return -Integer.compare(o1,o2);
                 }
-                ret.add(obj);
+            });
+            for(PropertyAccessor accessor : fields){
+                String fieldName= accessor.getName();
+                if(col.equals(fieldName)){
+                    waitMap.put(100,accessor); // 100%匹配，完全一致
+                }else if(col.equalsIgnoreCase(fieldName)){
+                    waitMap.put(80,accessor); // 80%匹配，忽略大小写一致
+                }else{
+                    String colAzName=col.replaceAll("_|-","");
+                    String fieldAzName=col.replaceAll("_|-","");
+                    if(colAzName.equals(fieldAzName)){
+                        waitMap.put(60,accessor); // 60%匹配，去除符号后完全匹配
+                    }else if(colAzName.equalsIgnoreCase(fieldAzName)){
+                        waitMap.put(50,accessor); // 50%匹配，去除符号后大小写不敏感匹配
+                    }
+                }
             }
-
-
-        }catch(Exception e){
-            throw new ReflectException("parse bean error",e);
+            if(waitMap.size()>0){ // 根据treemap特性，获取第一个，即为最优匹配项
+                PropertyAccessor accessor = waitMap.entrySet().iterator().next().getValue();
+                columnMapping.put(col,accessor);
+            }
         }
-        return ret;
+        return columnMapping;
     }
 
     /**
-     * 将此结果按照给定的属性和列名进行映射赋值，返回一个类对象列表
-     * 注意如果出现类型不一致将会被跳过，不进行赋值
-     * 如果出现匹配不上，也会被跳过，也就是映射中，不存在对应的列名，或者不存在对应的属性名
-     * 因此你要保证，列名和属性名映射没有写错，特别是在不忽略大小写的情况下
-     * @param clazz 类类型
-     * @param attrColMapping 类属性--列名的映射，key=类属性，value=列名
-     * @param ignoreCase 是否忽略列名与属性的大小写
-     * @param <T> 类型
-     * @return 返回满足要求的对象列表
+     * 将结果映射为指定的实体bean
+     * 需要指定实体bean类型
+     * 并且使用宽松比较
+     * 使用宽松比较的情况下，将会优先equals,其次是ignoreEquals,最后是忽略所有符号的仅英文字符的匹配
+     * 也就是说，如下情况将都会匹配到：
+     * java字段：userId
+     * 列名可以是：userId,userid,USERID,user_id,USER_ID,user-ID
+     * @param beanClass
+     * @param <T>
+     * @return
      */
-    public<T> List<T> parserBeans(Class<T> clazz,Map<String,String> attrColMapping,boolean ignoreCase) {
-        List<T> ret=new ArrayList<>();
-        try{
-            //获取所有对象属性
-            Field[] fields=clazz.getDeclaredFields();
-            //遍历每一行数据
-            for(Map<String,Object> line : datas){
-                T obj=clazz.newInstance();
-                //比较列名和哪一个属性对应
-                for(String dataKey : line.keySet()){
-                    for(String attrKey : attrColMapping.keySet()){
-                        //获取匹配上列名的属性名
-                        String attrMapCol=attrColMapping.get(attrKey);
-                        boolean isCmp=false;
-                        if(ignoreCase){
-                            if(dataKey.equalsIgnoreCase(attrMapCol)){
-                                isCmp=true;
-                            }
-                        }else{
-                            if(dataKey.equals(attrMapCol)){
-                                isCmp=true;
-                            }
-                        }
-                        //如果属性名与列名按照映射匹配上了
-                        if(isCmp){
-                            //获得匹配上的属性名对应的的属性
-                            for(Field field : fields){
-                                //获得匹配属性名的属性
-                                field.setAccessible(true);
-                                String fieldName=field.getName();
-                                isCmp=false;
-                                if(ignoreCase){
-                                    if(attrKey.equalsIgnoreCase(fieldName)){
-                                        isCmp=true;
-                                    }
-                                }else{
-                                    if(attrKey.equals(fieldName)){
-                                        isCmp=true;
-                                    }
-                                }
-                                if(isCmp){
-                                    //如果属性名与属性匹配上了，就执行赋值
-                                    try {
-                                        field.set(obj, line.get(dataKey));
-                                    }catch (Exception e){
-                                        //如果出现类型不兼容，赋值失败等，不处理，直接跳过
-                                    }
-                                }
-                            }
-                        }
-                    }
+    public <T> List<T> parseBean(Class<T> beanClass){
+        Map<String,PropertyAccessor> columnMapping=looseNamingMapping(cols,beanClass);
+        List<T> ret=new ArrayList<>(this.datas.size());
+        for(Map<String,Object> row : this.datas){
+            T obj=ReflectResolver.instance(beanClass);
+            for(Map.Entry<String,Object> item : row.entrySet()){
+                String name=item.getKey();
+                Object val=item.getValue();
+                PropertyAccessor accessor=columnMapping.get(name);
+                if(accessor!=null){
+                    accessor.setInvokeObject(obj);
+                    accessor.set(val);
                 }
-                ret.add(obj);
             }
-        }catch (Exception e){
-            throw new ReflectException("parse beans error",e);
         }
-
         return ret;
     }
 

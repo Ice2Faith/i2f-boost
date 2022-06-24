@@ -61,12 +61,54 @@ public class Calc {
     }
 
     /**
+     * 绝对值
+     * @param val
+     * @return
+     */
+    public static int abs(int val){
+        if(val<0){
+            return -val;
+        }
+        return val;
+    }
+
+    /**
+     * 绝对值
+     * @param val
+     * @return
+     */
+    public static long abs(long val){
+        if(val<0){
+            return -val;
+        }
+        return val;
+    }
+
+    /**
      * 相反数
      * @param val
      * @return
      */
     public  static double opposite(double val){
         return 0-val;
+    }
+
+    /**
+     * 相反数
+     * @param val
+     * @return
+     */
+    public static int opposite(int val){
+        return -val;
+    }
+
+    /**
+     * 相反数
+     * @param val
+     * @return
+     */
+    public static long opposite(long val){
+        return -val;
     }
 
     /**
@@ -122,12 +164,72 @@ public class Calc {
     }
 
     /**
+     * 最小值
+     * @param vals
+     * @return
+     */
+    public static int min(int ... vals){
+        int min=vals[0];
+        for(int i=1;i<vals.length;i++){
+            if(vals[i]<min){
+                min=vals[i];
+            }
+        }
+        return min;
+    }
+
+    /**
+     * 最小值
+     * @param vals
+     * @return
+     */
+    public static long min(long ... vals){
+        long min=vals[0];
+        for(int i=1;i<vals.length;i++){
+            if(vals[i]<min){
+                min=vals[i];
+            }
+        }
+        return min;
+    }
+
+    /**
      * 最大值
      * @param vals
      * @return
      */
     public static double max(double ... vals){
         double max=vals[0];
+        for(int i=1;i<vals.length;i++){
+            if(vals[i]>max){
+                max=vals[i];
+            }
+        }
+        return max;
+    }
+
+    /**
+     * 最大值
+     * @param vals
+     * @return
+     */
+    public static int max(int ... vals){
+        int max=vals[0];
+        for(int i=1;i<vals.length;i++){
+            if(vals[i]>max){
+                max=vals[i];
+            }
+        }
+        return max;
+    }
+
+    /**
+     * 最大值
+     * @param vals
+     * @return
+     */
+    public static long max(long ... vals){
+        long max=vals[0];
         for(int i=1;i<vals.length;i++){
             if(vals[i]>max){
                 max=vals[i];
@@ -150,12 +252,51 @@ public class Calc {
     }
 
     /**
+     * 求积
+     * @param vals
+     * @return
+     */
+    public static int mul(int ... vals){
+        int ret=1;
+        for(int item : vals){
+            ret*=item;
+        }
+        return ret;
+    }
+
+    /**
+     * 求积
+     * @param vals
+     * @return
+     */
+    public static long mul(long ... vals){
+        long ret=1;
+        for(long item : vals){
+            ret*=item;
+        }
+        return ret;
+    }
+
+    /**
      * 求积1-i
      * @param i
      * @return
      */
-    public static double muli(int i){
-        double ret=1.0;
+    public static int muli(int i){
+        int ret=1;
+        for (int j = 1; j < i; j++) {
+            ret*=j;
+        }
+        return ret;
+    }
+
+    /**
+     * 求积1-i
+     * @param i
+     * @return
+     */
+    public static long muli(long i){
+        int ret=1;
         for (int j = 1; j < i; j++) {
             ret*=j;
         }
@@ -168,12 +309,45 @@ public class Calc {
      * @param j
      * @return
      */
-    public static double mulij(int i,int j){
-        double ret=1.0;
+    public static int mulij(int i,int j){
+        int ret=1;
         int step=1;
         if(j<i){
             step=-1;
         }
+        for(int p=i;p!=j;p+=step){
+            ret*=p;
+        }
+        return ret;
+    }
+
+    /**
+     * 求积i-j
+     * @param i
+     * @param j
+     * @return
+     */
+    public static long mulij(long i,long j){
+        long ret=1;
+        int step=1;
+        if(j<i){
+            step=-1;
+        }
+        for(long p=i;p!=j;p+=step){
+            ret*=p;
+        }
+        return ret;
+    }
+
+    /**
+     * 求积i-j按照步长step
+     * @param i
+     * @param j
+     * @param step
+     * @return
+     */
+    public static int mulij(int i,int j,int step){
+        int ret=1;
         for(int p=i;p!=j;p+=step){
             ret*=p;
         }
@@ -187,9 +361,9 @@ public class Calc {
      * @param step
      * @return
      */
-    public static double mulij(int i,int j,int step){
-        double ret=1.0;
-        for(int p=i;p!=j;p+=step){
+    public static long mulij(long i,long j,long step){
+        long ret=1;
+        for(long p=i;p!=j;p+=step){
             ret*=p;
         }
         return ret;
@@ -210,13 +384,52 @@ public class Calc {
     }
 
     /**
+     * 求和
+     * @param vals
+     * @return
+     */
+    public static int sum(int ... vals){
+        int ret=0;
+        for(int item : vals){
+            ret+=item;
+        }
+        return ret;
+    }
+
+    /**
+     * 求和
+     * @param vals
+     * @return
+     */
+    public static long sum(long ... vals){
+        long ret=0;
+        for(long item : vals){
+            ret+=item;
+        }
+        return ret;
+    }
+
+    /**
      * 求和0-i
      * @param i
      * @return
      */
-    public static double sumi(int i){
-        double ret=0;
+    public static int sumi(int i){
+        int ret=0;
         for (int j = 0; j < i; j++) {
+            ret+=j;
+        }
+        return ret;
+    }
+
+    /**
+     * 求和0-i
+     * @param i
+     * @return
+     */
+    public static long sumi(long i){
+        long ret=0;
+        for (long j = 0; j < i; j++) {
             ret+=j;
         }
         return ret;
@@ -228,12 +441,45 @@ public class Calc {
      * @param j
      * @return
      */
-    public static double sumij(int i,int j){
-        double ret=0;
+    public static int sumij(int i,int j){
+        int ret=0;
         int step=1;
         if(j<i){
             step=-1;
         }
+        for(int p=i;p!=j;p+=step){
+            ret+=p;
+        }
+        return ret;
+    }
+
+    /**
+     * 求和i-j
+     * @param i
+     * @param j
+     * @return
+     */
+    public static long sumij(long i,long j){
+        long ret=0;
+        int step=1;
+        if(j<i){
+            step=-1;
+        }
+        for(long p=i;p!=j;p+=step){
+            ret+=p;
+        }
+        return ret;
+    }
+
+    /**
+     * 求和i-j按照步长step
+     * @param i
+     * @param j
+     * @param step
+     * @return
+     */
+    public static int sumij(int i,int j,int step){
+        int ret=0;
         for(int p=i;p!=j;p+=step){
             ret+=p;
         }
@@ -247,14 +493,22 @@ public class Calc {
      * @param step
      * @return
      */
-    public static double sumij(int i,int j,int step){
-        double ret=0;
-        for(int p=i;p!=j;p+=step){
+    public static long sumij(long i,long j,long step){
+        long ret=0;
+        for(long p=i;p!=j;p+=step){
             ret+=p;
         }
         return ret;
     }
 
+    /**
+     * 对平方和开方
+     * @param vals
+     * @return
+     */
+    public static double sqrtSquareSum(double ... vals){
+        return Math.sqrt(squareSum(vals));
+    }
     /**
      * 平方和
      * @param vals
@@ -313,7 +567,7 @@ public class Calc {
      * @param n
      * @return
      */
-    public static double arrangement(int n,int m){
+    public static int arrangement(int n,int m){
         return mulij(n-m+1,n);
     }
 
@@ -323,7 +577,7 @@ public class Calc {
      * @param m
      * @return
      */
-    public static double combination(int n,int m){
+    public static int combination(int n,int m){
         return arrangement(n,m)/muli(m);
     }
 
@@ -350,12 +604,64 @@ public class Calc {
     }
 
     /**
+     * 要求val应大于等于min
+     * @param val
+     * @param min
+     * @return
+     */
+    public static int gather(int val,int min){
+        if(val<min){
+            val=min;
+        }
+        return val;
+    }
+
+    /**
+     * 要求val应大于等于min
+     * @param val
+     * @param min
+     * @return
+     */
+    public static long gather(long val,long min){
+        if(val<min){
+            val=min;
+        }
+        return val;
+    }
+
+    /**
      * 要求val应小于等于max
      * @param val
      * @param max
      * @return
      */
     public static double lower(double val,double max){
+        if(val>max){
+            val=max;
+        }
+        return val;
+    }
+
+    /**
+     * 要求val应小于等于max
+     * @param val
+     * @param max
+     * @return
+     */
+    public static int lower(int val,int max){
+        if(val>max){
+            val=max;
+        }
+        return val;
+    }
+
+    /**
+     * 要求val应小于等于max
+     * @param val
+     * @param max
+     * @return
+     */
+    public static long lower(long val,long max){
         if(val>max){
             val=max;
         }
@@ -375,6 +681,110 @@ public class Calc {
         }
         if(val>max){
             val=max;
+        }
+        return val;
+    }
+
+    /**
+     * 要求val应大于等于min并小于等于max
+     * @param val
+     * @param min
+     * @param max
+     * @return
+     */
+    public static int between(int val,int min,int max){
+        if(val<min){
+            val=min;
+        }
+        if(val>max){
+            val=max;
+        }
+        return val;
+    }
+
+    /**
+     * 要求val应大于等于min并小于等于max
+     * @param val
+     * @param min
+     * @param max
+     * @return
+     */
+    public static long between(long val,long min,long max){
+        if(val<min){
+            val=min;
+        }
+        if(val>max){
+            val=max;
+        }
+        return val;
+    }
+
+
+    /**
+     * 要求val应该在min-max区间
+     * 但是，如果超过max,则采取截去max剩下的部分
+     * 也就是一种循环的区间
+     * @param val
+     * @param min
+     * @param max
+     * @return
+     */
+    public static double regular(double val,double min,double max){
+        double dis=max-min;
+        if(val<min){
+            while(val<min){
+                val+=dis;
+            }
+        }else{
+            while(val>max){
+                val-=dis;
+            }
+        }
+        return val;
+    }
+
+    /**
+     * 要求val应该在min-max区间
+     * 但是，如果超过max,则采取截去max剩下的部分
+     * 也就是一种循环的区间
+     * @param val
+     * @param min
+     * @param max
+     * @return
+     */
+    public static int regular(int val,int min,int max){
+        int dis=max-min;
+        if(val<min){
+            while(val<min){
+                val+=dis;
+            }
+        }else{
+            while(val>max){
+                val-=dis;
+            }
+        }
+        return val;
+    }
+
+    /**
+     * 要求val应该在min-max区间
+     * 但是，如果超过max,则采取截去max剩下的部分
+     * 也就是一种循环的区间
+     * @param val
+     * @param min
+     * @param max
+     * @return
+     */
+    public static long regular(long val,long min,long max){
+        long dis=max-min;
+        if(val<min){
+            while(val<min){
+                val+=dis;
+            }
+        }else{
+            while(val>max){
+                val-=dis;
+            }
         }
         return val;
     }

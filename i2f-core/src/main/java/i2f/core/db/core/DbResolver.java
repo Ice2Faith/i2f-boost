@@ -120,7 +120,12 @@ public class DbResolver {
         if (ret.getRemark() == null) {
             // 处理oracle连接获取不到表comment问题
             if (dbType == DbType.ORACLE || dbType == DbType.ORACLE_12C) {
-                DBResultData rd = provider.query("select comments from user_tab_comments where table_name = ?", ret.getTable());
+                DBResultData rd = provider.query("SELECT COMMENTS FROM user_tab_comments WHERE TABLE_NAME = ?", ret.getTable());
+                if (rd.hasData()) {
+                    ret.setRemark(rd.getData(0, 0));
+                }
+            }else if(dbType==DbType.MYSQL){
+                DBResultData rd=provider.query("select TABLE_COMMENT from information_schema.`TABLES` where TABLE_SCHEMA = ? and TABLE_NAME = ?",ret.getCatalog(),ret.getTable());
                 if (rd.hasData()) {
                     ret.setRemark(rd.getData(0, 0));
                 }
@@ -139,7 +144,20 @@ public class DbResolver {
             if (ret.getTable() != null && !"".equals(ret.getTable())) {
                 // 处理oracle连接获取不到列comment问题
                 if (dbType == DbType.ORACLE || dbType == DbType.ORACLE_12C) {
-                    DBResultData rd = provider.query("select column_name,comments from user_col_comments where table_name = ?", ret.getTable());
+                    DBResultData rd = provider.query("SELECT COLUMN_NAME,COMMENTS FROM user_col_comments WHERE TABLE_NAME = ?", ret.getTable());
+                    Map<String, String> columnCommentMap = new HashMap<>();
+                    if (rd.hasData()) {
+                        for (int i = 0; i < rd.getDatas().size(); i++) {
+                            columnCommentMap.put(((String) rd.getData(i, 0)).toLowerCase(), (String) rd.getData(i, 1));
+                        }
+                    }
+                    for (TableColumnMeta item : ret.getColumns()) {
+                        if (item.getRemark() == null) {
+                            item.setRemark(columnCommentMap.get(item.getName().toLowerCase()));
+                        }
+                    }
+                }else if(dbType==DbType.MYSQL){
+                    DBResultData rd = provider.query("select COLUMN_NAME,COLUMN_COMMENT from information_schema.`COLUMNS where TABLE_SCHEMA=? and TABLE_NAME =?",ret.getCatalog(), ret.getTable());
                     Map<String, String> columnCommentMap = new HashMap<>();
                     if (rd.hasData()) {
                         for (int i = 0; i < rd.getDatas().size(); i++) {
