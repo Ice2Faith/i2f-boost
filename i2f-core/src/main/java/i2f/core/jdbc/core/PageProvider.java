@@ -138,7 +138,7 @@ public class PageProvider {
                 .addLine(" FROM ( ")
                 .addLine(ctx.prepareSql)
                 .addLine(" ) TMP ")
-                .addLine(" WHERE ROWNUM <= ?) ")
+                .addLine(" WHERE ROWNUM <= ?) TMP ")
                 .addLine(" WHERE ROW_ID > ? ")
                 .get();
         ctx.pageSql=sql;

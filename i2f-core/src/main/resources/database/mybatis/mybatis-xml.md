@@ -139,3 +139,18 @@ set
 </trim>
 where id=#{id,jdbcType=NUMERIC}
 ```
+- 构造最近几天的左表
+```sql
+<foreach collection='"0,1,2,3,4,5,6".split(",")' item="item" separator="union all">
+    select  substr(date_sub(
+    <choose>
+        <when test="today!=null and today!=''">
+            #{today}
+        </when>
+        <otherwise>
+            now()
+        </otherwise>
+    </choose>
+    ,interval ${item} day),1,10) v_mon
+</foreach>
+```
