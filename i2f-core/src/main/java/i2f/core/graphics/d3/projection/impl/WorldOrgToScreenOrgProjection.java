@@ -2,7 +2,9 @@ package i2f.core.graphics.d3.projection.impl;
 
 import i2f.core.graphics.d2.Point;
 import i2f.core.graphics.d3.D3Point;
+import i2f.core.graphics.d3.D3SphericalPoint;
 import i2f.core.graphics.d3.D3VaryUtil;
+import i2f.core.graphics.d3.projection.IViewPointProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class WorldOrgToScreenOrgProjection extends AbstractMatrixProjection {
+public class WorldOrgToScreenOrgProjection extends AbstractMatrixProjection implements IViewPointProjection {
     protected double r;
     protected double d;
     protected double aAngle;
@@ -25,6 +27,19 @@ public class WorldOrgToScreenOrgProjection extends AbstractMatrixProjection {
         this.d = d;
         this.aAngle = aAngle;
         this.bAngle = bAngle;
+    }
+
+    public WorldOrgToScreenOrgProjection(boolean enableMatrix, D3SphericalPoint viewPoint, double d) {
+        super(enableMatrix);
+        this.r = viewPoint.radius;
+        this.d = d;
+        this.aAngle = viewPoint.aAngle;
+        this.bAngle = viewPoint.bAngle;
+    }
+
+    @Override
+    public D3SphericalPoint viewPoint() {
+        return new D3SphericalPoint(r,aAngle,bAngle);
     }
 
     @Override

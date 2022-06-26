@@ -2,13 +2,11 @@ package test.graphics;
 
 import i2f.core.graphics.color.Rgba;
 import i2f.core.graphics.d2.Point;
-import i2f.core.graphics.d3.D3Line;
 import i2f.core.graphics.d3.D3Painter;
-import i2f.core.graphics.d3.D3Point;
 import i2f.core.graphics.d3.data.D3Model;
 import i2f.core.graphics.d3.projection.ID3Projection;
 import i2f.core.graphics.d3.projection.impl.ThreePointProjection;
-import i2f.core.graphics.d3.shape.Cuboid;
+import i2f.core.graphics.d3.shape.Ball;
 import i2f.core.graphics.d3.shape.D3TreeLine;
 import i2f.core.graphics.d3.triangle.impl.ShortestDistanceTrianglize;
 import i2f.core.graphics.d3.visual.D3Canvas;
@@ -44,12 +42,13 @@ public class Test3D implements D3Frame.OnDraw{
 //        mod1=new SpinBezierCube(points).makeModelSpinX(15,20);
 //        mod1=new Ball(150).makeModel(10,10);
 //        mod1=new Cone(80,120).makeModel(10,10,5);
-//        mod1=new Ball(150).makeModel(3);
+        mod1=new Ball(150).makeModel(4);
 //        mod1=new Torus(150,50).makeModel(20,10);
 //        mod1=new Cylinder(50,150).makeModel(5,10,3);
-        mod1=new Cuboid(100,150,200).makeModel(3,3,3);
-        tree=D3TreeLine.makeTree(new D3Line(new D3Point(0,0,0),new D3Point(0,80,0)),8);
-        mod1= tree.modelize();
+//        mod1=new Cuboid(100,150,200).makeModel(3,3,3);
+//        tree=D3TreeLine.makeTree(new D3Line(new D3Point(0,0,0),new D3Point(0,80,0)),8);
+//        mod1= tree.modelize();
+//        mod1=new Icosahedron().makeModel(150);
 //        System.out.println(mod1);
 
         ShortestDistanceTrianglize trianglize=new ShortestDistanceTrianglize();
@@ -73,7 +72,7 @@ public class Test3D implements D3Frame.OnDraw{
 //            }
 //        };
 //        mod1=trianglize.trianglize(mod1);
-
+//
 
 //        mod1= TmFileUtil.load(new File("D:\\IDEA_ROOT\\DevCenter\\i2f-boost\\i2f-core\\src\\test\\java\\test\\graphics\\Bunny.tm"));
 
@@ -81,6 +80,7 @@ public class Test3D implements D3Frame.OnDraw{
     @Override
     public void draw(D3Painter painter, D3Canvas canvas, D3Frame frame) {
 
+        painter.enableBlanking=true;
 
         painter.clean(Rgba.black());
 
@@ -90,8 +90,8 @@ public class Test3D implements D3Frame.OnDraw{
 
         painter.drawAxis(1000);
 
-        tree.drawTree(painter,beginColor,endColor,10);
-//        painter.drawModelPoints(mod1);
+//        tree.drawTree(painter,beginColor,endColor,10);
+        painter.drawModelPoints(mod1);
 
 //        Thread.sleep(3000);
 //        painter.drawLine(new D3Point(200,0,0),new D3Point(0,200,0));
@@ -104,24 +104,29 @@ public class Test3D implements D3Frame.OnDraw{
 
 //        Thread.sleep(5000);
 
-//        painter.drawModelLines(mod1);
+
 
 //        Thread.sleep(5000);
 //
-//        painter.drawModelFlats(mod1);
+        painter.drawModelFlats(mod1);
 //
 //
-
+//        painter.drawModelLines(mod1);
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        ID3Projection proj=new ThreePointProjection(false,500,200);
+        ThreePointProjection vproj=new ThreePointProjection(false,500,200);
+        ID3Projection proj=vproj;
 
+//        proj=new ObliqueProjection(true,Calc.angle2radian(60),Calc.angle2radian(45));
 
         D3Frame.OnDraw drawer=new Test3D();
 
         D3Frame frame=new D3Frame(1080,720,drawer,proj);
+        frame.getCanvas().painter.enableBlanking=true;
+        frame.getCanvas().painter.viewPoint= vproj.viewPoint();
+        frame.getCanvas().painter.light.point=vproj.viewPoint().point();
         frame.setVisible(true);
         frame.refresh();
 

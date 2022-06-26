@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -45,30 +44,28 @@ public class Ball {
 
     //球体递归划分
     public D3Model makeModel(int level){
-        double a=radius*1.0/Math.sqrt(1+Math.pow(0.61828,2.0));
         D3Model ret=new D3Model();
         ret.points=new ArrayList<>();
         ret.flats=new ArrayList<>();
 
-
+        //球体递归划分
+        double a=radius*1.0/Math.sqrt(1+Math.pow(0.61828,2.0));
         D3Model icosdata=new Icosahedron().makeModel(a);
-        List<D3Point> pointsVec=new LinkedList<>();
-        List<D3ModelFlat> tranglesVec=new LinkedList<>();
 
-        //数据拷贝
-        pointsVec.addAll(icosdata.points);
-        tranglesVec.addAll(icosdata.flats);
+        List<D3Point> pointsVec=icosdata.points;
+        List<D3ModelFlat> tranglesVec= icosdata.flats;
 
         for(int n=0;n<level;n++)//进行递归划分
         {
             D3Point[] prePoints=new D3Point[6];//一个三角形三个点加上三个中点存储
-            for (int i = 0; i < prePoints.length; i++) {
-                prePoints[i]=new D3Point();
-            }
+
             int[] preIndexs=new int[6];//6个点的下标
             int preTranglesCount=tranglesVec.size();
             for(int i=0;i<preTranglesCount;i++)
             {
+                for(int p=0;p<prePoints.length;p++){
+                    prePoints[p]=new D3Point();
+                }
                 //获取原三角的三点坐标和下标
                 prePoints[0]=pointsVec.get(tranglesVec.get(0).p1);
                 prePoints[1]=pointsVec.get(tranglesVec.get(0).p2);
@@ -128,8 +125,8 @@ public class Ball {
 
         }
 
-        ret.points.addAll(pointsVec);
-        ret.flats.addAll(tranglesVec);
+        ret.points=pointsVec;
+        ret.flats=tranglesVec;
 
         return ret;
     }

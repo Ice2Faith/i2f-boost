@@ -6,8 +6,14 @@ import i2f.core.graphics.d2.projection.IProjection;
 import i2f.core.graphics.d2.projection.impl.MathCenterProjection;
 import i2f.core.graphics.d3.data.D3Model;
 import i2f.core.graphics.d3.data.D3ModelFlat;
+import i2f.core.graphics.d3.light.D3Color;
+import i2f.core.graphics.d3.light.D3Light;
+import i2f.core.graphics.d3.light.LightAlgorithm;
+import i2f.core.graphics.d3.light.Material;
 import i2f.core.graphics.d3.projection.ID3Projection;
 import i2f.core.graphics.d3.transform.ID3Transform;
+import i2f.core.graphics.d3.visible.BlankingAlgorithm;
+import i2f.core.graphics.math.Calc;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -19,6 +25,10 @@ import java.util.List;
  * @author ltb
  * @date 2022/6/19 15:26
  * @desc 3D绘图类
+ * 如何正确显示三维图形：
+ * 先变换transform
+ * 再隐面/背面剔除/材质/贴图/纹理/光照
+ * 最后投影
  */
 public class D3Painter {
     public BufferedImage hdc;
@@ -29,6 +39,17 @@ public class D3Painter {
     public Rgba fillColor;
     protected boolean disableTransform=false;
     public List<ID3Transform> transforms=new ArrayList<>();
+
+    // 使用背面剔除
+    public boolean enableBlanking=false;
+    // 视点
+    public D3SphericalPoint viewPoint=new D3SphericalPoint(500, Calc.angle2radian(60),Calc.angle2radian(45));
+
+    // 光照系统
+    public boolean enableLighting=true;
+    public D3Light light=D3Light.sun();
+    public Material material=Material.purpleGemstone();
+    public D3Color ambi=D3Color.of(Rgba.rgb(0,0,0));
 
     public D3Painter(BufferedImage hdc, ID3Projection d3proj, IProjection d2proj) {
         this.hdc = hdc;
@@ -83,8 +104,6 @@ public class D3Painter {
     public D3Painter drawAxis(double length){
 
         Rgba bakPointColor=pointColor;
-        boolean bakDisableTransform=disableTransform;
-        disableTransform=true;
         Rgba[] cls={Rgba.red(),Rgba.green(),Rgba.blue()};
         for(double d=0;d<length;d+=1){
             D3Point[] pts={new D3Point(d,0,0),new D3Point(0,d,0),new D3Point(0,0,d)};
@@ -93,7 +112,6 @@ public class D3Painter {
                 drawPoint(pts[i]);
             }
         }
-        disableTransform=bakDisableTransform;
         pointColor=bakPointColor;
 
         return this;
@@ -178,24 +196,34 @@ public class D3Painter {
     }
 
     /**
-     * 三维坐标转为显示坐标
+     * 变换
      * @param p
      * @return
      */
-    public Point d3p2hdcp(D3Point p){
+    public D3Point trans(D3Point p){
         D3Point np=new D3Point(p.x,p.y,p.z);
         if(!disableTransform){
             for(ID3Transform item : transforms){
                 np=item.transform(np);
             }
         }
-        Point p2=d3proj.projection(np);
+        return np;
+    }
+
+    /**
+     * 投影
+     * @param p
+     * @return
+     */
+    public Point proj(D3Point p){
+        Point p2=d3proj.projection(p);
         Point hp=d2proj.projection(p2);
         return hp;
     }
 
+
     public D3Painter drawPoint(D3Point p){
-        Point hp=d3p2hdcp(p);
+        Point hp=proj(p);
         int dx=(int)hp.x;
         int dy=(int)hp.y;
         if(dx<0 || dy<0 || dx>=hdc.getWidth() || dy>=hdc.getHeight()){
@@ -210,8 +238,8 @@ public class D3Painter {
     }
 
     public D3Painter drawLine(D3Line l){
-        Point begin=d3p2hdcp(l.begin);
-        Point end=d3p2hdcp(l.end);
+        Point begin=proj(l.begin);
+        Point end=proj(l.end);
         Graphics gra=hdc.getGraphics();
         gra.setColor(new Color(lineColor.argb(),true));
         gra.drawLine((int)begin.x,(int)begin.y,(int)end.x,(int)end.y);
@@ -228,7 +256,7 @@ public class D3Painter {
         gra.setColor(new Color(lineColor.argb(),true));
         List<Point> dps=new ArrayList<>(points.size());
         for(D3Point item : points){
-            dps.add(d3p2hdcp(item));
+            dps.add(proj(item));
         }
         int[] xs=new int[dps.size()];
         int[] ys=new int[dps.size()];
@@ -249,7 +277,7 @@ public class D3Painter {
         gra.setColor(new Color(lineColor.argb(),true));
         List<Point> dps=new ArrayList<>(points.size());
         for(D3Point item : points){
-            dps.add(d3p2hdcp(item));
+            dps.add(proj(item));
         }
         int[] xs=new int[dps.size()];
         int[] ys=new int[dps.size()];
@@ -266,7 +294,7 @@ public class D3Painter {
         gra.setColor(new Color(fillColor.argb(),true));
         List<Point> dps=new ArrayList<>(points.size());
         for(D3Point item : points){
-            dps.add(d3p2hdcp(item));
+            dps.add(proj(item));
         }
         int[] xs=new int[dps.size()];
         int[] ys=new int[dps.size()];
@@ -280,6 +308,7 @@ public class D3Painter {
 
     public D3Painter drawModelPoints(D3Model mod){
         for(D3Point item : mod.getPoints()){
+            item=trans(item);
             drawPoint(item);
         }
         return this;
@@ -291,7 +320,16 @@ public class D3Painter {
             flat.p1=mod.getPoints().get(item.p1);
             flat.p2=mod.getPoints().get(item.p2);
             flat.p3=mod.getPoints().get(item.p3);
-            drawFlatLine(flat);
+            flat.p1=trans(flat.p1);
+            flat.p2=trans(flat.p2);
+            flat.p3=trans(flat.p3);
+            boolean draw=true;
+            if(enableBlanking){
+                draw= BlankingAlgorithm.visible(viewPoint,flat)>0;
+            }
+            if(draw) {
+                drawFlatLine(flat);
+            }
         }
         return this;
     }
@@ -302,7 +340,25 @@ public class D3Painter {
             flat.p1=mod.getPoints().get(item.p1);
             flat.p2=mod.getPoints().get(item.p2);
             flat.p3=mod.getPoints().get(item.p3);
-            drawFlat(flat);
+            flat.p1=trans(flat.p1);
+            flat.p2=trans(flat.p2);
+            flat.p3=trans(flat.p3);
+            boolean draw=true;
+            if(enableBlanking){
+                draw= BlankingAlgorithm.visible(viewPoint,flat)>0;
+            }
+            if(draw) {
+                if(enableLighting){
+                    D3Color c= LightAlgorithm.light(viewPoint.point(),
+                            light,
+                            flat.p1,
+                            flat.normalLine(),
+                            material,
+                            ambi);
+                    fillColor=c.rgba();
+                }
+                drawFlat(flat);
+            }
         }
         return this;
     }

@@ -2,6 +2,7 @@ package i2f.core.graphics.d3.projection.impl;
 
 import i2f.core.graphics.d2.Point;
 import i2f.core.graphics.d3.D3Point;
+import i2f.core.graphics.d3.D3SphericalPoint;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +21,12 @@ public class ObliqueProjection extends AbstractMatrixProjection {
         super(enableMatrix);
         this.aAngle = aAngle;
         this.bAngle = bAngle;
+    }
+
+    public ObliqueProjection(boolean enableMatrix, D3SphericalPoint viewPoint){
+        super(enableMatrix);
+        this.aAngle= viewPoint.aAngle;
+        this.bAngle=viewPoint.bAngle;
     }
 
     @Override
