@@ -80,10 +80,10 @@ public class Material {
 
     public static Material snow(){
         Material ret=new Material();
-        ret.diff=new D3Color(0.35,0.35,0.35);
-        ret.spec=new D3Color(0.999,0.999,0.999);
-        ret.ambi=new D3Color(0.001,0.001,0.001);
-        ret.heigN=10;
+        ret.diff=new D3Color(0.9,0.9,0.9);
+        ret.spec=new D3Color(0.4,0.4,0.4);
+        ret.ambi=new D3Color(0,0,0);
+        ret.heigN=8;
         return ret;
     }
 }

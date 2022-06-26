@@ -72,7 +72,7 @@ public class Test3D implements D3Frame.OnDraw{
 //            }
 //        };
 //        mod1=trianglize.trianglize(mod1);
-//
+
 
 //        mod1= TmFileUtil.load(new File("D:\\IDEA_ROOT\\DevCenter\\i2f-boost\\i2f-core\\src\\test\\java\\test\\graphics\\Bunny.tm"));
 
@@ -126,7 +126,6 @@ public class Test3D implements D3Frame.OnDraw{
         D3Frame frame=new D3Frame(1080,720,drawer,proj);
         frame.getCanvas().painter.enableBlanking=true;
         frame.getCanvas().painter.viewPoint= vproj.viewPoint();
-        frame.getCanvas().painter.light.point=vproj.viewPoint().point();
         frame.setVisible(true);
         frame.refresh();
 

@@ -47,8 +47,16 @@ public class D3Painter {
 
     // 光照系统
     public boolean enableLighting=true;
-    public D3Light light=D3Light.sun();
-    public Material material=Material.purpleGemstone();
+    public List<D3Light> lights=Arrays.asList(
+            D3Light.greenGemstone(new D3Point(0,0,500))
+            ,
+            D3Light.blueGemstone(new D3Point(0,500,0))
+            ,
+            D3Light.purpleGemstone(new D3Point(500,0,0))
+            ,
+            D3Light.redGemstone(new D3Point(500,500,500))
+    );
+    public Material material=Material.snow();
     public D3Color ambi=D3Color.of(Rgba.rgb(0,0,0));
 
     public D3Painter(BufferedImage hdc, ID3Projection d3proj, IProjection d2proj) {
@@ -350,7 +358,7 @@ public class D3Painter {
             if(draw) {
                 if(enableLighting){
                     D3Color c= LightAlgorithm.light(viewPoint.point(),
-                            light,
+                            lights,
                             flat.p1,
                             flat.normalLine(),
                             material,

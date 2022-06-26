@@ -76,6 +76,10 @@ public class D3Vector extends D3Point implements ILenght {
         return mul(this,v);
     }
 
+    public D3Vector mul(double v){
+        return mul(this,v);
+    }
+
     public D3Vector mulCross(D3Vector v){
         return mulCross(this,v);
     }
@@ -110,6 +114,10 @@ public class D3Vector extends D3Point implements ILenght {
         ret.y=d1.y+d2.y;
         ret.z=d1.z+d2.z;
         return ret;
+    }
+
+    public static D3Vector mul(D3Vector d,double val){
+        return new D3Vector(d.x*val,d.y*val,d.z*val);
     }
 
     // 向量点乘
