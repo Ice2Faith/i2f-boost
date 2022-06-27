@@ -1,5 +1,6 @@
 package i2f.springboot.application;
 
+import i2f.spring.slf4j.Slf4jPrintStream;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
@@ -26,6 +27,7 @@ public class WarBootApplication extends SpringBootServletInitializer {
     }
 
     public static String startup(Class mainClass, String[] args) {
+        Slf4jPrintStream.redirectSysoutSyserr();
         ConfigurableApplicationContext application = SpringApplication.run(mainClass, args);
         Environment env = application.getEnvironment();
         StringBuilder builder = new StringBuilder();

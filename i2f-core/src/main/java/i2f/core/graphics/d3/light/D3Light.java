@@ -113,10 +113,10 @@ public class D3Light {
 
     public static D3Light white(D3Point point){
         D3Light ret=new D3Light();
-        ret.diff=new D3Color(0.8,0.8,0.8);
-        ret.spec=new D3Color(0.2,0.2,0.2);
+        ret.diff=new D3Color(0.5,0.5,0.5);
+        ret.spec=new D3Color(1.0,1.0,1.0);
         ret.c0=0.5;
-        ret.c1=0.8;
+        ret.c1=0.9;
         ret.c2=0.99;
         ret.point=point;
         return ret;

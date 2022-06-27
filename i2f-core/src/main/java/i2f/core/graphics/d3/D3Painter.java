@@ -48,15 +48,15 @@ public class D3Painter {
     // 光照系统
     public boolean enableLighting=true;
     public List<D3Light> lights=Arrays.asList(
-            D3Light.greenGemstone(new D3Point(0,0,500))
-            ,
-            D3Light.blueGemstone(new D3Point(0,500,0))
-            ,
-            D3Light.purpleGemstone(new D3Point(500,0,0))
-            ,
-            D3Light.redGemstone(new D3Point(500,500,500))
+            D3Light.silver(new D3Point(0,0,500))
+//            ,
+//            D3Light.blueGemstone(new D3Point(0,500,0))
+//            ,
+//            D3Light.purpleGemstone(new D3Point(500,0,0))
+//            ,
+//            D3Light.redGemstone(new D3Point(500,500,500))
     );
-    public Material material=Material.snow();
+    public Material material=Material.yellowRubber();
     public D3Color ambi=D3Color.of(Rgba.rgb(0,0,0));
 
     public D3Painter(BufferedImage hdc, ID3Projection d3proj, IProjection d2proj) {
