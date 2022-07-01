@@ -16,8 +16,19 @@ public class Base64Obfuscator {
         if(prefix){
             builder.append(OBF_PREFIX);
         }
+        int jpc= (bs4.length()+random.nextInt(31))%10;
+        builder.append((char)('0'+jpc));
+        for(int p=0;p<jpc;p++){
+            int ird=random.nextInt(16);
+            if(ird<10){
+                builder.append((char)('0'+ird));
+            }else{
+                builder.append((char)('A'+(ird-10)));
+            }
+        }
+        jpc=jpc%2+2;
         for(int i=0;i<bs4.length();i++){
-            if(i%2==0 && bs4.charAt(i)!='='){
+            if(i%jpc==0 && bs4.charAt(i)!='='){
                 int ird=random.nextInt(16);
                 if(ird<10){
                     builder.append((char)('0'+ird));
@@ -35,9 +46,12 @@ public class Base64Obfuscator {
             str=sob.substring(OBF_PREFIX.length());
         }
         StringBuilder builder = new StringBuilder();
+        int jpc = str.charAt(0)-'0';
+        str=str.substring(1+jpc);
+        jpc=jpc%2+3;
         int i=0;
         while(i<str.length()){
-            if(i%3==0 && str.charAt(i)!='='){
+            if(i%jpc==0 && str.charAt(i)!='='){
                 i++;
                 continue;
             }
@@ -45,6 +59,23 @@ public class Base64Obfuscator {
             i++;
         }
         return builder.toString();
+    }
+
+    public static void main(String[] args){
+        String src="123456789";
+        String enc = encode(src, true);
+        String dec=decode(enc);
+        System.out.println(enc);
+        System.out.println(dec);
+
+        enc = encode(src, true);
+        dec=decode(enc);
+        System.out.println(enc);
+        System.out.println(dec);
+
+        dec=decode(enc);
+        System.out.println(enc);
+        System.out.println(dec);
     }
 
 }

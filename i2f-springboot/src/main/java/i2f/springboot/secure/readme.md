@@ -186,7 +186,7 @@ import axios from 'axios'
 ```
 - 引入过滤器
 ```js
-import SecureTransferFilter from "../secure/secure-transfer-filter";
+import SecureTransferFilter from ".//secure-transfer-filter";
 ```
 - 添加一个请求实例
 ```js

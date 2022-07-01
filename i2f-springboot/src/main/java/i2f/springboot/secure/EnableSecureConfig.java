@@ -1,6 +1,5 @@
-package i2f.springboot.secure.annotation;
+package i2f.springboot.secure;
 
-import i2f.springboot.secure.SecureConfig;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
