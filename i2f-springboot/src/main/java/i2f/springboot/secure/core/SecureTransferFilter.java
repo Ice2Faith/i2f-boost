@@ -1,6 +1,5 @@
 package i2f.springboot.secure.core;
 
-
 import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.annotation.SecureParams;
 import i2f.springboot.secure.servlet.HttpServletRequestProxyWrapper;
@@ -110,11 +109,53 @@ public class SecureTransferFilter extends OncePerRequestFilter implements Initia
 
                 log.debug("find request secure.");
                 byte[] bytes = requestProxyWrapper.getBodyBytes();
+
+                String signPassHeader=null;
+                String signNoncePassHeader=null;
+
                 // 如果有请求体，解密请求体
                 if (bytes.length > 0) {
                     log.debug("decrypt request body...");
                     String aesKey = secureTransfer.getRequestSecureHeader(request);
                     String srcText = new String(bytes, request.getCharacterEncoding());
+
+                    // 如果有消息签名，则验证消息签名
+                    String signHeader = request.getHeader(SecureTransfer.SECURE_SIGN_HEADER);
+                    if(signHeader!= null && !"".equals(signHeader)){
+                        String signText=srcText;
+
+
+                        // 计算签名，并给出比对结果到请求头中，交给接下去的AOP中使用
+                        String sign=StringSignature.sign(signText);
+
+
+                        log.info("signHeader:"+signHeader);
+                        log.info("signCalc:"+sign);
+
+                        if(sign.equalsIgnoreCase(signHeader)){
+                            signPassHeader=SecureTransfer.FLAG_ENABLE;
+                        }else{
+                            signPassHeader=SecureTransfer.FLAG_DISABLE;
+                        }
+
+                        // 如果存在一次性消息头，需要结合一次性消息头一起计算签名
+                        String nonceHeader=request.getHeader(SecureTransfer.SECURE_NONCE_HEADER);
+                        String signNonceHeader=request.getHeader(SecureTransfer.SECURE_SIGN_NONCE_HEADER);
+                        log.info("nonceHeader:"+nonceHeader);
+                        if(nonceHeader!=null &&!"".equals(nonceHeader)){
+                            String signNonceText=nonceHeader+sign;
+                            String signNonce=StringSignature.sign(signNonceText);
+                            if(signNonce.equalsIgnoreCase(signNonceHeader)){
+                                signNoncePassHeader=SecureTransfer.FLAG_ENABLE;
+                            }else{
+                                signNoncePassHeader=SecureTransfer.FLAG_DISABLE;
+                            }
+                        }
+
+
+
+                    }
+
                     log.debug("src body:" + srcText);
                     String decryptText = secureTransfer.decrypt(srcText, aesKey);
                     log.debug("decrypt body:" + decryptText);
@@ -126,6 +167,15 @@ public class SecureTransferFilter extends OncePerRequestFilter implements Initia
                 // 标记已被解密
                 requestProxyWrapper.setAttachHeader(SecureTransfer.FILTER_DECRYPT_HEADER, SecureTransfer.FLAG_ENABLE);
 
+                // 标记签名验证
+                if(signPassHeader!=null) {
+                    requestProxyWrapper.setAttachHeader(SecureTransfer.FILTER_SIGN_PASS_HEADER, signPassHeader);
+                }
+
+                // 标记一次性签名验证
+                if(signNoncePassHeader!=null) {
+                    requestProxyWrapper.setAttachHeader(SecureTransfer.FILTER_SIGN_NONCE_PASS_HEADER, signNoncePassHeader);
+                }
                 nextRequest = requestProxyWrapper;
             }
         }

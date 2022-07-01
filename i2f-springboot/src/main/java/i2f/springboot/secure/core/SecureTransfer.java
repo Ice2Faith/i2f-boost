@@ -24,15 +24,31 @@ import java.util.*;
 @Data
 @Component
 public class SecureTransfer implements InitializingBean {
+    // 是否包含解密头标记
+    public static final String SECURE_DATA_HEADER="secure";
+
+    // 是否包含签名头标记
+    public static final String SECURE_SIGN_HEADER="sign";
+
+    // 是否包含一次性消息头标记
+    public static final String SECURE_NONCE_HEADER="nonce";
+
+    // 是否包含一次性签名消息头标记
+    public static final String SECURE_SIGN_NONCE_HEADER="sgonce";
+
+    //////////////////////////////////////////////////////////////////
 
     // 是否是String返回值类型标记
     public static final String STRING_RETURN_HEADER="secure_string";
 
-    // 是否包含解密头标记
-    public static final String SECURE_DATA_HEADER="credential";
-
     // 是否过滤器已解密标记
     public static final String FILTER_DECRYPT_HEADER="secure_decrypt";
+
+    // 是否签名验证通过
+    public static final String FILTER_SIGN_PASS_HEADER="sign_pass";
+
+    // 是否签名验证通过
+    public static final String FILTER_SIGN_NONCE_PASS_HEADER="sign_nonce_pass";
 
     public static final String FLAG_ENABLE ="true";
 

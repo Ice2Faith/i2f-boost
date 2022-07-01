@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.concurrent.*;
 
 /**
  * @author ltb
@@ -31,6 +32,9 @@ import java.lang.reflect.Parameter;
 @Component
 @Aspect
 public class SecureTransferAop implements InitializingBean {
+
+    ConcurrentMap<String,Long> nonceCache=new ConcurrentHashMap<>();
+    private ScheduledExecutorService pool=Executors.newScheduledThreadPool(30);
 
     @Autowired
     private SecureTransfer secureTransfer;
@@ -77,10 +81,58 @@ public class SecureTransferAop implements InitializingBean {
                 String decryptHeader = request.getHeader(SecureTransfer.FILTER_DECRYPT_HEADER);
                 if(!SecureTransfer.FLAG_ENABLE.equals(decryptHeader)){
                     log.debug("not decrypt request error.");
-                    throw new SecureException();
+                    throw new SecureException("不安全的请求");
                 }
             }
 
+        }
+
+        // 获取消息头
+        // 获取消息体签名头
+        String signHeader=request.getHeader(SecureTransfer.SECURE_SIGN_HEADER);
+        // 获取一次性头
+        String nonceHeader=request.getHeader(SecureTransfer.SECURE_NONCE_HEADER);
+        // 获取过滤器验证过的消息体签名结果头
+        String signPassHeader=request.getHeader(SecureTransfer.FILTER_SIGN_PASS_HEADER);
+        // 获取消息体与一次性头的复合签名
+        String signNonceHeader=request.getHeader(SecureTransfer.SECURE_SIGN_NONCE_HEADER);
+        // 获取过滤器验证过的消息体与一次性头复合签名的结果头
+        String signNoncePassHeader=request.getHeader(SecureTransfer.FILTER_SIGN_NONCE_PASS_HEADER);
+
+        // 存在签名头，这根据过滤器计算结果决定是否消息体签名不通过
+        if(signHeader!=null && !"".equals(signHeader)){
+            if(!SecureTransfer.FLAG_ENABLE.equals(signPassHeader)){
+                throw new SecureException("签名校验不通过");
+            }
+        }
+
+        // 如果存在一次性签名头，则根据过滤器计算结果决定是够消息体一次性签名不通过
+        if(signNonceHeader!=null && !"".equals(signNonceHeader)){
+            if(!SecureTransfer.FLAG_ENABLE.equals(signNoncePassHeader)){
+                throw new SecureException("一次性签名校验不通过");
+            }
+        }
+
+        // 如果是一次性头，并且一次性签名头都存在，则可以限制非正常的重放请求
+        // 正常的请求是客户端发起的，每一次一次性头都是不同的
+        // 然而，非正常的请求，可以进行重放请求达到目的
+        // 这样的请求，就会出现一次性头重复，存在相同的签名
+        if(nonceHeader!=null && signNonceHeader!=null){
+            if(nonceCache.containsKey(signNonceHeader)){
+                throw new SecureException("不允许重放请求");
+            }
+
+            nonceCache.put(signNonceHeader,1L);
+
+            // 这里定时消除一个时间窗口内的重放请求
+            // 更好的实现方式时使用redis，避免一个时间窗口内出现大量请求
+            // 导致map和pool宕机
+            pool.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    nonceCache.remove(signNonceHeader);
+                }
+            },60,TimeUnit.SECONDS);
         }
 
         // 特殊标记返回值为String的方法

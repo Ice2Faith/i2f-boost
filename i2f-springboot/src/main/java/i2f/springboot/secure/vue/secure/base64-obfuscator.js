@@ -9,8 +9,19 @@ const Base64Obfuscator = {
     if (prefix) {
       builder += this.OBF_PREFIX();
     }
+    let jpc= (bs4.length+Random.nextLowerInt(31))%10;
+    builder += (String.fromCharCode('0'.charCodeAt(0) + jpc));
+    for(let p=0;p<jpc;p++){
+      let ird = Random.nextLowerInt(16);
+      if (ird < 10) {
+        builder += (String.fromCharCode('0'.charCodeAt(0) + ird));
+      } else {
+        builder += (String.fromCharCode('A'.charCodeAt(0) + (ird - 10)));
+      }
+    }
+    jpc=jpc%2+2;
     for (let i = 0; i < bs4.length; i++) {
-      if (i % 2 == 0 && bs4.charAt(i) != '=') {
+      if (i % jpc == 0 && bs4.charAt(i) != '=') {
         let ird = Random.nextLowerInt(16);
         if (ird < 10) {
           builder += (String.fromCharCode('0'.charCodeAt(0) + ird));
@@ -28,9 +39,12 @@ const Base64Obfuscator = {
       str = sob.substring(this.OBF_PREFIX().length);
     }
     let builder = '';
+    let jpc = str.charAt(0).charCodeAt(0)-'0'.charCodeAt(0);
+    str=str.substring(1+jpc);
+    jpc=jpc%2+3;
     let i = 0;
     while (i < str.length) {
-      if (i % 3 == 0 && str.charAt(i) != '=') {
+      if (i % jpc == 0 && str.charAt(i) != '=') {
         i++;
         continue;
       }

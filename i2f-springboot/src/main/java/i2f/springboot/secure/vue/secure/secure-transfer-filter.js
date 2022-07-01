@@ -1,4 +1,6 @@
 import SecureTransfer from "./secure-transfer";
+import StringSignature from "./string-signature";
+import B64 from "./base64";
 
 const SecureTransferFilter = {
   // 请求加密过滤，config需要包含属性：data,params,headers
@@ -10,13 +12,24 @@ const SecureTransferFilter = {
   requestFilter(config) {
     if (config.headers[SecureTransfer.SECURE_DATA_HEADER()]===SecureTransfer.SECURE_HEADER_ENABLE()) {
       let aesKey = SecureTransfer.aesKeyGen16();
-      console.log('aes-key:', aesKey)
       SecureTransfer.setRequestSecureHeader(config.headers, aesKey);
       if (config.data) {
-        console.log('requestInSecure');
-        console.log('srcReqData:', config.data);
         config.data = SecureTransfer.encrypt(config.data, aesKey);
-        console.log('secReqData:', config.data);
+
+        // 生成一次性头，保证每一次都是客户端的请求，而不是被重放的请求（实际重放看signNonce）
+        let nonce=new Date().getTime().toString(16)+''+Math.floor(Math.random()*0x0fff).toString(16);
+
+        // 计算消息体签名，保证消息体不被篡改
+        let sign=StringSignature.sign(config.data)
+
+        // 计算签名与一次性头的复合签名，保证消息体绑定的一次性头不被篡改
+        let signNonceText=nonce+sign
+        let signNonce=StringSignature.sign(signNonceText)
+
+        // 将三个复合签名都添加到请求头
+        config.headers[SecureTransfer.SECURE_SIGN_HEADER()]=sign
+        config.headers[SecureTransfer.SECURE_NONCE_HEADER()]=nonce
+        config.headers[SecureTransfer.SECURE_SIGN_NONCE_HEADER()]=signNonce
       }
       if(config.headers[SecureTransfer.SECURE_PARAMS_HEADER()]===SecureTransfer.SECURE_HEADER_ENABLE()){
         if(config.params){
@@ -43,12 +56,10 @@ const SecureTransferFilter = {
   responseFilter(res) {
     let secureHeader = res.headers[SecureTransfer.SECURE_DATA_HEADER()];
     if (secureHeader && secureHeader != '') {
-      console.log('sec:data:', res.data);
       let aesKey = SecureTransfer.getResponseSecureHeaderByHeaders(res.headers);
 
       res.data = SecureTransfer.decrypt(res.data, aesKey);
 
-      console.log('sec:rec:', res.data);
     }
     return res;
   },

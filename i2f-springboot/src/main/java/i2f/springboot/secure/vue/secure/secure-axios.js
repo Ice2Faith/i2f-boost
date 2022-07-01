@@ -16,11 +16,7 @@ const request = axios.create({
 // request拦截器
 request.interceptors.request.use(config => {
 
-  console.log('headers:',config.headers);
-
   SecureTransferFilter.requestFilter(config)
-
-  console.log('reqUrl:',config.url);
 
   return config
 }, error => {
@@ -30,7 +26,6 @@ request.interceptors.request.use(config => {
 
 // 响应拦截器
 request.interceptors.response.use(res => {
-    console.log('res:',res);
 
     SecureTransferFilter.responseFilter(res);
 

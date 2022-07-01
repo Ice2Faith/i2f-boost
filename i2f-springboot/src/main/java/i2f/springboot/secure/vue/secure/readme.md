@@ -83,7 +83,7 @@ npm install
 ```
 - 在main.js中引入本包
 ```js
-import './secure/secure-vue-main'
+import './secure-vue-main'
 ```
 - web端是基于过滤器实现的自动加解密
 - 因此，需要对请求响应拦截器进行配置
@@ -134,7 +134,7 @@ request.interceptors.request.use(config => {
 // 响应拦截器
 request.interceptors.response.use(res => {
     console.log('res:',res);
-    
+
     // 核心过滤器
     SecureTransferFilter.responseFilter(res);
 

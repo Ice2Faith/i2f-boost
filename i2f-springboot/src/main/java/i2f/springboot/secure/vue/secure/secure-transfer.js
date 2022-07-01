@@ -4,9 +4,25 @@ import Rsa from "./rsa";
 import Base64Obfuscator from "./base64-obfuscator";
 
 const SecureTransfer = {
+  // 是否开启详细日志
+  // 在正式环境中，请禁用
+  ENABLE_DEBUG_LOG(){
+    return true;
+  },
   // 定义安全请求头名称
   SECURE_DATA_HEADER() {
     return "secure";
+  },
+  // 定义签名头名称
+  SECURE_SIGN_HEADER(){
+    return "sign";
+  },
+  // 定义一次性消息头名称
+  SECURE_NONCE_HEADER(){
+    return "nonce";
+  },
+  SECURE_SIGN_NONCE_HEADER(){
+    return "sgonce";
   },
   // 启用安全请求头
   SECURE_HEADER_ENABLE(){

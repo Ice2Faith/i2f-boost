@@ -1,8 +1,7 @@
 package i2f.springboot.secure.core;
 
 
-import i2f.core.digest.Base64Util;
-import i2f.core.j2ee.web.ServletContextUtil;
+import i2f.springboot.secure.util.Base64Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -25,10 +24,10 @@ import java.io.IOException;
 public class EncodeRequestForwardController implements InitializingBean {
     @RequestMapping("/enc/{encodeUrl}")
     public void encodeUrlForward(@PathVariable("encodeUrl")String encodeUrl, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        byte[] data= Base64Util.decodeUrl(encodeUrl);
+        byte[] data= Base64Util.fromUrl(encodeUrl);
         String trueUrl= new String(data,"UTF-8");
         log.info("forward:\n\tsrc:"+encodeUrl+"\n\t"+"dst:"+trueUrl);
-        ServletContextUtil.forward(request,response,trueUrl);
+        request.getRequestDispatcher(trueUrl).forward(request,response);
     }
 
     @Override
