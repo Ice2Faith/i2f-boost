@@ -128,7 +128,7 @@ public class Test3D implements D3Frame.OnDraw{
                 +","+"heigN("+material.heigN+")";
         d2.drawString(mate,50,50);
         try{
-            File dir=new File("G:\\01material", LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH-mm")));
+            File dir=new File("G:\\01material02", LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH-mm")));
             if(!dir.exists()){
                 dir.mkdirs();
             }
@@ -155,6 +155,28 @@ public class Test3D implements D3Frame.OnDraw{
         frame.setVisible(true);
         frame.refresh();
 
+        while(true){
+            drawer.material.diff.r=Calc.rand(100)/100.0;
+            drawer.material.diff.g=Calc.rand(100)/100.0;
+            drawer.material.diff.b=Calc.rand(100)/100.0;
+
+            drawer.material.spec.r=Calc.rand(100)/100.0;
+            drawer.material.spec.g=Calc.rand(100)/100.0;
+            drawer.material.spec.b=Calc.rand(100)/100.0;
+
+            drawer.material.ambi.r=Calc.rand(100)/100.0;
+            drawer.material.ambi.g=Calc.rand(100)/100.0;
+            drawer.material.ambi.b=Calc.rand(100)/100.0;
+
+            drawer.material.heigN=Calc.rand(100);
+
+            frame.refresh();
+            Thread.sleep(30);
+        }
+
+    }
+
+    private static void steps(Test3D drawer,D3Frame frame) throws InterruptedException {
         double cstep=0.25;
         double hstep=25;
 
@@ -188,7 +210,7 @@ public class Test3D implements D3Frame.OnDraw{
 
                                                 frame.refresh();
 
-                                                Thread.sleep(5);
+                                                Thread.sleep(15);
 
                                             }
 
@@ -204,6 +226,5 @@ public class Test3D implements D3Frame.OnDraw{
                 }
             }
         }
-
     }
 }

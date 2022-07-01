@@ -1,4 +1,6 @@
-package i2f.core.graphics.math;
+package test.graphics;
+
+import i2f.core.graphics.math.Matrix;
 
 /**
  * @author ltb
@@ -32,6 +34,6 @@ public class TestMatrix {
 
         Matrix m4 = Matrix.makeE(4);
         System.out.println(m4);
-        
+
     }
 }

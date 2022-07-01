@@ -71,6 +71,21 @@ public class Rgba {
         return rate;
     }
 
+    /**
+     * 颜色平滑渐变
+     * @param rate 渐变率
+     * @param c1 开始颜色
+     * @param c2 结束颜色
+     * @return
+     */
+    public static Rgba smooth(double rate,Rgba c1,Rgba c2){
+        int r=Calc.smooth(rate,c1.r,c2.r);
+        int g=Calc.smooth(rate,c1.g,c2.g);
+        int b=Calc.smooth(rate,c1.b,c2.b);
+        int a=Calc.smooth(rate,c1.a,c2.a);
+        return Rgba.rgba(r,g,b,a);
+    }
+
     public static Rgba black(){
         return rgb(0,0,0);
     }

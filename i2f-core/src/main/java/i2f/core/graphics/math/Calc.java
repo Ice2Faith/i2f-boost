@@ -49,6 +49,27 @@ public class Calc {
     }
 
     /**
+     * 插值平滑
+     * 一般用来平滑过度颜色，实现渐变色
+     * 或者在线条绘制中，进行线条绘制点确定
+     * @param rate
+     * @param start
+     * @param end
+     * @return
+     */
+    public static double smooth(double rate,double start,double end){
+        return start*rate+end*(1.0-rate);
+    }
+
+    public static int smooth(double rate,int start,int end){
+        return (int)(start*rate+end*(1.0-rate));
+    }
+
+    public static long smooth(double rate,long start,long end){
+        return (long)(start*rate+end*(1.0-rate));
+    }
+
+    /**
      * 绝对值
      * @param val
      * @return

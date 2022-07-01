@@ -1,4 +1,4 @@
-package i2f.springboot.advice;
+package i2f.springboot.secure.core;
 
 
 import i2f.core.digest.Base64Util;
@@ -19,7 +19,7 @@ import java.io.IOException;
  * @author ltb
  * @date 2021/10/8
  */
-@ConditionalOnExpression("${i2f.springboot.config.advice.enc-url-forward-controller.enable:true}")
+@ConditionalOnExpression("${i2f.springboot.config.secure.enc-url-forward-controller.enable:true}")
 @Slf4j
 @Controller
 public class EncodeRequestForwardController implements InitializingBean {

@@ -2,7 +2,6 @@ package com.i2f.demo;
 
 
 import i2f.springboot.activity.EnableActivityConfig;
-import i2f.springboot.advice.EnableHttpWebAdviceConfig;
 import i2f.springboot.application.WarBootApplication;
 import i2f.springboot.asyn.EnableAsyncConfig;
 import i2f.springboot.cors.EnableCorsConfig;
@@ -39,7 +38,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @EnableRedisConfig
 @EnableRefreshConfig
-@EnableHttpWebAdviceConfig
 @EnableQuartzConfig
 @EnableShiroConfig
 @EnableActivityConfig

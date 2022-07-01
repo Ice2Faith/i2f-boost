@@ -1,4 +1,4 @@
-package i2f.springboot.advice.annotation;
+package i2f.springboot.secure.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
