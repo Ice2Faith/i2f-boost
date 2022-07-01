@@ -1,7 +1,8 @@
-package i2f.springboot.advice;
+package i2f.springboot.secure.advice;
 
-import i2f.core.annotations.remark.Remark;
-import i2f.springboot.advice.annotation.SecureParams;
+
+import i2f.springboot.secure.annotation.SecureParams;
+import i2f.springboot.secure.core.SecureTransfer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +23,13 @@ import java.lang.reflect.Type;
 
 //注意，接受参数需要加上 @RequestBody注解，否则不会被拦截，另外需要以POST方式application/json方式提交
 //原因间此类中的调用：RequestResponseBodyMethodProcessor
-@ConditionalOnExpression("${i2f.springboot.config.advice.request-advice.enable:true}")
+@ConditionalOnExpression("${i2f.springboot.config.secure.request-advice.enable:true}")
 @Slf4j
 @ControllerAdvice
-@Remark("provide decrypt post/json request params advice")
 public class RequestBodyDecryptAdvice implements RequestBodyAdvice, InitializingBean {
 
     @Autowired
-    private IStringDecryptor decryptor;
+    private SecureTransfer secureTransfer;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -67,12 +67,32 @@ public class RequestBodyDecryptAdvice implements RequestBodyAdvice, Initializing
         public HttpHeaders headers;
         public RequestHttpInputMessage(HttpInputMessage inputMessage) throws IOException {
             this.headers=inputMessage.getHeaders();
-            String bodyStr= FileCopyUtils.copyToString(new InputStreamReader(inputMessage.getBody()));
-            System.out.println("bodyStr:"+bodyStr);
-            String data=decryptor.decrypt(bodyStr);
-            System.out.println("data:"+data);
-            byte[] deData=data.getBytes();
-            this.body=new ByteArrayInputStream(deData);
+            // 判断是否包含加密头，包含则需要解密
+            String aesKeyTransfer=this.headers.getFirst(SecureTransfer.SECURE_DATA_HEADER);
+            boolean isEncrypt=aesKeyTransfer!=null && !"".equals(aesKeyTransfer);
+
+            // 如果有使用过滤器，则需要判断过滤器是否已经解密，已经解密则直接跳过，不重复解密
+            String decryptFlag=this.headers.getFirst(SecureTransfer.FILTER_DECRYPT_HEADER);
+            if(SecureTransfer.FLAG_ENABLE.equals(decryptFlag)){
+                isEncrypt=false;
+            }
+
+            // 读取请求体
+            String bodyStr = FileCopyUtils.copyToString(new InputStreamReader(inputMessage.getBody()));
+            System.out.println("bodyStr:" + bodyStr);
+
+            // 需要解密，并且请求体不为空时解密
+            if(isEncrypt && bodyStr!=null && !"".equals(bodyStr)) {
+                String aesKey=secureTransfer.getRequestSecureHeader(aesKeyTransfer);
+                System.out.println("bodyStr:" + bodyStr);
+                String data=secureTransfer.decrypt(bodyStr,aesKey);
+                System.out.println("data:" + data);
+                byte[] deData = data.getBytes();
+                this.body = new ByteArrayInputStream(deData);
+            }else{
+                byte[] deData = bodyStr.getBytes();
+                this.body = new ByteArrayInputStream(deData);
+            }
         }
         @Override
         public InputStream getBody() throws IOException {

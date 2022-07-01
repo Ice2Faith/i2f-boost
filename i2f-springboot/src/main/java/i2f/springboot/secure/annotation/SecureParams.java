@@ -1,4 +1,4 @@
-package i2f.springboot.advice.annotation;
+package i2f.springboot.secure.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,7 +12,8 @@ import java.lang.annotation.Target;
 @Target({
         ElementType.METHOD,
         ElementType.TYPE,
-        ElementType.PARAMETER
+        ElementType.PARAMETER,
+        ElementType.FIELD
 })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SecureParams {

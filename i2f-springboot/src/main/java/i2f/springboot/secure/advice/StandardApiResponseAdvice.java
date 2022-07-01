@@ -1,11 +1,10 @@
-package i2f.springboot.advice;
+package i2f.springboot.secure.advice;
 
 
-import i2f.core.annotations.remark.Remark;
 import i2f.core.api.ApiResp;
-import i2f.spring.jackson.JacksonJsonProcessor;
-import i2f.springboot.advice.annotation.SecureParams;
-import i2f.springboot.advice.annotation.StandardApiResp;
+import i2f.springboot.secure.annotation.StandardApiResp;
+import i2f.springboot.secure.core.SecureTransfer;
+import i2f.springboot.secure.util.JacksonJsonProcessor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,24 +24,16 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import java.util.*;
+import javax.servlet.http.HttpServletResponse;
+import java.util.LinkedHashMap;
 
-@ConditionalOnExpression("${i2f.springboot.config.advice.response-advice.enable:true}")
+@ConditionalOnExpression("${i2f.springboot.config.secure.response-advice.enable:true}")
 @Slf4j
 @ControllerAdvice
-@Remark({
-        "provide response body encrypt and standard as ApiResp",
-        "when encrypt,response header has [secure-data] header,value is true",
-        "return type is ApiResp,and ApiResp.data,ApiResp.kvs.values will be encrypt."
-})
-public class ResponseBodyEncryptAdvice implements ResponseBodyAdvice<Object>, InitializingBean {
-    public static final String SECURE_DATA_HEADER="secure-data";
+public class StandardApiResponseAdvice implements ResponseBodyAdvice<Object>, InitializingBean {
 
     @Autowired
     private JacksonJsonProcessor processor;
-
-    @Autowired
-    public  IObjectEncryptor encryptor;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -76,33 +68,12 @@ public class ResponseBodyEncryptAdvice implements ResponseBodyAdvice<Object>, In
         if(o==null){
             return o;
         }
-        if(o instanceof ApiResp){
-            ApiResp resp=(ApiResp)o;
-            if(methodParameter.getMethod().isAnnotationPresent(SecureParams.class)){
-                SecureParams secureParams=methodParameter.getMethodAnnotation(SecureParams.class);
-                if(secureParams.out()){
-                    List<String> headers=new ArrayList<>();
-                    headers.add(SECURE_DATA_HEADER);
-                    serverHttpResponse.getHeaders().setAccessControlExposeHeaders(headers);
-                    serverHttpResponse.getHeaders().set(SECURE_DATA_HEADER,"true");
-                    Object data=resp.getData();
-                    if(data!=null){
-                        String enData= encryptor.encrypt(data);
-                        resp.setData(enData);
-                    }
-                    Map<String,Object> kvs=resp.getKvs();
-                    if(kvs!=null){
-                        Map<String,Object> enKvs=new HashMap<>();
-                        for(Map.Entry<String,Object> item : kvs.entrySet()){
-                            Object idata=item.getValue();
-                            String ienData=encryptor.encrypt(idata);
-                            enKvs.put(item.getKey(),ienData);
-                        }
-                        resp.setKvs(enKvs);
-                    }
-                }
-            }
-            return returnObj(o,isStringReturn);
+        // 如果封装之后，不是String类型，则表示不再需要对String类型特殊处理
+        // 后续如果使用过滤器，则不再需要针对String类型做特殊处理
+        if(isStringReturn && !(o instanceof String)){
+            ServletServerHttpResponse sresp=(ServletServerHttpResponse)serverHttpResponse;
+            HttpServletResponse resp = sresp.getServletResponse();
+            resp.setHeader(SecureTransfer.STRING_RETURN_HEADER,SecureTransfer.FLAG_DISABLE);
         }
         return returnObj(o,isStringReturn);
     }
