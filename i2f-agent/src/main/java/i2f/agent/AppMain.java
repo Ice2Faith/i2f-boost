@@ -16,6 +16,7 @@ import java.util.Scanner;
 public class AppMain {
     public static void main(String[] args) throws Exception {
         Scanner scanner=new Scanner(System.in);
+        System.out.println("------------------------------------------------");
         System.out.println("java process list:");
         List<VirtualMachineDescriptor> vmds= VirtualMachine.list();
         System.out.println("[index]\t[pid]\t[displayName]");
@@ -23,7 +24,9 @@ public class AppMain {
             VirtualMachineDescriptor item=vmds.get(i);
             System.out.println("["+i+"]\t["+ item.id()+"]\t"+item.displayName());
         }
+        System.out.println("------------------------------------------------");
         System.out.println("please select one to attach:");
+        System.out.print(">/ ");
         int idx= scanner.nextInt();
         VirtualMachineDescriptor vm=null;
         if(idx>=0 && idx< vmds.size()){
@@ -50,6 +53,7 @@ public class AppMain {
         agentJar=agentJar.substring("file:/".length());
         System.out.println("agentJar:"+agentJar);
 
+        System.out.println("------------------------------------------------");
         scanner.nextLine();
         String agentArg="args,ret,stat@com.i2f.**&stat@java.util.**";
         System.out.println("please input agent argument:");
@@ -62,7 +66,9 @@ public class AppMain {
         System.out.println("\tsuch:com.**.save* will match com.TestMapper.saveData or com.i2f.UserService.saveUser");
         System.out.println("simple case:");
         System.out.println("\t"+agentArg);
-
+        System.out.println("------------------------------------------------");
+        System.out.println("please input watch argument:");
+        System.out.print(">/ ");
         agentArg=scanner.nextLine();
 
         System.out.println("attach to process:"+vm.id()+"\t"+vm.displayName());
