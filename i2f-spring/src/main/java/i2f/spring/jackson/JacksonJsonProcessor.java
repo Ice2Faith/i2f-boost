@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import i2f.core.json.impl.AbstractJsonProcessor;
 import i2f.core.text.exception.TextFormatException;
+import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
  * @date 2022/3/26 15:52
  * @desc
  */
+@Component
 public class JacksonJsonProcessor extends AbstractJsonProcessor {
     protected volatile ObjectMapper mapper;
     public JacksonJsonProcessor(){
@@ -24,6 +26,11 @@ public class JacksonJsonProcessor extends AbstractJsonProcessor {
     }
     public ObjectMapper getMapper(){
         return mapper;
+    }
+
+    public synchronized JacksonJsonProcessor setMapper(ObjectMapper mapper) {
+        this.mapper = mapper;
+        return this;
     }
 
     @Override

@@ -126,7 +126,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public static final String REGISTRY_WEBSOCKET_PREFIX="i2f.springboot.config.websocket.registry.";
 
     public static Map<String, Map<String,Object>> getRegistryWebsocketConfigs(Environment env){
-        return EnvironmentUtil.getGroupMapConfigs(env,REGISTRY_WEBSOCKET_PREFIX);
+        return EnvironmentUtil.of(env).getGroupMapConfigs(REGISTRY_WEBSOCKET_PREFIX);
     }
 
 }

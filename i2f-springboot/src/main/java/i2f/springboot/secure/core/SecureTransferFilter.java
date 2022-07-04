@@ -1,9 +1,11 @@
 package i2f.springboot.secure.core;
 
+import i2f.core.digest.StringSignature;
+import i2f.core.j2ee.web.HttpServletRequestProxyWrapper;
+import i2f.core.j2ee.web.HttpServletResponseProxyWrapper;
+import i2f.spring.mapping.MappingUtil;
 import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.annotation.SecureParams;
-import i2f.springboot.secure.servlet.HttpServletRequestProxyWrapper;
-import i2f.springboot.secure.servlet.HttpServletResponseProxyWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +48,13 @@ public class SecureTransferFilter extends OncePerRequestFilter implements Initia
     private SecureConfig secureConfig;
 
     @Autowired
-    private FastRequestMappingProvider requestMappingProvider;
+    private MappingUtil requestMappingProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         log.debug("enter filter:" + request.getRequestURI());
         // 尝试获取方法与安全注解
-        Method method = requestMappingProvider.getMatchRequestMethod(request);
+        Method method = requestMappingProvider.getRequestMappingMethod(request);
         SecureParams ann = null;
         if (method != null) {
             log.debug("find mapping handler:" + method.getDeclaringClass().getName() + "." + method.getName());
@@ -126,7 +128,7 @@ public class SecureTransferFilter extends OncePerRequestFilter implements Initia
 
 
                         // 计算签名，并给出比对结果到请求头中，交给接下去的AOP中使用
-                        String sign=StringSignature.sign(signText);
+                        String sign= StringSignature.sign(signText);
 
 
                         log.info("signHeader:"+signHeader);

@@ -1,9 +1,9 @@
 package i2f.springboot.secure.core;
 
 
+import i2f.spring.jackson.JacksonJsonProcessor;
 import i2f.springboot.secure.annotation.SecureParams;
 import i2f.springboot.secure.exception.SecureException;
-import i2f.springboot.secure.util.JacksonJsonProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

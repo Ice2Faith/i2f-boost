@@ -1,10 +1,11 @@
 package i2f.springboot.secure;
 
 
+import i2f.spring.jackson.JacksonJsonProcessor;
+import i2f.spring.mapping.MappingUtil;
 import i2f.springboot.secure.advice.RequestBodyDecryptAdvice;
 import i2f.springboot.secure.advice.StandardApiResponseAdvice;
 import i2f.springboot.secure.core.*;
-import i2f.springboot.secure.util.JacksonJsonProcessor;
 import lombok.Data;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -25,7 +26,7 @@ import org.springframework.context.annotation.Import;
         SecureTransferFilter.class,
         SecureTransferAop.class,
         SecureTransfer.class,
-        FastRequestMappingProvider.class,
+        MappingUtil.class,
         SecureController.class,
         EncodeRequestForwardController.class,
         RequestBodyDecryptAdvice.class,

@@ -10,14 +10,25 @@ import java.util.Random;
  */
 public class Base64Obfuscator {
     public static final String OBF_PREFIX ="$.";
-    public String encode(String bs4,boolean prefix){
+    public static String encode(String bs4,boolean prefix){
         Random random=new Random();
         StringBuilder builder = new StringBuilder();
         if(prefix){
             builder.append(OBF_PREFIX);
         }
+        int jpc= (bs4.length()+random.nextInt(31))%10;
+        builder.append((char)('0'+jpc));
+        for(int p=0;p<jpc;p++){
+            int ird=random.nextInt(16);
+            if(ird<10){
+                builder.append((char)('0'+ird));
+            }else{
+                builder.append((char)('A'+(ird-10)));
+            }
+        }
+        jpc=jpc%2+2;
         for(int i=0;i<bs4.length();i++){
-            if(i%2==0 && bs4.charAt(i)!='='){
+            if(i%jpc==0 && bs4.charAt(i)!='='){
                 int ird=random.nextInt(16);
                 if(ird<10){
                     builder.append((char)('0'+ird));
@@ -29,15 +40,18 @@ public class Base64Obfuscator {
         }
         return builder.toString();
     }
-    public String decode(String sob){
+    public static String decode(String sob){
         String str=sob;
         if(sob.startsWith(OBF_PREFIX)){
             str=sob.substring(OBF_PREFIX.length());
         }
         StringBuilder builder = new StringBuilder();
+        int jpc = str.charAt(0)-'0';
+        str=str.substring(1+jpc);
+        jpc=jpc%2+3;
         int i=0;
         while(i<str.length()){
-            if(i%3==0 && str.charAt(i)!='='){
+            if(i%jpc==0 && str.charAt(i)!='='){
                 i++;
                 continue;
             }

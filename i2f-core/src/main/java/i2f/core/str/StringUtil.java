@@ -19,6 +19,28 @@ import java.util.regex.Pattern;
 
 @Author("i2f")
 public class StringUtil {
+    public static String ofCharset(byte[] data,String charset){
+        try{
+            return new String(data,charset);
+        }catch(Exception e){
+            throw new RuntimeException(e.getMessage(),e);
+        }
+    }
+    public static byte[] toCharset(String str,String charset){
+        try{
+            return str.getBytes(charset);
+        }catch(Exception e){
+            throw new RuntimeException(e.getMessage(),e);
+        }
+    }
+    public static String ofUtf8(byte[] data){
+        return ofCharset(data,"UTF-8");
+    }
+    public static byte[] toUtf8(String str){
+        return toCharset(str,"UTF-8");
+    }
+
+
     public static String removeWhiteLine(String str){
         return str.replaceAll("\\n\\s*\\n","\n");
     }

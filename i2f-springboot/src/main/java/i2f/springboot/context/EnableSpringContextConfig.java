@@ -1,4 +1,4 @@
-package i2f.springboot.mvc;
+package i2f.springboot.context;
 
 import org.springframework.context.annotation.Import;
 
@@ -13,11 +13,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import({
-        SpringMvcConfig.class,
-        LogAop.class,
-        PublicExceptionResolver.class
+        SpringContextConfig.class
 })
-public @interface EnableMvcConfig {
+public @interface EnableSpringContextConfig {
 
 }
 

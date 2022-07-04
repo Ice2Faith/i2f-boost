@@ -60,7 +60,7 @@ public class CustomerSwaggerApisConfig implements InitializingBean, ApplicationC
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Map<String, Map<String,Object>> apis= EnvironmentUtil.getGroupMapConfigs(environment,SWAGGER_API_PREFIX);
+        Map<String, Map<String,Object>> apis= EnvironmentUtil.of(environment).getGroupMapConfigs(SWAGGER_API_PREFIX);
 
         for(Map.Entry<String,Map<String, Object>> entry : apis.entrySet()){
             String name=entry.getKey();

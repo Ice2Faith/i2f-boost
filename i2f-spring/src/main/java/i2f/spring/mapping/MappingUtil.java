@@ -1,5 +1,6 @@
-package i2f.springboot.secure.core;
+package i2f.spring.mapping;
 
+import i2f.core.data.Pair;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,13 +17,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author ltb
- * @date 2022/7/1 8:32
+ * @date 2022/7/4 9:13
  * @desc
  */
 @Component
-public class FastRequestMappingProvider implements InitializingBean {
+public class MappingUtil implements InitializingBean {
+
     @Autowired
-    private RequestMappingHandlerMapping requestMappingHandler;
+    protected RequestMappingHandlerMapping requestMappingHandler;
 
     private Map<String,Map<RequestMappingInfo,HandlerMethod>> fastMapping=new ConcurrentHashMap<>();
 
@@ -45,7 +47,7 @@ public class FastRequestMappingProvider implements InitializingBean {
         for(Map.Entry<String,Map<RequestMappingInfo,HandlerMethod>> item : ret.entrySet()){
             String key = item.getKey();
             Map<RequestMappingInfo, HandlerMethod> value = item.getValue();
-            Map<RequestMappingInfo, HandlerMethod> umap=Collections.unmodifiableMap(value);
+            Map<RequestMappingInfo, HandlerMethod> umap= Collections.unmodifiableMap(value);
             fastMapping.put(key, umap);
         }
 
@@ -56,7 +58,8 @@ public class FastRequestMappingProvider implements InitializingBean {
         initFastMapping();
     }
 
-    public Method getMethodFormMappingMap(HttpServletRequest request, Map<RequestMappingInfo, HandlerMethod> handlerMethods) {
+    public Pair<RequestMappingInfo,HandlerMethod> getRequestMapping(HttpServletRequest request) {
+        Map<RequestMappingInfo, HandlerMethod> handlerMethods=requestMappingHandler.getHandlerMethods();
         for(Map.Entry<RequestMappingInfo, HandlerMethod> item : handlerMethods.entrySet()){
             RequestMappingInfo key = item.getKey();
             HandlerMethod value = item.getValue();
@@ -64,23 +67,27 @@ public class FastRequestMappingProvider implements InitializingBean {
             if(cond!=null){
                 HandlerMethod handler= handlerMethods.get(cond);
                 if(handler!=null){
-                    return handler.getMethod();
+                    return new Pair<>(cond,handler);
                 }
             }
         }
         return null;
     }
 
-    public Method getMatchRequestMethod(HttpServletRequest request){
-        String url=request.getRequestURI();
-        Map<RequestMappingInfo, HandlerMethod> fastMethods=fastMapping.get(url);
-        if(fastMethods!=null){
-            Method method=getMethodFormMappingMap(request,fastMethods);
-            if(method!=null){
-                return method;
-            }
+    public HandlerMethod getRequestMappingHandlerMethod(HttpServletRequest request){
+        Pair<RequestMappingInfo,HandlerMethod> pair=getRequestMapping(request);
+        if(pair!=null){
+            return pair.val;
         }
-        Map<RequestMappingInfo, HandlerMethod> handlerMethods = requestMappingHandler.getHandlerMethods();
-        return getMethodFormMappingMap(request, handlerMethods);
+        return null;
     }
+
+    public Method getRequestMappingMethod(HttpServletRequest request){
+        HandlerMethod handlerMethod=getRequestMappingHandlerMethod(request);
+        if(handlerMethod!=null){
+            return handlerMethod.getMethod();
+        }
+        return null;
+    }
+
 }

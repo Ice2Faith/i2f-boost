@@ -1,4 +1,4 @@
-package i2f.springboot.secure.util;
+package i2f.core.digest;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,20 +42,20 @@ public class RsaKey {
     }
 
     public String publicKeyBase64(){
-        return Base64Util.to(publicKeyBytes());
+        return Base64Util.encode(publicKeyBytes());
     }
 
     public String privateKeyBase64(){
-        return Base64Util.to(privateKeyBytes());
+        return Base64Util.encode(privateKeyBytes());
     }
 
     public static RSAPublicKey parsePublicKeyBase64(String bs64) throws InvalidKeyException {
-        byte[] data = Base64Util.from(bs64);
+        byte[] data = Base64Util.decode(bs64);
         return new RSAPublicKeyImpl(data);
     }
 
     public static RSAPrivateKey parsePrivateKeyBase64(String bs64) throws InvalidKeyException {
-        byte[] data = Base64Util.from(bs64);
+        byte[] data = Base64Util.decode(bs64);
         return RSAPrivateCrtKeyImpl.newKey(data);
     }
 
@@ -63,7 +63,7 @@ public class RsaKey {
     public static void saveRsaKey(RsaKey rsaKey,OutputStream os) throws IOException {
         String pubKey = rsaKey.publicKeyBase64();
         String priKey=rsaKey.privateKeyBase64();
-        pubKey=Base64Obfuscator.encode(pubKey,true);
+        pubKey= Base64Obfuscator.encode(pubKey,true);
         priKey=Base64Obfuscator.encode(priKey,true);
         BufferedWriter writer=new BufferedWriter(new OutputStreamWriter(os,"UTF-8"));
         writer.write(pubKey);

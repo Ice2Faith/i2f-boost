@@ -1,15 +1,28 @@
 package i2f.spring.event;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.beans.BeansException;
+import org.springframework.context.*;
+import org.springframework.stereotype.Component;
 
 /**
  * @author ltb
  * @date 2022/4/15 9:22
  * @desc
  */
-public class EventManager {
+@Component
+public class EventManager implements ApplicationContextAware, ApplicationEventPublisherAware {
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.context=applicationContext;
+    }
+
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.publisher=applicationEventPublisher;
+    }
+
+    ///////////////////////////////////////////
     private ApplicationEventPublisher publisher;
     private ApplicationContext context;
     public EventManager(ApplicationContext context){

@@ -1,4 +1,4 @@
-package i2f.springboot.secure.servlet;
+package i2f.core.j2ee.web;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;

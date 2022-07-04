@@ -1,5 +1,8 @@
 package i2f.springboot.secure.util;
 
+import i2f.core.digest.Base64Util;
+import i2f.core.digest.RsaKey;
+import i2f.core.str.StringUtil;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.Cipher;
@@ -118,31 +121,6 @@ public class RsaUtil {
         }
     }
 
-    /**
-     * 转为UTF-8字符串
-     * @param data
-     * @return
-     */
-    public static String utf8String(byte[] data){
-        try{
-            return new String(data,"UTF-8");
-        }catch(Exception e){
-            throw new RuntimeException(e.getMessage(),e);
-        }
-    }
-
-    /**
-     * 转为UTF-8字节
-     * @param text
-     * @return
-     */
-    public static byte[] utf8Bytes(String text){
-        try{
-            return text.getBytes("UTF-8");
-        }catch(Exception e){
-            throw new RuntimeException(e.getMessage(),e);
-        }
-    }
 
     /**
      * 私钥，对输入base64解密为string字符串
@@ -152,9 +130,9 @@ public class RsaUtil {
      * @return
      */
     public static String privateKeyDecryptBase64(RsaKey key,String bs64){
-        byte[] enc=Base64Util.from(bs64);
+        byte[] enc= Base64Util.decode(bs64);
         byte[] dec=privateKeyDecrypt(key,enc);
-        return utf8String(dec);
+        return StringUtil.ofUtf8(dec);
     }
 
     /**
@@ -165,9 +143,9 @@ public class RsaUtil {
      * @return
      */
     public static String privateKeyEncryptBase64(RsaKey key,String text){
-       byte[] data=utf8Bytes(text);
-       byte[] enc=privateKeyEncrypt(key,data);
-       return Base64Util.to(enc);
+        byte[] data=StringUtil.toUtf8(text);
+        byte[] enc=privateKeyEncrypt(key,data);
+        return Base64Util.encode(enc);
     }
 
     /**
@@ -178,9 +156,9 @@ public class RsaUtil {
      * @return
      */
     public static String publicKeyDecryptBase64(RsaKey key,String bs64){
-        byte[] enc=Base64Util.from(bs64);
+        byte[] enc=Base64Util.decode(bs64);
         byte[] dec=publicKeyDecrypt(key,enc);
-        return utf8String(dec);
+        return StringUtil.ofUtf8(dec);
     }
 
     /**
@@ -191,9 +169,8 @@ public class RsaUtil {
      * @return
      */
     public static String publicKeyEncryptBase64(RsaKey key,String text){
-        byte[] data=utf8Bytes(text);
+        byte[] data=StringUtil.toUtf8(text);
         byte[] enc=publicKeyEncrypt(key,data);
-        return Base64Util.to(enc);
+        return Base64Util.encode(enc);
     }
-
 }

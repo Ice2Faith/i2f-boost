@@ -2,6 +2,7 @@ package i2f.spring.jackson;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.Map;
@@ -10,12 +11,18 @@ import java.util.Map;
  * @author ltb
  * @date 2021/8/10
  */
+@Component
 public class JacksonUtil {
     private static String PROJ_DEFAULT_DATE_FMT="yyyy-MM-dd HH:mm:ss SSS";
     private static volatile JacksonJsonProcessor mapper;
     private JacksonUtil(){
 
     }
+
+    public synchronized static void setMapper(JacksonJsonProcessor mapper) {
+        JacksonUtil.mapper = mapper;
+    }
+
     public static JacksonJsonProcessor getMapper(){
         if(mapper==null){
             synchronized (JacksonUtil.class){

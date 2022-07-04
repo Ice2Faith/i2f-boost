@@ -94,14 +94,14 @@ public class SpringUtil implements
 
     public static Map<String,Map<String,Object>> getEnvironmentMap(boolean forceNew){
         if(forceNew || environmentMap.size()==0){
-            Map<String,Map<String,Object>> map= EnvironmentUtil.getEnvironmentProperties(getEnvironment());
+            Map<String,Map<String,Object>> map= EnvironmentUtil.of(getEnvironment()).getEnvironmentProperties();
             environmentMap=map;
         }
         return environmentMap;
     }
 
     public static Map<String,Object> getEnvironmentPropertiesWithPrefix(boolean keepPrefix,String prefix){
-        return EnvironmentUtil.getPropertiesWithPrefix(getEnvironmentMap(false),keepPrefix,prefix);
+        return EnvironmentUtil.of(getEnvironment()).getPropertiesWithPrefix(getEnvironmentMap(false),keepPrefix,prefix);
     }
 
     public static Resource getResource(String match){

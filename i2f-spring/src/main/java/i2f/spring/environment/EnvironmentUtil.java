@@ -1,8 +1,10 @@
 package i2f.spring.environment;
 
+import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,13 +15,40 @@ import java.util.Map;
  * @date 2022/3/26 16:57
  * @desc
  */
-public class EnvironmentUtil {
+@Component
+public class EnvironmentUtil implements EnvironmentAware {
 
-    public static String get(Environment env,String name){
+    protected Environment env;
+
+    public EnvironmentUtil(Environment env) {
+        this.env = env;
+    }
+
+    public Environment getEnv() {
+        return env;
+    }
+
+    public EnvironmentUtil setEnv(Environment env) {
+        this.env = env;
+        return this;
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.env=environment;
+    }
+
+    ///////////////////////////////////////
+    public static EnvironmentUtil of(Environment env){
+        return new EnvironmentUtil(env);
+    }
+
+
+    public String get(String name){
         return env.getProperty(name);
     }
 
-    public static int getInt(Environment env,String name,int def){
+    public int getInt(String name,int def){
         String str=env.getProperty(name);
         if(str==null){
             return def;
@@ -33,7 +62,7 @@ public class EnvironmentUtil {
         return def;
     }
 
-    public static double getDouble(Environment env,String name,double def){
+    public double getDouble(String name,double def){
         String str=env.getProperty(name);
         if(str==null){
             return def;
@@ -47,7 +76,7 @@ public class EnvironmentUtil {
         return def;
     }
 
-    public static long getLong(Environment env,String name,long def){
+    public long getLong(String name,long def){
         String str=env.getProperty(name);
         if(str==null){
             return def;
@@ -61,7 +90,7 @@ public class EnvironmentUtil {
         return def;
     }
 
-    public static float getFloat(Environment env,String name,float def){
+    public float getFloat(String name,float def){
         String str=env.getProperty(name);
         if(str==null){
             return def;
@@ -75,7 +104,7 @@ public class EnvironmentUtil {
         return def;
     }
 
-    public static boolean getBoolean(Environment env,String name,boolean def){
+    public boolean getBoolean(String name,boolean def){
         String str=env.getProperty(name);
         if(str==null){
             return def;
@@ -89,7 +118,7 @@ public class EnvironmentUtil {
         return def;
     }
 
-    public static String[] getArray(Environment env,String name,String splitReg,int limit){
+    public String[] getArray(String name,String splitReg,int limit){
         String str=env.getProperty(name);
         if(str==null){
             return new String[0];
@@ -98,18 +127,17 @@ public class EnvironmentUtil {
         return str.split(splitReg,limit);
     }
 
-    public static String[] getArray(Environment env,String name,String splitReg){
-        return getArray(env,name,splitReg,0);
+    public String[] getArray(String name,String splitReg){
+        return getArray(name,splitReg,0);
     }
 
     /**
      * 将环境处理为一个方便理解的数据结构
      * key表示每一个环境
      * value表示每一个环境中的配置的map
-     * @param env
      * @return
      */
-    public static Map<String, Map<String, Object>> getEnvironmentProperties(Environment env) {
+    public Map<String, Map<String, Object>> getEnvironmentProperties() {
         Map<String, Map<String, Object>> map = new HashMap<>(8);
         ConfigurableEnvironment configurableEnvironment = (ConfigurableEnvironment) env;
         Iterator<PropertySource<?>> iterator = configurableEnvironment.getPropertySources().iterator();
@@ -136,13 +164,12 @@ public class EnvironmentUtil {
 
     /**
      * 直接从环境中获取指定前缀的所有配置
-     * @param env 环境
      * @param keepPrefix 是否保留前缀
      * @param prefix 前缀
      * @return
      */
-    public static Map<String, Object> getPropertiesWithPrefix(Environment env, boolean keepPrefix, String prefix) {
-        return getPropertiesWithPrefix(getEnvironmentProperties(env), keepPrefix, prefix);
+    public Map<String, Object> getPropertiesWithPrefix( boolean keepPrefix, String prefix) {
+        return getPropertiesWithPrefix(getEnvironmentProperties(), keepPrefix, prefix);
     }
 
     /**
@@ -152,7 +179,7 @@ public class EnvironmentUtil {
      * @param prefix 前缀
      * @return
      */
-    public static Map<String, Object> getPropertiesWithPrefix(Map<String, Map<String, Object>> envProperties, boolean keepPrefix, String prefix) {
+    public Map<String, Object> getPropertiesWithPrefix(Map<String, Map<String, Object>> envProperties, boolean keepPrefix, String prefix) {
         Map<String, Object> ret = new HashMap<>();
         Map<String, Map<String, Object>> map = envProperties;
         for (Map.Entry<String, Map<String, Object>> item : map.entrySet()) {
@@ -193,13 +220,12 @@ public class EnvironmentUtil {
      *  driver:
      * 其中的master和slave被称为ID，作为返回值的key,
      * 每一组数据中的数据被url和driver被包装为value
-     * @param env
      * @param groupPrefix
      * @return
      */
-    public static Map<String, Map<String,Object>> getGroupMapConfigs(Environment env,String groupPrefix){
+    public Map<String, Map<String,Object>> getGroupMapConfigs(String groupPrefix){
         Map<String, Map<String,Object>> ret=new HashMap<>();
-        Map<String, Map<String, Object>> map = EnvironmentUtil.getEnvironmentProperties(env);
+        Map<String, Map<String, Object>> map = getEnvironmentProperties();
         for(Map.Entry<String,Map<String, Object>> item : map.entrySet()){
             Map<String, Object> entire=item.getValue();
             for(Map.Entry<String,Object> cfg : entire.entrySet()){

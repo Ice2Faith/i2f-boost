@@ -1,4 +1,4 @@
-package i2f.springboot.secure.servlet;
+package i2f.core.j2ee.web;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;

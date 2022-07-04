@@ -1,8 +1,5 @@
-package i2f.springboot.secure.core;
+package i2f.core.digest;
 
-import i2f.springboot.secure.util.Base64Util;
-
-import java.io.UnsupportedEncodingException;
 
 /**
  * @author ltb
@@ -12,7 +9,7 @@ import java.io.UnsupportedEncodingException;
 public class StringSignature {
     public static String sign(String text) {
         try{
-            text= Base64Util.to(text.getBytes("UTF-8"));
+            text= Base64Util.encode(text.getBytes("UTF-8"));
         }catch(Exception e){
 
         }
@@ -39,17 +36,4 @@ public class StringSignature {
         return String.format("%x%x%x%x%x",num1,num2,len,num3,num4);
     }
 
-    public static void main(String[] args) throws UnsupportedEncodingException {
-        String text="a123";
-        String sign=sign(text);
-        System.out.println(sign);
-
-        text="a13";
-        sign=sign(text);
-        System.out.println(sign);
-
-        text="a213";
-        sign=sign(text);
-        System.out.println(sign);
-    }
 }

@@ -278,7 +278,7 @@ public class ShiroConfig  {
     }
 
     private Map<String,Filter> getFilters(){
-        Map<String,Object> conf=EnvironmentUtil.getPropertiesWithPrefix(environment,false,SHIRO_FILTER_CONF_PREFIX);
+        Map<String,Object> conf=EnvironmentUtil.of(environment).getPropertiesWithPrefix(false,SHIRO_FILTER_CONF_PREFIX);
         Map<String,Filter> ret=new HashMap<>();
 
         for(Map.Entry<String, Object> item : conf.entrySet()){

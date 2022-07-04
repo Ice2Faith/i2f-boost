@@ -30,7 +30,7 @@ public class DynamicDataSourceProperty implements InitializingBean {
 
 
     public static Map<String,Map<String,Object>> getDatasourceConfigs(Environment env){
-        return EnvironmentUtil.getGroupMapConfigs(env,MULTIPLY_DATASOURCE_PREFIX);
+        return EnvironmentUtil.of(env).getGroupMapConfigs(MULTIPLY_DATASOURCE_PREFIX);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class DynamicDataSourceProperty implements InitializingBean {
     }
 
     private void resolveDefaultSpringDatasourceAsMaster(Map<String, Map<String,Object>> properties){
-        Map<String,Object> map=EnvironmentUtil.getPropertiesWithPrefix(environment,false,"spring.datasource.");
+        Map<String,Object> map=EnvironmentUtil.of(environment).getPropertiesWithPrefix(false,"spring.datasource.");
         Map<String,Object> res=new HashMap<>();
         if(!map.containsKey("url")){
             return;

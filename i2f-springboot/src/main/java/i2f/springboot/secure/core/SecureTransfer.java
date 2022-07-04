@@ -1,8 +1,12 @@
 package i2f.springboot.secure.core;
 
 
+import i2f.spring.jackson.JacksonJsonProcessor;
 import i2f.springboot.secure.SecureConfig;
-import i2f.springboot.secure.util.*;
+import i2f.core.digest.AESUtil;
+import i2f.core.digest.Base64Obfuscator;
+import i2f.core.digest.RsaKey;
+import i2f.springboot.secure.util.RsaUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
