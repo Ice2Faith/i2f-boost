@@ -1,14 +1,14 @@
 package i2f.core.digest;
 
 import i2f.core.annotations.remark.Author;
+import i2f.core.str.StringUtil;
 
 import javax.crypto.Cipher;
-import java.nio.charset.Charset;
-import java.security.*;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 
 //私钥加密，公钥解密，网络传输中，传输公钥和密文
 @Author("i2f")
@@ -16,37 +16,11 @@ public class RsaUtil {
     public static int UPDATE_SIZE=116;//require lower than 117
     public static int DEFAULT_KEY_SIZE=1024;
     public static String CHAR_SET_NAME="UTF-8";
-    public static class RsaKeyData {
-        public KeyPair keyPair;
-        public RSAPrivateKey privateKey;
-        public RSAPublicKey publicKey;
-        public String privateKeyBase64;
-        public String publicKeyBase64;
-        public RsaKeyData(){
 
-        }
-        public RsaKeyData(KeyPair keyPair){
-            parseKeyPair(keyPair);
-        }
-        public void parseKeyPair(KeyPair keyPair){
-            this.keyPair=keyPair;
-            privateKey=(RSAPrivateKey)keyPair.getPrivate();
-            publicKey=(RSAPublicKey) keyPair.getPublic();
-            privateKeyBase64=Base64Util.encode(privateKey.getEncoded());
-            publicKeyBase64=Base64Util.encode(publicKey.getEncoded());
-        }
-    }
-    public static String getEncryptPrivateKey(RsaKeyData keyData){
-        return keyData.privateKeyBase64;
-    }
-    public static String getDecryptPublicKey(RsaKeyData keyData){
-        return keyData.publicKeyBase64;
-    }
-
-    public static RsaKeyData genRsaKeyData() throws NoSuchAlgorithmException{
+    public static RsaKey genRsaKeyData() throws NoSuchAlgorithmException{
         return genRsaKeyData(DEFAULT_KEY_SIZE);
     }
-    public static RsaKeyData genRsaKeyData(int size) throws NoSuchAlgorithmException {
+    public static RsaKey genRsaKeyData(int size) throws NoSuchAlgorithmException {
         return getRsaKeyData(genRsaKeyPair(size));
     }
     public static KeyPair genRsaKeyPair() throws NoSuchAlgorithmException {
@@ -57,70 +31,162 @@ public class RsaUtil {
         generator.initialize(size,new SecureRandom());
         return generator.generateKeyPair();
     }
-    public static RsaKeyData getRsaKeyData(KeyPair keyPair){
-        return new RsaKeyData(keyPair);
+    public static RsaKey getRsaKeyData(KeyPair keyPair){
+        return new RsaKey(keyPair);
     }
+
+    /**
+     * 获取RSA
+     * @return
+     */
+    public static Cipher rsaCipher(){
+        try{
+            Cipher cipher=Cipher.getInstance("RSA");
+            return cipher;
+        }catch(Exception e){
+            throw new RuntimeException(e.getMessage(),e);
+        }
+    }
+
+    public static byte[] doCipherWorker(Cipher cipher,byte[] data){
+        byte[] result=new byte[data.length];
+        int plen=0;
+        while(plen<data.length){
+            int cplen=UPDATE_SIZE;
+            if(data.length-plen<UPDATE_SIZE){
+                cplen=data.length-plen;
+            }
+            byte[] part=new byte[cplen];
+            System.arraycopy(data,plen,part,0,cplen);
+            byte[] enPart=cipher.update(part);
+            System.arraycopy(part,0,result,plen,cplen);
+            plen+=UPDATE_SIZE;
+        }
+        return result;
+    }
+
     public static byte[] rsaEncrypt(byte[] data, RSAPrivateKey privateKey) throws Exception {
-        Cipher cipher=Cipher.getInstance("RSA");
+        Cipher cipher=rsaCipher();
         cipher.init(Cipher.ENCRYPT_MODE,privateKey);
-        byte[] result=new byte[data.length];
-        int plen=0;
-        while(plen<data.length){
-            int cplen=UPDATE_SIZE;
-            if(data.length-plen<UPDATE_SIZE){
-                cplen=data.length-plen;
-            }
-            byte[] part=new byte[cplen];
-            System.arraycopy(data,plen,part,0,cplen);
-            byte[] enPart=cipher.update(part);
-            System.arraycopy(part,0,result,plen,cplen);
-            plen+=UPDATE_SIZE;
+        return doCipherWorker(cipher,data);
+    }
+
+
+    /**
+     * 私钥解密
+     * @param key
+     * @param data
+     * @return
+     */
+    public static byte[] privateKeyDecrypt(RsaKey key,byte[] data){
+        try{
+            Cipher cipher=rsaCipher();
+            cipher.init(Cipher.DECRYPT_MODE,key.privateKey());
+            return doCipherWorker(cipher,data);
+        }catch(Exception e){
+            throw new RuntimeException(e.getMessage(),e);
         }
-        return result;
     }
-    public static String rsaEncryptDataBase64(byte[] data,String privateKeyBase64) throws Exception {
-        byte[] decodePrivateKey= Base64Util.decode(privateKeyBase64);
-        RSAPrivateKey privateKey=(RSAPrivateKey) KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(decodePrivateKey));
-        byte[] encodeData=rsaEncrypt(data,privateKey);
-        String ret=Base64Util.encode(encodeData);
-        return ret;
-    }
-    public static byte[] rsaDecrypt(byte[] data, RSAPublicKey publicKey) throws Exception{
-        Cipher cipher=Cipher.getInstance("RSA");
-        cipher.init(Cipher.DECRYPT_MODE,publicKey);
-        byte[] result=new byte[data.length];
-        int plen=0;
-        while(plen<data.length){
-            int cplen=UPDATE_SIZE;
-            if(data.length-plen<UPDATE_SIZE){
-                cplen=data.length-plen;
-            }
-            byte[] part=new byte[cplen];
-            System.arraycopy(data,plen,part,0,cplen);
-            byte[] enPart=cipher.update(part);
-            System.arraycopy(part,0,result,plen,cplen);
-            plen+=UPDATE_SIZE;
+
+    /**
+     * 私钥加密
+     * @param key
+     * @param data
+     * @return
+     */
+    public static byte[] privateKeyEncrypt(RsaKey key,byte[] data){
+        try{
+            Cipher cipher=rsaCipher();
+            cipher.init(Cipher.ENCRYPT_MODE,key.privateKey());
+            return doCipherWorker(cipher,data);
+        }catch(Exception e){
+            throw new RuntimeException(e.getMessage(),e);
         }
-        return result;
     }
-    public static byte[] rsaDecryptDataBase64(String base64EncryptStr,String publicKeyBase64) throws Exception {
-        byte[] enData=Base64Util.decode(base64EncryptStr.getBytes(CHAR_SET_NAME));
-        byte[] dePublicKey=Base64Util.decode(publicKeyBase64);
-        RSAPublicKey publicKey=(RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(dePublicKey));
-        byte[] deData=rsaDecrypt(enData,publicKey);
-        return deData;
+
+    /**
+     * 公钥解密
+     * @param key
+     * @param data
+     * @return
+     */
+    public static byte[] publicKeyDecrypt(RsaKey key,byte[] data){
+        try{
+            Cipher cipher=rsaCipher();
+            cipher.init(Cipher.DECRYPT_MODE,key.publicKey());
+            return doCipherWorker(cipher,data);
+        }catch(Exception e){
+            throw new RuntimeException(e.getMessage(),e);
+        }
     }
-    public static String rsaEncryptBase64(String data,String privateKeyBase64) throws Exception{
-        return rsaEncryptDataBase64(data.getBytes(CHAR_SET_NAME),privateKeyBase64);
+
+    /**
+     * 公钥加密
+     * @param key
+     * @param data
+     * @return
+     */
+    public static byte[] publicKeyEncrypt(RsaKey key,byte[] data){
+        try{
+            Cipher cipher=rsaCipher();
+            cipher.init(Cipher.ENCRYPT_MODE,key.publicKey());
+            return doCipherWorker(cipher,data);
+        }catch(Exception e){
+            throw new RuntimeException(e.getMessage(),e);
+        }
     }
-    public static String rsaDecryptBase64(String base64Data,String publicKeyBase64) throws Exception{
-        byte[] data=rsaDecryptDataBase64(base64Data,publicKeyBase64);
-        return new String(data, Charset.forName(CHAR_SET_NAME));
+
+
+    /**
+     * 私钥，对输入base64解密为string字符串
+     * 适用于使用JSON序列化的数据加密后使用base64传输
+     * @param key
+     * @param bs64
+     * @return
+     */
+    public static String privateKeyDecryptBase64(RsaKey key,String bs64){
+        byte[] enc= Base64Util.decode(bs64);
+        byte[] dec=privateKeyDecrypt(key,enc);
+        return StringUtil.ofUtf8(dec);
     }
-    public static String doEncrypt(String data,RsaKeyData keyData) throws Exception {
-        return rsaEncryptBase64(data,keyData.privateKeyBase64);
+
+    /**
+     * 私钥，对输入的字符串加密为base64字符串
+     * 适用于已经使用JSON序列化的数据进行加密后使用base64传输
+     * @param key
+     * @param text
+     * @return
+     */
+    public static String privateKeyEncryptBase64(RsaKey key,String text){
+        byte[] data=StringUtil.toUtf8(text);
+        byte[] enc=privateKeyEncrypt(key,data);
+        return Base64Util.encode(enc);
     }
-    public static String doDecrypt(String base64Data,RsaKeyData keyData) throws Exception{
-        return rsaDecryptBase64(base64Data,keyData.publicKeyBase64);
+
+    /**
+     * 公钥，对输入base64解密为string字符串
+     * 适用于使用JSON序列化的数据加密后使用base64传输
+     * @param key
+     * @param bs64
+     * @return
+     */
+    public static String publicKeyDecryptBase64(RsaKey key,String bs64){
+        byte[] enc=Base64Util.decode(bs64);
+        byte[] dec=publicKeyDecrypt(key,enc);
+        return StringUtil.ofUtf8(dec);
     }
+
+    /**
+     * 公钥，对输入的字符串加密为base64字符串
+     * 适用于已经使用JSON序列化的数据进行加密后使用base64传输
+     * @param key
+     * @param text
+     * @return
+     */
+    public static String publicKeyEncryptBase64(RsaKey key,String text){
+        byte[] data=StringUtil.toUtf8(text);
+        byte[] enc=publicKeyEncrypt(key,data);
+        return Base64Util.encode(enc);
+    }
+
 }
