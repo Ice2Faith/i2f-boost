@@ -6,6 +6,7 @@ import i2f.core.j2ee.web.HttpServletResponseProxyWrapper;
 import i2f.spring.mapping.MappingUtil;
 import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.annotation.SecureParams;
+import i2f.springboot.secure.exception.SecureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,55 +116,63 @@ public class SecureTransferFilter extends OncePerRequestFilter implements Initia
                 String signPassHeader=null;
                 String signNoncePassHeader=null;
 
-                // 如果有请求体，解密请求体
-                if (bytes.length > 0) {
-                    log.debug("decrypt request body...");
-                    String aesKey = secureTransfer.getRequestSecureHeader(request);
-                    String srcText = new String(bytes, request.getCharacterEncoding());
-
-                    // 如果有消息签名，则验证消息签名
-                    String signHeader = request.getHeader(SecureTransfer.SECURE_SIGN_HEADER);
-                    if(signHeader!= null && !"".equals(signHeader)){
-                        String signText=srcText;
-
-
-                        // 计算签名，并给出比对结果到请求头中，交给接下去的AOP中使用
-                        String sign= StringSignature.sign(signText);
-
-
-                        log.info("signHeader:"+signHeader);
-                        log.info("signCalc:"+sign);
-
-                        if(sign.equalsIgnoreCase(signHeader)){
-                            signPassHeader=SecureTransfer.FLAG_ENABLE;
-                        }else{
-                            signPassHeader=SecureTransfer.FLAG_DISABLE;
+                try{
+                    // 如果有请求体，解密请求体
+                    if (bytes.length > 0) {
+                        log.debug("decrypt request body...");
+                        String aesKey = secureTransfer.getRequestSecureHeader(request);
+                        if(aesKey==null){
+                            throw new SecureException("秘钥无效或已失效，请重试！");
                         }
+                        String srcText = new String(bytes, request.getCharacterEncoding());
 
-                        // 如果存在一次性消息头，需要结合一次性消息头一起计算签名
-                        String nonceHeader=request.getHeader(SecureTransfer.SECURE_NONCE_HEADER);
-                        String signNonceHeader=request.getHeader(SecureTransfer.SECURE_SIGN_NONCE_HEADER);
-                        log.info("nonceHeader:"+nonceHeader);
-                        if(nonceHeader!=null &&!"".equals(nonceHeader)){
-                            String signNonceText=nonceHeader+sign;
-                            String signNonce=StringSignature.sign(signNonceText);
-                            if(signNonce.equalsIgnoreCase(signNonceHeader)){
-                                signNoncePassHeader=SecureTransfer.FLAG_ENABLE;
+                        // 如果有消息签名，则验证消息签名
+                        String signHeader = request.getHeader(SecureTransfer.SECURE_SIGN_HEADER);
+                        if(signHeader!= null && !"".equals(signHeader)){
+                            String signText=srcText;
+
+                            // 计算签名，并给出比对结果到请求头中，交给接下去的AOP中使用
+                            String sign= StringSignature.sign(signText);
+
+                            log.info("signHeader:"+signHeader);
+                            log.info("signCalc:"+sign);
+
+                            if(sign.equalsIgnoreCase(signHeader)){
+                                signPassHeader=SecureTransfer.FLAG_ENABLE;
                             }else{
-                                signNoncePassHeader=SecureTransfer.FLAG_DISABLE;
+                                signPassHeader=SecureTransfer.FLAG_DISABLE;
                             }
+
+                            // 如果存在一次性消息头，需要结合一次性消息头一起计算签名
+                            String nonceHeader=request.getHeader(SecureTransfer.SECURE_NONCE_HEADER);
+                            String signNonceHeader=request.getHeader(SecureTransfer.SECURE_SIGN_NONCE_HEADER);
+                            log.info("nonceHeader:"+nonceHeader);
+                            if(nonceHeader!=null &&!"".equals(nonceHeader)){
+                                String signNonceText=nonceHeader+sign;
+                                String signNonce= StringSignature.sign(signNonceText);
+                                if(signNonce.equalsIgnoreCase(signNonceHeader)){
+                                    signNoncePassHeader=SecureTransfer.FLAG_ENABLE;
+                                }else{
+                                    signNoncePassHeader=SecureTransfer.FLAG_DISABLE;
+                                }
+                            }
+
+
+
                         }
 
-
+                        log.debug("src body:" + srcText);
+                        String decryptText = secureTransfer.decrypt(srcText, aesKey);
+                        log.debug("decrypt body:" + decryptText);
+                        // 将解密的数据重新包装
+                        requestProxyWrapper = new HttpServletRequestProxyWrapper(request, decryptText.getBytes(request.getCharacterEncoding()));
 
                     }
-
-                    log.debug("src body:" + srcText);
-                    String decryptText = secureTransfer.decrypt(srcText, aesKey);
-                    log.debug("decrypt body:" + decryptText);
-                    // 将解密的数据重新包装
-                    requestProxyWrapper = new HttpServletRequestProxyWrapper(request, decryptText.getBytes(request.getCharacterEncoding()));
-
+                }catch(Exception e){
+                    log.error(e.getClass().getName(),e);
+                    // 标记异常头，如果发生异常，标记后在AOP或者RequestAdvice中抛出异常，以进行ExceptionHandler处理
+                    requestProxyWrapper.setAttachHeader(SecureTransfer.FILTER_EXCEPTION_ATTR_KEY,SecureTransfer.FLAG_ENABLE);
+                    requestProxyWrapper.setAttribute(SecureTransfer.FILTER_EXCEPTION_ATTR_KEY,e);
                 }
                 log.debug("mark as decrypted.");
                 // 标记已被解密
@@ -244,6 +253,9 @@ public class SecureTransferFilter extends OncePerRequestFilter implements Initia
         }
 
         log.debug("write response and finish...");
+
+        // 重设刷新的rsa头
+        secureTransfer.setRefreshRsaKey(request, response);
 
         // 响应数据
         response.setContentType(responseProxyWrapper.getContentType());

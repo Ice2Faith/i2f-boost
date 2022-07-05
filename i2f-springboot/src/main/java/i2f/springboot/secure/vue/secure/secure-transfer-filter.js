@@ -30,6 +30,10 @@ const SecureTransferFilter = {
         config.headers[SecureTransfer.SECURE_SIGN_HEADER()]=sign
         config.headers[SecureTransfer.SECURE_NONCE_HEADER()]=nonce
         config.headers[SecureTransfer.SECURE_SIGN_NONCE_HEADER()]=signNonce
+
+        let pubKey=SecureTransfer.loadRsaPubKey();
+        let skey=StringSignature.sign(pubKey);
+        config.headers[SecureTransfer.SECURE_RSA_PUB_KEY_OR_SIGN_HEADER()]=skey;
       }
       if(config.headers[SecureTransfer.SECURE_PARAMS_HEADER()]===SecureTransfer.SECURE_HEADER_ENABLE()){
         if(config.params){
@@ -54,6 +58,10 @@ const SecureTransferFilter = {
   // 分别表示响应头和响应体
   // 当响应头中存在SECURE_DATA_HEADER时，将会自动解密响应体
   responseFilter(res) {
+    let skeyHeader=res.headers[SecureTransfer.SECURE_RSA_PUB_KEY_OR_SIGN_HEADER()];
+    if(skeyHeader && skeyHeader!=''){
+      SecureTransfer.saveRsaPubKey(skeyHeader);
+    }
     let secureHeader = res.headers[SecureTransfer.SECURE_DATA_HEADER()];
     if (secureHeader && secureHeader != '') {
       let aesKey = SecureTransfer.getResponseSecureHeaderByHeaders(res.headers);

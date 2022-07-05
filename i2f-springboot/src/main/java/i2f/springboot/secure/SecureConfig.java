@@ -38,4 +38,12 @@ public class SecureConfig {
     private String whiteAntPaths;
 
     private String responseCharset;
+
+    private int rsaKeySize=1024;
+
+    private boolean enableDynamicRsaKey=true;
+
+    private long dynamicRefreshDelaySeconds=6*60;
+
+    private int dynamicMaxHistoriesCount=5;
 }

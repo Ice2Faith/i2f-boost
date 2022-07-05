@@ -1,11 +1,13 @@
 package i2f.springboot.secure.core;
 
 
-import i2f.spring.jackson.JacksonJsonProcessor;
-import i2f.springboot.secure.SecureConfig;
 import i2f.core.digest.AESUtil;
 import i2f.core.digest.Base64Obfuscator;
 import i2f.core.digest.RsaKey;
+import i2f.core.digest.StringSignature;
+import i2f.core.thread.ThreadPools;
+import i2f.spring.jackson.JacksonJsonProcessor;
+import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.util.RsaUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author ltb
@@ -39,6 +44,9 @@ public class SecureTransfer implements InitializingBean {
 
     // 是否包含一次性签名消息头标记
     public static final String SECURE_SIGN_NONCE_HEADER="sgonce";
+
+    // 是否包含动态刷新的RSA公钥签名/公钥头
+    public static final String SECURE_RSA_PUB_KEY_OR_SIGN_HEADER="skey";
 
     //////////////////////////////////////////////////////////////////
 
@@ -62,16 +70,28 @@ public class SecureTransfer implements InitializingBean {
 
     public static final String RSA_KEY_FILE_NAME="rsa.key";
 
+    // 过滤器中发生的异常，使用请求属性装载到AOP中曝出，以进行ExceptionHander的拦截
+    public static final String FILTER_EXCEPTION_ATTR_KEY="secure_except";
+
     @Autowired
     private JacksonJsonProcessor processor;
 
     @Autowired
     private SecureConfig secureConfig;
 
-    private RsaKey rsaKey= RsaUtil.makeKeyPair(1024);
+    private RsaKey rsaKey= RsaUtil.makeKeyPair(secureConfig.getRsaKeySize());
 
-    public void restoreRsaKey(){
+    private LinkedList<RsaKey> histories;
+
+    private ScheduledExecutorService pool;
+
+    public File getRsaStoreFile(){
         File file=new File(secureConfig.getRsaStorePath(),RSA_KEY_FILE_NAME);
+        return file;
+    }
+
+    public void loadRsaKey(){
+        File file=getRsaStoreFile();
         log.info("rsa store file:"+file.getAbsolutePath());
         if(file.exists()){
             try{
@@ -81,6 +101,11 @@ public class SecureTransfer implements InitializingBean {
                 log.warn("load rsa key exception:"+e.getMessage()+" of "+e.getClass().getName());
             }
         }
+    }
+
+    public void saveRsaKey(){
+        File file=getRsaStoreFile();
+        log.info("rsa store file:"+file.getAbsolutePath());
         try{
             RsaKey.saveRsaKey(rsaKey,file);
         }catch(Exception e){
@@ -88,9 +113,65 @@ public class SecureTransfer implements InitializingBean {
         }
     }
 
+    public void restoreRsaKey(){
+        loadRsaKey();
+        saveRsaKey();
+    }
+
+    public void scheduleRsaUpdate(){
+        histories=new LinkedList<>();
+        pool= Executors.newSingleThreadScheduledExecutor(new ThreadPools.NamingThreadFactory("secure","refresh"));
+        pool.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (SecureTransfer.this){
+                    log.info("rsaKey update....");
+                    histories.addFirst(rsaKey);
+                    rsaKey=RsaUtil.makeKeyPair(secureConfig.getRsaKeySize());
+                    if(histories.size()> secureConfig.getDynamicMaxHistoriesCount()){
+                        histories.removeLast();
+                    }
+                    saveRsaKey();
+                }
+            }
+        },secureConfig.getDynamicRefreshDelaySeconds(),secureConfig.getDynamicRefreshDelaySeconds(), TimeUnit.SECONDS);
+    }
+
+    public RsaKey findRsaKey(String sign){
+        if(!secureConfig.isEnableDynamicRsaKey()){
+            return rsaKey;
+        }
+        List<RsaKey> keys=new ArrayList<>();
+        keys.add(rsaKey);
+        keys.addAll(histories);
+        for(RsaKey item : keys){
+            String b464=item.publicKeyBase64();
+            String sg= StringSignature.sign(b464);
+            if(sg.equalsIgnoreCase(sign)){
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public void setRefreshRsaKey(HttpServletRequest request,HttpServletResponse response){
+        if(!secureConfig.isEnableDynamicRsaKey()){
+            return;
+        }
+        String rsaSign=request.getHeader(SECURE_RSA_PUB_KEY_OR_SIGN_HEADER);
+        String b464=rsaKey.publicKeyBase64();
+        String sg=StringSignature.sign(b464);
+        if(!sg.equalsIgnoreCase(rsaSign)){
+            response.setHeader(SECURE_RSA_PUB_KEY_OR_SIGN_HEADER,getWebRsaPublicKey());
+        }
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
         restoreRsaKey();
+        if(secureConfig.isEnableDynamicRsaKey()){
+            scheduleRsaUpdate();
+        }
     }
 
     public String aesKeyGen(int size){
@@ -132,6 +213,9 @@ public class SecureTransfer implements InitializingBean {
         // 将随机RSA加密模糊之后的AES秘钥放入响应头，并设置可访问权限
         List<String> headers=new ArrayList<>();
         headers.add(SECURE_DATA_HEADER);
+        if(secureConfig.isEnableDynamicRsaKey()){
+            headers.add(SECURE_RSA_PUB_KEY_OR_SIGN_HEADER);
+        }
         response.getHeaders().setAccessControlExposeHeaders(headers);
         response.getHeaders().set(SECURE_DATA_HEADER,aesKeyTransfer);
     }
@@ -143,6 +227,9 @@ public class SecureTransfer implements InitializingBean {
         Collection<String> oldHeaders = response.getHeaders(ACCESS_CONTROL_EXPOSE_HEADERS);
         List<String> headers = new ArrayList<>(oldHeaders);
         headers.add(SECURE_DATA_HEADER);
+        if(secureConfig.isEnableDynamicRsaKey()){
+            headers.add(SECURE_RSA_PUB_KEY_OR_SIGN_HEADER);
+        }
         response.setHeader(ACCESS_CONTROL_EXPOSE_HEADERS,toCommaDelimitedString(headers));
         response.setHeader(SECURE_DATA_HEADER,aesKeyTransfer);
     }
@@ -161,11 +248,15 @@ public class SecureTransfer implements InitializingBean {
         return joiner.toString();
     }
 
-    public String getRequestSecureHeader(String aesKeyTransfer){
+    public String getRequestSecureHeader(String aesKeyTransfer,String rsaSign){
         if(aesKeyTransfer==null){
             return aesKeyTransfer;
         }
         aesKeyTransfer=aesKeyTransfer.trim();
+        RsaKey rsaKey=findRsaKey(rsaSign);
+        if(rsaKey==null){
+            return null;
+        }
         // 解除模糊之后使用RSA进行解密得到aes秘钥
         String aesKey=Base64Obfuscator.decode(aesKeyTransfer);
         aesKey=RsaUtil.privateKeyDecryptBase64(rsaKey,aesKey);
@@ -174,7 +265,8 @@ public class SecureTransfer implements InitializingBean {
 
     public String getRequestSecureHeader(HttpServletRequest request){
         String aesKeyTransfer = request.getHeader(SECURE_DATA_HEADER);
-        return getRequestSecureHeader(aesKeyTransfer);
+        String rsaSign=request.getHeader(SECURE_RSA_PUB_KEY_OR_SIGN_HEADER);
+        return getRequestSecureHeader(aesKeyTransfer,rsaSign);
     }
 
     /**
@@ -185,4 +277,5 @@ public class SecureTransfer implements InitializingBean {
         String pubKey=Base64Obfuscator.encode(this.getRsaKey().publicKeyBase64(),true);
         return pubKey;
     }
+
 }

@@ -72,6 +72,12 @@ public class SecureTransferAop implements InitializingBean {
 
         log.debug("enter mapping aop:"+clazz.getName()+"."+method.getName());
 
+        // 如果过滤器中有异常，在AOP中进行抛出，以在ExceptionHandler中进行捕获处理
+        Throwable ex=(Throwable) request.getAttribute(SecureTransfer.FILTER_EXCEPTION_ATTR_KEY);
+        if(ex!=null){
+            throw ex;
+        }
+
         // 如果方法上有注解指定返回加密，则给上响应头占位符，在filter中将会处理这个响应头进行数据加密
         // 如果方法上不存在注解，则以类上存在的注解为准
         SecureParams ann=getMethodAnnotation(method);

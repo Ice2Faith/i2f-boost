@@ -3,6 +3,7 @@ package i2f.springboot.secure.advice;
 
 import i2f.springboot.secure.annotation.SecureParams;
 import i2f.springboot.secure.core.SecureTransfer;
+import i2f.springboot.secure.exception.SecureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,8 +68,16 @@ public class RequestBodyDecryptAdvice implements RequestBodyAdvice, Initializing
         public HttpHeaders headers;
         public RequestHttpInputMessage(HttpInputMessage inputMessage) throws IOException {
             this.headers=inputMessage.getHeaders();
+            // 判断是否发生异常
+            String exceptionHeader=this.headers.getFirst(SecureTransfer.FILTER_EXCEPTION_ATTR_KEY);
+            if(SecureTransfer.FLAG_ENABLE.equals(exceptionHeader)){
+                throw new SecureException("秘钥过期或已失效，请重试！");
+            }
+
             // 判断是否包含加密头，包含则需要解密
             String aesKeyTransfer=this.headers.getFirst(SecureTransfer.SECURE_DATA_HEADER);
+            String rsaSign=this.headers.getFirst(SecureTransfer.SECURE_RSA_PUB_KEY_OR_SIGN_HEADER);
+
             boolean isEncrypt=aesKeyTransfer!=null && !"".equals(aesKeyTransfer);
 
             // 如果有使用过滤器，则需要判断过滤器是否已经解密，已经解密则直接跳过，不重复解密
@@ -83,7 +92,7 @@ public class RequestBodyDecryptAdvice implements RequestBodyAdvice, Initializing
 
             // 需要解密，并且请求体不为空时解密
             if(isEncrypt && bodyStr!=null && !"".equals(bodyStr)) {
-                String aesKey=secureTransfer.getRequestSecureHeader(aesKeyTransfer);
+                String aesKey=secureTransfer.getRequestSecureHeader(aesKeyTransfer,rsaSign);
                 System.out.println("bodyStr:" + bodyStr);
                 String data=secureTransfer.decrypt(bodyStr,aesKey);
                 System.out.println("data:" + data);

@@ -32,6 +32,10 @@ const SecureTransfer = {
   SECURE_PARAMS_HEADER(){
     return "secure_params";
   },
+  // 动态刷新skey支持
+  SECURE_RSA_PUB_KEY_OR_SIGN_HEADER(){
+    return "skey";
+  },
   // 获取安全请求头，参数：是否启用安全参数
   getSecureHeader(openSecureParams){
     let ret={};
