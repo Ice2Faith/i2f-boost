@@ -10,9 +10,12 @@
         <hr/>
         <hr/>
         <h2>comment:   ${_vm.ifnull(${api.comment},"")}</h2>
-        <h3>url:  ${_vm.ifnull(${api.url},"")}</h3>
-        <h3>method:  ${_vm.ifnull(${api.method},"")}</h3>
-        <h3>contentType: ${_vm.ifnull(${api.contentType},"")}</h3>
+        <h3>java: ${_vm.ifnull(${api.javaMethod},"")}</h3>
+        <h3>url:  ${_vm.ifnull(${api.urls},"")}</h3>
+        <h3>method:  ${_vm.ifnull(${api.methods},"")}</h3>
+        <h3>consumers: ${_vm.ifnull(${api.consumers},"")}</h3>
+        <h3>products: ${_vm.ifnull(${api.products},"")}</h3>
+        <h3>remark: ${_vm.ifnull(${api.remark},"")}</h3>
         <h3>request:</h3>
         <table border="1" cellspacing="0" style="width:100%;">
             <tr style="background-color: #ddd;">
@@ -41,7 +44,7 @@
                     remark
                 </th>
             </tr>
-            #foreach(${line} in ${api.lines})
+            #foreach(${line} in ${api.args})
             <tr>
                 <td style="background-color: #eee;">
                     $velocityCount
@@ -56,7 +59,7 @@
                     ${_vm.ifnull(${line.restrict},"")}
                 </td>
                 <td>
-                    ${_vm.ifnull(${line.type},"")}
+                    ${_vm.ifnull(${line.typeName},"")}
                 </td>
                 <td>
                     ${_vm.ifnull(${line.width},"")}
@@ -113,7 +116,7 @@
                     ${_vm.ifnull(${line.restrict},"")}
                 </td>
                 <td>
-                    ${_vm.ifnull(${line.type},"")}
+                    ${_vm.ifnull(${line.typeName},"")}
                 </td>
                 <td>
                     ${_vm.ifnull(${line.width},"")}

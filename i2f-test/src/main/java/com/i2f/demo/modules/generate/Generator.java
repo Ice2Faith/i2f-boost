@@ -6,8 +6,8 @@ import i2f.core.db.data.TableMeta;
 import i2f.core.reflect.core.ReflectResolver;
 import i2f.core.resource.ResourceUtil;
 import i2f.generator.GeneratorDriver;
-import i2f.generator.api.ApiContext;
-import i2f.generator.api.ApiJoinLine;
+import i2f.generator.api.ApiLine;
+import i2f.generator.api.ApiMethod;
 import i2f.generator.er.ErEntity;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,13 +90,13 @@ public class Generator implements ApplicationListener<ApplicationEvent> {
 
         String apiVoTpl= ResourceUtil.getClasspathResourceAsString("tpl/api/api.html.vm","UTF-8");
 
-        String apiVo = GeneratorDriver.apiVo(ApiContext.class,apiVoTpl);
+        String apiVo = GeneratorDriver.apiVo(ApiMethod.class,apiVoTpl);
 
 //        System.out.println(apiVo);
 
         String apiMethodTpl= ResourceUtil.getClasspathResourceAsString("tpl/api/api.html.vm","UTF-8");
 
-        Method method= ReflectResolver.findMethodsByName(ApiContext.class,"parse").iterator().next();
+        Method method= ReflectResolver.findMethodsByName(ApiMethod.class,"parseMethod").iterator().next();
 
         String apiMethod = GeneratorDriver.apiMethod(method,apiMethodTpl);
 
@@ -129,13 +129,13 @@ public class Generator implements ApplicationListener<ApplicationEvent> {
 
     @Remark("PUT的接口")
     @PutMapping("put")
-    public Object put(ApiContext ctx, String userId){
+    public Object put(ApiMethod ctx, String userId){
         return null;
     }
 
     @Remark("DELETE的接口")
     @DeleteMapping("delete")
-    public Object get(ApiJoinLine line, String userId){
+    public Object get(ApiLine line, String userId){
         return null;
     }
 
