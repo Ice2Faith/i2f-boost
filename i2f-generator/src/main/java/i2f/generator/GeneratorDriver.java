@@ -4,7 +4,9 @@ import i2f.core.db.core.DbBeanResolver;
 import i2f.core.db.core.DbResolver;
 import i2f.core.db.data.TableMeta;
 import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.xml.Xml2;
 import i2f.extension.template.velocity.VelocityGenerator;
+import i2f.generator.api.ApiLine;
 import i2f.generator.api.ApiMethod;
 import i2f.generator.api.ApiMethodResolver;
 import i2f.generator.data.JavaCodeContext;
@@ -120,6 +122,10 @@ public class GeneratorDriver {
         Map<String,Object> map=new HashMap<>();
         for(ApiMethod item : apis){
             item.refresh(false,false);
+            for(ApiLine line : item.getArgs()){
+                line.setTypeName(Xml2.toXmlString(line.getTypeName()));
+                line.setComment(Xml2.toXmlString(line.getComment()));
+            }
         }
         map.put("apis",apis);
         return VelocityGenerator.render(template,map);
@@ -148,14 +154,37 @@ public class GeneratorDriver {
         return apis(apis,template);
     }
 
-    public static String apiMvc(Class clazz,String template) throws IOException {
-        List<ApiMethod> apis=new ArrayList<>();
+    public static Set<Method> getMvcMethos(Class clazz){
         Set<Method> set = ReflectResolver.getMethodsWithAnnotations(clazz, false,
                 RequestMapping.class,
                 GetMapping.class, PostMapping.class, PutMapping.class, DeleteMapping.class,
                 PatchMapping.class);
+        return set;
+    }
+
+    public static String apiMvc(Class clazz,String template) throws IOException {
+        List<ApiMethod> apis=new ArrayList<>();
+        Set<Method> set = getMvcMethos(clazz);
         for(Method item : set){
             apis.add(ApiMethodResolver.parseMethod(item));
+        }
+        return apis(apis,template);
+    }
+
+    public static List<ApiMethod> getMvcApiMethods(Class clazz){
+        List<ApiMethod> apis=new ArrayList<>();
+        Set<Method> set = getMvcMethos(clazz);
+        for(Method item : set){
+            apis.add(ApiMethodResolver.parseMethod(item));
+        }
+        return apis;
+    }
+
+    public static String apiMvcs(String template,Class clazz,Class ... classes) throws IOException {
+        List<ApiMethod> apis=new ArrayList<>();
+        apis.addAll(getMvcApiMethods(clazz));
+        for(Class item : classes){
+            apis.addAll(getMvcApiMethods(item));
         }
         return apis(apis,template);
     }

@@ -530,7 +530,6 @@ public class ApiMethodResolver {
         return ret;
     }
 
-
     public static String getTypeName(Type type,boolean keepJavaLang,boolean keepAll){
         if(type instanceof Class){
             Class clazz=(Class)type;

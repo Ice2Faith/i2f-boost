@@ -58,7 +58,7 @@ public class Xml2 {
     protected static String toXmlDate(Date date){
         return dateFmt.format(date);
     }
-    protected static String toXmlString(String str){
+    public static String toXmlString(String str){
         for(String[] item : transMap){
             str=str.replaceAll(item[0],item[1]);
         }
