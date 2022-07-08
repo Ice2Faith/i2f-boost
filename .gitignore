@@ -27,6 +27,6 @@ out/
 target/
 .idea/
 .mvn/
-log/
-logs/
+#log/
+#logs/
 *.iml
