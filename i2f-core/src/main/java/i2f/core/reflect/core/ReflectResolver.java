@@ -589,7 +589,6 @@ public class ReflectResolver {
      * ckClass 指定是否检查类上面
      * ckSuperClass 指定是否检查父类上面
      * ckAnnotatedAnn 指定是否检查注解的注解
-     *
      * @param elem
      * @param clazz
      * @param ckClass

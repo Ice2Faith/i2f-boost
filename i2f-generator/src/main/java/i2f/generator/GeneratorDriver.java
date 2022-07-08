@@ -126,6 +126,10 @@ public class GeneratorDriver {
                 line.setTypeName(Xml2.toXmlString(line.getTypeName()));
                 line.setComment(Xml2.toXmlString(line.getComment()));
             }
+            for(ApiLine line : item.getReturns()){
+                line.setTypeName(Xml2.toXmlString(line.getTypeName()));
+                line.setComment(Xml2.toXmlString(line.getComment()));
+            }
         }
         map.put("apis",apis);
         return VelocityGenerator.render(template,map);
