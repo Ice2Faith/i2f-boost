@@ -79,7 +79,7 @@ public class WarBootApplication extends SpringBootServletInitializer {
         Runtime runtime=Runtime.getRuntime();
         builder.append("\tstartup:\t").append(mainClass.getName()).append(".class\n")
                .append("\tsystem :\t").append(env.getProperty("os.name")).append(" | ").append(env.getProperty("os.arch")).append(" | ").append(env.getProperty("os.version")).append("\n")
-               .append("\tenv    :\t").append("core:").append(runtime.availableProcessors()).append(" | ").append("free:").append(runtime.freeMemory()/1024/1024).append("M").append(" | ").append("total:").append(runtime.totalMemory()/1024/1024).append("M").append(" | ").append("max:").append(runtime.maxMemory()/1024/1024).append("M").append("\n")
+               .append("\tenv    :\t").append("core:").append(runtime.availableProcessors()).append(" | ").append("useRate:" + (((int) ((1.0 - (runtime.freeMemory() * 1.0 / runtime.totalMemory())) * 10000)) / 100.0)).append("% | ").append("free:").append(runtime.freeMemory()/1024/1024).append("M").append(" | ").append("total:").append(runtime.totalMemory()/1024/1024).append("M").append(" | ").append("max:").append(runtime.maxMemory()/1024/1024).append("M").append("\n")
                .append("\tjava   :\t").append(env.getProperty("java.version")).append(" | ").append(env.getProperty("java.vendor")).append(" | ").append(env.getProperty("java.home")).append("\n")
                .append("\tjvm    :\t").append(env.getProperty("java.vm.name")).append(" | ").append(env.getProperty("java.vm.version")).append(" | ").append(env.getProperty("java.vm.vendor")).append("\n")
                .append("\ttmpdir :\t").append(env.getProperty("java.io.tmpdir")).append("\n")

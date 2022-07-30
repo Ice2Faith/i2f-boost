@@ -48,6 +48,18 @@ public class AESUtil {
         }
         return null;
     }
+    public static Cipher getAes(byte[] key,int mode){
+        try{
+            byte[] keyRaw=key;
+            SecretKeySpec keySpec=new SecretKeySpec(keyRaw,"AES" );
+            Cipher cipher=Cipher.getInstance("AES/ECB/ISO10126Padding");
+            cipher.init(mode,keySpec);
+            return cipher;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
     public static String encrypt(byte[] data,String key){
         try{
             Cipher cipher=getAes(key,Cipher.ENCRYPT_MODE);
@@ -59,6 +71,16 @@ public class AESUtil {
         return null;
     }
     public static byte[] decrypt(String data,String key){
+        try{
+            byte[] sdata=Base64Util.decode(data);
+            Cipher cipher=getAes(key,Cipher.DECRYPT_MODE);
+            return cipher.doFinal(sdata);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public static byte[] decrypt(String data,byte[] key){
         try{
             byte[] sdata=Base64Util.decode(data);
             Cipher cipher=getAes(key,Cipher.DECRYPT_MODE);

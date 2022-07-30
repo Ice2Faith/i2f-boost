@@ -241,3 +241,11 @@ as
 select * from tb_user
 where 1=2;
 ```
+- 查看锁
+```sql
+SELECT * FROM information_schema.INNODB_TRX ;
+```
+- 删除锁
+```sql
+kill ${trx_mysql_thread_id}
+```

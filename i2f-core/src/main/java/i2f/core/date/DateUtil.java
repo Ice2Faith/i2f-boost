@@ -5,6 +5,11 @@ import i2f.core.annotations.remark.Author;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +20,84 @@ public class DateUtil {
     public static ThreadLocal<SimpleDateFormat> formatter=ThreadLocal.withInitial(()->{
         return new SimpleDateFormat(FMT_DATE_TIME_MILL);
     });
+    public static ThreadLocal<SimpleDateFormat> sfmtMill=ThreadLocal.withInitial(()->{
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
+    });
+    public static ThreadLocal<SimpleDateFormat> sfmtSecond=ThreadLocal.withInitial(()->{
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    });
+    public static ThreadLocal<SimpleDateFormat> sfmtMinus=ThreadLocal.withInitial(()->{
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    });
+    public static ThreadLocal<SimpleDateFormat> sfmtHour=ThreadLocal.withInitial(()->{
+        return new SimpleDateFormat("yyyy-MM-dd HH");
+    });
+    public static ThreadLocal<SimpleDateFormat> sfmtDay=ThreadLocal.withInitial(()->{
+        return new SimpleDateFormat("yyyy-MM-dd");
+    });
+    public static ThreadLocal<SimpleDateFormat> sfmtMonth=ThreadLocal.withInitial(()->{
+        return new SimpleDateFormat("yyyy-MM");
+    });
+    public static ThreadLocal<SimpleDateFormat> sfmtYear=ThreadLocal.withInitial(()->{
+        return new SimpleDateFormat("yyyy");
+    });
+    public static final DateTimeFormatter fmtMill=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss SSS");
+    public static final DateTimeFormatter fmtSecond=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public static final DateTimeFormatter fmtMinus=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    public static final DateTimeFormatter fmtHour=DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
+    public static final DateTimeFormatter fmtDay=DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter fmtMonth=DateTimeFormatter.ofPattern("yyyy-MM");
+    public static final DateTimeFormatter fmtYear=DateTimeFormatter.ofPattern("yyyy");
+
+    public static long date2secondTimestamp(Date date){
+        return date.getTime()/1000;
+    }
+
+    public static Date secondTimestamp2Date(long stamp){
+        return new Date(stamp*1000);
+    }
+
+    public static Date localDate2Date(LocalDate val){
+        ZoneId zone=ZoneId.systemDefault();
+        Instant instant = ((LocalDate)val).atStartOfDay().atZone(zone).toInstant();
+        return Date.from(instant);
+    }
+
+    public static Date localDateTime2Date(LocalDateTime val){
+        ZoneId zone=ZoneId.systemDefault();
+        Instant instant = ((LocalDateTime)val).atZone(zone).toInstant();
+        return Date.from(instant);
+    }
+
+    public static Date calendar2Date(Calendar val){
+        return val.getTime();
+    }
+
+    public static java.sql.Timestamp date2Timestamp(Date val){
+        return new java.sql.Timestamp(val.getTime());
+    }
+
+    public static java.sql.Date date2sqlDate(Date val){
+        return new java.sql.Date(val.getTime());
+    }
+
+    public static LocalDate date2LocalDate(Date val){
+        Instant instant = new java.util.Date(val.getTime()).toInstant();
+        ZoneId zone=ZoneId.systemDefault();
+        return LocalDateTime.ofInstant(instant, zone).toLocalDate();
+    }
+
+    public static LocalDateTime date2LocalDateTime(Date val){
+        Instant instant = new java.util.Date(val.getTime()).toInstant();
+        ZoneId zone=ZoneId.systemDefault();
+        return LocalDateTime.ofInstant(instant, zone);
+    }
+
+    public static Calendar date2Calendar(Date val){
+        Calendar ret=Calendar.getInstance();
+        ret.setTime(val);
+        return ret;
+    }
 
     public static String[] SUPPORT_PARSE_DATE_FORMATS={
             "yyyy-MM-dd HH:mm:ss",

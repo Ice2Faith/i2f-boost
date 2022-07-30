@@ -436,6 +436,13 @@
             <version>7.1.0</version>
         </dependency>
 
+        <!-- mongo-db -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.10.2</version>
+        </dependency>
+
     </dependencies>
 
 
