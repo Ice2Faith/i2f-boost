@@ -19,7 +19,7 @@
         <!-- bin，一些脚本，例如启动停止脚本 -->
         <fileSet>
             <directory>bin</directory>
-            <outputDirectory>bin</outputDirectory>
+            <outputDirectory>.</outputDirectory>
             <filtered>true</filtered>
             <includes>
                 <include>*.sh</include>

@@ -155,6 +155,8 @@
                         <exclude>logback/**</exclude>
                         <exclude>**/*.properties</exclude>
                         <exclude>**/*.xml</exclude>
+                        <exclude>**/*.yml</exclude>
+                        <exclude>**/*.yaml</exclude>
                     </excludes>
                 </configuration>
             </plugin>

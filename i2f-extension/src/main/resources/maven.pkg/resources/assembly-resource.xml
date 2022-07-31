@@ -12,7 +12,7 @@
         <!-- bin -->
         <fileSet>
             <directory>bin</directory>
-            <outputDirectory>bin</outputDirectory>
+            <outputDirectory>.</outputDirectory>
             <filtered>true</filtered>
             <includes>
                 <include>*.sh</include>
