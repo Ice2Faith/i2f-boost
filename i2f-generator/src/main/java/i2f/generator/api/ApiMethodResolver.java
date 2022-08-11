@@ -251,7 +251,10 @@ public class ApiMethodResolver {
 
     public static String[] getParameterNames(Method method){
         if(springCoreSupport()){
-            return new LocalVariableTableParameterNameDiscoverer().getParameterNames(method);
+            String[] names = new LocalVariableTableParameterNameDiscoverer().getParameterNames(method);
+            if (names != null) {
+                return names;
+            }
         }
         Parameter[] parameters = method.getParameters();
         String[] names=new String[parameters.length];

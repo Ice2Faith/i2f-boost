@@ -96,7 +96,7 @@ public class Generator implements ApplicationListener<ApplicationEvent> {
 
         String apiMethodTpl= ResourceUtil.getClasspathResourceAsString("tpl/api/api.html.vm","UTF-8");
 
-        Method method= ReflectResolver.findMethodsByName(ApiMethod.class,"parseMethod").iterator().next();
+        Method method = ReflectResolver.findMethodsByName(ApiMethod.class, "refresh").iterator().next();
 
         String apiMethod = GeneratorDriver.apiMethod(method,apiMethodTpl);
 

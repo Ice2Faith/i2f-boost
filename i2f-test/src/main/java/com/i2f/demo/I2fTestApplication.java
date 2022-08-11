@@ -18,7 +18,10 @@ import i2f.springboot.shiro.EnableShiroConfig;
 import i2f.springboot.swagger.EnableSwaggerConfig;
 import i2f.springboot.websocket.EnableWebsocketConfig;
 import i2f.springcloud.netflix.feign.EnableFeignConfig;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
@@ -41,6 +44,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableQuartzConfig
 @EnableShiroConfig
 @EnableActivityConfig
+@EnableAutoConfiguration(exclude = {
+		MongoAutoConfiguration.class,
+		SecurityAutoConfiguration.class
+})
 public class I2fTestApplication extends WarBootApplication {
 
 	public static void main(String[] args) {

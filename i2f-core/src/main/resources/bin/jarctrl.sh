@@ -6,6 +6,10 @@ AppName=$1
 ctrlOption=$2
 # control argument
 ctrlArg1=$3
+# app env,for spring active,dev/test/prod
+AppEnv=
+# app port,reset server.port
+AppPort=
 
 echo "-----------------------"
 echo "jarctrl.sh running..."
@@ -43,6 +47,7 @@ PID_PATH=${APP_HOME}/pid.$AppName.txt
 # logback
 ENABLE_LOGBACK=$BOOL_TRUE
 # logging.config
+# LOGBACK_CONFIG_FILE=classpath:logback-spring.xml
 LOGBACK_CONFIG_FILE=resources/logback-spring.xml
 LOGBACK_APP_NAME=$AppName
 LOGBACK_APP_ENV=
@@ -108,6 +113,14 @@ function help()
 function prepareBootJvmOpts()
 {
   echo "----jvm opts begin----"
+  if [[ -n "$AppEnv" ]]; then
+    JVM_OPTS="$JVM_OPTS -Dspring.profiles.active=$AppEnv"
+    echo "-Dspring.profiles.active=$AppEnv"
+  fi
+  if [[ -n "$AppPort" ]]; then
+    JVM_OPTS="$JVM_OPTS -Dserver.port=$AppPort"
+    echo "-Dserver.port=$AppPort"
+  fi
   if [[ -n "$USER_TIME_ZONE" ]]; then
     JVM_OPTS="$JVM_OPTS -Duser.timezone=$USER_TIME_ZONE"
     echo "-Duser.timezone=$USER_TIME_ZONE"
@@ -182,8 +195,6 @@ function prepareBootJvmOpts()
   echo "----jvm opts end----"
 }
 
-prepareBootJvmOpts
-
 
 if [ "$ctrlOption" = "" ];
 then
@@ -217,6 +228,8 @@ function mkcmd()
 
 function start()
 {
+    prepareBootJvmOpts
+
     query
 
     if [ x"$PID" != x"" ]; then
@@ -419,6 +432,8 @@ function pidstop()
 
 function pidstart()
 {
+  prepareBootJvmOpts
+
   if [ ! -d ${PID_PATH} ]; then
     echo "not pid file,create..."
     touch ${PID_PATH}

@@ -41,23 +41,25 @@ public class DateUtil {
     public static ThreadLocal<SimpleDateFormat> sfmtYear=ThreadLocal.withInitial(()->{
         return new SimpleDateFormat("yyyy");
     });
-    public static final DateTimeFormatter fmtMill=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss SSS");
-    public static final DateTimeFormatter fmtSecond=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    public static final DateTimeFormatter fmtMinus=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    public static final DateTimeFormatter fmtHour=DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
-    public static final DateTimeFormatter fmtDay=DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    public static final DateTimeFormatter fmtMonth=DateTimeFormatter.ofPattern("yyyy-MM");
-    public static final DateTimeFormatter fmtYear=DateTimeFormatter.ofPattern("yyyy");
+    public static final DateTimeFormatter fmtMill = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss SSS");
+    public static final DateTimeFormatter fmtSecond = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public static final DateTimeFormatter fmtMinus = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    public static final DateTimeFormatter fmtHour = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
+    public static final DateTimeFormatter fmtDay = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter fmtMonth = DateTimeFormatter.ofPattern("yyyy-MM");
+    public static final DateTimeFormatter fmtYear = DateTimeFormatter.ofPattern("yyyy");
 
-    public static long date2secondTimestamp(Date date){
-        return date.getTime()/1000;
+    private static final Class<Calendar> calendarLock = Calendar.class;
+
+    public static long date2secondTimestamp(Date date) {
+        return date.getTime() / 1000;
     }
 
-    public static Date secondTimestamp2Date(long stamp){
-        return new Date(stamp*1000);
+    public static Date secondTimestamp2Date(long stamp) {
+        return new Date(stamp * 1000);
     }
 
-    public static Date localDate2Date(LocalDate val){
+    public static Date localDate2Date(LocalDate val) {
         ZoneId zone=ZoneId.systemDefault();
         Instant instant = ((LocalDate)val).atStartOfDay().atZone(zone).toInstant();
         return Date.from(instant);
@@ -183,36 +185,44 @@ public class DateUtil {
         long time=date.getTime();
         return new Date(time+week2(weeks));
     }
-    public static Date addMonth(Date date,int months){
-        Calendar calendar=Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.MONTH,months);
-        return calendar.getTime();
+    public static Date addMonth(Date date,int months) {
+        synchronized (calendarLock) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.MONTH, months);
+            return calendar.getTime();
+        }
     }
-    public static Date addYear(Date date,int years){
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.YEAR,years);
-        return calendar.getTime();
+    public static Date addYear(Date date,int years) {
+        synchronized (calendarLock) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.YEAR, years);
+            return calendar.getTime();
+        }
     }
     public static Date add(Date date, long times, TimeUnit unit){
         long time=date.getTime();
         long fac=unit.toMillis(times);
         return new Date(time+fac);
     }
-    public static Date lastDayOfMonth(Date date){
-        Calendar calendar=Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.DAY_OF_MONTH,1);
-        calendar.add(Calendar.MONTH,+1);
-        calendar.add(Calendar.DAY_OF_MONTH,-1);
-        return calendar.getTime();
+    public static Date lastDayOfMonth(Date date) {
+        synchronized (calendarLock) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.add(Calendar.MONTH, +1);
+            calendar.add(Calendar.DAY_OF_MONTH, -1);
+            return calendar.getTime();
+        }
     }
-    public static Date firstDayOfMonth(Date date){
-        Calendar calendar=Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.DAY_OF_MONTH,1);
-        return calendar.getTime();
+    public static Date firstDayOfMonth(Date date) {
+        synchronized (calendarLock) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            return calendar.getTime();
+        }
     }
     public static Date lastDayOfPreviousMonth(Date date){
         Date ndate=firstDayOfMonth(date);
@@ -222,57 +232,71 @@ public class DateUtil {
         Date ndate=lastDayOfMonth(date);
         return addDays(ndate,1);
     }
-    public static Date lastDayOfYear(Date date){
-        Calendar calendar=Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.DAY_OF_MONTH,1);
-        calendar.set(Calendar.MONTH,0);
-        calendar.add(Calendar.YEAR,1);
-        calendar.add(Calendar.DAY_OF_MONTH,-1);
-        return calendar.getTime();
+    public static Date lastDayOfYear(Date date) {
+        synchronized (calendarLock) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.MONTH, 0);
+            calendar.add(Calendar.YEAR, 1);
+            calendar.add(Calendar.DAY_OF_MONTH, -1);
+            return calendar.getTime();
+        }
     }
-    public static Date firstDayOfYear(Date date){
-        Calendar calendar=Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.DAY_OF_MONTH,1);
-        calendar.set(Calendar.MONTH,0);
-        return calendar.getTime();
+    public static Date firstDayOfYear(Date date) {
+        synchronized (calendarLock) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.MONTH, 0);
+            return calendar.getTime();
+        }
     }
-    public static Date add(Date date, int fieldOfCalendar,int amount){
-        Calendar calendar=Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(fieldOfCalendar,amount);
-        return calendar.getTime();
+    public static Date add(Date date, int fieldOfCalendar,int amount) {
+        synchronized (calendarLock) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(fieldOfCalendar, amount);
+            return calendar.getTime();
+        }
     }
-    public static Date set(Date date,int fieldOfCalendar,int value){
-        Calendar calendar=Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(fieldOfCalendar,value);
-        return calendar.getTime();
+    public static Date set(Date date,int fieldOfCalendar,int value) {
+        synchronized (calendarLock) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(fieldOfCalendar, value);
+            return calendar.getTime();
+        }
     }
-    public static int season(Date date){
-        Calendar calendar=Calendar.getInstance();
-        calendar.setTime(date);
-        int mon=calendar.get(Calendar.MONTH);
-        return mon/3;
+    public static int season(Date date) {
+        synchronized (calendarLock) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            int mon = calendar.get(Calendar.MONTH);
+            return mon / 3;
+        }
     }
-    public static Date firstDayOfSeason(Date date){
-        int season=season(date);
-        int mon=season*3;
-        Calendar calendar=Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.DAY_OF_MONTH,1);
-        calendar.set(Calendar.MONTH,mon);
-        return calendar.getTime();
+    public static Date firstDayOfSeason(Date date) {
+        synchronized (calendarLock) {
+            int season = season(date);
+            int mon = season * 3;
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.MONTH, mon);
+            return calendar.getTime();
+        }
     }
-    public static Date lastDayOfSeason(Date date){
-        int season=season(date);
-        int mon=season*3+2;
-        Calendar calendar=Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.DAY_OF_MONTH,1);
-        calendar.set(Calendar.MONTH,mon);
-        return calendar.getTime();
+    public static Date lastDayOfSeason(Date date) {
+        synchronized (calendarLock) {
+            int season = season(date);
+            int mon = season * 3 + 2;
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.MONTH, mon);
+            return calendar.getTime();
+        }
     }
     public static Date lastDayOfPreviousSeason(Date date){
         Date sdate=firstDayOfSeason(date);
