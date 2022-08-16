@@ -22,4 +22,8 @@ public class Pair<K, V> {
         this.val = val;
         this.tag = tag;
     }
+
+    public static <TK, TV> Pair<TK, TV> of(TK key, TV val) {
+        return new Pair<>(key, val);
+    }
 }
