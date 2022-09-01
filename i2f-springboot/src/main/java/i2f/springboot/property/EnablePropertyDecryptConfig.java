@@ -14,7 +14,8 @@ import java.lang.annotation.*;
 @Documented
 @Import({
         PropertyDecryptConfig.class,
-        DefaultPropertyDecryptorConfig.class
+        DefaultPropertyDecryptorConfig.class,
+        DefaultAesPropertyDecryptorConfig.class
 })
 public @interface EnablePropertyDecryptConfig {
 

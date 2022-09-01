@@ -1,5 +1,10 @@
 package i2f.springboot.secure;
 
+import i2f.spring.jackson.JacksonJsonProcessor;
+import i2f.spring.mapping.MappingUtil;
+import i2f.springboot.secure.advice.RequestBodyDecryptAdvice;
+import i2f.springboot.secure.advice.StandardApiResponseAdvice;
+import i2f.springboot.secure.core.*;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
@@ -17,7 +22,16 @@ import java.lang.annotation.Target;
 })
 @Retention(RetentionPolicy.RUNTIME)
 @Import({
-        SecureConfig.class
+        SecureConfig.class,
+        JacksonJsonProcessor.class,
+        SecureTransferFilter.class,
+        SecureTransferAop.class,
+        SecureTransfer.class,
+        MappingUtil.class,
+        SecureController.class,
+        EncodeRequestForwardController.class,
+        RequestBodyDecryptAdvice.class,
+        StandardApiResponseAdvice.class
 })
 public @interface EnableSecureConfig {
 

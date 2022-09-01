@@ -1,5 +1,6 @@
 package i2f.spring.event;
 
+import lombok.NoArgsConstructor;
 import org.springframework.beans.BeansException;
 import org.springframework.context.*;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
  * @date 2022/4/15 9:22
  * @desc
  */
+@NoArgsConstructor
 @Component
 public class EventManager implements ApplicationContextAware, ApplicationEventPublisherAware {
 
@@ -21,6 +23,7 @@ public class EventManager implements ApplicationContextAware, ApplicationEventPu
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
         this.publisher=applicationEventPublisher;
     }
+
 
     ///////////////////////////////////////////
     private ApplicationEventPublisher publisher;

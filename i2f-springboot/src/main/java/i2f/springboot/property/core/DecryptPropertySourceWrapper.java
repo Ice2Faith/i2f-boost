@@ -19,8 +19,11 @@ public class DecryptPropertySourceWrapper<T> extends PropertySource<T> {
 
     @Override
     public Object getProperty(String name) {
-        Object src=this.delegate.getProperty(name);
-        Object ret=decryptor.decrypt(src,name);
+        Object src = this.delegate.getProperty(name);
+        if (src == null) {
+            return src;
+        }
+        Object ret = decryptor.decrypt(src, name);
         return ret;
     }
 
