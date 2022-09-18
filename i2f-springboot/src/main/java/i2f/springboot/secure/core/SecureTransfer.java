@@ -13,6 +13,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,10 @@ import java.util.concurrent.TimeUnit;
  * @date 2022/6/29 9:04
  * @desc RSA+AES加密的工作支撑类
  */
+@ConditionalOnBean({
+        SecureConfig.class,
+        JacksonJsonProcessor.class
+})
 @Slf4j
 @Data
 @Component
@@ -79,7 +84,7 @@ public class SecureTransfer implements InitializingBean {
     @Autowired
     private SecureConfig secureConfig;
 
-    private RsaKey rsaKey= RsaUtil.makeKeyPair(secureConfig.getRsaKeySize());
+    private RsaKey rsaKey;
 
     private LinkedList<RsaKey> histories;
 
@@ -168,8 +173,11 @@ public class SecureTransfer implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        if (this.rsaKey == null) {
+            this.rsaKey = RsaUtil.makeKeyPair(secureConfig.getRsaKeySize());
+        }
         restoreRsaKey();
-        if(secureConfig.isEnableDynamicRsaKey()){
+        if (secureConfig.isEnableDynamicRsaKey()) {
             scheduleRsaUpdate();
         }
     }

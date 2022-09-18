@@ -17,6 +17,7 @@ import java.lang.annotation.*;
         ConnectRedisTemplateConfig.class,
         LettuceRedisTemplateConfig.class,
         RedisCacheConfig.class,
+        LettuceRedisHeartbeatConfig.class
 })
 public @interface EnableRedisConfig {
 

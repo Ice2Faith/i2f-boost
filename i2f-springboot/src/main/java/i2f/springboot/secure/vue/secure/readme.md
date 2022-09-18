@@ -1,12 +1,12 @@
 # RSA+AES前端接入教程
 ---
 
-## 考试系统rsa公钥获取接口
+## 系统rsa公钥获取接口
 - 系统加载是就调用
     - 也就是 login.vue --> mounted
 - 接口
 ```bash
-POST exam/api/secure/key
+POST secure/key
 ```
 - 请求体
     - 无
@@ -28,7 +28,7 @@ POST exam/api/secure/key
 - 默认是存储在session中，如有其他需要，请修改secure-transfer.js
 ```js
 this.$axios({
-    url: 'exam/api/secure/key',
+    url: 'secure/key',
     method: 'POST'
   }).then(({data})=>{
     this.$secureTransfer.saveRsaPubKey(data);

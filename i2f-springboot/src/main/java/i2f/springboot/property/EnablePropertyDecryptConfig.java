@@ -13,9 +13,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import({
-        PropertyDecryptConfig.class,
+        DefaultAesPropertyDecryptorConfig.class,
         DefaultPropertyDecryptorConfig.class,
-        DefaultAesPropertyDecryptorConfig.class
+        PropertyDecryptConfig.class,
 })
 public @interface EnablePropertyDecryptConfig {
 

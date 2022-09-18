@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * @date 2022/6/7 10:12
  * @desc
  */
-@ConditionalOnExpression("!${i2f.springboot.config.property.aes.enable:false}")
+@ConditionalOnExpression("${i2f.springboot.config.property.base64.enable:true}")
 @Configuration
 public class DefaultPropertyDecryptorConfig {
 

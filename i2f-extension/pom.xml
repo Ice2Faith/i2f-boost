@@ -457,6 +457,20 @@
                         <!-- 去除maven描述信息 -->
                         <addMavenDescriptor>false</addMavenDescriptor>
                     </archive>
+                    <includes>
+                        <include>**/*.class</include>
+                        <include>**/*.properties</include>
+                        <include>**/*.yaml</include>
+                        <include>**/*.yml</include>
+                        <include>**/*.xml</include>
+                        <include>**/*.html</include>
+                        <include>**/*.js</include>
+                        <include>**/*.css</include>
+                        <include>**/*.vue</include>
+                        <include>**/*.json</include>
+                        <include>**/*.md</include>
+                        <include>**/*.txt</include>
+                    </includes>
                 </configuration>
             </plugin>
         </plugins>
