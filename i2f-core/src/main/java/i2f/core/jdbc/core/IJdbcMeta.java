@@ -8,7 +8,8 @@ import i2f.core.annotations.remark.Author;
  */
 @Author("i2f")
 public interface IJdbcMeta {
-    String getDriverClassName();
+    String getDriver();
+
     String getUrl();
     String getUsername();
     String getPassword();

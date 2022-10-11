@@ -111,23 +111,32 @@ public class SpringUtil implements
         return getApplicationContext().getBean(name);
     }
 
-    public static <T> T getBean(Class<T> clazz){
+    public static <T> T getBean(Class<T> clazz) {
         return getApplicationContext().getBean(clazz);
     }
 
-    public static <T> T getBean(String name,Class<T> clazz){
-        return getApplicationContext().getBean(name,clazz);
+    public static <T> T getBean(String name, Class<T> clazz) {
+        return getApplicationContext().getBean(name, clazz);
     }
 
-    public static AutowireCapableBeanFactory getAutowireCapableBeanFactory(){
+    public static <T> Map<String, T> getBeans(Class<T> clazz) {
+        String[] beanNames = getApplicationContext().getBeanNamesForType(clazz);
+        Map<String, T> ret = new HashMap<>(Math.max(beanNames.length, 10));
+        for (String name : beanNames) {
+            ret.put(name, getBean(name, clazz));
+        }
+        return ret;
+    }
+
+    public static AutowireCapableBeanFactory getAutowireCapableBeanFactory() {
         return getApplicationContext().getAutowireCapableBeanFactory();
     }
 
-    public static void makeAutowireSupport(Object existBean,int autowireMode,boolean dependencyCheck){
-        getAutowireCapableBeanFactory().autowireBeanProperties(existBean,autowireMode,dependencyCheck);
+    public static void makeAutowireSupport(Object existBean, int autowireMode, boolean dependencyCheck) {
+        getAutowireCapableBeanFactory().autowireBeanProperties(existBean, autowireMode, dependencyCheck);
     }
 
-    public static void makeAutowireSupport(Object existBean){
+    public static void makeAutowireSupport(Object existBean) {
         getAutowireCapableBeanFactory().autowireBeanProperties(existBean,AutowireCapableBeanFactory.AUTOWIRE_BY_NAME,false);
     }
 

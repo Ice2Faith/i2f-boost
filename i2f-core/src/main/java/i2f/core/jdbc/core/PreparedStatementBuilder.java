@@ -311,7 +311,7 @@ public class PreparedStatementBuilder {
             } else if (clazz.equals(SQLXML.class)) {
                 stat.setSQLXML(index, (SQLXML) val);
             } else {
-                throw new SQLException("Unsupported Object Type of " + clazz.getName() + ":" + val);
+                stat.setObject(index, val);
             }
         } catch (SQLException e) {
             throw new SQLException("PreparedStatementBuilder setAnyObj(" + index + "," + val + ") error:" + stat.toString(),e);

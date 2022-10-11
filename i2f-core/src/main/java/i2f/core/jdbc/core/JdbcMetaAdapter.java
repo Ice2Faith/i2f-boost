@@ -8,8 +8,8 @@ import i2f.core.annotations.remark.Author;
  * @desc
  */
 @Author("i2f")
-public class JdbcMetaAdapter implements IJdbcMeta{
-    private String driverClassName;
+public class JdbcMetaAdapter implements IJdbcMeta {
+    private String driver;
     private String url;
     private String username;
     private String password;
@@ -17,15 +17,15 @@ public class JdbcMetaAdapter implements IJdbcMeta{
     public JdbcMetaAdapter() {
     }
 
-    public JdbcMetaAdapter(String driverClassName, String url, String username, String password) {
-        this.driverClassName = driverClassName;
+    public JdbcMetaAdapter(String driver, String url, String username, String password) {
+        this.driver = driver;
         this.url = url;
         this.username = username;
         this.password = password;
     }
 
-    public JdbcMetaAdapter setDriverClassName(String driverClassName) {
-        this.driverClassName = driverClassName;
+    public JdbcMetaAdapter setDriver(String driver) {
+        this.driver = driver;
         return this;
     }
 
@@ -45,8 +45,8 @@ public class JdbcMetaAdapter implements IJdbcMeta{
     }
 
     @Override
-    public String getDriverClassName() {
-        return driverClassName;
+    public String getDriver() {
+        return driver;
     }
 
     @Override

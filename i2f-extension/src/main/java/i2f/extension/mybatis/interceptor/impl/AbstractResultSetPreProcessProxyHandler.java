@@ -1,7 +1,6 @@
 package i2f.extension.mybatis.interceptor.impl;
 
-import i2f.core.jdbc.core.JdbcProvider;
-import i2f.core.jdbc.data.DBResultData;
+import i2f.core.jdbc.data.DBResultList;
 import i2f.core.proxy.IInvokable;
 import i2f.core.proxy.impl.IMethodAccessInvokable;
 import i2f.core.reflect.ValueResolver;
@@ -88,12 +87,12 @@ public abstract class AbstractResultSetPreProcessProxyHandler extends BasicResul
 
         ResultSet rs=null;
         List<Object> ret=new ArrayList<>();
-        try{
-            rs=stat.getResultSet();
-            DBResultData data= JdbcProvider.parseResultSet(rs);
-            List<Map<String,Object>> src=data.getDatas();
-            src= preProcess(src);
-            ret=BeanResolver.mapList2BeanList(src,type,true,null);
+        try {
+            rs = stat.getResultSet();
+            DBResultList data = DBResultList.of(rs);
+            List<Map<String, Object>> src = data;
+            src = preProcess(src);
+            ret = BeanResolver.mapList2BeanList(src, type, true, null);
         }catch(Exception e){
             e.printStackTrace();
             System.out.println(e.getMessage());

@@ -27,7 +27,7 @@ public class TestDbResolver {
     public static void testDbResolver(boolean simple) throws SQLException {
         JdbcProvider provider = new JdbcProvider(new TransactionManager(
                 new JdbcMetaAdapter()
-                        .setDriverClassName("com.mysql.cj.jdbc.Driver")
+                        .setDriver("com.mysql.cj.jdbc.Driver")
                         .setUrl("jdbc:mysql://39.105.33.11:3306/car_loc_db?useUnicode=true&characterEncoding=UTF-8")
                         .setUsername("root")
                         .setPassword("ltb12315")));

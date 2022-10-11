@@ -1,0 +1,46 @@
+{
+  "datasource": {
+    "url": "jdbc:mysql://127.0.0.1:3306/test_db?useAffectedRows=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai",
+    "username": "root",
+    "password": "123456",
+    "driver": "com.mysql.cj.jdbc.Driver"
+  },
+  "select": {
+    "sql": "select * from sys_user a limit ${page.offset},${page.size}",
+    "pageable": true,
+    "pageSize": 20000,
+    "output": {
+      "compress": true,
+      "type": "File",
+      "packages": [],
+      "meta": {
+        "path": "../backup/data",
+        "prefix": "sys_user",
+        "expireDays": 15
+      }
+    }
+  },
+  "insert": {
+    "table": "sys_user",
+    "mapping": [
+    ],
+    "prepare": {
+      "truncate": true,
+      "backup": true,
+      "backupSuffix": "_bak"
+    },
+    "unionMode": false,
+    "batchCount": 2000,
+    "input": {
+      "compress": true,
+      "type": "File",
+      "packages": [],
+      "meta": {
+        "path": "../backup/data",
+        "pattens": [
+          "sys_user+*.x.json*"
+        ]
+      }
+    }
+  }
+}

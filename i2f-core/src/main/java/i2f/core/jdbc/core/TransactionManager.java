@@ -20,31 +20,33 @@ public class TransactionManager {
         private Isolation(int level){
             this.level=level;
         }
-        public int getLevel(){
+
+        public int getLevel() {
             return level;
         }
     }
 
-    private boolean openTrans=false;
+    private boolean keepConnect = false;
 
     private IJdbcMeta meta;
     private Connection conn;
 
-    public boolean isOpenTrans(){
-        return openTrans;
+    public boolean isKeepConnect() {
+        return keepConnect;
     }
 
-    public TransactionManager openTrans(boolean openTrans){
-        this.openTrans=openTrans;
+    public TransactionManager keepConnect(boolean keepConnect) {
+        this.keepConnect = keepConnect;
         return this;
     }
 
     public TransactionManager setMeta(IJdbcMeta meta) throws SQLException {
-        this.meta=meta;
-        this.conn=getConnection();
+        this.meta = meta;
+        this.conn = getConnection();
         return this;
     }
-    public IJdbcMeta getMeta(){
+
+    public IJdbcMeta getMeta() {
         return meta;
     }
     public TransactionManager(IJdbcMeta meta) throws SQLException {

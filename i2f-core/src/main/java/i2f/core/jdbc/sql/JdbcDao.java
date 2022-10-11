@@ -4,7 +4,7 @@ import i2f.core.annotations.remark.Author;
 import i2f.core.jdbc.core.IJdbcMeta;
 import i2f.core.jdbc.core.JdbcProvider;
 import i2f.core.jdbc.core.TransactionManager;
-import i2f.core.jdbc.data.DBResultData;
+import i2f.core.jdbc.data.DBResultList;
 import i2f.core.jdbc.data.PageContextData;
 import i2f.core.jdbc.data.PageMeta;
 import i2f.core.jdbc.sql.consts.Sql;
@@ -40,7 +40,7 @@ public class JdbcDao {
         this.meta = this.transactionManager.getMeta();
     }
 
-    public DBResultData queryNative(String sql) throws SQLException {
+    public DBResultList queryNative(String sql) throws SQLException {
         return provider.query(sql);
     }
 
@@ -60,9 +60,9 @@ public class JdbcDao {
         return provider.update(sql);
     }
 
-    public DBResultData queryAll(String tableName) throws SQLException {
+    public DBResultList queryAll(String tableName) throws SQLException {
         String sql = Appender.builder()
-                .addsSep(" ", Sql.SELECT,"*",Sql.FROM,tableName)
+                .addsSep(" ", Sql.SELECT, "*", Sql.FROM, tableName)
                 .get();
 
         return provider.query(sql);
@@ -91,19 +91,19 @@ public class JdbcDao {
 
     public long countTable(String tableName) throws SQLException {
         String sql = Appender.builder()
-                .addsSep(" ",Sql.SELECT,"count(*)",Sql.FROM,tableName)
+                .addsSep(" ", Sql.SELECT, "count(*)", Sql.FROM, tableName)
                 .get();
-        DBResultData rs = provider.query(sql);
-        return (Long) rs.getData(0, 0);
+        DBResultList rs = provider.query(sql);
+        return rs.getLongValue();
     }
 
-    public DBResultData queryCommon(QueryWrapper wrapper) throws SQLException {
-        BindSql bindSql=wrapper.prepare();
+    public DBResultList queryCommon(QueryWrapper wrapper) throws SQLException {
+        BindSql bindSql = wrapper.prepare();
         return provider.queryRaw(bindSql.sql, bindSql.params);
     }
 
     public long queryCountCommon(QueryWrapper wrapper) throws SQLException {
-        BindSql bindSql=wrapper.prepare();
+        BindSql bindSql = wrapper.prepare();
         String sql = Appender.builder()
                 .addsSep("\n",
                         " select count(*) cnt ",
@@ -112,8 +112,8 @@ public class JdbcDao {
                         " ) tmp ")
                 .get();
 
-        DBResultData rs = provider.queryRaw(sql, bindSql.params);
-        return (Long) rs.getData(0, 0);
+        DBResultList rs = provider.queryRaw(sql, bindSql.params);
+        return rs.getLongValue();
     }
 
     public int deleteCommon(DeleteWrapper wrapper) throws SQLException {
@@ -137,8 +137,8 @@ public class JdbcDao {
     public long insertCommonReturnId(InsertWrapper wrapper) throws SQLException {
         int effecLine = insertCommon(wrapper);
         String sql = "select @@IDENTITY";
-        DBResultData rs = provider.query(sql);
-        Long id = rs.getData(0, 0);
+        DBResultList rs = provider.query(sql);
+        Long id = rs.getLongValue();
         return id;
     }
 

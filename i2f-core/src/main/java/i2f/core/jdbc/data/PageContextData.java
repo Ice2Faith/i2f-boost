@@ -17,7 +17,7 @@ public class PageContextData {
     public String countSql;
     public List<Object> countParams=new ArrayList<>();
     public List<Object> params;
-    public DBResultData data;
+    public DBResultList data;
     public Long count;
     public PageMeta page;
     public PageContextData(String prepareSql, List<Object> params){

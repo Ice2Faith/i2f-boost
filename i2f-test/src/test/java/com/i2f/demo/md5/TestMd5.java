@@ -109,7 +109,7 @@ public class TestMd5 {
     public static IJdbcMeta getMeta(){
         return new IJdbcMeta() {
             @Override
-            public String getDriverClassName() {
+            public String getDriver() {
                 return "com.mysql.cj.jdbc.Driver";
             }
 

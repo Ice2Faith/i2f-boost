@@ -2,7 +2,7 @@ package i2f.core.jdbc.core;
 
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.jdbc.data.DBResultData;
+import i2f.core.jdbc.data.DBResultList;
 import i2f.core.jdbc.data.PageContextData;
 import i2f.core.jdbc.data.PageMeta;
 import i2f.core.jdbc.type.DbType;
@@ -83,15 +83,22 @@ public class PageProvider {
                 throw new SQLException("unsupport auto page route db type");
         }
         prepareCountSql(ctx);
-        if(ctx.countSql!=null){
-            DBResultData rsCount= JdbcProvider.queryRaw(conn,ctx.countSql,ctx.countParams);
-            Long count=rsCount.getData(0,0);
-            ctx.count=count;
+        if(ctx.countSql!=null) {
+            DBResultList rsCount = JdbcProvider.queryRaw(conn, ctx.countSql, ctx.countParams);
+            Long count = rsCount.getLongValue();
+            ctx.count = count;
         }
-        if(ctx.count!=null){
-            if(ctx.count>0L){
-                DBResultData rsData= JdbcProvider.queryRaw(conn,ctx.pageSql,ctx.pageParams);
-                ctx.data=rsData;
+        if (ctx.count != null) {
+            if (ctx.count > 0L) {
+                DBResultList rsData = JdbcProvider.queryRaw(conn, ctx.pageSql, ctx.pageParams);
+                ctx.data = rsData;
+            }
+        }
+        if (ctx.data != null) {
+            ctx.data.setCount(ctx.count);
+            if (ctx.page != null) {
+                ctx.data.setIndex(ctx.page.index);
+                ctx.data.setLimit(ctx.page.size);
             }
         }
         return ctx;

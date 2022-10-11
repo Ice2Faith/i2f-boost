@@ -20,25 +20,27 @@ public class Slf4jPrintStream extends PrintStream {
         TRACE,DEBUG,INFO,WARN,ERROR;
     }
     // logback配置项名称
-    public static final String LOGBACK_CONFIG_PROPERTY_NAME="logging.config";
+    public static final String LOGBACK_CONFIG_PROPERTY_NAME = "logging.config";
     // 初始化时自动获取本类类名
     protected final String selfClassName;
     protected final String selfSimpleName;
     // 被代理的打印流
     protected PrintStream target;
     // 代理流的日志级别
-    protected Slf4jLevel level= Slf4jLevel.INFO;
+    protected Slf4jLevel level = Slf4jLevel.INFO;
     // 被代理流的名称
-    protected String targetName="";
-    protected Logger log= LoggerFactory.getLogger(Slf4jPrintStream.class.getSimpleName());
+    protected String targetName = "";
+    protected Logger log = LoggerFactory.getLogger(Slf4jPrintStream.class.getSimpleName());
+    protected PerfLogger logger = new PerfLogger(log);
     // 是否依旧输出控制台，为true时，在控制台中将会看到两条输出，一条是slf4j,一条是sys.out/sys.err
-    protected boolean keepConsole=false;
+    protected boolean keepConsole = false;
     // 是否启用打印堆栈跟踪，启用后将会跟踪堆栈，找出谁调用了本类进行打印，但是会带来一定的性能问题
     // 但是一般不影响，除非，项目中大量使用System.out进行日志打印
     // 但是，如果项目中已经使用了大量的System.out都能够正常运行，那么替换之后的性能代价也可以忽略
-    protected boolean useTrace=true;
+    protected boolean useTrace = true;
 
-    protected boolean logbackEnv=false;
+    protected boolean logbackEnv = false;
+
     public Slf4jPrintStream(Slf4jLevel level, PrintStream target, String targetName, boolean keepConsole, boolean useTrace) {
         super((OutputStream) new ByteArrayOutputStream());
         selfClassName=getClass().getName();
@@ -94,22 +96,22 @@ public class Slf4jPrintStream extends PrintStream {
     }
 
     // 针对特殊数据做转换
-    protected Object stringify(Object val){
-        if(val==null){
+    protected static Object stringify(Object val) {
+        if (val == null) {
             return val;
         }
-        if(val instanceof byte[]){
-            byte[] data=(byte[])val;
-            try{
-                String str=new String(data);
+        if (val instanceof byte[]) {
+            byte[] data = (byte[]) val;
+            try {
+                String str = new String(data);
                 return str;
-            }catch(Exception e){
+            } catch (Exception e) {
 
             }
-            try{
-                String str=new String(data,"UTF-8");
+            try {
+                String str = new String(data, "UTF-8");
                 return str;
-            }catch(Exception e){
+            } catch (Exception e) {
 
             }
             try{
@@ -126,16 +128,6 @@ public class Slf4jPrintStream extends PrintStream {
         if(vals.length<=0){
             return;
         }
-        String line=null;
-        if(vals.length==1){
-            line=String.valueOf(stringify(vals[0]));
-        }else {
-            StringBuilder builder = new StringBuilder();
-            for (Object item : vals) {
-                builder.append(stringify(item));
-            }
-            line=builder.toString();
-        }
         if(useTrace) {
             StackTraceElement[] stacks = Thread.currentThread().getStackTrace();
             int idx = 0;
@@ -150,26 +142,41 @@ public class Slf4jPrintStream extends PrintStream {
             if (didx >= 0) {
                 traceLocation = traceLocation.substring(didx + 1);
             }
-            traceLocation += "." + stacks[idx].getMethodName()+"."+stacks[idx].getLineNumber();
+            traceLocation += "." + stacks[idx].getMethodName() + "." + stacks[idx].getLineNumber();
 
             log = LoggerFactory.getLogger(selfSimpleName + "." + targetName + "." + traceLocation);
+            logger = new PerfLogger(log);
         }
-        if(level== Slf4jLevel.TRACE){
-            log.trace(line);
-        }else if(level== Slf4jLevel.DEBUG){
-            log.debug(line);
-        }else if(level== Slf4jLevel.INFO){
-            log.info(line);
-        }else if(level== Slf4jLevel.WARN){
-            log.warn(line);
-        }else if(level== Slf4jLevel.ERROR){
-            log.error(line);
+        if (level == Slf4jLevel.TRACE) {
+            logger.trace(Slf4jPrintStream::serializeVals, vals);
+        } else if (level == Slf4jLevel.DEBUG) {
+            logger.debug(Slf4jPrintStream::serializeVals, vals);
+        } else if (level == Slf4jLevel.INFO) {
+            logger.info(Slf4jPrintStream::serializeVals, vals);
+        } else if (level == Slf4jLevel.WARN) {
+            logger.warn(Slf4jPrintStream::serializeVals, vals);
+        } else if (level == Slf4jLevel.ERROR) {
+            logger.error(Slf4jPrintStream::serializeVals, vals);
         }
+    }
+
+    public static Object serializeVals(Object... vals) {
+        String line = null;
+        if (vals.length == 1) {
+            line = String.valueOf(stringify(vals[0]));
+        } else {
+            StringBuilder builder = new StringBuilder();
+            for (Object item : vals) {
+                builder.append(stringify(item));
+            }
+            line = builder.toString();
+        }
+        return line;
     }
 
     @Override
     public void flush() {
-        if(target!=null){
+        if (target != null) {
             target.flush();
         }
     }

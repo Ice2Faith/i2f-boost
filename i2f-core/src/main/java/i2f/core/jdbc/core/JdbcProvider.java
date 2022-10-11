@@ -2,7 +2,7 @@ package i2f.core.jdbc.core;
 
 import i2f.core.annotations.remark.Author;
 import i2f.core.date.DateUtil;
-import i2f.core.jdbc.data.DBResultData;
+import i2f.core.jdbc.data.DBResultList;
 import i2f.core.jdbc.data.PageContextData;
 import i2f.core.jdbc.data.PageMeta;
 import i2f.core.str.Appender;
@@ -10,9 +10,7 @@ import lombok.Data;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author ltb
@@ -48,23 +46,28 @@ public class JdbcProvider {
     }
 
 
-    public JdbcProvider(TransactionManager transactionManager){
-        this.transactionManager=transactionManager;
+    public JdbcProvider(TransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+
+    public JdbcProvider(IJdbcMeta meta) throws SQLException {
+        this.transactionManager = new TransactionManager(meta);
     }
 
     public static void registryDriverClass(String className) throws SQLException {
         try {
             Class.forName(className);
         } catch (ClassNotFoundException e) {
-            throw new SQLException("Db driver class not found, className="+className,e);
+            throw new SQLException("Db driver class not found, className=" + className, e);
         }
     }
+
     public Connection getConnection() throws SQLException {
         return transactionManager.getConnection();
     }
 
     public static Connection getConnection(IJdbcMeta meta) throws SQLException {
-        registryDriverClass(meta.getDriverClassName());
+        registryDriverClass(meta.getDriver());
         Connection conn= DriverManager.getConnection(meta.getUrl(), meta.getUsername(), meta.getPassword());
         return conn;
     }
@@ -83,14 +86,14 @@ public class JdbcProvider {
 
     public boolean execute(String prepareSql, Object ... params) throws SQLException {
         boolean ret= execute(getConnection(),prepareSql,params);
-        if(!transactionManager.isOpenTrans()){
+        if (!transactionManager.isKeepConnect()) {
             transactionManager.close();
         }
         return ret;
     }
     public boolean executeRaw(String prepareSql, List<Object> params) throws SQLException {
         boolean ret= executeRaw(getConnection(),prepareSql,params);
-        if(!transactionManager.isOpenTrans()){
+        if (!transactionManager.isKeepConnect()) {
             transactionManager.close();
         }
         return ret;
@@ -114,14 +117,14 @@ public class JdbcProvider {
 
     public int update(String prepareSql, Object ... params) throws SQLException {
         int ret= update(getConnection(),prepareSql,params);
-        if(!transactionManager.isOpenTrans()){
+        if (!transactionManager.isKeepConnect()) {
             transactionManager.close();
         }
         return ret;
     }
     public int updateRaw(String prepareSql, List<Object> params) throws SQLException {
         int ret= updateRaw(getConnection(),prepareSql,params);
-        if(!transactionManager.isOpenTrans()){
+        if (!transactionManager.isKeepConnect()) {
             transactionManager.close();
         }
         return ret;
@@ -133,52 +136,56 @@ public class JdbcProvider {
         }
         return updateRaw(conn,prepareSql,args);
     }
+
     public static int updateRaw(Connection conn, String prepareSql, List<Object> params) throws SQLException {
-        PreparedStatement stat=PreparedStatementBuilder.makeByList(conn,prepareSql,params);
-        Date date=new Date(System.currentTimeMillis());
-        logout(date,stat,prepareSql,params);
-        int rs= stat.executeUpdate();
-        logout(date,"update result : ",rs);
-        closeRes(null,stat,null);
+        PreparedStatement stat = PreparedStatementBuilder.makeByList(conn, prepareSql, params);
+        Date date = new Date(System.currentTimeMillis());
+        logout(date, stat, prepareSql, params);
+        int rs = stat.executeUpdate();
+        logout(date, "update result : ", rs);
+        closeRes(null, stat, null);
         return rs;
     }
 
-    public DBResultData query(String prepareSql, Object ... params) throws SQLException {
-        DBResultData ret= query(getConnection(),prepareSql,params);
-        if(!transactionManager.isOpenTrans()){
+    public DBResultList query(String prepareSql, Object... params) throws SQLException {
+        DBResultList ret = query(getConnection(), prepareSql, params);
+        if (!transactionManager.isKeepConnect()) {
             transactionManager.close();
         }
         return ret;
     }
-    public DBResultData queryRaw(String prepareSql, List<Object> params) throws SQLException {
-        DBResultData ret= queryRaw(getConnection(),prepareSql,params);
-        if(!transactionManager.isOpenTrans()){
+
+    public DBResultList queryRaw(String prepareSql, List<Object> params) throws SQLException {
+        DBResultList ret = queryRaw(getConnection(), prepareSql, params);
+        if (!transactionManager.isKeepConnect()) {
             transactionManager.close();
         }
         return ret;
     }
-    public static DBResultData query(Connection conn, String prepareSql, Object ... params) throws SQLException {
-        List<Object> args=new ArrayList<>(params.length);
-        for(Object item : params){
+
+    public static DBResultList query(Connection conn, String prepareSql, Object... params) throws SQLException {
+        List<Object> args = new ArrayList<>(params.length);
+        for (Object item : params) {
             args.add(item);
         }
-        return queryRaw(conn,prepareSql,args);
+        return queryRaw(conn, prepareSql, args);
     }
-    public static DBResultData queryRaw(Connection conn, String prepareSql, List<Object> params) throws SQLException {
-        PreparedStatement stat=PreparedStatementBuilder.makeByList(conn,prepareSql,params);
-        Date date=new Date(System.currentTimeMillis());
-        logout(date,stat,prepareSql,params);
-        ResultSet rs= stat.executeQuery();
-        DBResultData ret=parseResultSet(rs);
-        logout(date,"query result : ",ret.getCountRows());
-        closeRes(null,stat,rs);
+
+    public static DBResultList queryRaw(Connection conn, String prepareSql, List<Object> params) throws SQLException {
+        PreparedStatement stat = PreparedStatementBuilder.makeByList(conn, prepareSql, params);
+        Date date = new Date(System.currentTimeMillis());
+        logout(date, stat, prepareSql, params);
+        ResultSet rs = stat.executeQuery();
+        DBResultList ret = DBResultList.of(rs);
+        logout(date, "query result : ", ret.getCount());
+        closeRes(null, stat, rs);
         return ret;
     }
 
 
     public PageContextData page(PageMeta page, String prepareSql, Object ... params) throws SQLException {
         PageContextData ret= page(page,getConnection(),prepareSql,params);
-        if(!transactionManager.isOpenTrans()){
+        if (!transactionManager.isKeepConnect()) {
             transactionManager.close();
         }
         return ret;
@@ -192,7 +199,7 @@ public class JdbcProvider {
     }
     public PageContextData pageRaw(PageMeta page,String prepareSql,List<Object> params) throws SQLException {
         PageContextData ret= pageRaw(page,getConnection(),prepareSql,params);
-        if(!transactionManager.isOpenTrans()){
+        if (!transactionManager.isKeepConnect()) {
             transactionManager.close();
         }
         return ret;
@@ -200,30 +207,5 @@ public class JdbcProvider {
     public static PageContextData pageRaw(PageMeta page,Connection conn,String prepareSql,List<Object> params) throws SQLException {
         return PageProvider.queryPage(page,conn,prepareSql,params);
     }
-    public static DBResultData parseResultSet(ResultSet rs) throws SQLException {
-        List<String> cols=new ArrayList<>(32);
-        List<Map<String,Object>> datas=new ArrayList<>(256);
-        try{
-            ResultSetMetaData meta=rs.getMetaData();
-            int colCount=meta.getColumnCount();
-            for(int i=1;i<=colCount;i++){
-                String colName=meta.getColumnName(i);
-                cols.add(colName);
-            }
-            while(rs.next()){
-                Map<String,Object> row=new HashMap<>();
-                for(int i=1;i<=colCount;i++){
-                    String colName=meta.getColumnName(i);
-                    Object colValue=rs.getObject(colName);
-                    row.put(colName,colValue);
-                }
-                datas.add(row);
-            }
 
-        }catch(Exception e){
-            throw new SQLException("read DataSet error",e);
-        }
-
-        return new DBResultData(cols,datas);
-    }
 }

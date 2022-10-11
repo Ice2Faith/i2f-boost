@@ -10,7 +10,7 @@ import i2f.core.db.impl.DefaultTableMetaFilter;
 import i2f.core.interfaces.IFilter;
 import i2f.core.jdbc.core.JdbcProvider;
 import i2f.core.jdbc.core.TransactionManager;
-import i2f.core.jdbc.data.DBResultData;
+import i2f.core.jdbc.data.DBResultList;
 import i2f.core.jdbc.type.DbType;
 
 import java.sql.*;
@@ -114,20 +114,20 @@ public class DbResolver {
         JdbcProvider provider = new JdbcProvider(new TransactionManager(conn));
         // 由于目前provider的设计上，没有开启事务，则执行一次直接关闭连接，因此使用一个事务
         // 后续provider可能改变策略
-        provider.getTransactionManager().openTrans(true);
+        provider.getTransactionManager().keepConnect(true);
         String connUrl = conn.getMetaData().getURL();
         DbType dbType = DbType.typeOfJdbcUrl(connUrl);
         if (ret.getRemark() == null) {
             // 处理oracle连接获取不到表comment问题
             if (dbType == DbType.ORACLE || dbType == DbType.ORACLE_12C) {
-                DBResultData rd = provider.query("SELECT COMMENTS FROM user_tab_comments WHERE TABLE_NAME = ?", ret.getTable());
-                if (rd.hasData()) {
-                    ret.setRemark(rd.getData(0, 0));
+                DBResultList rd = provider.query("SELECT COMMENTS FROM user_tab_comments WHERE TABLE_NAME = ?", ret.getTable());
+                if (!rd.isEmpty()) {
+                    ret.setRemark(rd.getStringValue());
                 }
-            }else if(dbType==DbType.MYSQL){
-                DBResultData rd=provider.query("select TABLE_COMMENT from information_schema.`TABLES` where TABLE_SCHEMA = ? and TABLE_NAME = ?",ret.getCatalog(),ret.getTable());
-                if (rd.hasData()) {
-                    ret.setRemark(rd.getData(0, 0));
+            }else if(dbType==DbType.MYSQL) {
+                DBResultList rd = provider.query("select TABLE_COMMENT from information_schema.`TABLES` where TABLE_SCHEMA = ? and TABLE_NAME = ?", ret.getCatalog(), ret.getTable());
+                if (!rd.isEmpty()) {
+                    ret.setRemark(rd.getStringValue());
                 }
             }
         }
@@ -144,11 +144,11 @@ public class DbResolver {
             if (ret.getTable() != null && !"".equals(ret.getTable())) {
                 // 处理oracle连接获取不到列comment问题
                 if (dbType == DbType.ORACLE || dbType == DbType.ORACLE_12C) {
-                    DBResultData rd = provider.query("SELECT COLUMN_NAME,COMMENTS FROM user_col_comments WHERE TABLE_NAME = ?", ret.getTable());
+                    DBResultList rd = provider.query("SELECT COLUMN_NAME,COMMENTS FROM user_col_comments WHERE TABLE_NAME = ?", ret.getTable());
                     Map<String, String> columnCommentMap = new HashMap<>();
-                    if (rd.hasData()) {
-                        for (int i = 0; i < rd.getDatas().size(); i++) {
-                            columnCommentMap.put(((String) rd.getData(i, 0)).toLowerCase(), (String) rd.getData(i, 1));
+                    if (!rd.isEmpty()) {
+                        for (int i = 0; i < rd.size(); i++) {
+                            columnCommentMap.put((rd.getStringValue(i, 0)).toLowerCase(), rd.getStringValue(i, 1));
                         }
                     }
                     for (TableColumnMeta item : ret.getColumns()) {
@@ -156,12 +156,12 @@ public class DbResolver {
                             item.setRemark(columnCommentMap.get(item.getName().toLowerCase()));
                         }
                     }
-                }else if(dbType==DbType.MYSQL){
-                    DBResultData rd = provider.query("select COLUMN_NAME,COLUMN_COMMENT from information_schema.`COLUMNS where TABLE_SCHEMA=? and TABLE_NAME =?",ret.getCatalog(), ret.getTable());
+                }else if(dbType==DbType.MYSQL) {
+                    DBResultList rd = provider.query("select COLUMN_NAME,COLUMN_COMMENT from information_schema.`COLUMNS where TABLE_SCHEMA=? and TABLE_NAME =?", ret.getCatalog(), ret.getTable());
                     Map<String, String> columnCommentMap = new HashMap<>();
-                    if (rd.hasData()) {
-                        for (int i = 0; i < rd.getDatas().size(); i++) {
-                            columnCommentMap.put(((String) rd.getData(i, 0)).toLowerCase(), (String) rd.getData(i, 1));
+                    if (!rd.isEmpty()) {
+                        for (int i = 0; i < rd.size(); i++) {
+                            columnCommentMap.put((rd.getStringValue(i, 0)).toLowerCase(), rd.getStringValue(i, 1));
                         }
                     }
                     for (TableColumnMeta item : ret.getColumns()) {
@@ -172,7 +172,7 @@ public class DbResolver {
                 }
             }
         }
-        provider.getTransactionManager().openTrans(false);
+        provider.getTransactionManager().keepConnect(false);
 
         return ret;
     }
