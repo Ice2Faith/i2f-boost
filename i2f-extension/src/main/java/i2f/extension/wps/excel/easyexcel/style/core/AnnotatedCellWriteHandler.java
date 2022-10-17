@@ -80,6 +80,14 @@ public class AnnotatedCellWriteHandler implements CellWriteHandler {
     @Override
     public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<CellData> list, Cell cell, Head head, Integer integer, Boolean aBoolean) {
 
+        try {
+            excelStyleApplyDelegate(writeSheetHolder, writeTableHolder, list, cell, head, integer, aBoolean);
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+    }
+
+    protected void excelStyleApplyDelegate(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<CellData> list, Cell cell, Head head, Integer integer, Boolean aBoolean) {
         Sheet sheet = writeSheetHolder.getSheet();
         Workbook workbook = sheet.getWorkbook();
 
@@ -108,33 +116,56 @@ public class AnnotatedCellWriteHandler implements CellWriteHandler {
             }
         }
 
+
         // 设置单元格样式
         Map<Integer, ExcelStyleCallbackMeta> lineStyle = cellStyle.get(rowIdx);
         if (lineStyle != null) {
             ExcelStyleCallbackMeta writeCellStyle = lineStyle.get(colIdx);
             if (writeCellStyle != null) {
+                resolveSpelExpression(writeCellStyle);
                 WriteCellStyle style = invokeExcelStyleMethod(writeCellStyle, cell, sheet, workbook);
                 if (style != null) {
                     CellStyle cellStyle = StyleUtil.buildHeadCellStyle(workbook, style);
                     cell.setCellStyle(cellStyle);
                 }
+                annotationExcelStyleCellAfterProcess(writeCellStyle, cell, sheet, workbook);
             }
         }
+    }
 
+    public static void resolveSpelExpression(ExcelStyleCallbackMeta meta) {
+        meta.styleEnable = false;
+        if (meta.style == null) {
+            return;
+        }
+
+        String express = meta.style.spel();
+        if (!StringUtils.isEmpty(express)) {
+            meta.styleEnable = StandaloneSpelExpressionResolver.getBool(express, meta);
+        }
+    }
+
+    public static void annotationExcelStyleCellAfterProcess(ExcelStyleCallbackMeta meta, Cell cell, Sheet sheet, Workbook workbook) {
+        if (!meta.styleEnable) {
+            return;
+        }
+        if (meta.style.hyperLink()) {
+            PresetExcelStyles.urlStyle(meta, cell, sheet, workbook);
+        }
+        if (meta.style.rowHeight() > 0) {
+            cell.getRow().setHeightInPoints(meta.style.rowHeight());
+        }
+        if (meta.style.colWidth() > 0) {
+            sheet.setColumnWidth(cell.getColumnIndex(), meta.style.colWidth());
+        }
     }
 
     public static WriteCellStyle invokeExcelStyleMethod(ExcelStyleCallbackMeta meta, Cell cell, Sheet sheet, Workbook workbook) {
         if (meta == null) {
             return null;
         }
-        if (meta.style != null) {
-            String express = meta.style.spel();
-            if (!StringUtils.isEmpty(express)) {
-                boolean match = StandaloneSpelExpressionResolver.getBool(express, meta);
-                if (match) {
-                    return PresetExcelStyles.createCellStyleByAnnotation(meta.style);
-                }
-            }
+        if (meta.styleEnable) {
+            return PresetExcelStyles.createCellStyleByAnnotation(meta.style);
         }
         if (meta.method == null) {
             return null;
@@ -162,7 +193,7 @@ public class AnnotatedCellWriteHandler implements CellWriteHandler {
             }
         } else {
             if (meta.ivkObj == null && meta.clazz != null) {
-//                meta.ivkObj= SpringUtil.getBean(meta.clazz);
+//                meta.ivkObj = SpringUtil.getBean(meta.clazz);
                 if (meta.ivkObj == null) {
                     try {
                         meta.ivkObj = meta.clazz.newInstance();

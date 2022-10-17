@@ -3,10 +3,10 @@ package i2f.extension.wps.excel.easyexcel.style.style;
 import com.alibaba.excel.util.StyleUtil;
 import com.alibaba.excel.write.metadata.style.WriteCellStyle;
 import com.alibaba.excel.write.metadata.style.WriteFont;
-import i2f.extension.wps.excel.easyexcel.style.annotations.ExcelCellStyle;
-import i2f.extension.wps.excel.easyexcel.style.data.ExcelStyleCallbackMeta;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
+import i2f.extension.wps.excel.easyexcel.style.annotations.ExcelCellStyle;
+import i2f.extension.wps.excel.easyexcel.style.data.ExcelStyleCallbackMeta;
 import org.springframework.util.StringUtils;
 
 /**
@@ -46,6 +46,7 @@ public class PresetExcelStyles {
         ret.setBorderTop(ann.borderTop());
         ret.setHorizontalAlignment(ann.alignHorizontal());
         ret.setVerticalAlignment(ann.alignVertical());
+        ret.setWrapped(ann.textWrapped());
         return ret;
     }
 

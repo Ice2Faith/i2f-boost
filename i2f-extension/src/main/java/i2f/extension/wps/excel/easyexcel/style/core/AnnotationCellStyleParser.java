@@ -3,14 +3,15 @@ package i2f.extension.wps.excel.easyexcel.style.core;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.write.metadata.style.WriteCellStyle;
-import i2f.extension.wps.excel.easyexcel.style.annotations.ExcelCellStyle;
-import i2f.extension.wps.excel.easyexcel.style.annotations.ExcelStyle;
-import i2f.extension.wps.excel.easyexcel.style.data.ExcelStyleCallbackMeta;
-import i2f.extension.wps.excel.easyexcel.style.defined.ExcelStyleCallback;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import i2f.extension.wps.excel.easyexcel.style.annotations.ExcelCellStyle;
+import i2f.extension.wps.excel.easyexcel.style.annotations.ExcelStyle;
+import i2f.extension.wps.excel.easyexcel.style.data.ExcelStyleCallbackMeta;
+import i2f.extension.wps.excel.easyexcel.style.defined.ExcelStyleCallback;
+import i2f.extension.wps.excel.easyexcel.style.style.PresetExcelStyles;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -25,6 +26,19 @@ import java.util.*;
  */
 @Slf4j
 public class AnnotationCellStyleParser {
+
+    public static <T> AnnotatedCellWriteHandler parse(Collection<T> list, Class<T> clazz, int offRow, int offCol) {
+        AnnotatedCellWriteHandler handler = new AnnotatedCellWriteHandler();
+
+        try {
+            parseIntoAnnotatedCellWriteHandler(list, clazz, offRow, offCol, handler);
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+
+        return handler;
+    }
+
     public static Map<Field, Class> getAllFields(Class clazz) {
         Map<Field, Class> ret = new LinkedHashMap<>();
         if (clazz == null || Object.class.equals(clazz)) {
@@ -121,6 +135,19 @@ public class AnnotationCellStyleParser {
                 log.debug(e.getMessage());
             }
         }
+        Method method = findStyleProvideMethod(clazz, methodName);
+        if (method != null) {
+            return method;
+        }
+
+        method = findStyleProvideMethod(PresetExcelStyles.class, methodName);
+        if (method != null) {
+            return method;
+        }
+        return null;
+    }
+
+    protected static Method findStyleProvideMethod(Class clazz, String methodName) {
         Method method = getMethod(clazz, methodName, WriteCellStyle.class, ExcelStyleCallbackMeta.class, Cell.class, Sheet.class, Workbook.class);
         if (method != null) {
             return method;
@@ -161,7 +188,6 @@ public class AnnotationCellStyleParser {
         if (method != null) {
             return method;
         }
-
         return null;
     }
 
@@ -234,8 +260,7 @@ public class AnnotationCellStyleParser {
     }
 
 
-    public static <T> AnnotatedCellWriteHandler parse(Collection<T> list, Class<T> clazz, int offRow, int offCol) {
-        AnnotatedCellWriteHandler handler = new AnnotatedCellWriteHandler();
+    public static <T> AnnotatedCellWriteHandler parseIntoAnnotatedCellWriteHandler(Collection<T> list, Class<T> clazz, int offRow, int offCol, AnnotatedCellWriteHandler handler) {
         ExcelFieldBindData[] fields = getExcelFields(clazz);
         // 样式分类
         List<ExcelFieldBindData> rowList = new ArrayList<>();
@@ -296,6 +321,7 @@ public class AnnotationCellStyleParser {
                         meta.clazz = clazz;
                         meta.ivkObj = item;
                         meta.style = bind.cellStyle;
+                        meta.record = item;
                         Map<Integer, ExcelStyleCallbackMeta> rowStyle = handler.getRowStyle();
                         rowStyle.put(rowNum, meta);
                     }
@@ -322,6 +348,7 @@ public class AnnotationCellStyleParser {
                         meta.clazz = clazz;
                         meta.ivkObj = item;
                         meta.style = bind.cellStyle;
+                        meta.record = item;
                         Map<Integer, Map<Integer, ExcelStyleCallbackMeta>> dataStyle = handler.getCellStyle();
                         if (!dataStyle.containsKey(rowNum)) {
                             dataStyle.put(rowNum, new HashMap<>());
@@ -334,8 +361,6 @@ public class AnnotationCellStyleParser {
                 i++;
             }
         }
-
-
-        return handler;
+        return null;
     }
 }

@@ -1,6 +1,7 @@
 package i2f.extension.wps.excel.easyexcel.style.data;
 
 import i2f.extension.wps.excel.easyexcel.style.annotations.ExcelCellStyle;
+import i2f.extension.wps.excel.easyexcel.style.core.SpelEnhancer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -15,6 +16,10 @@ public class ExcelStyleCallbackMeta {
     public int index;
     public Method method;
     public ExcelCellStyle style;
+    public boolean styleEnable = false;
+
+    // for spel
+    public SpelEnhancer tool = new SpelEnhancer();
 
     // args
     public Object record;

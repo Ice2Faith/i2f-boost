@@ -1,10 +1,10 @@
 package i2f.extension.wps.excel.easyexcel.style.defined;
 
 import com.alibaba.excel.write.metadata.style.WriteCellStyle;
-import i2f.extension.wps.excel.easyexcel.style.data.ExcelStyleCallbackMeta;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import i2f.extension.wps.excel.easyexcel.style.data.ExcelStyleCallbackMeta;
 
 /**
  * @author ltb
@@ -13,6 +13,7 @@ import org.apache.poi.ss.usermodel.Workbook;
  */
 @FunctionalInterface
 public interface ExcelStyleCallback {
+
     /**
      * 根据给定的参数对表格样式进行设置
      *

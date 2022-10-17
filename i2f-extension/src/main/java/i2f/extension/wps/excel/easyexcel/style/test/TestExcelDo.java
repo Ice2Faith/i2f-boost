@@ -3,12 +3,12 @@ package i2f.extension.wps.excel.easyexcel.style.test;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.write.metadata.style.WriteCellStyle;
+import lombok.Data;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import i2f.extension.wps.excel.easyexcel.style.annotations.ExcelCellStyle;
 import i2f.extension.wps.excel.easyexcel.style.annotations.ExcelStyle;
 import i2f.extension.wps.excel.easyexcel.style.data.ExcelStyleCallbackMeta;
 import i2f.extension.wps.excel.easyexcel.style.style.PresetExcelStyles;
-import lombok.Data;
-import org.apache.poi.ss.usermodel.IndexedColors;
 
 /**
  * @author ltb
@@ -23,11 +23,11 @@ public class TestExcelDo {
     @ExcelProperty(value = "月份", order = 0)
     private String month;
 
-    @ExcelStyle(col = "com.test.style.PresetExcelStyles.exampleStyle")
+    @ExcelStyle(col = "exampleStyle")
     @ExcelProperty(value = "姓名", order = 10)
     private String name;
 
-    @ExcelStyle(cell = "com.test.style.PresetExcelStyles.urlStyle")
+    @ExcelStyle(cell = "urlStyle")
     @ExcelProperty(value = "照片", order = 20)
     private String photo;
 
@@ -48,11 +48,11 @@ public class TestExcelDo {
         return null;
     }
 
-    @ExcelStyle(cell = "com.test.style.PresetExcelStyles.greenFontStyle")
+    @ExcelStyle(cell = "greenFontStyle")
     @ExcelProperty(value = {"用户统计", "登录"}, order = 40)
     private String loginCount;
 
-    @ExcelStyle(cell = "com.test.style.PresetExcelStyles.blueFontStyle")
+    @ExcelStyle(cell = "blueFontStyle")
     @ExcelProperty(value = {"用户统计", "任务"}, order = 50)
     private String taskCount;
 
@@ -60,6 +60,7 @@ public class TestExcelDo {
     @ExcelProperty(value = {"用户统计", "告警"}, order = 60)
     private String alarmCount;
 
+    @ExcelCellStyle(spel = "#{tool.toInt(val)>1}", fontColor = IndexedColors.ORANGE)
     @ExcelStyle(cellClass = TestStyleCallback.class)
     @ExcelProperty(value = {"最后操作状态"}, order = 70)
     private String lastStatus;

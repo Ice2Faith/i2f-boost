@@ -53,4 +53,12 @@ public @interface ExcelCellStyle {
     HorizontalAlignment alignHorizontal() default HorizontalAlignment.LEFT;
 
     VerticalAlignment alignVertical() default VerticalAlignment.CENTER;
+
+    boolean textWrapped() default false;
+
+    boolean hyperLink() default false;
+
+    float rowHeight() default -1;
+
+    short colWidth() default -1;
 }
