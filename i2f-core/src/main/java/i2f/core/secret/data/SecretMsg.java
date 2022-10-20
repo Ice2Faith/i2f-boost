@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class SecretMsg extends i2f.core.secret.data.SecretHeader {
+public class SecretMsg extends SecretHeader {
     public byte[] msg;
     public byte[] publicKey;
 
-    public i2f.core.secret.data.Base64SecretMsg convert() {
-        i2f.core.secret.data.Base64SecretMsg ret = new i2f.core.secret.data.Base64SecretMsg();
+    public Base64SecretMsg convert() {
+        Base64SecretMsg ret = new Base64SecretMsg();
         ret.randomKey = SecretUtil.toBase64(randomKey);
         ret.nonce = SecretUtil.toBase64(nonce);
         ret.signature = SecretUtil.toBase64(signature);

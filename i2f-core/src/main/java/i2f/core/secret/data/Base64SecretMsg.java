@@ -18,8 +18,8 @@ public class Base64SecretMsg {
     public String msg;
     public String publicKey;
 
-    public i2f.core.secret.data.SecretMsg convert() {
-        i2f.core.secret.data.SecretMsg ret = new i2f.core.secret.data.SecretMsg();
+    public SecretMsg convert() {
+        SecretMsg ret = new SecretMsg();
         ret.randomKey = SecretUtil.parseBase64(randomKey);
         ret.nonce = SecretUtil.parseBase64(nonce);
         ret.signature = SecretUtil.parseBase64(signature);

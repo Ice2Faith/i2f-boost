@@ -10,7 +10,7 @@ import i2f.core.secret.util.SecretUtil;
  * @desc
  */
 public class CacheNoncer implements INoncer {
-    public ICacher _cache = new i2f.core.secret.impl.ram.api.MemCacher();
+    public ICacher _cache = new MemCacher();
     public long nonceTimeoutSecond = 30 * 60;
     public static final byte[] NONCE_HOLDER = new byte[]{32};
 

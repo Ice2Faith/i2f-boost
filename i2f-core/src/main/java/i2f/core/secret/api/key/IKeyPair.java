@@ -7,6 +7,5 @@ package i2f.core.secret.api.key;
  */
 public interface IKeyPair {
     byte[] publicKey();
-
     byte[] privateKey();
 }

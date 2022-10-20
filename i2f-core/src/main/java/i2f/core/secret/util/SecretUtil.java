@@ -21,7 +21,6 @@ import java.util.zip.GZIPOutputStream;
 public class SecretUtil {
     public static final String DEFAULT_CHARSET = "UTF-8";
     public static SecureRandom random = new SecureRandom();
-
     public static byte[] str2utf8(String str) {
         try {
             return str.getBytes(DEFAULT_CHARSET);
@@ -144,7 +143,6 @@ public class SecretUtil {
         baos.close();
         return baos.toByteArray();
     }
-
     public static byte[] gzipUnzipBytes(byte[] data) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ByteArrayInputStream bis = new ByteArrayInputStream(data);

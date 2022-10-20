@@ -7,6 +7,5 @@ package i2f.core.secret.api.encrypt;
  */
 public interface IEncryptor {
     byte[] encrypt(byte[] data);
-
     byte[] decrypt(byte[] data);
 }

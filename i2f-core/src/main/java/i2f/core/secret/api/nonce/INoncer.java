@@ -7,8 +7,6 @@ package i2f.core.secret.api.nonce;
  */
 public interface INoncer {
     byte[] nonce();
-
     boolean pass(byte[] nonce);
-
     void store(byte[] nonce);
 }

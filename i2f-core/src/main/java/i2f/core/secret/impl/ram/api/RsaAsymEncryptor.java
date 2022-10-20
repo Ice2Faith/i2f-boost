@@ -11,16 +11,16 @@ import i2f.core.secret.api.key.IKeyPair;
 public class RsaAsymEncryptor implements IAsymmetricalEncryptor {
     public IKeyPair key;
 
-    public i2f.core.secret.impl.ram.api.RsaProvider rsaProvider = new i2f.core.secret.impl.ram.api.RsaProvider();
+    public RsaProvider rsaProvider = new RsaProvider();
 
     public RsaAsymEncryptor() {
     }
 
-    public RsaAsymEncryptor(i2f.core.secret.impl.ram.api.RsaProvider rsaProvider) {
+    public RsaAsymEncryptor(RsaProvider rsaProvider) {
         this.rsaProvider = rsaProvider;
     }
 
-    public RsaAsymEncryptor(IKeyPair key, i2f.core.secret.impl.ram.api.RsaProvider rsaProvider) {
+    public RsaAsymEncryptor(IKeyPair key, RsaProvider rsaProvider) {
         this.key = key;
         this.rsaProvider = rsaProvider;
     }
