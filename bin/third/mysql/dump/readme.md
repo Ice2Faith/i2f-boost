@@ -3,6 +3,13 @@
 - 借助MySQL提供的 mysqldump+crontable 进行定期的关键表备份
 
 ---
+## 脚本路径
+- 生产
+    - 放在Windows下进行dump
+    - 路径为： G:\mysql8-backup\mysql8-backup-suit
+    - dump的数据路径： G:\db_backup
+
+---
 ## 使用方式
 - 解压本压缩包
 - 你将会得到如下文件树
@@ -71,6 +78,14 @@ mysqldump [-u 用户名] [-p 密码] --single-transaction 数据库名 [... 表�
 ```
 ```shell script
 mysqldump [-u 用户名] [-p 密码] --quick 数据库名 [... 表名] > 文件名
+```
+- 忽略表空间统计
+```shell script
+--no-tablespaces
+```
+- 多行显示insert语句，方便修改
+```shell script
+--skip-extended-insert
 ```
 - 一般情况下推荐的命令
 ```shell script

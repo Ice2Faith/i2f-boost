@@ -25,7 +25,7 @@ goto formatNowDate
 echo ------------ begin %_ret% ------------
 echo backup table %bak_db%.%bak_table% to %bak_file% ...
 
-.\mysql8\mysqldump.exe -h %bak_host% -u%bak_user% -p%bak_password%  --single-transaction --quick %bak_db% %bak_table%  >  %bak_file%
+.\mysql8\mysqldump.exe -h %bak_host% -u%bak_user% -p%bak_password% --no-tablespaces --skip-extended-insert --single-transaction --quick %bak_db% %bak_table%  >  %bak_file%
 
 echo backup done for backup table %bak_db%.%bak_table% to %bak_file%
 set _ret_goto=_next3
