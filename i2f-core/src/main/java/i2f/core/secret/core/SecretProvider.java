@@ -24,16 +24,16 @@ public class SecretProvider {
     public ISymmetricalEncryptor symmetricalEncryptor;
     public IAsymmetricalEncryptor asymmetricalEncryptor;
 
-    public SecretMsg send(byte[] data) throws Exception {
+    public SecretMsg send(byte[] data, IKeyPair otherKeyPair) throws Exception {
         SecretMsg ret = new SecretMsg();
         byte[] key = coder.code();
         ret.publicKey = mineKey.publicKey();
-        ret.randomKey = asymmetricalEncryptor.encrypt(key, mineKey);
+        ret.randomKey = asymmetricalEncryptor.encryptPublicKey(key, otherKeyPair);
         ret.nonce = noncer.nonce();
-        ret.msg = symmetricalEncryptor.encrypt(data, key);
+        ret.msg = symmetricalEncryptor.encryptKey(data, key);
 
         byte[] sign = hash(ret);
-        ret.signature = asymmetricalEncryptor.encrypt(sign, mineKey);
+        ret.signature = asymmetricalEncryptor.encryptKey(sign, mineKey);
 
         return ret;
     }
@@ -42,7 +42,7 @@ public class SecretProvider {
         SecretKeyPair sendKeyPair = new SecretKeyPair(msg.publicKey);
         byte[] sendSign = null;
         try {
-            sendSign = asymmetricalEncryptor.decrypt(msg.signature, sendKeyPair);
+            sendSign = asymmetricalEncryptor.decryptKey(msg.signature, sendKeyPair);
         } catch (Exception e) {
             throw new SecretException("数字签名验证失败");
         }
@@ -59,7 +59,7 @@ public class SecretProvider {
         noncer.store(msg.nonce);
         byte[] key = null;
         try {
-            key = asymmetricalEncryptor.decrypt(msg.randomKey, sendKeyPair);
+            key = asymmetricalEncryptor.decryptPrivateKey(msg.randomKey, mineKey);
         } catch (Exception e) {
             throw new SecretException("密文解析失败");
         }
@@ -68,7 +68,7 @@ public class SecretProvider {
         }
         byte[] data = null;
         try {
-            data = symmetricalEncryptor.decrypt(msg.msg, key);
+            data = symmetricalEncryptor.decryptKey(msg.msg, key);
         } catch (Exception e) {
             throw new SecretException("密文解析失败");
         }
@@ -79,7 +79,9 @@ public class SecretProvider {
     }
 
     public byte[] hash(SecretMsg msg) throws Exception {
-        byte[] sdata = SecretUtil.mergeByteArray(msg.msg, msg.nonce, msg.randomKey);
+        byte[] sdata = SecretUtil.mergeByteArray(SecretUtil.str2utf8(SecretUtil.toBase64(msg.msg)),
+                msg.nonce,
+                SecretUtil.str2utf8(SecretUtil.toBase64(msg.randomKey)));
         byte[] sign = hasher.hash(sdata);
         return sign;
     }

@@ -6,7 +6,7 @@ package i2f.core.secret.api.encrypt;
  * @desc symmetrical 对称的
  */
 public interface ISymmetricalEncryptor extends IEncryptor {
-    byte[] encrypt(byte[] data, byte[] key);
+    byte[] encryptKey(byte[] data, byte[] key);
 
-    byte[] decrypt(byte[] data, byte[] key);
+    byte[] decryptKey(byte[] data, byte[] key);
 }

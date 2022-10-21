@@ -106,14 +106,14 @@
 	- 携带自身公钥mine_pub_key请求对方公钥other_pub_key
 - 发送消息body
 	- 生成随机秘钥key=random.randomKey()【反窃听，防止固定秘钥被解密】
-	- 由随机秘钥key使用自身私钥mine_pri_key用rsa生成消息头random_key=rsa.encrypt(key)【消息体反窃听】
+	- 由随机秘钥key使用对方公钥other_pub_key用rsa生成消息头random_key=rsa.encryptPublicKey(key)【消息体反窃听】
 	- 生成一次性消息头nonce=guid.nextGuid()【反重放】
 	- 使用对称加密aes用key加密body得到msg=aes.encrypt(body)【反窃听】
 	- 计算消息签名send_sign=md5(msg+nonce+random_key)【反篡改】
-	- 计算消息签名,带上数字签名属性，signature=rsa.encrypt(send_sign)【反否认】
+	- 计算消息签名,用自身私钥mine_pri_key加密,带上数字签名属性，signature=rsa.encrypt(send_sign)【反否认】
 	- 发送消息：msg,signature,nonce,random_key
 - 接受消息
-	- 解密发送过来的signature得到send_sign=rsa.decrypt(signature)【反否认，验证数字签名】
+	- 解密发送过来的signature，用对方公钥other_pub_key解密，得到send_sign=rsa.decrypt(signature)【反否认，验证数字签名】
 	- 判断是否解密send_sign是否成功
 		- 如果解密失败，则数字签名验证失败，消息不合法
 	- 如果成功则继续
@@ -124,7 +124,7 @@
 	- 判断nonce是否已经在nonce池中【反重放，验证一次性消息】
 		- 如果已经在，则是重放请求，丢弃消息
 	- 如果不存在则继续
-	- 使用rsa用对方的公钥other_pub_key解密random_key得到key=rsa.decrypt(random_key)【反窃听】
+	- 使用rsa用自身的私钥mine_pri_key解密random_key得到key=rsa.decryptPrivateKey(random_key)【反窃听】
 	- 使用对称加密aes用key解密消息msg得到body=aes.decrypt(msg)【反窃听】
 	- 处理消息体body的内容
 	- 处理完毕之后，按照发送消息顺序，将响应消息返回

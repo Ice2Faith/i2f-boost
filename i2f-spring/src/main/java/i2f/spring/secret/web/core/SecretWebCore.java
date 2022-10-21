@@ -1,16 +1,17 @@
 package i2f.spring.secret.web.core;
 
-
 import i2f.core.j2ee.web.HttpServletRequestProxyWrapper;
 import i2f.core.j2ee.web.HttpServletResponseProxyWrapper;
+import i2f.core.secret.api.key.IKeyPair;
 import i2f.core.secret.core.SecretProvider;
 import i2f.core.secret.data.Base64SecretMsg;
+import i2f.core.secret.data.SecretKeyPair;
 import i2f.core.secret.data.SecretMsg;
 import i2f.core.secret.exception.SecretException;
-import i2f.core.secret.impl.ram.RamSecretProvider;
 import i2f.core.secret.util.SecretUtil;
 import i2f.spring.mapping.MappingUtil;
 import i2f.spring.secret.web.annotations.SecretParams;
+import i2f.spring.secret.web.exception.SecretFilterExceptionHandler;
 import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.ServletInputStream;
@@ -38,9 +39,15 @@ public class SecretWebCore {
     public static final String HEADER_NONCE_KEY = "nonce";
     public static final String HEADER_PUB_KEY = "spk";
 
+    public ThreadLocal<HttpServletRequest> requestHolder = new ThreadLocal<>();
+    public ThreadLocal<HttpServletResponse> responseHolder = new ThreadLocal<>();
+    public ThreadLocal<Base64SecretMsg> secretHeaderHolder = new ThreadLocal<>();
+
+    public SecretFilterExceptionHandler exceptionHandler;
+
     public List<String> whiteList = new ArrayList<>();
 
-    public SecretProvider secretProvider = RamSecretProvider.getInstance(true);
+    public SecretProvider secretProvider;
 
     public static AntPathMatcher antPathMatcher = new AntPathMatcher();
 
@@ -118,6 +125,15 @@ public class SecretWebCore {
         return new HttpServletRequestProxyWrapper(request, msg.msg);
     }
 
+    public Base64SecretMsg parseMsgHeaders(HttpServletRequest request) {
+        Base64SecretMsg ret = new Base64SecretMsg();
+        ret.signature = request.getHeader(HEADER_SIGN_KEY);
+        ret.randomKey = request.getHeader(HEADER_RANDOM_KEY);
+        ret.nonce = request.getHeader(HEADER_NONCE_KEY);
+        ret.publicKey = request.getHeader(HEADER_PUB_KEY);
+        return ret;
+    }
+
     public SecretMsg parseMsg(HttpServletRequest request) throws IOException {
         Base64SecretMsg ret = new Base64SecretMsg();
         ret.signature = request.getHeader(HEADER_SIGN_KEY);
@@ -143,9 +159,11 @@ public class SecretWebCore {
         }
     }
 
-    public SecretMsg secretMsg(HttpServletResponseProxyWrapper response) throws IOException {
+    public SecretMsg secretMsg(HttpServletResponseProxyWrapper response, Base64SecretMsg secretHeader) throws IOException {
         try {
-            return secret().send(response.getBodyBytes());
+            SecretMsg header = secretHeader.convert();
+            IKeyPair key = new SecretKeyPair(header.publicKey);
+            return secret().send(response.getBodyBytes(), key);
         } catch (Exception e) {
             throw new SecretException(e);
         }

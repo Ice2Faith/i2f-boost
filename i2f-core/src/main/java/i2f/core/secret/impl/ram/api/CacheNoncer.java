@@ -34,6 +34,6 @@ public class CacheNoncer implements INoncer {
 
     @Override
     public void store(byte[] nonce) {
-        _cache.set(nonce, NONCE_HOLDER, nonceTimeoutSecond);
+        _cache.setExpire(nonce, NONCE_HOLDER, nonceTimeoutSecond);
     }
 }

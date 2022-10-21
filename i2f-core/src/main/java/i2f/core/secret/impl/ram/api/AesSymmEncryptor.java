@@ -33,7 +33,7 @@ public class AesSymmEncryptor implements ISymmetricalEncryptor {
     }
 
     @Override
-    public byte[] encrypt(byte[] data, byte[] key) {
+    public byte[] encryptKey(byte[] data, byte[] key) {
         try {
             Cipher cipher = getAes(key, Cipher.ENCRYPT_MODE);
             byte[] sdata = cipher.doFinal(data);
@@ -44,7 +44,7 @@ public class AesSymmEncryptor implements ISymmetricalEncryptor {
     }
 
     @Override
-    public byte[] decrypt(byte[] data, byte[] key) {
+    public byte[] decryptKey(byte[] data, byte[] key) {
         try {
             Cipher cipher = getAes(key, Cipher.DECRYPT_MODE);
             byte[] sdata = cipher.doFinal(data);
@@ -56,11 +56,11 @@ public class AesSymmEncryptor implements ISymmetricalEncryptor {
 
     @Override
     public byte[] encrypt(byte[] data) {
-        return encrypt(data, key);
+        return encryptKey(data, key);
     }
 
     @Override
     public byte[] decrypt(byte[] data) {
-        return decrypt(data, key);
+        return decryptKey(data, key);
     }
 }

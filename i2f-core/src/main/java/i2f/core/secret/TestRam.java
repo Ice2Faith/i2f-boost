@@ -6,6 +6,10 @@ import i2f.core.secret.data.SecretMsg;
 import i2f.core.secret.impl.ram.RamSecretProvider;
 import i2f.core.secret.util.SecretUtil;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
 /**
  * @author ltb
  * @date 2022/10/19 18:15
@@ -13,7 +17,19 @@ import i2f.core.secret.util.SecretUtil;
  */
 public class TestRam {
     public static void main(String[] args) throws Exception {
-        SecretProvider ins = RamSecretProvider.getInstance();
+        SecretProvider sender = RamSecretProvider.getInstance();
+
+        SecretProvider recver = RamSecretProvider.getInstance();
+        String rsaKeyPath = "../rsa.key";
+        File file = new File(rsaKeyPath);
+        try {
+            if (file.exists()) {
+                InputStream is = new FileInputStream(file);
+                recver.mineKey = SecretUtil.loadKeyPair(is);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         String msg = "{\n" +
                 "  \"username\": \"aaa\",\n" +
@@ -29,7 +45,7 @@ public class TestRam {
 
         boolean eq = SecretUtil.bytesCompare(data, ldata);
 
-        SecretMsg send = ins.send(data);
+        SecretMsg send = sender.send(data, recver.mineKey);
 
         Base64SecretMsg sendWeb = send.convert();
         System.out.println(sendWeb);
@@ -37,7 +53,7 @@ public class TestRam {
         SecretMsg recvWeb = sendWeb.convert();
         System.out.println(recvWeb);
 
-        byte[] rdata = ins.recv(recvWeb);
+        byte[] rdata = recver.recv(recvWeb);
 
         String str = SecretUtil.utf82str(rdata);
 

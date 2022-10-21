@@ -26,22 +26,32 @@ public class RsaAsymEncryptor implements IAsymmetricalEncryptor {
     }
 
     @Override
-    public byte[] encrypt(byte[] data, IKeyPair key) {
+    public byte[] encryptKey(byte[] data, IKeyPair key) {
         return rsaProvider.encrypt(data, key);
     }
 
     @Override
-    public byte[] decrypt(byte[] data, IKeyPair key) {
+    public byte[] decryptKey(byte[] data, IKeyPair key) {
         return rsaProvider.decrypt(data, key);
     }
 
     @Override
+    public byte[] encryptPublicKey(byte[] data, IKeyPair key) {
+        return rsaProvider.encryptPublicKey(data, key);
+    }
+
+    @Override
+    public byte[] decryptPrivateKey(byte[] data, IKeyPair key) {
+        return rsaProvider.decryptPrivateKey(data, key);
+    }
+
+    @Override
     public byte[] encrypt(byte[] data) {
-        return encrypt(data, key);
+        return encryptKey(data, key);
     }
 
     @Override
     public byte[] decrypt(byte[] data) {
-        return decrypt(data, key);
+        return decryptKey(data, key);
     }
 }

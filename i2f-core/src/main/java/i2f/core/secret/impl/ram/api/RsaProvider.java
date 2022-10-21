@@ -123,4 +123,25 @@ public class RsaProvider {
             throw new SecretException(e);
         }
     }
+
+    public byte[] encryptPublicKey(byte[] data, IKeyPair key) {
+        try {
+            Cipher cipher = rsaCipher();
+            cipher.init(Cipher.ENCRYPT_MODE, adaptRsaKeyPair(key).getPublic());
+            return cipher.doFinal(data);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public byte[] decryptPrivateKey(byte[] data, IKeyPair key) {
+        try {
+            Cipher cipher = rsaCipher();
+            cipher.init(Cipher.DECRYPT_MODE, adaptRsaKeyPair(key).getPrivate());
+            return cipher.doFinal(data);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
 }

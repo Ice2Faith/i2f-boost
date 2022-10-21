@@ -1,7 +1,9 @@
 package i2f.spring.secret.web.filter;
 
 import i2f.core.j2ee.web.HttpServletResponseProxyWrapper;
+import i2f.core.secret.data.Base64SecretMsg;
 import i2f.core.secret.data.SecretMsg;
+import i2f.core.secret.exception.SecretException;
 import i2f.spring.secret.web.annotations.SecretParams;
 import i2f.spring.secret.web.core.SecretWebCore;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ import java.io.IOException;
 @WebFilter(urlPatterns = "/**")
 public class SecretFilter extends OncePerRequestFilter {
 
+
     public SecretWebCore secretWebCore;
 
     public SecretFilter(SecretWebCore secretWebCore) {
@@ -33,8 +36,42 @@ public class SecretFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+
+        Base64SecretMsg secretHeader = secretWebCore.parseMsgHeaders(request);
+        try {
+            secretWebCore.requestHolder.set(request);
+            secretWebCore.responseHolder.set(response);
+            secretWebCore.secretHeaderHolder.set(secretHeader);
+            filterProxy(request, response, chain, secretHeader);
+        } catch (Throwable e) {
+            onFilterException(request, response, e);
+        } finally {
+            secretWebCore.requestHolder.remove();
+            secretWebCore.responseHolder.remove();
+            secretWebCore.secretHeaderHolder.remove();
+
+        }
+
+    }
+
+    protected void onFilterException(HttpServletRequest request, HttpServletResponse response, Throwable e) throws ServletException, IOException {
+        if (secretWebCore.exceptionHandler != null) {
+            secretWebCore.exceptionHandler.handle(request, response, e);
+        } else {
+            throw new SecretException(e);
+        }
+    }
+
+    protected void filterProxy(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Base64SecretMsg secretHeader) throws IOException, ServletException {
+
+        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
+        response.addHeader("Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers"));
+        response.addHeader("Access-Control-Max-Age", "120");
+
         // 白名单内，直接进入
-        if (secretWebCore.isWhiteListMapping(request)) {
+        if (secretWebCore.isWhiteListMapping(request) || request.getMethod().toLowerCase().contains("options")) {
             chain.doFilter(request, response);
             return;
         }
@@ -73,9 +110,8 @@ public class SecretFilter extends OncePerRequestFilter {
         }
 
         // 需要安全输出，处理转换值，重新写会响应
-        SecretMsg ret = secretWebCore.secretMsg((HttpServletResponseProxyWrapper) nextResponse);
+        SecretMsg ret = secretWebCore.secretMsg((HttpServletResponseProxyWrapper) nextResponse, secretHeader);
         secretWebCore.writeMsg(response, ret);
-
     }
 
 

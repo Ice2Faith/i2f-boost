@@ -61,9 +61,9 @@ public class HttpServletRequestProxyWrapper extends HttpServletRequestWrapper {
 
     @Override
     public String getHeader(String name) {
-        String ret= super.getHeader(name);
+        String ret = headers.get(name);
         if(ret==null){
-            ret=headers.get(name);
+            ret = super.getHeader(name);
         }
         return ret;
     }

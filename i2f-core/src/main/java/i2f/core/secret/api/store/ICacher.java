@@ -8,7 +8,7 @@ package i2f.core.secret.api.store;
 public interface ICacher {
     void set(byte[] key, byte[] value);
 
-    void set(byte[] key, byte[] value, long expireSecond);
+    void setExpire(byte[] key, byte[] value, long expireSecond);
 
     byte[] get(byte[] key);
 

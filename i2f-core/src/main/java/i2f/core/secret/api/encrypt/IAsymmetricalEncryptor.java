@@ -8,7 +8,11 @@ import i2f.core.secret.api.key.IKeyPair;
  * @desc asymmetrical 非对称的
  */
 public interface IAsymmetricalEncryptor extends IEncryptor {
-    byte[] encrypt(byte[] data, IKeyPair key);
+    byte[] encryptKey(byte[] data, IKeyPair key);
 
-    byte[] decrypt(byte[] data, IKeyPair key);
+    byte[] decryptKey(byte[] data, IKeyPair key);
+
+    byte[] encryptPublicKey(byte[] data, IKeyPair key);
+
+    byte[] decryptPrivateKey(byte[] data, IKeyPair key);
 }

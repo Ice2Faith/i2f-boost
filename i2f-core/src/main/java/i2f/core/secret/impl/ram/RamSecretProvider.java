@@ -13,14 +13,14 @@ public class RamSecretProvider {
     }
 
     public static SecretProvider getInstance() {
-        return getInstance(false, 1024, 16);
+        return getCustomInstance(false, 1024, 16);
     }
 
-    public static SecretProvider getInstance(boolean usePkcs1) {
-        return getInstance(usePkcs1, 1024, 16);
+    public static SecretProvider getPkcs1Instance(boolean usePkcs1) {
+        return getCustomInstance(usePkcs1, 1024, 16);
     }
 
-    public static SecretProvider getInstance(boolean usePkcs1, int rsaKeyLen, int aesKeyLen) {
+    public static SecretProvider getCustomInstance(boolean usePkcs1, int rsaKeyLen, int aesKeyLen) {
         SecretProvider ret = new SecretProvider();
         RsaProvider rsa = new RsaProvider(usePkcs1);
         ret.mineKey = rsa.adaptRsaKeyPair(rsa.makeRsaKey(rsaKeyLen));

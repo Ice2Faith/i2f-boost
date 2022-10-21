@@ -43,7 +43,7 @@ public class MemCacher implements ICacher {
     }
 
     @Override
-    public void set(byte[] key, byte[] value, long expireSecond) {
+    public void setExpire(byte[] key, byte[] value, long expireSecond) {
         _map.put(keyOf(key), value);
         executor.schedule(new Runnable() {
             @Override

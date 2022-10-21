@@ -20,11 +20,21 @@ public class Base64SecretMsg {
 
     public SecretMsg convert() {
         SecretMsg ret = new SecretMsg();
-        ret.randomKey = SecretUtil.parseBase64(randomKey);
-        ret.nonce = SecretUtil.parseBase64(nonce);
-        ret.signature = SecretUtil.parseBase64(signature);
-        ret.msg = SecretUtil.parseBase64(msg);
-        ret.publicKey = SecretUtil.parseBase64(publicKey);
+        if (randomKey != null) {
+            ret.randomKey = SecretUtil.parseBase64(SecretUtil.descapeBase64(randomKey));
+        }
+        if (nonce != null) {
+            ret.nonce = SecretUtil.parseBase64(SecretUtil.descapeBase64(nonce));
+        }
+        if (signature != null) {
+            ret.signature = SecretUtil.parseBase64(SecretUtil.descapeBase64(signature));
+        }
+        if (msg != null) {
+            ret.msg = SecretUtil.parseBase64(msg);
+        }
+        if (publicKey != null) {
+            ret.publicKey = SecretUtil.parseBase64(SecretUtil.descapeBase64(publicKey));
+        }
 
         return ret;
     }
