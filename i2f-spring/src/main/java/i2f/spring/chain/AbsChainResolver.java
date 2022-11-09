@@ -22,15 +22,19 @@ public abstract class AbsChainResolver implements IChainResolver {
     }
 
     @Override
+    public void next(Object action, Object params, boolean async, boolean await, ExecutorService pool, ChainContext context) {
+        ChainManager.dispatch(this, action, params, async, await, pool, context);
+    }
+
     public void next(Object action, Object params, boolean async, boolean await, ExecutorService pool) {
-        ChainManager.dispatch(this, action, params, async, await, pool);
+        ChainManager.dispatch(this, action, params, async, await, pool, null);
     }
 
     public void next(Object action, Object params, boolean async, boolean await) {
-        ChainManager.dispatch(this, action, params, async, await, null);
+        ChainManager.dispatch(this, action, params, async, await, null, null);
     }
 
     public void next(Object action, Object params) {
-        ChainManager.dispatch(this, action, params, false, false, null);
+        ChainManager.dispatch(this, action, params, false, false, null, null);
     }
 }

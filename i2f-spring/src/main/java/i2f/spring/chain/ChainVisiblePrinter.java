@@ -1,6 +1,8 @@
 package i2f.spring.chain;
 
+import i2f.core.safe.Null;
 import i2f.spring.context.SpringUtil;
+import i2f.spring.filter.WhiteFilter;
 import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
@@ -19,8 +21,12 @@ public class ChainVisiblePrinter {
     }
 
     public static <T extends IChainResolver> String getChainTreeAsString(Class<T> rootClass) {
+        return getChainTreeAsString(rootClass, null);
+    }
+
+    public static <T extends IChainResolver> String getChainTreeAsString(Class<T> rootClass, ChainContext chainContext) {
         ApplicationContext context = SpringUtil.getApplicationContext();
-        List<TreeNode<Class>> tree = getChainTree(context, rootClass);
+        List<TreeNode<Class>> tree = getChainTree(context, rootClass, chainContext);
         StringBuilder sb = new StringBuilder();
         getChainTreeAsString(sb, tree);
         return sb.toString();
@@ -48,22 +54,27 @@ public class ChainVisiblePrinter {
     }
 
     public static List<TreeNode<Class>> getChainTree(ApplicationContext context) {
-        return getChainTree(context, null);
+        return getChainTree(context, null, null);
     }
 
     public static <T extends IChainResolver> List<TreeNode<Class>> getChainTree(ApplicationContext context, Class<T> rootClass) {
+        return getChainTree(context, rootClass, null);
+    }
+
+    public static <T extends IChainResolver> List<TreeNode<Class>> getChainTree(ApplicationContext context, Class<T> rootClass, ChainContext chainContext) {
         Map<String, IChainResolver> beans = context.getBeansOfType(IChainResolver.class);
+
         TreeNode<Class> node = new TreeNode<>();
         node.data = rootClass;
         node.level = 0;
-        node.children = getChainTreeNext(node.data, node.level + 1, beans);
+        node.children = getChainTreeNext(node.data, node.level + 1, beans, chainContext);
 
         List<TreeNode<Class>> children = new ArrayList<>();
         children.add(node);
         return children;
     }
 
-    private static List<TreeNode<Class>> getChainTreeNext(Class<? extends IChainResolver> root, int level, Map<String, IChainResolver> beans) {
+    private static List<TreeNode<Class>> getChainTreeNext(Class<? extends IChainResolver> root, int level, Map<String, IChainResolver> beans, ChainContext chainContext) {
         List<TreeNode<Class>> ret = new ArrayList<>();
         for (Map.Entry<String, IChainResolver> item : beans.entrySet()) {
             IChainResolver val = item.getValue();
@@ -85,11 +96,14 @@ public class ChainVisiblePrinter {
                 TreeNode<Class> node = new TreeNode<>();
                 node.data = val.getClass();
                 node.level = level;
-                node.children = getChainTreeNext(node.data, node.level + 1, beans);
+                node.children = getChainTreeNext(node.data, node.level + 1, beans, chainContext);
                 ret.add(node);
             }
         }
-        return ret;
+        return WhiteFilter.antPkgFilter(new ArrayList<>(), ret,
+                Null.get(chainContext, ChainContext::getIncludesResolver),
+                Null.get(chainContext, ChainContext::getExcludesResolver),
+                (elem) -> elem.data.getName());
     }
 
 }

@@ -2,6 +2,7 @@ package i2f.spring.chain.impl;
 
 import i2f.spring.chain.AbsChainResolver;
 import i2f.spring.chain.ChainAction;
+import i2f.spring.chain.ChainContext;
 import i2f.spring.chain.IChainResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class TestBtAChainResolver extends AbsChainResolver {
     }
 
     @Override
-    public void task(IChainResolver parent, Object action, Object params) {
+    public void task(IChainResolver parent, Object action, Object params, ChainContext chainContext) {
         log.info(this.getClass().getSimpleName() + ":task:" + params);
         next(ChainAction.AFTER, "[" + this.getClass().getSimpleName() + ":ret]", true, false, null);
     }
