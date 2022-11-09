@@ -4,9 +4,9 @@ import i2f.core.data.Pair;
 import i2f.core.jdbc.sql.consts.Sql;
 import i2f.core.jdbc.sql.core.DbFinder;
 import i2f.core.lambda.Lambdas;
-import i2f.core.lambda.funcs.IBuilder;
-import i2f.core.lambda.funcs.IGetter;
-import i2f.core.lambda.funcs.ISetter;
+import i2f.core.lambda.functional.preset.IBeanBuilder;
+import i2f.core.lambda.functional.preset.IBeanGetter;
+import i2f.core.lambda.functional.preset.IBeanSetter;
 import i2f.core.str.Appender;
 
 import java.util.ArrayList;
@@ -49,26 +49,31 @@ public class SelectWrapper<N> implements INextWrapper<N> {
         cols.add(new Pair<>(colName,colAs));
         return this;
     }
-    public SelectWrapper<N> col(String colName){
-        return col(colName,colName);
+
+    public SelectWrapper<N> col(String colName) {
+        return col(colName, colName);
     }
-    public<T,R> SelectWrapper<N> col(IGetter<T,R> getter){
+
+    public <T, R> SelectWrapper<N> col(IBeanGetter<T, R> getter) {
         String colName = DbFinder.dbFieldName(getter);
-        String fieldName= Lambdas.fieldName(getter);
-        return col(colName,fieldName);
+        String fieldName = Lambdas.fieldName(getter);
+        return col(colName, fieldName);
     }
-    public<T,V1> SelectWrapper<N> col(ISetter<T,V1> setter){
+
+    public <T, V1> SelectWrapper<N> col(IBeanSetter<T, V1> setter) {
         String colName = DbFinder.dbFieldName(setter);
-        String fieldName= Lambdas.fieldName(setter);
-        return col(colName,fieldName);
+        String fieldName = Lambdas.fieldName(setter);
+        return col(colName, fieldName);
     }
-    public<T,R,V1> SelectWrapper<N> col(IBuilder<T,R,V1> builder){
+
+    public <R, T, V1> SelectWrapper<N> col(IBeanBuilder<R, T, V1> builder) {
         String colName = DbFinder.dbFieldName(builder);
-        String fieldName= Lambdas.fieldName(builder);
-        return col(colName,fieldName);
+        String fieldName = Lambdas.fieldName(builder);
+        return col(colName, fieldName);
     }
-    public SelectWrapper<N> cols(String ... cols){
-        for(String item : cols){
+
+    public SelectWrapper<N> cols(String... cols) {
+        for (String item : cols) {
             col(item);
         }
         return this;

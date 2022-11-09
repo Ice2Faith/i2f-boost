@@ -40,7 +40,7 @@ public interface IChainResolver {
      * @param params 参数，可能为空，不传递参数
      * @return
      */
-    void task(IChainResolver parent, Object action, Object params);
+    void task(IChainResolver parent, Object action, Object params, ChainContext context);
 
     /**
      * 执行这个处理器
@@ -48,6 +48,6 @@ public interface IChainResolver {
      * @param action 触发链式的动作或目的
      * @param params 参数，可能为空，取决于本执行器的task返回值
      */
-    void next(Object action, Object params, boolean async, boolean await, ExecutorService pool);
+    void next(Object action, Object params, boolean async, boolean await, ExecutorService pool, ChainContext context);
 
 }

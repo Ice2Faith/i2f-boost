@@ -1,7 +1,7 @@
 package i2f.core.lambda.condition;
 
 import i2f.core.lambda.Lambdas;
-import i2f.core.lambda.funcs.IGetter;
+import i2f.core.lambda.functional.preset.IBeanGetter;
 
 import java.util.*;
 
@@ -162,22 +162,22 @@ public class Conditions {
         return cond(decide, this.link, this.prefix, column, this.oper, value);
     }
 
-    public <T, R> Conditions cond(boolean decide, Object link, Object prefix, IGetter<T, R> column, Object oper, Object value) {
+    public <T, R> Conditions cond(boolean decide, Object link, Object prefix, IBeanGetter<T, R> column, Object oper, Object value) {
         String columnName = Lambdas.fieldName(column);
         return cond(decide, link, prefix, columnName, oper, value);
     }
 
-    public <T, R> Conditions cond(boolean decide, Object link, IGetter<T, R> column, Object oper, Object value) {
+    public <T, R> Conditions cond(boolean decide, Object link, IBeanGetter<T, R> column, Object oper, Object value) {
         String columnName = Lambdas.fieldName(column);
         return cond(decide, link, columnName, oper, value);
     }
 
-    public <T, R> Conditions cond(boolean decide, IGetter<T, R> column, Object oper, Object value) {
+    public <T, R> Conditions cond(boolean decide, IBeanGetter<T, R> column, Object oper, Object value) {
         String columnName = Lambdas.fieldName(column);
         return cond(decide, columnName, oper, value);
     }
 
-    public <T, R> Conditions cond(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions cond(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return cond(decide, columnName, value);
     }
@@ -298,112 +298,112 @@ public class Conditions {
         return cond(decide, column, CondOper.NOT_EXISTS, value);
     }
 
-    public <T, R> Conditions eq(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions eq(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return eq(decide, columnName, value);
     }
 
-    public <T, R> Conditions neq(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions neq(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return neq(decide, columnName, value);
     }
 
-    public <T, R> Conditions gt(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions gt(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return gt(decide, columnName, value);
     }
 
-    public <T, R> Conditions lt(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions lt(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return lt(decide, columnName, value);
     }
 
-    public <T, R> Conditions gte(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions gte(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return gte(decide, columnName, value);
     }
 
-    public <T, R> Conditions lte(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions lte(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return lte(decide, columnName, value);
     }
 
-    public <T, R> Conditions in(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions in(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return in(decide, columnName, value);
     }
 
-    public <T, R> Conditions in(boolean decide, IGetter<T, R> column, Object... values) {
+    public <T, R> Conditions in(boolean decide, IBeanGetter<T, R> column, Object... values) {
         String columnName = Lambdas.fieldName(column);
         return in(decide, columnName, values);
     }
 
-    public <T, R> Conditions in(boolean decide, IGetter<T, R> column, Collection<?> values) {
+    public <T, R> Conditions in(boolean decide, IBeanGetter<T, R> column, Collection<?> values) {
         String columnName = Lambdas.fieldName(column);
         return in(decide, columnName, values);
     }
 
-    public <T, R> Conditions in(boolean decide, IGetter<T, R> column, Iterable<?> iterable) {
+    public <T, R> Conditions in(boolean decide, IBeanGetter<T, R> column, Iterable<?> iterable) {
         String columnName = Lambdas.fieldName(column);
         return in(decide, columnName, iterable);
     }
 
-    public <T, R> Conditions in(boolean decide, IGetter<T, R> column, Enumeration<?> enumeration) {
+    public <T, R> Conditions in(boolean decide, IBeanGetter<T, R> column, Enumeration<?> enumeration) {
         String columnName = Lambdas.fieldName(column);
         return in(decide, columnName, enumeration);
     }
 
-    public <T, R> Conditions like(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions like(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return like(decide, columnName, value);
     }
 
-    public <T, R> Conditions between(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions between(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return between(decide, columnName, value);
     }
 
-    public <T, R> Conditions between(boolean decide, IGetter<T, R> column, Object low, Object high) {
+    public <T, R> Conditions between(boolean decide, IBeanGetter<T, R> column, Object low, Object high) {
         String columnName = Lambdas.fieldName(column);
         return between(decide, columnName, low, high);
     }
 
-    public <T, R> Conditions exists(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions exists(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return exists(decide, columnName, value);
     }
 
-    public <T, R> Conditions nin(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions nin(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return nin(decide, columnName, value);
     }
 
-    public <T, R> Conditions nin(boolean decide, IGetter<T, R> column, Object... values) {
+    public <T, R> Conditions nin(boolean decide, IBeanGetter<T, R> column, Object... values) {
         String columnName = Lambdas.fieldName(column);
         return nin(decide, columnName, values);
     }
 
-    public <T, R> Conditions nin(boolean decide, IGetter<T, R> column, Collection<?> values) {
+    public <T, R> Conditions nin(boolean decide, IBeanGetter<T, R> column, Collection<?> values) {
         String columnName = Lambdas.fieldName(column);
         return nin(decide, columnName, values);
     }
 
-    public <T, R> Conditions nin(boolean decide, IGetter<T, R> column, Iterable<?> iterable) {
+    public <T, R> Conditions nin(boolean decide, IBeanGetter<T, R> column, Iterable<?> iterable) {
         String columnName = Lambdas.fieldName(column);
         return nin(decide, columnName, iterable);
     }
 
-    public <T, R> Conditions nin(boolean decide, IGetter<T, R> column, Enumeration<?> enumeration) {
+    public <T, R> Conditions nin(boolean decide, IBeanGetter<T, R> column, Enumeration<?> enumeration) {
         String columnName = Lambdas.fieldName(column);
         return nin(decide, columnName, enumeration);
     }
 
-    public <T, R> Conditions nlike(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions nlike(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return nlike(decide, columnName, value);
     }
 
-    public <T, R> Conditions nexists(boolean decide, IGetter<T, R> column, Object value) {
+    public <T, R> Conditions nexists(boolean decide, IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return nexists(decide, columnName, value);
     }
@@ -425,17 +425,17 @@ public class Conditions {
         return cond(true, column, value);
     }
 
-    public <T, R> Conditions cond(Object link, IGetter<T, R> column, Object oper, Object value) {
+    public <T, R> Conditions cond(Object link, IBeanGetter<T, R> column, Object oper, Object value) {
         String columnName = Lambdas.fieldName(column);
         return cond(link, columnName, oper, value);
     }
 
-    public <T, R> Conditions cond(IGetter<T, R> column, Object oper, Object value) {
+    public <T, R> Conditions cond(IBeanGetter<T, R> column, Object oper, Object value) {
         String columnName = Lambdas.fieldName(column);
         return cond(columnName, oper, value);
     }
 
-    public <T, R> Conditions cond(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions cond(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return cond(columnName, value);
     }
@@ -530,112 +530,112 @@ public class Conditions {
     }
 
 
-    public <T, R> Conditions eq(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions eq(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return eq(columnName, value);
     }
 
-    public <T, R> Conditions neq(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions neq(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return neq(columnName, value);
     }
 
-    public <T, R> Conditions gt(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions gt(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return gt(columnName, value);
     }
 
-    public <T, R> Conditions lt(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions lt(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return lt(columnName, value);
     }
 
-    public <T, R> Conditions gte(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions gte(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return gte(columnName, value);
     }
 
-    public <T, R> Conditions lte(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions lte(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return lte(columnName, value);
     }
 
-    public <T, R> Conditions in(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions in(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return in(columnName, value);
     }
 
-    public <T, R> Conditions in(IGetter<T, R> column, Object... values) {
+    public <T, R> Conditions in(IBeanGetter<T, R> column, Object... values) {
         String columnName = Lambdas.fieldName(column);
         return in(columnName, values);
     }
 
-    public <T, R> Conditions in(IGetter<T, R> column, Collection<?> values) {
+    public <T, R> Conditions in(IBeanGetter<T, R> column, Collection<?> values) {
         String columnName = Lambdas.fieldName(column);
         return in(columnName, values);
     }
 
-    public <T, R> Conditions in(IGetter<T, R> column, Iterable<?> iterable) {
+    public <T, R> Conditions in(IBeanGetter<T, R> column, Iterable<?> iterable) {
         String columnName = Lambdas.fieldName(column);
         return in(columnName, iterable);
     }
 
-    public <T, R> Conditions in(IGetter<T, R> column, Enumeration<?> enumeration) {
+    public <T, R> Conditions in(IBeanGetter<T, R> column, Enumeration<?> enumeration) {
         String columnName = Lambdas.fieldName(column);
         return in(columnName, enumeration);
     }
 
-    public <T, R> Conditions like(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions like(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return like(columnName, value);
     }
 
-    public <T, R> Conditions between(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions between(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return between(columnName, value);
     }
 
-    public <T, R> Conditions between(IGetter<T, R> column, Object low, Object high) {
+    public <T, R> Conditions between(IBeanGetter<T, R> column, Object low, Object high) {
         String columnName = Lambdas.fieldName(column);
         return between(columnName, low, high);
     }
 
-    public <T, R> Conditions exists(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions exists(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return exists(columnName, value);
     }
 
-    public <T, R> Conditions nin(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions nin(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return nin(columnName, value);
     }
 
-    public <T, R> Conditions nin(IGetter<T, R> column, Object... values) {
+    public <T, R> Conditions nin(IBeanGetter<T, R> column, Object... values) {
         String columnName = Lambdas.fieldName(column);
         return nin(columnName, values);
     }
 
-    public <T, R> Conditions nin(IGetter<T, R> column, Collection<?> values) {
+    public <T, R> Conditions nin(IBeanGetter<T, R> column, Collection<?> values) {
         String columnName = Lambdas.fieldName(column);
         return nin(columnName, values);
     }
 
-    public <T, R> Conditions nin(IGetter<T, R> column, Iterable<?> iterable) {
+    public <T, R> Conditions nin(IBeanGetter<T, R> column, Iterable<?> iterable) {
         String columnName = Lambdas.fieldName(column);
         return nin(columnName, iterable);
     }
 
-    public <T, R> Conditions nin(IGetter<T, R> column, Enumeration<?> enumeration) {
+    public <T, R> Conditions nin(IBeanGetter<T, R> column, Enumeration<?> enumeration) {
         String columnName = Lambdas.fieldName(column);
         return nin(columnName, enumeration);
     }
 
-    public <T, R> Conditions nlike(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions nlike(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return nlike(columnName, value);
     }
 
-    public <T, R> Conditions nexists(IGetter<T, R> column, Object value) {
+    public <T, R> Conditions nexists(IBeanGetter<T, R> column, Object value) {
         String columnName = Lambdas.fieldName(column);
         return nexists(columnName, value);
     }

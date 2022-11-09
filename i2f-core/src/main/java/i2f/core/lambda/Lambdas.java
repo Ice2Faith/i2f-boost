@@ -1,184 +1,569 @@
 package i2f.core.lambda;
 
 import i2f.core.exception.BoostException;
-import i2f.core.lambda.funcs.IBuilder;
-import i2f.core.lambda.funcs.IGetter;
-import i2f.core.lambda.funcs.ISetter;
-import i2f.core.lambda.funcs.core.*;
+import i2f.core.lambda.functional.IFunction;
+import i2f.core.lambda.functional.consumer.*;
+import i2f.core.lambda.functional.provider.*;
 
 import java.io.Serializable;
 import java.lang.invoke.SerializedLambda;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * @author ltb
- * @date 2022/5/17 14:37
- * @desc 直接通过引用方法方式获取方法名或对应的字段名
- * System.out.println(Lambdas.fieldName(SysUser::getAvatar));
- * System.out.println(Lambdas.methodName(SysUser::toString));
- * 结果：
- * avatar
- * toString
+ * @date 2022/11/9 12:49
+ * @desc
  */
 public class Lambdas {
 
-    /**
-     * 通过getter的方法引用获取字段名
-     */
-    public static <T,R> String fieldName(IGetter<T,R> fn)  {
-        return trimPrefixAndFirstLower(fn,"get","is");
+    public static String path2className(String path) {
+        return path.replaceAll("/", ".").replaceAll("\\\\", ".");
+    }
+
+    public static Method implMethod(SerializedLambda lambda) {
+        try {
+            String implClassName = path2className(lambda.getImplClass());
+            Class implClass = Class.forName(implClassName);
+            Method implMethod = findMethodBySignature(implClass,
+                    lambda.getImplMethodName(),
+                    lambda.getImplMethodSignature());
+            return implMethod;
+        } catch (Exception e) {
+            throw new BoostException(e.getMessage(), e);
+        }
+    }
+
+    public static Field implBindField(SerializedLambda lambda) {
+        try {
+            String implClassName = path2className(lambda.getImplClass());
+            Class implClass = Class.forName(implClassName);
+            String fieldName = fieldNameByMethodName(lambda.getImplMethodName());
+            return findFieldByName(implClass, fieldName);
+        } catch (Exception e) {
+            throw new BoostException(e.getMessage(), e);
+        }
+    }
+
+    public static String methodName(SerializedLambda lambda) {
+        return lambda.getImplMethodName();
+    }
+
+    public static String fieldName(SerializedLambda lambda) {
+        return fieldNameByMethodName(lambda.getImplMethodName());
     }
 
     /**
-     * 通过setter的方法引用获取字段名
+     * 字符串首字母转小写
      */
-    public static <T,V> String fieldName(ISetter<T,V> fn)  {
-        return trimPrefixAndFirstLower(fn,"set");
+    public static String firstLower(String field) {
+        return field.substring(0, 1).toLowerCase() + field.substring(1);
     }
 
-    /**
-     * 通过builder的方法引用获取字段名
-     */
-    public static <T, R,V> String fieldName(IBuilder<T,R,V> fn)  {
-        return trimPrefixAndFirstLower(fn,"set","build","add");
-    }
-    public static String fieldGetter(String methodName){
-        return trimPrefixAndFirstLower(methodName,"get","is");
-    }
-
-    public static String fieldSetter(String methodName){
-        return trimPrefixAndFirstLower(methodName,"set","build","add");
-    }
-
-    public static String trimPrefixAndFirstLower(ILambdaArgs fn,String ... prefixes)  {
-        String name=trimPrefix(fn,prefixes);
-        return firstLower(name);
-    }
-    public static String trimPrefixAndFirstLower(String name,String ... prefixes)  {
-        name=trimPrefix(name,prefixes);
-        return firstLower(name);
-    }
-
-    public static String trimPrefix(ILambdaArgs fn,String ... prefixes)  {
-        String name=methodNameProxy(fn);
-        return trimPrefix(name,prefixes);
-    }
-    public static String trimPrefix(String name,String ... prefixes)  {
-        for(String item : prefixes){
-            if(name.startsWith(item)){
-                name=name.substring(item.length());
+    public static String trimPrefix(String name, String... prefixes) {
+        for (String item : prefixes) {
+            if (name.startsWith(item)) {
+                name = name.substring(item.length());
                 break;
             }
         }
         return name;
     }
 
-    ///////////////////////////////////////////////////////////
-
-    public static<T,R> String methodName(ILambdaArgs0<T,R> fn)  {
-        return methodNameProxy(fn);
+    public static String fieldNameByMethodName(String methodName) {
+        String fieldName = trimPrefix(methodName, "get", "set", "is", "with", "build");
+        return firstLower(fieldName);
     }
 
-    public static<T,R,V1> String methodName(ILambdaArgs1<T,R,V1> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,R,V1,V2> String methodName(ILambdaArgs2<T,R,V1,V2> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,R,V1,V2,V3> String methodName(ILambdaArgs3<T,R,V1,V2,V3> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,R,V1,V2,V3,V4> String methodName(ILambdaArgs4<T,R,V1,V2,V3,V4> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,R,V1,V2,V3,V4,V5> String methodName(ILambdaArgs5<T,R,V1,V2,V3,V4,V5> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,R,V1,V2,V3,V4,V5,V6> String methodName(ILambdaArgs6<T,R,V1,V2,V3,V4,V5,V6> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,R,V1,V2,V3,V4,V5,V6,V7> String methodName(ILambdaArgs7<T,R,V1,V2,V3,V4,V5,V6,V7> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,R,V1,V2,V3,V4,V5,V6,V7,V8> String methodName(ILambdaArgs8<T,R,V1,V2,V3,V4,V5,V6,V7,V8> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,R,V1,V2,V3,V4,V5,V6,V7,V8,V9> String methodName(ILambdaArgs9<T,R,V1,V2,V3,V4,V5,V6,V7,V8,V9> fn)  {
-        return methodNameProxy(fn);
-    }
-
-
-    ///////////////////////////////////////////
-
-    public static<T> String methodName(ILambdaArgsVoid0<T> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,V1> String methodName(ILambdaArgsVoid1<T,V1> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,V1,V2> String methodName(ILambdaArgsVoid2<T,V1,V2> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,V1,V2,V3> String methodName(ILambdaArgsVoid3<T,V1,V2,V3> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,V1,V2,V3,V4> String methodName(ILambdaArgsVoid4<T,V1,V2,V3,V4> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,V1,V2,V3,V4,V5> String methodName(ILambdaArgsVoid5<T,V1,V2,V3,V4,V5> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,V1,V2,V3,V4,V5,V6> String methodName(ILambdaArgsVoid6<T,V1,V2,V3,V4,V5,V6> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,V1,V2,V3,V4,V5,V6,V7> String methodName(ILambdaArgsVoid7<T,V1,V2,V3,V4,V5,V6,V7> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,V1,V2,V3,V4,V5,V6,V7,V8> String methodName(ILambdaArgsVoid8<T,V1,V2,V3,V4,V5,V6,V7,V8> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    public static<T,V1,V2,V3,V4,V5,V6,V7,V8,V9> String methodName(ILambdaArgsVoid9<T,V1,V2,V3,V4,V5,V6,V7,V8,V9> fn)  {
-        return methodNameProxy(fn);
-    }
-
-    protected static String methodNameProxy(ILambdaArgs fn){
-        String name=null;
-        try{
-            name=methodNameNativeProxy(fn);
-        }catch(Exception e){
-            throw new BoostException(e.getMessage(),e);
+    public static Field findFieldByName(Class<?> clazz, String name) {
+        Set<Field> fields = new HashSet<>();
+        for (Field field : clazz.getFields()) {
+            if (field.getName().equals(name)) {
+                fields.add(field);
+            }
         }
-        return name;
+        for (Field field : clazz.getDeclaredFields()) {
+            if (field.getName().equals(name)) {
+                fields.add(field);
+            }
+        }
+        int size = fields.size();
+        if (size == 0) {
+            return null;
+        }
+        return fields.iterator().next();
     }
 
-    protected static String methodNameNativeProxy(ILambdaArgs fn)throws Exception{
-        SerializedLambda lambda = getSerializedLambda(fn);
-        String methodName = lambda.getImplMethodName();
-        return methodName;
+    public static Method findMethodBySignature(Class<?> clazz, String name, String signature) {
+        Set<Method> methods = new HashSet<>();
+        for (Method method : clazz.getMethods()) {
+            if (method.getName().equals(name)) {
+                methods.add(method);
+            }
+        }
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.getName().equals(name)) {
+                methods.add(method);
+            }
+        }
+        int size = methods.size();
+        if (size == 0) {
+            return null;
+        }
+        if (size == 1) {
+            return methods.iterator().next();
+        }
+        // 实际上，再实现lambda过程中，如果是方法引用的方式，将会出现指向不明确的情况，因此，次需要单纯判断参数个数即可
+        String[] arr = signature.split("\\)");
+        String argsLine = arr[0].substring(1);
+        if (argsLine.endsWith(";")) {
+            argsLine = argsLine.substring(0, argsLine.length() - 1);
+        }
+        String[] args = argsLine.split(";");
+        Iterator<Method> iterator = methods.iterator();
+        while (iterator.hasNext()) {
+            Method next = iterator.next();
+            if (next.getParameterCount() == args.length) {
+                return next;
+            }
+        }
+        return methods.iterator().next();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static Field implBindField(IConsumer0 fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <V1> Field implBindField(IConsumer1<V1> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2> Field implBindField(IConsumer2<V1, V2> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3> Field implBindField(IConsumer3<V1, V2, V3> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4> Field implBindField(IConsumer4<V1, V2, V3, V4> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5> Field implBindField(IConsumer5<V1, V2, V3, V4, V5> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6> Field implBindField(IConsumer6<V1, V2, V3, V4, V5, V6> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7> Field implBindField(IConsumer7<V1, V2, V3, V4, V5, V6, V7> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7, V8> Field implBindField(IConsumer8<V1, V2, V3, V4, V5, V6, V7, V8> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9> Field implBindField(IConsumer9<V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static <R> Field implBindField(IProvider0<R> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <R, V1> Field implBindField(IProvider1<R, V1> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2> Field implBindField(IProvider2<R, V1, V2> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3> Field implBindField(IProvider3<R, V1, V2, V3> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4> Field implBindField(IProvider4<R, V1, V2, V3, V4> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5> Field implBindField(IProvider5<R, V1, V2, V3, V4, V5> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6> Field implBindField(IProvider6<R, V1, V2, V3, V4, V5, V6> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7> Field implBindField(IProvider7<R, V1, V2, V3, V4, V5, V6, V7> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7, V8> Field implBindField(IProvider8<R, V1, V2, V3, V4, V5, V6, V7, V8> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9> Field implBindField(IProvider9<R, V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
+        return implBindField(getSerializedLambda(fn));
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static Method implMethod(IConsumer0 fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <V1> Method implMethod(IConsumer1<V1> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2> Method implMethod(IConsumer2<V1, V2> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3> Method implMethod(IConsumer3<V1, V2, V3> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4> Method implMethod(IConsumer4<V1, V2, V3, V4> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5> Method implMethod(IConsumer5<V1, V2, V3, V4, V5> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6> Method implMethod(IConsumer6<V1, V2, V3, V4, V5, V6> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7> Method implMethod(IConsumer7<V1, V2, V3, V4, V5, V6, V7> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7, V8> Method implMethod(IConsumer8<V1, V2, V3, V4, V5, V6, V7, V8> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9> Method implMethod(IConsumer9<V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static <R> Method implMethod(IProvider0<R> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <R, V1> Method implMethod(IProvider1<R, V1> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2> Method implMethod(IProvider2<R, V1, V2> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3> Method implMethod(IProvider3<R, V1, V2, V3> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4> Method implMethod(IProvider4<R, V1, V2, V3, V4> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5> Method implMethod(IProvider5<R, V1, V2, V3, V4, V5> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6> Method implMethod(IProvider6<R, V1, V2, V3, V4, V5, V6> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7> Method implMethod(IProvider7<R, V1, V2, V3, V4, V5, V6, V7> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7, V8> Method implMethod(IProvider8<R, V1, V2, V3, V4, V5, V6, V7, V8> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9> Method implMethod(IProvider9<R, V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
+        return implMethod(getSerializedLambda(fn));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public static String fieldName(IConsumer0 fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <V1> String fieldName(IConsumer1<V1> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2> String fieldName(IConsumer2<V1, V2> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3> String fieldName(IConsumer3<V1, V2, V3> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4> String fieldName(IConsumer4<V1, V2, V3, V4> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5> String fieldName(IConsumer5<V1, V2, V3, V4, V5> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6> String fieldName(IConsumer6<V1, V2, V3, V4, V5, V6> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7> String fieldName(IConsumer7<V1, V2, V3, V4, V5, V6, V7> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7, V8> String fieldName(IConsumer8<V1, V2, V3, V4, V5, V6, V7, V8> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9> String fieldName(IConsumer9<V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static <R> String fieldName(IProvider0<R> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1> String fieldName(IProvider1<R, V1> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2> String fieldName(IProvider2<R, V1, V2> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3> String fieldName(IProvider3<R, V1, V2, V3> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4> String fieldName(IProvider4<R, V1, V2, V3, V4> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5> String fieldName(IProvider5<R, V1, V2, V3, V4, V5> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6> String fieldName(IProvider6<R, V1, V2, V3, V4, V5, V6> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7> String fieldName(IProvider7<R, V1, V2, V3, V4, V5, V6, V7> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7, V8> String fieldName(IProvider8<R, V1, V2, V3, V4, V5, V6, V7, V8> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9> String fieldName(IProvider9<R, V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
+        return fieldName(getSerializedLambda(fn));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static String methodName(IConsumer0 fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <V1> String methodName(IConsumer1<V1> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2> String methodName(IConsumer2<V1, V2> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3> String methodName(IConsumer3<V1, V2, V3> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4> String methodName(IConsumer4<V1, V2, V3, V4> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5> String methodName(IConsumer5<V1, V2, V3, V4, V5> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6> String methodName(IConsumer6<V1, V2, V3, V4, V5, V6> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7> String methodName(IConsumer7<V1, V2, V3, V4, V5, V6, V7> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7, V8> String methodName(IConsumer8<V1, V2, V3, V4, V5, V6, V7, V8> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9> String methodName(IConsumer9<V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static <R> String methodName(IProvider0<R> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1> String methodName(IProvider1<R, V1> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2> String methodName(IProvider2<R, V1, V2> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3> String methodName(IProvider3<R, V1, V2, V3> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4> String methodName(IProvider4<R, V1, V2, V3, V4> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5> String methodName(IProvider5<R, V1, V2, V3, V4, V5> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6> String methodName(IProvider6<R, V1, V2, V3, V4, V5, V6> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7> String methodName(IProvider7<R, V1, V2, V3, V4, V5, V6, V7> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7, V8> String methodName(IProvider8<R, V1, V2, V3, V4, V5, V6, V7, V8> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9> String methodName(IProvider9<R, V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
+        return methodName(getSerializedLambda(fn));
+    }
+
+    public static SerializedLambda getSerializedLambda(IConsumer0 fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <V1> SerializedLambda getSerializedLambda(IConsumer1<V1> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <V1, V2> SerializedLambda getSerializedLambda(IConsumer2<V1, V2> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <V1, V2, V3> SerializedLambda getSerializedLambda(IConsumer3<V1, V2, V3> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <V1, V2, V3, V4> SerializedLambda getSerializedLambda(IConsumer4<V1, V2, V3, V4> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <V1, V2, V3, V4, V5> SerializedLambda getSerializedLambda(IConsumer5<V1, V2, V3, V4, V5> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <V1, V2, V3, V4, V5, V6> SerializedLambda getSerializedLambda(IConsumer6<V1, V2, V3, V4, V5, V6> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7> SerializedLambda getSerializedLambda(IConsumer7<V1, V2, V3, V4, V5, V6, V7> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7, V8> SerializedLambda getSerializedLambda(IConsumer8<V1, V2, V3, V4, V5, V6, V7, V8> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9> SerializedLambda getSerializedLambda(IConsumer9<V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static <R> SerializedLambda getSerializedLambda(IProvider0<R> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <R, V1> SerializedLambda getSerializedLambda(IProvider1<R, V1> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <R, V1, V2> SerializedLambda getSerializedLambda(IProvider2<R, V1, V2> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <R, V1, V2, V3> SerializedLambda getSerializedLambda(IProvider3<R, V1, V2, V3> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <R, V1, V2, V3, V4> SerializedLambda getSerializedLambda(IProvider4<R, V1, V2, V3, V4> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <R, V1, V2, V3, V4, V5> SerializedLambda getSerializedLambda(IProvider5<R, V1, V2, V3, V4, V5> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6> SerializedLambda getSerializedLambda(IProvider6<R, V1, V2, V3, V4, V5, V6> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7> SerializedLambda getSerializedLambda(IProvider7<R, V1, V2, V3, V4, V5, V6, V7> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7, V8> SerializedLambda getSerializedLambda(IProvider8<R, V1, V2, V3, V4, V5, V6, V7, V8> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9> SerializedLambda getSerializedLambda(IProvider9<R, V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
+        return getFunctionSerializedLambda(fn);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static SerializedLambda getFunctionSerializedLambda(IFunction fn) {
+        return getSerializedLambdaNoExcept(fn);
     }
 
     public static SerializedLambda getSerializedLambdaNoExcept(Serializable fn) {
-        try{
+        try {
             return getSerializedLambda(fn);
-        }catch(Exception e){
-            throw new BoostException(e.getMessage(),e);
+        } catch (Exception e) {
+            throw new BoostException(e.getMessage(), e);
         }
     }
 
@@ -191,12 +576,4 @@ public class Lambdas {
         SerializedLambda lambda = (SerializedLambda) method.invoke(fn);
         return lambda;
     }
-
-    /**
-     * 字符串首字母转小写
-     */
-    public static String firstLower(String field) {
-        return field.substring(0,1).toLowerCase()+field.substring(1);
-    }
-
 }

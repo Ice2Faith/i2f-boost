@@ -3,9 +3,9 @@ package i2f.core.jdbc.sql.wrapper.core;
 import i2f.core.data.Pair;
 import i2f.core.jdbc.sql.core.DbFinder;
 import i2f.core.jdbc.sql.enums.SqlOrder;
-import i2f.core.lambda.funcs.IBuilder;
-import i2f.core.lambda.funcs.IGetter;
-import i2f.core.lambda.funcs.ISetter;
+import i2f.core.lambda.functional.preset.IBeanBuilder;
+import i2f.core.lambda.functional.preset.IBeanGetter;
+import i2f.core.lambda.functional.preset.IBeanSetter;
 import i2f.core.str.Appender;
 
 import java.util.ArrayList;
@@ -46,27 +46,31 @@ public class OrderWrapper<N> implements INextWrapper<N> {
         return this;
     }
 
-    public OrderWrapper<N> col(String colName){
-        if(prefix!=null){
-            colName=prefix+colName;
+    public OrderWrapper<N> col(String colName) {
+        if (prefix != null) {
+            colName = prefix + colName;
         }
-        cols.add(new Pair<>(colName,order));
+        cols.add(new Pair<>(colName, order));
         return this;
     }
-    public<T,R> OrderWrapper<N> col(IGetter<T,R> getter){
+
+    public <T, R> OrderWrapper<N> col(IBeanGetter<T, R> getter) {
         String colName = DbFinder.dbFieldName(getter);
         return col(colName);
     }
-    public<T,V1> OrderWrapper<N> col(ISetter<T,V1> setter){
+
+    public <T, V1> OrderWrapper<N> col(IBeanSetter<T, V1> setter) {
         String colName = DbFinder.dbFieldName(setter);
         return col(colName);
     }
-    public<T,R,V1> OrderWrapper<N> col(IBuilder<T,R,V1> builder){
+
+    public <R, T, V1> OrderWrapper<N> col(IBeanBuilder<R, T, V1> builder) {
         String colName = DbFinder.dbFieldName(builder);
         return col(colName);
     }
-    public OrderWrapper<N> cols(String ... cols){
-        for(String item : cols){
+
+    public OrderWrapper<N> cols(String... cols) {
+        for (String item : cols) {
             col(item);
         }
         return this;
