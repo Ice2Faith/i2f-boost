@@ -2,7 +2,7 @@ package i2f.core.digest;
 
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.collection.CollectionUtil;
+import i2f.core.collection.Collections;
 import i2f.core.str.Appender;
 
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ public class HexStringUtil {
     public static byte[] parseHexString(String data,String separator){
         List<String> parts=new ArrayList<>();
         if(separator!=null){
-            CollectionUtil.toCollection(parts,data.split(separator));
+            Collections.collect(parts, data.split(separator));
         }else{
             int dlen=data.length();
             for (int i = 0; (i+2) <= dlen; i+=2) {
@@ -113,7 +113,7 @@ public class HexStringUtil {
     public static byte[] parseOtcString(String data,String separator){
         List<String> parts=new ArrayList<>();
         if(separator!=null){
-            CollectionUtil.toCollection(parts,data.split(separator));
+            Collections.collect(parts, data.split(separator));
         }else{
             int dlen=data.length();
             for (int i = 0; (i+3) <= dlen; i+=3) {
@@ -139,7 +139,7 @@ public class HexStringUtil {
     public static byte[] parseDecString(String data,String separator){
         List<String> parts=new ArrayList<>();
         if(separator!=null){
-            CollectionUtil.toCollection(parts,data.split(separator));
+            Collections.collect(parts, data.split(separator));
         }else{
             int dlen=data.length();
             for (int i = 0; (i+3) <= dlen; i+=3) {
@@ -165,7 +165,7 @@ public class HexStringUtil {
     public static byte[] parseBinString(String data,String separator){
         List<String> parts=new ArrayList<>();
         if(separator!=null){
-            CollectionUtil.toCollection(parts,data.split(separator));
+            Collections.collect(parts, data.split(separator));
         }else{
             int dlen=data.length();
             for (int i = 0; (i+8) <= dlen; i+=8) {

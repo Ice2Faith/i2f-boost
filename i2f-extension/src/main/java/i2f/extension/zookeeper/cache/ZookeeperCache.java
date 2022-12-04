@@ -13,17 +13,17 @@ import java.util.concurrent.TimeUnit;
  * @date 2022/4/13 8:27
  * @desc
  */
-public class ZookeeperCache implements ICache<String> {
-    private String prefix="/cache";
+public class ZookeeperCache implements ICache<String, Object> {
+    private String prefix = "/cache";
     private ZooKeeper zooKeeper;
     private IJsonProcessor processor;
     private ZookeeperManager manager;
 
-    public ZookeeperCache(ZooKeeper zooKeeper,IJsonProcessor processor){
-        this.prefix="/cache";
-        this.zooKeeper=zooKeeper;
-        this.processor=processor;
-        manager=new ZookeeperManager(zooKeeper);
+    public ZookeeperCache(ZooKeeper zooKeeper, IJsonProcessor processor) {
+        this.prefix = "/cache";
+        this.zooKeeper = zooKeeper;
+        this.processor = processor;
+        manager = new ZookeeperManager(zooKeeper);
         manager.makePaths(prefix);
     }
 
@@ -46,9 +46,9 @@ public class ZookeeperCache implements ICache<String> {
     }
 
     @Override
-    public Object set(String key, Object val) {
-        String path=getPath(key);
-        return manager.set(path,val);
+    public void set(String key, Object val) {
+        String path = getPath(key);
+        manager.set(path, val);
     }
 
     @Override
@@ -64,21 +64,21 @@ public class ZookeeperCache implements ICache<String> {
     }
 
     @Override
-    public Object set(String key, long expire, TimeUnit timeUnit, Object val) {
-        String path=getPath(key);
-        return manager.set(path,expire,timeUnit,val);
+    public void set(String key, Object val, long expire, TimeUnit timeUnit) {
+        String path = getPath(key);
+        manager.set(path, expire, timeUnit, val);
     }
 
     @Override
-    public Object expire(String key, long expire, TimeUnit timeUnit) {
-        String path=getPath(key);
-        return manager.expire(path,expire,timeUnit);
+    public void expire(String key, long expire, TimeUnit timeUnit) {
+        String path = getPath(key);
+        manager.expire(path, expire, timeUnit);
     }
 
     @Override
-    public Object remove(String key) {
-        String path=getPath(key);
-        return manager.remove(path);
+    public void remove(String key) {
+        String path = getPath(key);
+        manager.remove(path);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class ZookeeperCache implements ICache<String> {
     }
 
     @Override
-    public Object clean() {
-        return manager.remove(prefix);
+    public void clean() {
+        manager.remove(prefix);
     }
 }

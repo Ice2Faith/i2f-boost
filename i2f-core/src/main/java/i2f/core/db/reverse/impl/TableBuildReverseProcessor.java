@@ -1,7 +1,7 @@
 package i2f.core.db.reverse.impl;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.collection.CollectionUtil;
+import i2f.core.collection.Collections;
 import i2f.core.db.data.TableColumnMeta;
 import i2f.core.db.data.TableMeta;
 import i2f.core.db.reverse.DbReverseEngineer;
@@ -24,8 +24,8 @@ public class TableBuildReverseProcessor implements IReverseProcessor<String> {
     private Map<String, Set<String>> primaryKeys=new HashMap<>();
     private Map<String, Set<String>> uniqueKeys=new HashMap<>();
     private Map<String,Set<String>> indexKeys=new HashMap<>();
-    private Map<String,String> indexKeyUsings =new HashMap<>();
-    private Set<String> defaultKeywords= CollectionUtil.hashSet("CURRENT_TIMESTAMP","NOW()");
+    private Map<String, String> indexKeyUsings = new HashMap<>();
+    private Set<String> defaultKeywords = Collections.hashSet("CURRENT_TIMESTAMP", "NOW()");
     public TableBuildReverseProcessor(boolean withDrop,boolean withCatalog,boolean withSchema){
         this.withDrop=withDrop;
         this.withCatalog=withCatalog;

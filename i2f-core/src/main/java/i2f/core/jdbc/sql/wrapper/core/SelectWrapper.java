@@ -1,12 +1,12 @@
 package i2f.core.jdbc.sql.wrapper.core;
 
 import i2f.core.data.Pair;
+import i2f.core.functional.common.IBuilder;
+import i2f.core.functional.common.IGetter;
+import i2f.core.functional.common.ISetter;
 import i2f.core.jdbc.sql.consts.Sql;
 import i2f.core.jdbc.sql.core.DbFinder;
 import i2f.core.lambda.Lambdas;
-import i2f.core.lambda.functional.preset.IBeanBuilder;
-import i2f.core.lambda.functional.preset.IBeanGetter;
-import i2f.core.lambda.functional.preset.IBeanSetter;
 import i2f.core.str.Appender;
 
 import java.util.ArrayList;
@@ -54,19 +54,19 @@ public class SelectWrapper<N> implements INextWrapper<N> {
         return col(colName, colName);
     }
 
-    public <T, R> SelectWrapper<N> col(IBeanGetter<T, R> getter) {
+    public <R, T> SelectWrapper<N> col(IGetter<R, T> getter) {
         String colName = DbFinder.dbFieldName(getter);
         String fieldName = Lambdas.fieldName(getter);
         return col(colName, fieldName);
     }
 
-    public <T, V1> SelectWrapper<N> col(IBeanSetter<T, V1> setter) {
+    public <T, V1> SelectWrapper<N> col(ISetter<T, V1> setter) {
         String colName = DbFinder.dbFieldName(setter);
         String fieldName = Lambdas.fieldName(setter);
         return col(colName, fieldName);
     }
 
-    public <R, T, V1> SelectWrapper<N> col(IBeanBuilder<R, T, V1> builder) {
+    public <R, T, V1> SelectWrapper<N> col(IBuilder<R, T, V1> builder) {
         String colName = DbFinder.dbFieldName(builder);
         String fieldName = Lambdas.fieldName(builder);
         return col(colName, fieldName);

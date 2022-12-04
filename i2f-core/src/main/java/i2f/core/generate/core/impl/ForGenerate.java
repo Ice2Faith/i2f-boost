@@ -1,9 +1,9 @@
 package i2f.core.generate.core.impl;
 
 import i2f.core.annotations.remark.Author;
+import i2f.core.functional.common.IMapper;
 import i2f.core.generate.RegexGenerator;
 import i2f.core.generate.core.IGenerate;
-import i2f.core.interfaces.IMap;
 import lombok.Data;
 
 import java.lang.reflect.Array;
@@ -17,7 +17,7 @@ import java.util.*;
 @Author("i2f")
 @Data
 public class ForGenerate implements IGenerate {
-    public IMap<Object,String> mapper;
+    public IMapper<String, Object> mapper;
     public Object root;
     public Object data;
     public String separator=",";
@@ -31,7 +31,7 @@ public class ForGenerate implements IGenerate {
     @Override
     public String gen() {
         if(data==null){
-            return mapper.map(data);
+            return mapper.get(data);
         }
         Class clazz=this.data.getClass();
         if(clazz.isArray()) {
@@ -49,7 +49,7 @@ public class ForGenerate implements IGenerate {
             Set<Map.Entry> vals=map.entrySet();
             return proxyIterable(vals);
         }else{
-            return mapper.map(this.data);
+            return mapper.get(this.data);
         }
     }
 
@@ -107,7 +107,7 @@ public class ForGenerate implements IGenerate {
                 param.put("_ctx",ctx);
                 str= RegexGenerator.render(template,param,mapper,basePackages);
             }else{
-                str= mapper.map(val);
+                str = mapper.get(val);
             }
             boolean isLegal=false;
             if(!isJump){

@@ -1,7 +1,7 @@
 package i2f.spring.filter;
 
 
-import i2f.core.lambda.functional.preset.IBeanGetter;
+import i2f.core.functional.common.IGetter;
 import org.springframework.util.AntPathMatcher;
 
 import java.util.Collection;
@@ -16,15 +16,15 @@ public class WhiteFilter {
     public static AntPathMatcher urlMatcher = new AntPathMatcher("/");
     public static AntPathMatcher pkgMatcher = new AntPathMatcher(".");
 
-    public static <IN extends Collection<E>, OUT extends Collection<E>, E> OUT antUrlFilter(OUT out, IN in, Collection<String> includes, Collection<String> excludes, IBeanGetter<String, E> getter) {
+    public static <IN extends Collection<E>, OUT extends Collection<E>, E> OUT antUrlFilter(OUT out, IN in, Collection<String> includes, Collection<String> excludes, IGetter<String, E> getter) {
         return filter(out, in, includes, excludes, (elem, patten) -> {
-            return urlMatcher.match(patten, getter.pick(elem));
+            return urlMatcher.match(patten, getter.get(elem));
         });
     }
 
-    public static <IN extends Collection<E>, OUT extends Collection<E>, E> OUT antPkgFilter(OUT out, IN in, Collection<String> includes, Collection<String> excludes, IBeanGetter<String, E> getter) {
+    public static <IN extends Collection<E>, OUT extends Collection<E>, E> OUT antPkgFilter(OUT out, IN in, Collection<String> includes, Collection<String> excludes, IGetter<String, E> getter) {
         return filter(out, in, includes, excludes, (elem, patten) -> {
-            return pkgMatcher.match(patten, getter.pick(elem));
+            return pkgMatcher.match(patten, getter.get(elem));
         });
     }
 

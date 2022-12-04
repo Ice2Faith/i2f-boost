@@ -8,7 +8,7 @@ import i2f.core.db.data.TableMeta;
 import i2f.core.db.reverse.DbReverseEngineer;
 import i2f.core.db.reverse.IReverseProcessor;
 import i2f.core.reflect.core.ReflectResolver;
-import i2f.core.str.StringUtil;
+import i2f.core.str.Strings;
 
 import java.util.List;
 
@@ -30,8 +30,8 @@ public class BeanReverseProcessor implements IReverseProcessor<String> {
 
     @Override
     public void onBegin(TableMeta meta) {
-        builder=new StringBuilder();
-        className= StringUtil.toPascal(meta.getTable());
+        builder = new StringBuilder();
+        className = Strings.toPascal(meta.getTable());
     }
 
     @Override
@@ -101,7 +101,7 @@ public class BeanReverseProcessor implements IReverseProcessor<String> {
             }
             builder.append("\t@DbIndex(key=\""+column.getIndexKeyName()+"\""+indexType+")\n");
         }
-        builder.append("\tprivate "+DbReverseEngineer.getShortTypeName(column)+" "+ StringUtil.toCamel(column.getName())+";\n");
+        builder.append("\tprivate " + DbReverseEngineer.getShortTypeName(column) + " " + Strings.toCamel(column.getName()) + ";\n");
         builder.append("\n");
         return true;
     }
@@ -109,16 +109,16 @@ public class BeanReverseProcessor implements IReverseProcessor<String> {
     @Override
     public void onEndColumns(TableMeta meta, List<TableColumnMeta> columns) {
         if(!useLombok){
-            for(TableColumnMeta item : columns){
-                String type=DbReverseEngineer.getShortTypeName(item);
-                String variableName=StringUtil.toCamel(item.getName());
-                String variablePascalName=StringUtil.toPascal(item.getName());
-                builder.append("\tpublic "+type+" get"+variablePascalName+"() {\n");
-                builder.append("\t\treturn "+variableName+";\n");
+            for(TableColumnMeta item : columns) {
+                String type = DbReverseEngineer.getShortTypeName(item);
+                String variableName = Strings.toCamel(item.getName());
+                String variablePascalName = Strings.toPascal(item.getName());
+                builder.append("\tpublic " + type + " get" + variablePascalName + "() {\n");
+                builder.append("\t\treturn " + variableName + ";\n");
                 builder.append("\t}\n");
                 builder.append("\n");
-                builder.append("\tpublic "+className+" set"+variablePascalName+"("+type+" "+variableName+") {\n");
-                builder.append("\t\tthis."+variableName+" = "+variableName+";\n");
+                builder.append("\tpublic " + className + " set" + variablePascalName + "(" + type + " " + variableName + ") {\n");
+                builder.append("\t\tthis." + variableName + " = " + variableName + ";\n");
                 builder.append("\t\treturn this;\n");
                 builder.append("\t}\n");
                 builder.append("\n");

@@ -1,7 +1,7 @@
 package i2f.core.db.data;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.str.StringUtil;
+import i2f.core.str.Strings;
 
 import java.io.File;
 
@@ -18,10 +18,10 @@ public class GenerateContext {
     public TableMeta meta;
     public boolean save2File=false;
     public static String castTableName(String tableName){
-        return StringUtil.toPascal(tableName);
+        return Strings.toPascal(tableName);
     }
     public static String castColumnName(String columnName){
-        return StringUtil.toCamel(columnName);
+        return Strings.toCamel(columnName);
     }
 
     public static Builder build(){

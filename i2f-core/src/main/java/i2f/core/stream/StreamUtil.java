@@ -1,7 +1,7 @@
 package i2f.core.stream;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.interfaces.IMap;
+import i2f.core.functional.common.IMapper;
 
 import java.io.*;
 
@@ -114,14 +114,14 @@ public class StreamUtil {
         return rdSize;
     }
 
-    public static void convertByteStream(InputStream is, OutputStream os, IMap<Byte, Byte> mapper) throws IOException {
+    public static void convertByteStream(InputStream is, OutputStream os, IMapper<Byte, Byte> mapper) throws IOException {
         BufferedInputStream bis = new BufferedInputStream(is);
         BufferedOutputStream bos = new BufferedOutputStream(os);
         int bt = -1;
         while ((bt = bis.read()) >= 0) {
             byte wbt = (byte) (bt & 0x0ff);
             if (mapper != null) {
-                wbt = mapper.map(wbt);
+                wbt = mapper.get(wbt);
             }
             bos.write(wbt);
         }

@@ -2,7 +2,7 @@ package i2f.core.generate.core;
 
 import i2f.core.annotations.remark.Author;
 import i2f.core.annotations.remark.Usage;
-import i2f.core.collection.CollectionUtil;
+import i2f.core.collection.Collections;
 import i2f.core.reflect.ValueResolver;
 import i2f.core.reflect.convert.ConvertResolver;
 import i2f.core.reflect.core.ReflectResolver;
@@ -170,7 +170,7 @@ public class ObjectFinder {
         Set<Field> sets=new HashSet<>(48);
         Field[] declare=clazz.getDeclaredFields();
         Field[] fields=clazz.getFields();
-        CollectionUtil.mergeCollection(sets,declare,fields);
+        Collections.merge(sets, declare, fields);
         for(Field item : sets){
             String name=item.getName();
             if(name.equals(fieldName)){

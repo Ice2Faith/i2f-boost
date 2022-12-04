@@ -1,6 +1,6 @@
 package test.sql.wrapper;
 
-import i2f.core.collection.CollectionUtil;
+import i2f.core.collection.Collections;
 import i2f.core.jdbc.sql.consts.Sql;
 import i2f.core.jdbc.sql.wrapper.DeleteWrapper;
 import i2f.core.jdbc.sql.wrapper.InsertWrapper;
@@ -29,15 +29,15 @@ public class TestConditionWrapper {
                 .next()
 
                 .joins()
-                .inner().join("tb_role r","a.role_id=r.role_id")
+                .inner().join("tb_role r", "a.role_id=r.role_id")
                 .next()
 
                 .where()
                 .and()
-                .prefix("a.").eq(SysUser::getUserName,"Zhang")
-                .like(SysUser::getRealName,"Li")
-                .likes(SysUser::getAvatar, CollectionUtil.arrayList("1","2","3").iterator())
-                .multiLike(CollectionUtil.arrayList("userName","realName").iterator(),"wang")
+                .prefix("a.").eq(SysUser::getUserName, "Zhang")
+                .like(SysUser::getRealName, "Li")
+                .likes(SysUser::getAvatar, Collections.arrayList("1", "2", "3").iterator())
+                .multiLike(Collections.arrayList("userName", "realName").iterator(), "wang")
                 .condFree("r.role_name like '%'||?||'%'","admin")
                 .next()
 

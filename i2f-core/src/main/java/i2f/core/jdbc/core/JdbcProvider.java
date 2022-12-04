@@ -1,7 +1,7 @@
 package i2f.core.jdbc.core;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.date.DateUtil;
+import i2f.core.date.Dates;
 import i2f.core.jdbc.data.DBResultList;
 import i2f.core.jdbc.data.PageContextData;
 import i2f.core.jdbc.data.PageMeta;
@@ -26,7 +26,7 @@ public class JdbcProvider {
     public static void logout(Date date,Statement stat,String sql,List<Object> params){
         if(showLog){
             String log= Appender.builder()
-                    .adds("JdbcLogOut -> time:", DateUtil.format(date)).line()
+                    .adds("JdbcLogOut -> time:", Dates.format(date)).line()
                     .adds("\tstat: ",stat).line()
                     .adds("\tsql : ",sql).line()
                     .add("\tparams : ")
@@ -37,8 +37,8 @@ public class JdbcProvider {
     }
     public static void logout(Date date,Object ... objs){
         if(showLog){
-            String log=Appender.builder()
-                    .adds("JdbcLogOut -> time:",DateUtil.format(date)," : ")
+            String log= Appender.builder()
+                    .adds("JdbcLogOut -> time:", Dates.format(date), " : ")
                     .adds(objs)
                     .get();
             System.out.println(log);

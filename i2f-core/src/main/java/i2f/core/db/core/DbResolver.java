@@ -7,7 +7,7 @@ import i2f.core.annotations.remark.Author;
 import i2f.core.db.data.TableColumnMeta;
 import i2f.core.db.data.TableMeta;
 import i2f.core.db.impl.DefaultTableMetaFilter;
-import i2f.core.interfaces.IFilter;
+import i2f.core.functional.common.IFilter;
 import i2f.core.jdbc.core.JdbcProvider;
 import i2f.core.jdbc.core.TransactionManager;
 import i2f.core.jdbc.data.DBResultList;
@@ -46,7 +46,7 @@ public class DbResolver {
             TableMeta meta = new TableMeta();
             inflateTableAttributes(tables, meta);
 
-            if (filter.choice(meta)) {
+            if (filter.test(meta)) {
                 if (withColumns) {
                     try {
                         if (meta.getCatalog() != null) {

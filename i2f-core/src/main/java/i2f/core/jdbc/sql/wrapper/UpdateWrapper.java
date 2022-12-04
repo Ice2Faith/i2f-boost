@@ -1,6 +1,6 @@
 package i2f.core.jdbc.sql.wrapper;
 
-import i2f.core.collection.CollectionUtil;
+import i2f.core.collection.Collections;
 import i2f.core.data.Triple;
 import i2f.core.jdbc.sql.consts.Sql;
 import i2f.core.jdbc.sql.wrapper.core.*;
@@ -60,7 +60,7 @@ public class UpdateWrapper
                 });
 
         List<Object> params=new ArrayList<>();
-        CollectionUtil.toCollection(params,kvs.kvs,0,-1,null,(Triple<String,String,Object> item)->{
+        Collections.collect(params, kvs.kvs, 0, -1, null, (Triple<String, String, Object> item) -> {
             return item.trd;
         });
 

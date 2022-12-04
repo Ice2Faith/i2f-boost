@@ -1,8 +1,7 @@
 package i2f.core.match;
 
 import i2f.core.annotations.notice.CloudBe;
-import i2f.core.collection.adapter.ArrayIteratorAdapter;
-import i2f.core.collection.adapter.IterableIteratorAdapter;
+import i2f.core.iterator.Iterators;
 import i2f.core.match.impl.AntMatcher;
 import i2f.core.match.impl.SimpleMatcher;
 
@@ -70,11 +69,11 @@ public class StringMatcher {
     }
 
     public  List<String> priorMatches(String str, String ... pattens){
-        return priorMatches(str,new ArrayIteratorAdapter<>(pattens),-1);
+        return priorMatches(str, Iterators.of(pattens), -1);
     }
 
     public  List<String> priorMatches(String str,Iterable<String> pattens){
-        return priorMatches(str,new IterableIteratorAdapter<>(pattens),-1);
+        return priorMatches(str, Iterators.of(pattens), -1);
     }
 
     public List<String> priorMatches(String str, Iterator<String> iterator,@CloudBe("-1") int maxReturnCount){

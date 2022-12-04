@@ -1,7 +1,7 @@
 package i2f.springboot.zplugin.file;
 
 import i2f.core.j2ee.web.ServletContextUtil;
-import i2f.core.str.StringUtil;
+import i2f.core.str.Strings;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,8 +115,8 @@ public class FileController {
         }
         String path=storePath.substring("classpath:".length());
         File contextPath = ServletContextUtil.getContextPath(request.getSession().getServletContext(), "");
-        File relativePath=new File(StringUtil.pathGen(contextPath.getAbsolutePath(),path));
-        String absPath=relativePath.getAbsolutePath();
+        File relativePath = new File(Strings.pathGen(contextPath.getAbsolutePath(), path));
+        String absPath = relativePath.getAbsolutePath();
         fileConfig.setStorePath(absPath);
     }
 

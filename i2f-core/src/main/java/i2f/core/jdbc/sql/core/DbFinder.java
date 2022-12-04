@@ -1,10 +1,11 @@
 package i2f.core.jdbc.sql.core;
 
 import i2f.core.db.annotations.DbName;
+import i2f.core.functional.common.IBuilder;
+import i2f.core.functional.common.IGetter;
+import i2f.core.functional.common.ISetter;
 import i2f.core.lambda.Lambdas;
-import i2f.core.lambda.functional.preset.IBeanBuilder;
-import i2f.core.lambda.functional.preset.IBeanGetter;
-import i2f.core.lambda.functional.preset.IBeanSetter;
+import i2f.core.lambda.impl.LambdaInflater;
 import i2f.core.reflect.core.ReflectResolver;
 
 import java.io.Serializable;
@@ -22,20 +23,20 @@ public class DbFinder {
     public static volatile ConcurrentHashMap<String,String> cacheFieldName2DbName=new ConcurrentHashMap<>();
     public static volatile ConcurrentHashMap<Class,String> cacheClassName2DbName=new ConcurrentHashMap<>();
 
-    public static <T, R> String dbFieldName(IBeanGetter<T, R> getter) {
+    public static <R, T> String dbFieldName(IGetter<R, T> getter) {
         return dbFileNameProxy(getter);
     }
 
-    public static <T, V1> String dbFieldName(IBeanSetter<T, V1> getter) {
+    public static <T, V1> String dbFieldName(ISetter<T, V1> getter) {
         return dbFileNameProxy(getter);
     }
 
-    public static <R, T, V1> String dbFieldName(IBeanBuilder<R, T, V1> getter) {
+    public static <R, T, V1> String dbFieldName(IBuilder<R, T, V1> getter) {
         return dbFileNameProxy(getter);
     }
 
     public static String dbFileNameProxy(Serializable lmb) {
-        SerializedLambda meta = Lambdas.getSerializedLambdaNoExcept(lmb);
+        SerializedLambda meta = LambdaInflater.getSerializedLambdaNoExcept(lmb);
         String className = meta.getImplClass();
         className = className.replaceAll("/", ".");
         String methodName = meta.getImplMethodName();

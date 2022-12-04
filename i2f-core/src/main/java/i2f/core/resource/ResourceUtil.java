@@ -1,8 +1,8 @@
 package i2f.core.resource;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.array.ArrayUtil;
-import i2f.core.collection.CollectionUtil;
+import i2f.core.array.Arrays;
+import i2f.core.collection.Collections;
 import i2f.core.match.IMatcher;
 import i2f.core.match.impl.AntMatcher;
 import i2f.core.stream.StreamUtil;
@@ -66,7 +66,7 @@ public class ResourceUtil {
                 lloc=lloc.substring(1);
             }
             Enumeration<URL> enums=getLoader().getResources(lloc);
-            return ArrayUtil.toArray(CollectionUtil.toCollection(new HashSet<URL>(),enums),URL[].class);
+            return Arrays.collect(Collections.collect(new HashSet<URL>(), enums), URL[].class);
         }else{
             File file=new File(location);
             URL url=file.toURI().toURL();

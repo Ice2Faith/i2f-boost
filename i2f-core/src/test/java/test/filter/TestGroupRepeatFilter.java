@@ -1,6 +1,6 @@
 package test.filter;
 
-import i2f.core.collection.CollectionUtil;
+import i2f.core.collection.Collections;
 import i2f.core.data.IDataReader;
 import i2f.core.data.IDataWriter;
 import i2f.core.data.impl.StreamReaderDataReader;
@@ -62,7 +62,7 @@ public class TestGroupRepeatFilter {
     }
 
     public static List<IDataReader<String>> getReaders(String basePath){
-        return CollectionUtil.arrayList(
+        return Collections.arrayList(
                 new StreamReaderDataReader(new File(basePath, "part1.txt")),
                 new StreamReaderDataReader(new File(basePath, "part2.txt")),
                 new StreamReaderDataReader(new File(basePath, "part3.txt")),

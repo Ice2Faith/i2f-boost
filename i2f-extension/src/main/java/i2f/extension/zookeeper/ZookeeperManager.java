@@ -1,6 +1,6 @@
 package i2f.extension.zookeeper;
 
-import i2f.core.collection.CollectionUtil;
+import i2f.core.collection.Collections;
 import i2f.core.text.FormatTextSerializer;
 import i2f.core.text.ITextSerializer;
 import i2f.extension.json.gson.GsonJsonProcessor;
@@ -148,7 +148,7 @@ public class ZookeeperManager {
     public Set<String> keys(String path) {
         try{
             List<String> list=zooKeeper.getChildren(path,false);
-            return CollectionUtil.hashSet(list);
+            return Collections.hashSet(list);
         }catch(Exception e){
             throw new ZookeeperException(e.getMessage(),e);
         }

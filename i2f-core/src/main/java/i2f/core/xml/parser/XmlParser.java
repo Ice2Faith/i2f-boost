@@ -1,7 +1,7 @@
 package i2f.core.xml.parser;
 
 import i2f.core.generate.RegexGenerator;
-import i2f.core.str.StringUtil;
+import i2f.core.str.Strings;
 import i2f.core.str.data.RegexMatchItem;
 
 import java.util.HashMap;
@@ -94,7 +94,7 @@ public class XmlParser {
                 String attrLine = ctx.getAttr();
                 if(attrLine!=null && !"".equals(attrLine)){
                     attrs=new HashMap<>();
-                    List<RegexMatchItem> items = StringUtil.regexFinds(attrLine, REG_KEY_EQUAL_VALUE);
+                    List<RegexMatchItem> items = Strings.regexFinds(attrLine, REG_KEY_EQUAL_VALUE);
                     for(RegexMatchItem item : items){
                         String pstr = item.matchStr;
                         String[] arr2=pstr.split("=",2);

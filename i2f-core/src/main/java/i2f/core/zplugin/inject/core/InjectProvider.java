@@ -1,8 +1,8 @@
 package i2f.core.zplugin.inject.core;
 
-import i2f.core.collection.adapter.ArrayIteratorAdapter;
+import i2f.core.iterator.Iterators;
 import i2f.core.reflect.ValueResolver;
-import i2f.core.str.StringUtil;
+import i2f.core.str.Strings;
 import i2f.core.zplugin.inject.IInjectFieldProvider;
 import i2f.core.zplugin.inject.annotations.Injects;
 
@@ -26,8 +26,8 @@ public class InjectProvider {
     protected volatile ConcurrentHashMap<Class<IInjectFieldProvider>,ConcurrentHashMap<String,IInjectFieldProvider>> context=new ConcurrentHashMap<>();
     public InjectProvider registry(IInjectFieldProvider provider){
         Class<IInjectFieldProvider> clazz=(Class<IInjectFieldProvider>)provider.getClass();
-        String className=clazz.getSimpleName();
-        String beanName= StringUtil.firstLowerCase(className);
+        String className = clazz.getSimpleName();
+        String beanName = Strings.firstLowerCase(className);
         return registry(beanName,provider);
     }
     public InjectProvider registry(String name,IInjectFieldProvider provider){
@@ -80,7 +80,7 @@ public class InjectProvider {
         return inject(obj,providers,ann.fields());
     }
     public<T> T inject(T obj,Iterable<IInjectFieldProvider> providers,String ... fields){
-        return inject(obj,providers,new ArrayIteratorAdapter<>(fields));
+        return inject(obj, providers, Iterators.of(fields));
     }
     public<T> T inject(T obj, Iterable<IInjectFieldProvider> providers, Iterator<String> fields){
         while(fields.hasNext()){

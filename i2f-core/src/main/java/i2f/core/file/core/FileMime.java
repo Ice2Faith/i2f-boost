@@ -2,12 +2,12 @@ package i2f.core.file.core;
 
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.str.StringUtil;
+import i2f.core.str.Strings;
 
 @Author("i2f")
 public class FileMime {
     public static String getMimeType(String fileName) {
-        String suffix = StringUtil.getExtension(fileName);
+        String suffix = Strings.getExtension(fileName);
 
         String ret = "application/octet-stream";
         for (int i = 0; i < MIME_MapTable.length; i++) {

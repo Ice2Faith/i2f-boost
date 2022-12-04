@@ -1,44 +1,114 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <included>
-    <property name="log.max.size" value="${logback.app.log.max.size:-20MB}"/>
-    <property name="log.app.name" value="${logback.app.name:-noappname}"/>
-    <property name="log.dir.name" value="${logback.app.log.dir.name:-logs}"/>
 
-    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
-    <property name="CONSOLE_LOG_PATTERN"
-              value="${CONSOLE_LOG_PATTERN:-%clr(%d{MM-dd HH:mm:ss.SSS}){faint} %clr([%-5level]) %clr([%-40.40logger{40}:%-4.5line]){cyan} %clr([%-24.24thread]){magenta} - %msg%n}" />
-
+    <!-- 控制台日志输出-->
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <!-- encoder 默认配置为PatternLayoutEncoder -->
-        <encoder>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
             <charset>UTF-8</charset>
-            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            </layout>
         </encoder>
     </appender>
 
-    <!-- 1. 按文件大小区分的滚动日志 -->
-    <appender name="rfilebysize" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.dir.name}/${log.app.name}.log</file>
-        <encoder>
+    <!-- 所有日志级别 -->
+    <appender name="fileAll" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--过滤-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ALL</level>
+        </filter>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
             <charset>UTF-8</charset>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%-40.40logger{40}:%-4.5line] [%-4.24thread] [%X{JOB_ID}]  [%X{TASK_ID}] - %msg%n</pattern>
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>${LOG_PATTERN}</pattern>
+            </layout>
         </encoder>
-        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <fileNamePattern>${log.dir.name}/${log.app.name}.%i.log</fileNamePattern>
-            <MinIndex>1</MinIndex>
-            <MaxIndex>5</MaxIndex>
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--路径-->
+            <fileNamePattern>${log.dir.name}/${log.app.name}.all.%d.%i.log</fileNamePattern>
+            <maxHistory>${log.max.count}</maxHistory>
+            <maxFileSize>${log.max.size}</maxFileSize>
+            <totalSizeCap>${log.total.size}</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
         </rollingPolicy>
-
-        <!-- 触发条件: 满足大小时触发 -->
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>${log.max.size}</MaxFileSize>
-        </triggeringPolicy>
     </appender>
 
-    <logger name="com" level="debug" />
+    <!-- INFO及以上级别日志，INFO，WARN，ERROR -->
+    <appender name="fileInfo" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--过滤-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <charset>UTF-8</charset>
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>${LOG_PATTERN}</pattern>
+            </layout>
+        </encoder>
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--路径-->
+            <fileNamePattern>${log.dir.name}/${log.app.name}.info.%d.%i.log</fileNamePattern>
+            <maxHistory>${log.max.count}</maxHistory>
+            <maxFileSize>${log.max.size}</maxFileSize>
+            <totalSizeCap>${log.total.size}</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+    </appender>
 
-    <root level="debug">
+    <!-- WARN及以上级别日志，WARN，ERROR -->
+    <appender name="fileWarn" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--过滤-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <charset>UTF-8</charset>
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>${LOG_PATTERN}</pattern>
+            </layout>
+        </encoder>
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--路径-->
+            <fileNamePattern>${log.dir.name}/${log.app.name}.warn.%d.%i.log</fileNamePattern>
+            <maxHistory>${log.max.count}</maxHistory>
+            <maxFileSize>${log.max.size}</maxFileSize>
+            <totalSizeCap>${log.total.size}</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+    </appender>
+
+    <!-- ERROR及以上级别日志，ERROR -->
+    <appender name="fileError" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--过滤-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <charset>UTF-8</charset>
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>${LOG_PATTERN}</pattern>
+            </layout>
+        </encoder>
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--路径-->
+            <fileNamePattern>${log.dir.name}/${log.app.name}.error.%d.%i.log</fileNamePattern>
+            <maxHistory>${log.max.count}</maxHistory>
+            <maxFileSize>${log.max.size}</maxFileSize>
+            <totalSizeCap>${log.total.size}</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+    </appender>
+
+    <root level="all">
         <appender-ref ref="stdout"/>
-        <appender-ref ref="rfilebysize"/>
+        <appender-ref ref="fileAll"/>
+        <appender-ref ref="fileInfo"/>
+        <appender-ref ref="fileWarn"/>
+        <appender-ref ref="fileError"/>
     </root>
 </included>

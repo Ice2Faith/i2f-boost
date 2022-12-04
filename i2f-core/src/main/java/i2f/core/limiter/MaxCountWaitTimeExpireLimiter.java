@@ -26,9 +26,9 @@ public class MaxCountWaitTimeExpireLimiter implements ILimiter{
     // 等待时间单位
     protected TimeUnit waitTimeUint;
 
-    protected ICache<String> cache;
+    protected ICache<String, Object> cache;
 
-    public ICache<String> getCache(){
+    public ICache<String, Object> getCache() {
         return cache;
     }
 
@@ -47,7 +47,7 @@ public class MaxCountWaitTimeExpireLimiter implements ILimiter{
     }
 
     public synchronized void setKeyCount(String key,int cnt){
-        getCache().set(key,waitTime,waitTimeUint,cnt+"");
+        getCache().set(key, cnt + "", waitTime, waitTimeUint);
     }
 
     @Override

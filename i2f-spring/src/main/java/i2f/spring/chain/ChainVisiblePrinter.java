@@ -1,6 +1,6 @@
 package i2f.spring.chain;
 
-import i2f.core.safe.Null;
+import i2f.core.safe.Nulls;
 import i2f.spring.context.SpringUtil;
 import i2f.spring.filter.WhiteFilter;
 import org.springframework.context.ApplicationContext;
@@ -101,8 +101,8 @@ public class ChainVisiblePrinter {
             }
         }
         return WhiteFilter.antPkgFilter(new ArrayList<>(), ret,
-                Null.get(chainContext, ChainContext::getIncludesResolver),
-                Null.get(chainContext, ChainContext::getExcludesResolver),
+                Nulls.get(chainContext, ChainContext::getIncludesResolver),
+                Nulls.get(chainContext, ChainContext::getExcludesResolver),
                 (elem) -> elem.data.getName());
     }
 

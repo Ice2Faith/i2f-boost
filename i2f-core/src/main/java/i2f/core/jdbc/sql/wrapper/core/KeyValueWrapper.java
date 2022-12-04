@@ -1,9 +1,11 @@
 package i2f.core.jdbc.sql.wrapper.core;
 
 import i2f.core.data.Triple;
+import i2f.core.functional.common.IBuilder;
+import i2f.core.functional.common.IGetter;
+import i2f.core.functional.common.ISetter;
 import i2f.core.jdbc.sql.consts.Sql;
 import i2f.core.jdbc.sql.core.DbFinder;
-import i2f.core.lambda.functional.preset.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,32 +41,32 @@ public class KeyValueWrapper<N> implements INextWrapper<N> {
     }
 
     ////////////////////////////////////////
-    public <T, R> KeyValueWrapper<N> set(boolean cond, IBeanGetter<T, R> getter, String ope, Object val) {
+    public <R, T> KeyValueWrapper<N> set(boolean cond, IGetter<R, T> getter, String ope, Object val) {
         String name = DbFinder.dbFieldName(getter);
         return set(cond, name, ope, val);
     }
 
-    public <T, V1> KeyValueWrapper<N> set(boolean cond, IBeanSetter<T, V1> setter, String ope, Object val) {
+    public <T, V1> KeyValueWrapper<N> set(boolean cond, ISetter<T, V1> setter, String ope, Object val) {
         String name = DbFinder.dbFieldName(setter);
         return set(cond, name, ope, val);
     }
 
-    public <R, T, V1> KeyValueWrapper<N> set(boolean cond, IBeanBuilder<R, T, V1> builder, String ope, Object val) {
+    public <R, T, V1> KeyValueWrapper<N> set(boolean cond, IBuilder<R, T, V1> builder, String ope, Object val) {
         String name = DbFinder.dbFieldName(builder);
         return set(cond, name, ope, val);
     }
 
-    public <T, R> KeyValueWrapper<N> set(boolean cond, IBeanGetter<T, R> getter, Object val) {
+    public <R, T> KeyValueWrapper<N> set(boolean cond, IGetter<R, T> getter, Object val) {
         String name = DbFinder.dbFieldName(getter);
         return set(cond, name, val);
     }
 
-    public <T, V1> KeyValueWrapper<N> set(boolean cond, IBeanSetter<T, V1> setter, Object val) {
+    public <T, V1> KeyValueWrapper<N> set(boolean cond, ISetter<T, V1> setter, Object val) {
         String name = DbFinder.dbFieldName(setter);
         return set(cond, name, val);
     }
 
-    public <R, T, V1> KeyValueWrapper<N> set(boolean cond, IBeanBuilder<R, T, V1> builder, Object val) {
+    public <R, T, V1> KeyValueWrapper<N> set(boolean cond, IBuilder<R, T, V1> builder, Object val) {
         String name = DbFinder.dbFieldName(builder);
         return set(cond, name, val);
     }
@@ -81,32 +83,32 @@ public class KeyValueWrapper<N> implements INextWrapper<N> {
     }
 
     ////////////////////////////////////////
-    public <T, R> KeyValueWrapper<N> set(IBeanGetter<T, R> getter, String ope, Object val) {
+    public <R, T> KeyValueWrapper<N> set(IGetter<R, T> getter, String ope, Object val) {
         String name = DbFinder.dbFieldName(getter);
         return set(true, name, ope, val);
     }
 
-    public <T, V1> KeyValueWrapper<N> set(IBeanSetter<T, V1> setter, String ope, Object val) {
+    public <T, V1> KeyValueWrapper<N> set(ISetter<T, V1> setter, String ope, Object val) {
         String name = DbFinder.dbFieldName(setter);
         return set(true, name, ope, val);
     }
 
-    public <R, T, V1> KeyValueWrapper<N> set(IBeanBuilder<R, T, V1> builder, String ope, Object val) {
+    public <R, T, V1> KeyValueWrapper<N> set(IBuilder<R, T, V1> builder, String ope, Object val) {
         String name = DbFinder.dbFieldName(builder);
         return set(true, name, ope, val);
     }
 
-    public <T, R> KeyValueWrapper<N> set(IBeanGetter<T, R> getter, Object val) {
+    public <R, T> KeyValueWrapper<N> set(IGetter<R, T> getter, Object val) {
         String name = DbFinder.dbFieldName(getter);
         return set(true, name, val);
     }
 
-    public <T, V1> KeyValueWrapper<N> set(IBeanSetter<T, V1> setter, Object val) {
+    public <T, V1> KeyValueWrapper<N> set(ISetter<T, V1> setter, Object val) {
         String name = DbFinder.dbFieldName(setter);
         return set(true, name, val);
     }
 
-    public <R, T, V1> KeyValueWrapper<N> set(IBeanBuilder<R, T, V1> builder, Object val) {
+    public <R, T, V1> KeyValueWrapper<N> set(IBuilder<R, T, V1> builder, Object val) {
         String name = DbFinder.dbFieldName(builder);
         return set(true, name, val);
     }

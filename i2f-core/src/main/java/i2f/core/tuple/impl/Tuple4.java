@@ -1,15 +1,25 @@
 package i2f.core.tuple.impl;
 
+import i2f.core.collection.Collections;
 import i2f.core.tuple.ITuple;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * @author ltb
- * @date 2022/11/9 12:12
- * @desc
- */
-public class Tuple4<V1, V2, V3, V4> implements ITuple {
-    public V1 v1;
-    public V2 v2;
-    public V3 v3;
-    public V4 v4;
+import java.util.List;
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Tuple4<T1, T2, T3, T4> implements ITuple {
+    public T1 t1;
+    public T2 t2;
+    public T3 t3;
+    public T4 t4;
+
+    @Override
+    public List<Object> toList() {
+        return Collections.arrayList(t1, t2, t3, t4);
+    }
 }

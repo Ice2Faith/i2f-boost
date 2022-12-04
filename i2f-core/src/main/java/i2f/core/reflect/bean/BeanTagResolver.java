@@ -1,12 +1,12 @@
 package i2f.core.reflect.bean;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.interfaces.ICompare;
-import i2f.core.interfaces.IFilter;
-import i2f.core.interfaces.impl.AlwaysTrueFilter;
-import i2f.core.interfaces.impl.EmptyFilter;
-import i2f.core.interfaces.impl.EqualsCompare;
-import i2f.core.interfaces.impl.NullFilter;
+import i2f.core.functional.common.ICompare;
+import i2f.core.functional.common.IFilter;
+import i2f.core.functional.impl.AlwaysTrueFilter;
+import i2f.core.functional.impl.EmptyFilter;
+import i2f.core.functional.impl.EqualsCompare;
+import i2f.core.functional.impl.NullFilter;
 import i2f.core.reflect.bean.annotations.BeanTag;
 import i2f.core.reflect.core.ReflectResolver;
 import i2f.core.reflect.interfaces.PropertyAccessor;
@@ -94,7 +94,7 @@ public class BeanTagResolver {
                 continue;
             }
             for(PropertyAccessor ditem : dst){
-                if(keyCmp.compare(sitem.getName(),ditem.getName())==0){
+                if (keyCmp.get(sitem.getName(), ditem.getName()) == 0) {
                     ditem.setInvokeObject(dstObj);
                     ditem.set(sval);
                     break;
@@ -145,7 +145,7 @@ public class BeanTagResolver {
         for(PropertyAccessor item : list){
             item.setInvokeObject(obj);
             Object val=item.get();
-            if(filter.choice(val)){
+            if (filter.test(val)) {
                 item.set(value);
             }
         }

@@ -1,9 +1,9 @@
 package i2f.core.reflect.bean;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.interfaces.ICompare;
-import i2f.core.interfaces.IMap;
-import i2f.core.interfaces.impl.EqualsCompare;
+import i2f.core.functional.common.ICompare;
+import i2f.core.functional.common.IMapper;
+import i2f.core.functional.impl.EqualsCompare;
 import i2f.core.reflect.convert.ConvertResolver;
 import i2f.core.reflect.core.ReflectResolver;
 import i2f.core.reflect.exception.InstanceException;
@@ -93,7 +93,7 @@ public class BeanResolver {
             for (Object item : srcMap.keySet()) {
                 String key = String.valueOf(item);
                 for (PropertyAccessor accessor : dstFields) {
-                    if (keyCmp.compare(accessor.getName(), key) == 0) {
+                    if (keyCmp.get(accessor.getName(), key) == 0) {
                         Object val = srcMap.get(item);
                         if (!includeNull && val == null) {
                             continue;
@@ -123,7 +123,7 @@ public class BeanResolver {
             for (PropertyAccessor src : srcFields) {
                 String srcName = src.getName();
                 for (PropertyAccessor dst : dstFields) {
-                    if (keyCmp.compare(dst.getName(), srcName) == 0) {
+                    if (keyCmp.get(dst.getName(), srcName) == 0) {
                         src.setInvokeObject(srcObj);
                         Object val = src.get();
                         if (!includeNull && val == null) {
@@ -153,36 +153,37 @@ public class BeanResolver {
      * @param <T>
      * @return
      */
-    public static<T> T map2Bean(Map<String,Object> map, Class<T> clazz, boolean includeNull, IMap<String,String> mapKey){
-        if(mapKey!=null){
-            Map<String,Object> nmap=new HashMap<>();
-            for(Map.Entry<String, Object> item : map.entrySet()){
-                nmap.put(mapKey.map(item.getKey()),item.getValue());
+    public static <T> T map2Bean(Map<String, Object> map, Class<T> clazz, boolean includeNull, IMapper<String, String> mapKey) {
+        if (mapKey != null) {
+            Map<String, Object> nmap = new HashMap<>();
+            for (Map.Entry<String, Object> item : map.entrySet()) {
+                nmap.put(mapKey.get(item.getKey()), item.getValue());
             }
-            map=nmap;
+            map = nmap;
         }
-        return copy(map,clazz,includeNull);
+        return copy(map, clazz, includeNull);
     }
 
     /**
      * 将Bean转换为Map
      * includeNull则包含值为null的字段
      * mapKey指定按照什么关系将Bean的字段名映射为Map的key
+     *
      * @param obj
      * @param includeNull
      * @param mapKey
      * @return
      */
-    public static Map<String, Object> bean2Map(Object obj,boolean includeNull, IMap<String,String> mapKey){
-        if(obj==null){
+    public static Map<String, Object> bean2Map(Object obj, boolean includeNull, IMapper<String, String> mapKey) {
+        if (obj == null) {
             return null;
         }
-        Map<String,Object> ret=new HashMap<>();
-        copy(obj,ret,includeNull);
-        if(mapKey!=null){
-            Map<String,Object> nmap=new HashMap<>();
-            for(Map.Entry<String, Object> item : ret.entrySet()){
-                nmap.put(mapKey.map(item.getKey()),item.getValue());
+        Map<String, Object> ret = new HashMap<>();
+        copy(obj, ret, includeNull);
+        if (mapKey != null) {
+            Map<String, Object> nmap = new HashMap<>();
+            for (Map.Entry<String, Object> item : ret.entrySet()) {
+                nmap.put(mapKey.get(item.getKey()), item.getValue());
             }
             ret=nmap;
         }
@@ -193,18 +194,18 @@ public class BeanResolver {
         return bean2Map(obj,includeNull,null);
     }
 
-    public static<T> List<T> mapList2BeanList(List<Map<String,Object>> list,Class<T> clazz,boolean includeNull, IMap<String,String> mapKey){
-        List<T> ret=new ArrayList<>();
-        for(Map<String,Object> item : list){
-            ret.add(map2Bean(item,clazz,includeNull,mapKey));
+    public static <T> List<T> mapList2BeanList(List<Map<String, Object>> list, Class<T> clazz, boolean includeNull, IMapper<String, String> mapKey) {
+        List<T> ret = new ArrayList<>();
+        for (Map<String, Object> item : list) {
+            ret.add(map2Bean(item, clazz, includeNull, mapKey));
         }
         return ret;
     }
 
-    public static List<Map<String, Object>> beanList2MapList(List list,boolean includeNull, IMap<String,String> mapKey){
-        List<Map<String, Object>> ret=new ArrayList<>();
-        for(Object item : list){
-            ret.add(bean2Map(item,includeNull,mapKey));
+    public static List<Map<String, Object>> beanList2MapList(List list, boolean includeNull, IMapper<String, String> mapKey) {
+        List<Map<String, Object>> ret = new ArrayList<>();
+        for (Object item : list) {
+            ret.add(bean2Map(item, includeNull, mapKey));
         }
         return ret;
     }

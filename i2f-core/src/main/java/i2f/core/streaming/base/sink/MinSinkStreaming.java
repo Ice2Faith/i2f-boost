@@ -1,0 +1,35 @@
+package i2f.core.streaming.base.sink;
+
+import java.util.Comparator;
+import java.util.Iterator;
+
+/**
+ * @author ltb
+ * @date 2022/11/22 10:19
+ * @desc
+ */
+public class MinSinkStreaming<E> extends AbsSinkStreaming<E, E, E> {
+    private Comparator<E> comparator;
+
+    public MinSinkStreaming(Comparator<E> comparator) {
+        this.comparator = comparator;
+    }
+
+    @Override
+    protected E sink(Iterator<E> iterator) {
+        E ret = null;
+        boolean first = false;
+        while (iterator.hasNext()) {
+            E item = iterator.next();
+            if (first) {
+                ret = item;
+            } else {
+                if (comparator.compare(item, ret) < 0) {
+                    ret = item;
+                }
+            }
+            first = false;
+        }
+        return ret;
+    }
+}

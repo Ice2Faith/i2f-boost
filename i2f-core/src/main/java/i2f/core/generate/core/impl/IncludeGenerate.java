@@ -1,9 +1,9 @@
 package i2f.core.generate.core.impl;
 
 import i2f.core.annotations.remark.Author;
+import i2f.core.functional.common.IMapper;
 import i2f.core.generate.RegexGenerator;
 import i2f.core.generate.core.IGenerate;
-import i2f.core.interfaces.IMap;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.Map;
 @Author("i2f")
 @Data
 public class IncludeGenerate implements IGenerate {
-    public IMap<Object,String> mapper;
+    public IMapper<String, Object> mapper;
     public Object root;
     public Object data;
     public String template;
@@ -26,7 +26,7 @@ public class IncludeGenerate implements IGenerate {
     @Override
     public String gen() {
         if(data==null){
-            return mapper.map(data);
+            return mapper.get(data);
         }
         if(template!=null){
             String tpl=template.trim();
@@ -47,7 +47,7 @@ public class IncludeGenerate implements IGenerate {
             String str= RegexGenerator.render(template,param,mapper,basePackages);
             builder.append(str);
         }else{
-            String str= mapper.map(data);
+            String str = mapper.get(data);
             builder.append(str);
         }
         return builder.toString();

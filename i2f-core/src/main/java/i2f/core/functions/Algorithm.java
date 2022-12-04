@@ -3,9 +3,9 @@ package i2f.core.functions;
 import i2f.core.annotations.notice.Nullable;
 import i2f.core.annotations.notice.NullableReturn;
 import i2f.core.annotations.remark.Author;
-import i2f.core.interfaces.IExecute;
-import i2f.core.interfaces.IFilter;
-import i2f.core.interfaces.IMap;
+import i2f.core.functional.common.IExecutor;
+import i2f.core.functional.common.IFilter;
+import i2f.core.functional.common.IMapper;
 
 import java.util.Collection;
 import java.util.Enumeration;
@@ -35,19 +35,19 @@ public class Algorithm {
      * @return
      */
     @NullableReturn
-    public static<T,E,R extends Collection<E>> R eachProxy(@Nullable R collection, Iterable<T> ite,
-                                                           @Nullable IFilter<T> filter, @Nullable IMap<T,E> mapper,
-                                                           @Nullable IExecute<E> executor){
-        Iterator<T> itr=ite.iterator();
-        while (itr.hasNext()){
-            T cur= itr.next();
-            if(filter==null || filter.choice(cur)){
-                E val= (mapper==null)?((E)cur):(mapper.map(cur));
-                if(collection!=null){
+    public static <T, E, R extends Collection<E>> R eachProxy(@Nullable R collection, Iterable<T> ite,
+                                                              @Nullable IFilter<T> filter, @Nullable IMapper<E, T> mapper,
+                                                              @Nullable IExecutor<E> executor) {
+        Iterator<T> itr = ite.iterator();
+        while (itr.hasNext()) {
+            T cur = itr.next();
+            if (filter == null || filter.test(cur)) {
+                E val = (mapper == null) ? ((E) cur) : (mapper.get(cur));
+                if (collection != null) {
                     collection.add(val);
                 }
-                if(executor!=null){
-                    executor.exec(val);
+                if (executor != null) {
+                    executor.accept(val);
                 }
             }
         }
@@ -68,18 +68,18 @@ public class Algorithm {
      * @return
      */
     @NullableReturn
-    public static<T,E,R extends Collection<E>> R eachProxy(@Nullable R collection, Enumeration<T> ite,
-                                                      @Nullable IFilter<T> filter, @Nullable IMap<T,E> mapper,
-                                                      @Nullable IExecute<E> executor){
-        while (ite.hasMoreElements()){
-            T cur= ite.nextElement();
-            if(filter==null || filter.choice(cur)){
-                E val= (mapper==null)?((E)cur):(mapper.map(cur));
-                if(collection!=null){
+    public static <T, E, R extends Collection<E>> R eachProxy(@Nullable R collection, Enumeration<T> ite,
+                                                              @Nullable IFilter<T> filter, @Nullable IMapper<E, T> mapper,
+                                                              @Nullable IExecutor<E> executor) {
+        while (ite.hasMoreElements()) {
+            T cur = ite.nextElement();
+            if (filter == null || filter.test(cur)) {
+                E val = (mapper == null) ? ((E) cur) : (mapper.get(cur));
+                if (collection != null) {
                     collection.add(val);
                 }
-                if(executor!=null){
-                    executor.exec(val);
+                if (executor != null) {
+                    executor.accept(val);
                 }
             }
         }
@@ -98,12 +98,13 @@ public class Algorithm {
      * @return
      */
     @NullableReturn
-    public static<T,E,R extends Collection<E>> R filterMap(@Nullable R collection,Iterable<T> ite,@Nullable IFilter<T> filter,@Nullable IMap<T,E> mapper){
-        return eachProxy(collection,ite,filter,mapper,null);
+    public static <T, E, R extends Collection<E>> R filterMap(@Nullable R collection, Iterable<T> ite, @Nullable IFilter<T> filter, @Nullable IMapper<E, T> mapper) {
+        return eachProxy(collection, ite, filter, mapper, null);
     }
+
     @NullableReturn
-    public static<T,E,R extends Collection<E>> R filterMap(@Nullable R collection,Enumeration<T> ite,@Nullable IFilter<T> filter,@Nullable IMap<T,E> mapper){
-        return eachProxy(collection,ite,filter,mapper,null);
+    public static <T, E, R extends Collection<E>> R filterMap(@Nullable R collection, Enumeration<T> ite, @Nullable IFilter<T> filter, @Nullable IMapper<E, T> mapper) {
+        return eachProxy(collection, ite, filter, mapper, null);
     }
 
     /**
@@ -135,24 +136,27 @@ public class Algorithm {
      * @return
      */
     @NullableReturn
-    public static<T,E,R extends Collection<E>> R map(@Nullable R collection,Iterable<T> ite,@Nullable IMap<T,E> mapper){
-        return eachProxy(collection,ite,null,mapper,null);
+    public static <T, E, R extends Collection<E>> R map(@Nullable R collection, Iterable<T> ite, @Nullable IMapper<E, T> mapper) {
+        return eachProxy(collection, ite, null, mapper, null);
     }
+
     @NullableReturn
-    public static<T,E,R extends Collection<E>> R map(@Nullable R collection,Enumeration<T> ite,@Nullable IMap<T,E> mapper){
-        return eachProxy(collection,ite,null,mapper,null);
+    public static <T, E, R extends Collection<E>> R map(@Nullable R collection, Enumeration<T> ite, @Nullable IMapper<E, T> mapper) {
+        return eachProxy(collection, ite, null, mapper, null);
     }
 
     /**
      * 仅执行
+     *
      * @param ite
      * @param executor
      * @param <T>
      */
-    public static<T> void execute(Iterable<T> ite,@Nullable IExecute<T> executor){
-        eachProxy(null,ite,null,null,executor);
+    public static <T> void execute(Iterable<T> ite, @Nullable IExecutor<T> executor) {
+        eachProxy(null, ite, null, null, executor);
     }
-    public static<T> void execute(Enumeration<T> ite,@Nullable IExecute<T> executor){
-        eachProxy(null,ite,null,null,executor);
+
+    public static <T> void execute(Enumeration<T> ite, @Nullable IExecutor<T> executor) {
+        eachProxy(null, ite, null, null, executor);
     }
 }

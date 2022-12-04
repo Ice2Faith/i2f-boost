@@ -2,9 +2,9 @@ package i2f.core.generate.core.impl;
 
 import i2f.core.annotations.remark.Author;
 import i2f.core.command.CmdLineExecutor;
+import i2f.core.functional.common.IMapper;
 import i2f.core.generate.RegexGenerator;
 import i2f.core.generate.core.IGenerate;
-import i2f.core.interfaces.IMap;
 import lombok.Data;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ import java.util.Map;
 @Author("i2f")
 @Data
 public class CmdGenerate implements IGenerate {
-    public IMap<Object,String> mapper;
+    public IMapper<String, Object> mapper;
     public Object root;
     public Object data;
     public List<String> basePackages;

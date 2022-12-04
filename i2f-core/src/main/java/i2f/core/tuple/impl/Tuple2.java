@@ -1,13 +1,41 @@
 package i2f.core.tuple.impl;
 
+import i2f.core.collection.Collections;
 import i2f.core.tuple.ITuple;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * @author ltb
- * @date 2022/11/9 12:12
- * @desc
- */
-public class Tuple2<V1, V2> implements ITuple {
-    public V1 v1;
-    public V2 v2;
+import java.util.List;
+import java.util.Map;
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Tuple2<T1, T2> implements ITuple, Map.Entry<T1, T2> {
+    public T1 t1;
+    public T2 t2;
+
+    @Override
+    public List<Object> toList() {
+        return Collections.arrayList(t1, t2);
+    }
+
+    @Override
+    public T1 getKey() {
+        return t1;
+    }
+
+    @Override
+    public T2 getValue() {
+        return t2;
+    }
+
+    @Override
+    public T2 setValue(T2 value) {
+        T2 ret = t2;
+        t2 = value;
+        return ret;
+    }
 }

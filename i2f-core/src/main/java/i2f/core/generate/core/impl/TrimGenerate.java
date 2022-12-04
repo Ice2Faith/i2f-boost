@@ -2,9 +2,9 @@ package i2f.core.generate.core.impl;
 
 
 import i2f.core.annotations.remark.Author;
+import i2f.core.functional.common.IMapper;
 import i2f.core.generate.RegexGenerator;
 import i2f.core.generate.core.IGenerate;
-import i2f.core.interfaces.IMap;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.Map;
  */
 @Author("i2f")
 public class TrimGenerate  implements IGenerate {
-    public IMap<Object,String> mapper;
+    public IMapper<String, Object> mapper;
     public Object root;
     public Object data;
     public List<String> basePackages;
@@ -36,7 +36,7 @@ public class TrimGenerate  implements IGenerate {
             }
         }
         if(template==null){
-            str=mapper.map(data);
+            str = mapper.get(data);
         }else{
             Map<String,Object> param=new HashMap<>(16);
             param.put("_root",root);

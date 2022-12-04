@@ -3,7 +3,7 @@ package i2f.core.check;
 
 import i2f.core.annotations.remark.Author;
 import i2f.core.annotations.remark.Usage;
-import i2f.core.interfaces.IFilter;
+import i2f.core.functional.common.IFilter;
 
 import java.util.Collection;
 import java.util.Map;
@@ -21,13 +21,15 @@ import java.util.concurrent.ConcurrentHashMap;
 })
 public class Checker {
     public static ConcurrentHashMap<String, IFilter> validators=new ConcurrentHashMap<>();
-    public static void registerValidator(String name,IFilter filter){
-        validators.put(name,filter);
+
+    public static void registerValidator(String name, IFilter filter) {
+        validators.put(name, filter);
     }
-    public static void registerValidator(IFilter filter){
-        String cname=filter.getClass().getSimpleName();
-        String name = cname.substring(0,1).toLowerCase()+cname.substring(1);
-        validators.put(name,filter);
+
+    public static void registerValidator(IFilter filter) {
+        String cname = filter.getClass().getSimpleName();
+        String name = cname.substring(0, 1).toLowerCase() + cname.substring(1);
+        validators.put(name, filter);
     }
     public static IFilter getValidator(String validatorName){
         return validators.get(validatorName);
@@ -982,22 +984,22 @@ public class Checker {
         }
 
         public CheckWorker validate(String validatorName,Object obj,String message){
-            if(!ok){
+            if (!ok) {
                 return chk();
             }
-            if(getValidator(validatorName).choice(obj)){
-                this.ok=false;
-                this.message=message;
+            if (getValidator(validatorName).test(obj)) {
+                this.ok = false;
+                this.message = message;
             }
             return chk();
         }
         public CheckWorker validate(Class<IFilter> validatorClass,Object obj,String message){
-            if(!ok){
+            if (!ok) {
                 return chk();
             }
-            if(getValidator(validatorClass).choice(obj)){
-                this.ok=false;
-                this.message=message;
+            if (getValidator(validatorClass).test(obj)) {
+                this.ok = false;
+                this.message = message;
             }
             return chk();
         }

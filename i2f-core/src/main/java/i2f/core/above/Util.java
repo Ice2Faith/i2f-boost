@@ -1,7 +1,7 @@
 package i2f.core.above;
 
 import i2f.core.data.Pair;
-import i2f.core.interfaces.IMap;
+import i2f.core.functional.common.IMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -355,35 +355,35 @@ public class Util {
         return copyCollection(col, ret);
     }
 
-    public static <T, K, V, IN extends Collection<T>, OUT extends Map<K, V>> OUT copyMap(IN src, OUT dst, IMap<T, Pair<K, V>> mapper) {
+    public static <T, K, V, IN extends Collection<T>, OUT extends Map<K, V>> OUT copyMap(IN src, OUT dst, IMapper<Pair<K, V>, T> mapper) {
         for (T item : src) {
-            Pair<K, V> pair = mapper.map(item);
+            Pair<K, V> pair = mapper.get(item);
             dst.put(pair.key, pair.val);
         }
         return dst;
     }
 
-    public static <T, K, V> HashMap<K, V> ofHashMap(Collection<T> col, IMap<T, Pair<K, V>> mapper) {
+    public static <T, K, V> HashMap<K, V> ofHashMap(Collection<T> col, IMapper<Pair<K, V>, T> mapper) {
         HashMap<K, V> ret = new HashMap<>(hashCapital(col.size()));
         return copyMap(col, ret, mapper);
     }
 
-    public static <T, K, V> LinkedHashMap<K, V> ofLinkedHashMap(Collection<T> col, IMap<T, Pair<K, V>> mapper) {
+    public static <T, K, V> LinkedHashMap<K, V> ofLinkedHashMap(Collection<T> col, IMapper<Pair<K, V>, T> mapper) {
         LinkedHashMap<K, V> ret = new LinkedHashMap<>(hashCapital(col.size()));
         return copyMap(col, ret, mapper);
     }
 
-    public static <T, K extends Comparable<K>, V> TreeMap<K, V> ofTreeMap(Collection<T> col, IMap<T, Pair<K, V>> mapper) {
+    public static <T, K extends Comparable<K>, V> TreeMap<K, V> ofTreeMap(Collection<T> col, IMapper<Pair<K, V>, T> mapper) {
         TreeMap<K, V> ret = new TreeMap<>();
         return copyMap(col, ret, mapper);
     }
 
-    public static <T, K, V> TreeMap<K, V> ofTreeMap(Collection<T> col, IMap<T, Pair<K, V>> mapper, Comparator<K> comparator) {
+    public static <T, K, V> TreeMap<K, V> ofTreeMap(Collection<T> col, IMapper<Pair<K, V>, T> mapper, Comparator<K> comparator) {
         TreeMap<K, V> ret = new TreeMap<>(comparator);
         return copyMap(col, ret, mapper);
     }
 
-    public static <T, K, V> ConcurrentHashMap<K, V> ofConcurrentHashMap(Collection<T> col, IMap<T, Pair<K, V>> mapper) {
+    public static <T, K, V> ConcurrentHashMap<K, V> ofConcurrentHashMap(Collection<T> col, IMapper<Pair<K, V>, T> mapper) {
         ConcurrentHashMap<K, V> ret = new ConcurrentHashMap<>(hashCapital(col.size()));
         return copyMap(col, ret, mapper);
     }

@@ -1,10 +1,7 @@
 package i2f.core.str;
 
-import i2f.core.collection.adapter.ArrayIteratorAdapter;
-import i2f.core.collection.adapter.EnumerationIteratorAdapter;
-import i2f.core.collection.adapter.IterableIteratorAdapter;
-import i2f.core.collection.adapter.ReflectArrayIteratorAdapter;
-import i2f.core.interfaces.IMap;
+import i2f.core.functional.common.IMapper;
+import i2f.core.iterator.Iterators;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -356,38 +353,38 @@ public class Appender<T extends Appendable> {
         return this;
     }
     public<E> Appender<T> addIterableElem(Iterable<E> col, Object separator, Object open, Object close, IElemAppend<T,E> mapper){
-        return addIteratorElem(new IterableIteratorAdapter<>(col),separator,open,close,mapper);
+        return addIteratorElem(Iterators.of(col), separator, open, close, mapper);
     }
     public<E> Appender<T> addCollectionElem(Collection<E> col, Object separator, Object open, Object close, IElemAppend<T,E> mapper){
-        return addIteratorElem(new IterableIteratorAdapter<>(col),separator,open,close,mapper);
+        return addIteratorElem(Iterators.of(col), separator, open, close, mapper);
     }
     public<E> Appender<T> addEnumerationElem(Enumeration<E> enums, Object separator, Object open, Object close, IElemAppend<T,E> mapper){
-        return addIteratorElem(new EnumerationIteratorAdapter<>(enums),separator,open,close,mapper);
+        return addIteratorElem(Iterators.of(enums), separator, open, close, mapper);
     }
     public<E> Appender<T> addArrayElem(E[] arr, Object separator, Object open, Object close, IElemAppend<T,E> mapper){
-        return addIteratorElem(new ArrayIteratorAdapter<>(arr),separator,open,close,mapper);
+        return addIteratorElem(Iterators.of(arr), separator, open, close, mapper);
     }
     public<E> Appender<T> addReflectArrayElem(Object arr, Object separator, Object open, Object close, IElemAppend<T,E> mapper){
-        return addIteratorElem(new ReflectArrayIteratorAdapter<>(arr),separator,open,close,mapper);
+        return addIteratorElem(Iterators.of(arr), separator, open, close, mapper);
     }
     public<E> Appender<T> addsElem(Object separator, Object open, Object close, IElemAppend<T,E> mapper,E ... arr){
-        return addIteratorElem(new ArrayIteratorAdapter<>(arr),separator,open,close,mapper);
+        return addIteratorElem(Iterators.of(arr), separator, open, close, mapper);
     }
 
-    public Appender<T> addIterator(Iterator<?> iterator, Object separator, Object open, Object close, IMap mapper){
-        if(open!=null){
+    public Appender<T> addIterator(Iterator<?> iterator, Object separator, Object open, Object close, IMapper mapper) {
+        if (open != null) {
             add(open);
         }
-        boolean isFirst=true;
-        while (iterator.hasNext()){
-            if(!isFirst){
-                if(separator!=null){
+        boolean isFirst = true;
+        while (iterator.hasNext()) {
+            if (!isFirst) {
+                if (separator != null) {
                     add(separator);
                 }
             }
             Object val=iterator.next();
             if(mapper!=null){
-                val=mapper.map(val);
+                val = mapper.get(val);
             }
             add(val);
             isFirst=false;
@@ -397,102 +394,129 @@ public class Appender<T extends Appendable> {
         }
         return this;
     }
-    public Appender<T> addIterator(Iterator<?> iterator, Object separator, Object open, Object close){
-        return addIterator(iterator, separator, open, close,null);
+
+    public Appender<T> addIterator(Iterator<?> iterator, Object separator, Object open, Object close) {
+        return addIterator(iterator, separator, open, close, null);
     }
-    public Appender<T> addIterator(Iterator<?> iterator, Object separator){
-        return addIterator(iterator,separator,null,null);
+
+    public Appender<T> addIterator(Iterator<?> iterator, Object separator) {
+        return addIterator(iterator, separator, null, null);
     }
-    public Appender<T> addIterator(Iterator<?> iterator){
-        return addIterator(iterator,null,null,null);
+
+    public Appender<T> addIterator(Iterator<?> iterator) {
+        return addIterator(iterator, null, null, null);
     }
-    public Appender<T> addIterable(Iterable<?> col,Object separator,Object open,Object close,IMap mapper){
-        return addIterator(new IterableIteratorAdapter<>(col),separator,open,close,mapper);
+
+    public Appender<T> addIterable(Iterable<?> col, Object separator, Object open, Object close, IMapper mapper) {
+        return addIterator(Iterators.of(col), separator, open, close, mapper);
     }
-    public Appender<T> addIterable(Iterable<?> col,Object separator,Object open,Object close){
-        return addIterator(new IterableIteratorAdapter<>(col),separator,open,close);
+
+    public Appender<T> addIterable(Iterable<?> col, Object separator, Object open, Object close) {
+        return addIterator(Iterators.of(col), separator, open, close);
     }
-    public Appender<T> addIterable(Iterable<?> col,Object separator){
-        return addIterator(new IterableIteratorAdapter<>(col),separator,null,null);
+
+    public Appender<T> addIterable(Iterable<?> col, Object separator) {
+        return addIterator(Iterators.of(col), separator, null, null);
     }
-    public Appender<T> addIterable(Iterable<?> col){
-        return addIterator(new IterableIteratorAdapter<>(col),null,null,null);
+
+    public Appender<T> addIterable(Iterable<?> col) {
+        return addIterator(Iterators.of(col), null, null, null);
     }
-    public Appender<T> addCollection(Collection<?> col, Object separator, Object open, Object close,IMap mapper){
-        return addIterator(new IterableIteratorAdapter<>(col),separator,open,close,mapper);
+
+    public Appender<T> addCollection(Collection<?> col, Object separator, Object open, Object close, IMapper mapper) {
+        return addIterator(Iterators.of(col), separator, open, close, mapper);
     }
-    public Appender<T> addCollection(Collection<?> col, Object separator, Object open, Object close){
-        return addIterator(new IterableIteratorAdapter<>(col),separator,open,close);
+
+    public Appender<T> addCollection(Collection<?> col, Object separator, Object open, Object close) {
+        return addIterator(Iterators.of(col), separator, open, close);
     }
-    public Appender<T> addCollection(Collection<?> col, Object separator){
-        return addIterator(new IterableIteratorAdapter<>(col),separator,null,null);
+
+    public Appender<T> addCollection(Collection<?> col, Object separator) {
+        return addIterator(Iterators.of(col), separator, null, null);
     }
-    public Appender<T> addCollection(Collection<?> col){
-        return addIterator(new IterableIteratorAdapter<>(col),null,null,null);
+
+    public Appender<T> addCollection(Collection<?> col) {
+        return addIterator(Iterators.of(col), null, null, null);
     }
-    public Appender<T> addEnumeration(Enumeration<?> enu,Object separator,Object open,Object close,IMap mapper){
-        return addIterator(new EnumerationIteratorAdapter<>(enu),separator,open,close,mapper);
+
+    public Appender<T> addEnumeration(Enumeration<?> enu, Object separator, Object open, Object close, IMapper mapper) {
+        return addIterator(Iterators.of(enu), separator, open, close, mapper);
     }
-    public Appender<T> addEnumeration(Enumeration<?> enu,Object separator,Object open,Object close){
-        return addIterator(new EnumerationIteratorAdapter<>(enu),separator,open,close);
+
+    public Appender<T> addEnumeration(Enumeration<?> enu, Object separator, Object open, Object close) {
+        return addIterator(Iterators.of(enu), separator, open, close);
     }
-    public Appender<T> addEnumeration(Enumeration<?> enu,Object separator){
-        return addIterator(new EnumerationIteratorAdapter<>(enu),separator,null,null);
+
+    public Appender<T> addEnumeration(Enumeration<?> enu, Object separator) {
+        return addIterator(Iterators.of(enu), separator, null, null);
     }
-    public Appender<T> addEnumeration(Enumeration<?> enu){
-        return addIterator(new EnumerationIteratorAdapter<>(enu),null,null,null);
+
+    public Appender<T> addEnumeration(Enumeration<?> enu) {
+        return addIterator(Iterators.of(enu), null, null, null);
     }
-    public<E> Appender<T> addArray(E[] arr,Object separator,Object open,Object close,IMap mapper){
-        return addIterator(new ArrayIteratorAdapter<>(arr),separator,open,close,mapper);
+
+    public <E> Appender<T> addArray(E[] arr, Object separator, Object open, Object close, IMapper mapper) {
+        return addIterator(Iterators.of(arr), separator, open, close, mapper);
     }
-    public<E> Appender<T> addArray(E[] arr,Object separator,Object open,Object close){
-        return addIterator(new ArrayIteratorAdapter<>(arr),separator,open,close);
+
+    public <E> Appender<T> addArray(E[] arr, Object separator, Object open, Object close) {
+        return addIterator(Iterators.of(arr), separator, open, close);
     }
-    public<E> Appender<T> addArray(E[] arr,Object separator){
-        return addIterator(new ArrayIteratorAdapter<>(arr),separator,null,null);
+
+    public <E> Appender<T> addArray(E[] arr, Object separator) {
+        return addIterator(Iterators.of(arr), separator, null, null);
     }
-    public<E> Appender<T> addArray(E[] arr){
-        return addIterator(new ArrayIteratorAdapter<>(arr),null,null,null);
+
+    public <E> Appender<T> addArray(E[] arr) {
+        return addIterator(Iterators.of(arr), null, null, null);
     }
-    public Appender<T> addReflectArray(Object arr,Object separator,Object open,Object close,IMap mapper){
-        return addIterator(new ReflectArrayIteratorAdapter<>(arr),separator,open,close,mapper);
+
+    public Appender<T> addReflectArray(Object arr, Object separator, Object open, Object close, IMapper mapper) {
+        return addIterator(Iterators.of(arr), separator, open, close, mapper);
     }
-    public Appender<T> addReflectArray(Object arr,Object separator,Object open,Object close){
-        return addIterator(new ReflectArrayIteratorAdapter<>(arr),separator,open,close);
+
+    public Appender<T> addReflectArray(Object arr, Object separator, Object open, Object close) {
+        return addIterator(Iterators.of(arr), separator, open, close);
     }
-    public Appender<T> addReflectArray(Object arr,Object separator){
-        return addIterator(new ReflectArrayIteratorAdapter<>(arr),separator,null,null);
+
+    public Appender<T> addReflectArray(Object arr, Object separator) {
+        return addIterator(Iterators.of(arr), separator, null, null);
     }
-    public Appender<T> addReflectArray(Object arr){
-        return addIterator(new ReflectArrayIteratorAdapter<>(arr),null,null,null);
+
+    public Appender<T> addReflectArray(Object arr) {
+        return addIterator(Iterators.of(arr), null, null, null);
     }
     public Appender<T> addsLine(Object ... arr){
         adds(arr);
         return line();
     }
     public Appender<T> adds(Object ... arr){
-        return addIterator(new ArrayIteratorAdapter<>(arr),null,null,null);
-    }
-    public Appender<T> addsSepLine(Object separator, Object ... arr){
-        addsSep(separator,arr);
-        return line();
-    }
-    public Appender<T> addsSep(Object separator, Object ... arr){
-        return addIterator(new ArrayIteratorAdapter<>(arr),separator,null,null);
-    }
-    public Appender<T> addsFull(Object separator, Object open, Object close, Object ... arr){
-        return addIterator(new ArrayIteratorAdapter<>(arr),separator,open,close);
-    }
-    public Appender<T> addsFullMap(Object separator, Object open, Object close, IMap mapper, Object ... arr){
-        return addIterator(new ArrayIteratorAdapter<>(arr),separator,open,close);
+        return addIterator(Iterators.of(arr), null, null, null);
     }
 
-    public<K,V> Appender<T> addMap(Map<K,V> map,Object kvSeparator,Object entrySeparator,Object open,Object close){
-        if(open!=null){
+    public Appender<T> addsSepLine(Object separator, Object... arr) {
+        addsSep(separator, arr);
+        return line();
+    }
+
+    public Appender<T> addsSep(Object separator, Object... arr) {
+        return addIterator(Iterators.of(arr), separator, null, null);
+    }
+
+    public Appender<T> addsFull(Object separator, Object open, Object close, Object... arr) {
+        return addIterator(Iterators.of(arr), separator, open, close);
+    }
+
+    public Appender<T> addsFullMap(Object separator, Object open, Object close, IMapper mapper, Object... arr) {
+        return addIterator(Iterators.of(arr), separator, open, close);
+    }
+
+    public <K, V> Appender<T> addMap(Map<K, V> map, Object kvSeparator, Object entrySeparator, Object open, Object close) {
+        if (open != null) {
             add(open);
         }
 
-        if(close!=null){
+        if (close != null) {
             add(close);
         }
 

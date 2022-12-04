@@ -1,7 +1,7 @@
 package i2f.core.digest;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.str.StringUtil;
+import i2f.core.str.Strings;
 
 import javax.crypto.Cipher;
 import java.security.KeyPair;
@@ -147,7 +147,7 @@ public class RsaUtil {
     public static String privateKeyDecryptBase64(RsaKey key,String bs64){
         byte[] enc= Base64Util.decode(bs64);
         byte[] dec=privateKeyDecrypt(key,enc);
-        return StringUtil.ofUtf8(dec);
+        return Strings.ofUtf8(dec);
     }
 
     /**
@@ -158,8 +158,8 @@ public class RsaUtil {
      * @return
      */
     public static String privateKeyEncryptBase64(RsaKey key,String text){
-        byte[] data=StringUtil.toUtf8(text);
-        byte[] enc=privateKeyEncrypt(key,data);
+        byte[] data = Strings.toUtf8(text);
+        byte[] enc = privateKeyEncrypt(key, data);
         return Base64Util.encode(enc);
     }
 
@@ -173,7 +173,7 @@ public class RsaUtil {
     public static String publicKeyDecryptBase64(RsaKey key,String bs64){
         byte[] enc=Base64Util.decode(bs64);
         byte[] dec=publicKeyDecrypt(key,enc);
-        return StringUtil.ofUtf8(dec);
+        return Strings.ofUtf8(dec);
     }
 
     /**
@@ -184,8 +184,8 @@ public class RsaUtil {
      * @return
      */
     public static String publicKeyEncryptBase64(RsaKey key,String text){
-        byte[] data=StringUtil.toUtf8(text);
-        byte[] enc=publicKeyEncrypt(key,data);
+        byte[] data = Strings.toUtf8(text);
+        byte[] enc = publicKeyEncrypt(key, data);
         return Base64Util.encode(enc);
     }
 

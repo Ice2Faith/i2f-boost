@@ -1,8 +1,8 @@
 package i2f.core.bit;
 
-import i2f.core.array.ArrayUtil;
+import i2f.core.array.Arrays;
 import i2f.core.check.CheckUtil;
-import i2f.core.collection.CollectionUtil;
+import i2f.core.collection.Collections;
 import i2f.core.str.Appender;
 
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class BytesUtil {
                 pi+=len;
             }
         }else{
-           arr.addAll(CollectionUtil.arrayList(str.split(sep)));
+            arr.addAll(Collections.arrayList(str.split(sep)));
         }
 
         for(String item : arr){
@@ -80,8 +80,8 @@ public class BytesUtil {
             ret.add(b);
         }
 
-        Byte[] bts=ArrayUtil.toArray(ret,Byte[].class);
-        byte[] bytes=new byte[bts.length];
+        Byte[] bts = Arrays.collect(ret, Byte[].class);
+        byte[] bytes = new byte[bts.length];
         for (int i = 0; i < bts.length; i++) {
             bytes[i]=bts[i];
         }

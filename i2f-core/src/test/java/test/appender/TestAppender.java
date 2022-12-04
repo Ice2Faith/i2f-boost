@@ -1,6 +1,6 @@
 package test.appender;
 
-import i2f.core.collection.CollectionUtil;
+import i2f.core.collection.Collections;
 import i2f.core.str.Appender;
 
 /**
@@ -19,7 +19,7 @@ public class TestAppender {
                 .line()
                 .addOtcBytes("你好".getBytes())
                 .line()
-                .addCollection(CollectionUtil.arrayList(1,2,3,4),",","[","]")
+                .addCollection(Collections.arrayList(1, 2, 3, 4), ",", "[", "]")
                 .line()
                 .add(",")
                 .trimEnd(",")

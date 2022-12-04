@@ -1,9 +1,17 @@
 package i2f.core.date;
 
+import i2f.core.annotations.notice.NullableReturn;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author ltb
@@ -11,58 +19,198 @@ import java.util.Date;
  * @desc
  */
 public class Dates {
-    public interface DatePatten {
-        String DATE_ONLY = "yyyy-MM-dd";
-        String DATE_TIME = "yyyy-MM-dd HH:mm:ss";
-        String DATE_TIME_MILLI = "yyyy-MM-dd HH:mm:ss SSS";
-        String MONTH = "yyyy-MM";
-        String YEAR = "yyyy";
-        String HOUR_MIN = "HH:mm";
-        String TIME_ONLY = "HH:mm:ss";
+    public static final String FMT_DATE_TIME_MILL = "yyyy-MM-dd HH:mm:ss SSS";
+    public static ThreadLocal<SimpleDateFormat> formatter = ThreadLocal.withInitial(() -> {
+        return new SimpleDateFormat(FMT_DATE_TIME_MILL);
+    });
+    public static ThreadLocal<SimpleDateFormat> sfmtMill = ThreadLocal.withInitial(() -> {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
+    });
+    public static ThreadLocal<SimpleDateFormat> sfmtSecond = ThreadLocal.withInitial(() -> {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    });
+    public static ThreadLocal<SimpleDateFormat> sfmtMinus = ThreadLocal.withInitial(() -> {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    });
+    public static ThreadLocal<SimpleDateFormat> sfmtHour = ThreadLocal.withInitial(() -> {
+        return new SimpleDateFormat("yyyy-MM-dd HH");
+    });
+    public static ThreadLocal<SimpleDateFormat> sfmtDay = ThreadLocal.withInitial(() -> {
+        return new SimpleDateFormat("yyyy-MM-dd");
+    });
+    public static ThreadLocal<SimpleDateFormat> sfmtMonth = ThreadLocal.withInitial(() -> {
+        return new SimpleDateFormat("yyyy-MM");
+    });
+    public static ThreadLocal<SimpleDateFormat> sfmtYear = ThreadLocal.withInitial(() -> {
+        return new SimpleDateFormat("yyyy");
+    });
+    public static final DateTimeFormatter fmtMill = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss SSS");
+    public static final DateTimeFormatter fmtSecond = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public static final DateTimeFormatter fmtMinus = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    public static final DateTimeFormatter fmtHour = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
+    public static final DateTimeFormatter fmtDay = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter fmtMonth = DateTimeFormatter.ofPattern("yyyy-MM");
+    public static final DateTimeFormatter fmtYear = DateTimeFormatter.ofPattern("yyyy");
+
+
+    public static String[] SUPPORT_PARSE_DATE_FORMATS = {
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd",
+            "yyyy-MM-dd HH:mm:ss SSS",
+            "yyyy-MM",
+            "yyyyMMdd",
+            "yyyyMM",
+            "yyyyMMddHH",
+            "yyyy/MM/dd HH:mm:ss",
+            "yyyy/MM/dd",
+            "yyyy年MM月dd日 HH时mm分ss秒",
+            "yyyy-MM-dd HH:mm",
+            "yyyy-MM-dd HH",
+            "yyyy"
+    };
+
+    @NullableReturn
+    public static Date from(String date) {
+        for (String item : SUPPORT_PARSE_DATE_FORMATS) {
+            SimpleDateFormat fmt = new SimpleDateFormat(item);
+            try {
+                return fmt.parse(date);
+            } catch (Exception e) {
+
+            }
+        }
+        return null;
     }
 
-    public enum DateField {
-        YEAR(Calendar.YEAR, 0, 9999, 0),
-        MONTH(Calendar.MONTH, 0, 11, 0),// 0 is first month of year
-        DAY(Calendar.DAY_OF_MONTH, 1, 31, -1), // 1 is first day of month
-        HOUR(Calendar.HOUR_OF_DAY, 0, 23, 0),
-        MINUTE(Calendar.MINUTE, 0, 59, 0),
-        SECOND(Calendar.SECOND, 0, 59, 0),
-        MILLISECOND(Calendar.MILLISECOND, 0, 999, 0),
-        WEEK(Calendar.DAY_OF_WEEK, 1, 7, -1); // 0 is sunday,1 is monday
+    @NullableReturn
+    public static Date from(String date, String patten) {
+        SimpleDateFormat fmt = new SimpleDateFormat(patten);
+        Date ret = null;
+        try {
+            ret = fmt.parse(date);
+        } catch (ParseException e) {
 
-        private int code;
-        private int min;
-        private int max;
-        private int off;
-
-        private DateField(int code, int min, int max, int off) {
-            this.code = code;
-            this.min = min;
-            this.max = max;
-            this.off = off;
         }
-
-        public int code() {
-            return code;
-        }
-
-        public int min() {
-            return min;
-        }
-
-        public int max() {
-            return max;
-        }
-
-        public int calendar2logical(int val) {
-            return val + off;
-        }
-
-        public int logical2calendar(int val) {
-            return val - off;
-        }
+        return ret;
     }
+
+    public static Date parse(String date) throws ParseException {
+        return parse(date, FMT_DATE_TIME_MILL);
+    }
+
+    public static String format(Date date) {
+        return formatter.get().format(date);
+    }
+
+    @NullableReturn
+    public static String convertFormat(String date, String srcFmt, String dstFmt) {
+        Date sdate = from(date, srcFmt);
+        if (sdate != null) {
+            return format(sdate, dstFmt);
+        }
+        return null;
+    }
+
+    public static boolean isLeapYear(int year) {
+        if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isLegalDate(int year, int month, int day) {
+        if (month < 1 || month > 12) {
+            return false;
+        }
+        if (day < 1 || day > 31) {
+            return false;
+        }
+        switch (month) {
+            case 1:
+            case 3:
+            case 5:
+            case 7:
+            case 8:
+            case 10:
+            case 12:
+                if (day > 31) {
+                    return false;
+                }
+                break;
+            case 2:
+                if (isLeapYear(year)) {
+                    if (day > 29) {
+                        return false;
+                    }
+                } else {
+                    if (day > 28) {
+                        return false;
+                    }
+                }
+                break;
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+                if (day > 30) {
+                    return false;
+                }
+                break;
+        }
+        return true;
+    }
+
+    /**
+     * 获取年有多少天
+     *
+     * @param year
+     * @return
+     */
+    public static long getDaysOnYear(int year) {
+        if (isLeapYear(year)) {
+            return 366;
+        }
+        return 365;
+    }
+
+    /**
+     * 获取月有多少天
+     *
+     * @param year
+     * @param month
+     * @return
+     */
+    public static long getDaysOnMonth(int year, int month) {
+        long ret = 0;
+        switch (month) {
+            case 1:
+            case 3:
+            case 5:
+            case 7:
+            case 8:
+            case 10:
+            case 12:
+                ret = 31;
+                break;
+            case 2:
+                if (isLeapYear(year)) {
+                    ret = 29;
+                } else {
+                    ret = 28;
+                }
+                break;
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+                ret = 30;
+                break;
+        }
+        return ret;
+    }
+
+
+    private static final Class<Calendar> calendarLock = Calendar.class;
 
     public static Date parse(String date, String patten) throws ParseException {
         SimpleDateFormat fmt = new SimpleDateFormat(patten);
@@ -74,14 +222,12 @@ public class Dates {
         return fmt.format(date);
     }
 
-    private static final Class<?> lock = Calendar.class;
-
     public static Calendar calendar() {
         return Calendar.getInstance();
     }
 
     public static Date add(Date date, DateField field, int offset) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
             calendar.add(field.code(), offset);
@@ -90,7 +236,7 @@ public class Dates {
     }
 
     public static Date set(Date date, DateField field, int value) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
             calendar.set(field.code(), value);
@@ -99,7 +245,7 @@ public class Dates {
     }
 
     public static int get(Date date, DateField field) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
             return calendar.get(field.code());
@@ -107,7 +253,7 @@ public class Dates {
     }
 
     public static Date min(Date date, DateField field) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
             calendar.set(field.code(), field.min());
@@ -125,7 +271,7 @@ public class Dates {
      * @return
      */
     public static Date setLogical(Date date, DateField field, int value) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
             calendar.set(field.code(), field.logical2calendar(value));
@@ -142,60 +288,86 @@ public class Dates {
      * @return
      */
     public static int getLogical(Date date, DateField field) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
             return field.calendar2logical(calendar.get(field.code()));
         }
     }
 
-    public static Date addMillisecond(Date date, int offset) {
-        synchronized (lock) {
-            Calendar calendar = calendar();
-            calendar.setTime(date);
-            calendar.add(DateField.MILLISECOND.code(), offset);
-            return calendar.getTime();
-        }
+
+    public static Date addMillisecond(Date date, long millSeconds) {
+        long time = date.getTime();
+        return new Date(time + millSeconds);
     }
 
-    public static Date addSecond(Date date, int offset) {
-        synchronized (lock) {
-            Calendar calendar = calendar();
-            calendar.setTime(date);
-            calendar.add(DateField.SECOND.code(), offset);
-            return calendar.getTime();
-        }
+    public static Date addSecond(Date date, long seconds) {
+        long time = date.getTime();
+        return new Date(time + seconds2(seconds));
     }
 
-    public static Date addMinute(Date date, int offset) {
-        synchronized (lock) {
-            Calendar calendar = calendar();
-            calendar.setTime(date);
-            calendar.add(DateField.MINUTE.code(), offset);
-            return calendar.getTime();
-        }
+    public static Date addMinute(Date date, long minus) {
+        long time = date.getTime();
+        return new Date(time + minus2(minus));
     }
 
-    public static Date addHour(Date date, int offset) {
-        synchronized (lock) {
-            Calendar calendar = calendar();
-            calendar.setTime(date);
-            calendar.add(DateField.HOUR.code(), offset);
-            return calendar.getTime();
-        }
+    public static Date addHour(Date date, long hours) {
+        long time = date.getTime();
+        return new Date(time + hours2(hours));
     }
 
-    public static Date addDay(Date date, int offset) {
-        synchronized (lock) {
-            Calendar calendar = calendar();
-            calendar.setTime(date);
-            calendar.add(DateField.DAY.code(), offset);
-            return calendar.getTime();
-        }
+    public static Date addDay(Date date, long days) {
+        long time = date.getTime();
+        return new Date(time + days2(days));
+    }
+
+    public static Date addWeek(Date date, long weeks) {
+        long time = date.getTime();
+        return new Date(time + week2(weeks));
+    }
+
+    public static long diff(Date date1, Date date2) {
+        return (date1.getTime() - date2.getTime());
+    }
+
+    public static long toSeconds(long millSeconds) {
+        return millSeconds / 1000;
+    }
+
+    public static long toMinus(long millSeconds) {
+        return millSeconds / 1000 / 60;
+    }
+
+    public static long toHours(long millSeconds) {
+        return millSeconds / 1000 / 60 / 60;
+    }
+
+    public static long toDays(long millSeconds) {
+        return millSeconds / 1000 / 60 / 60 / 24;
+    }
+
+    public static long seconds2(long seconds) {
+        return seconds * 1000;
+    }
+
+    public static long minus2(long minus) {
+        return minus * 1000 * 60;
+    }
+
+    public static long hours2(long hours) {
+        return hours * 1000 * 60 * 60;
+    }
+
+    public static long days2(long days) {
+        return days * 1000 * 60 * 60 * 24;
+    }
+
+    public static long week2(long weeks) {
+        return weeks * 1000 * 60 * 60 * 24 * 7;
     }
 
     public static Date addMonth(Date date, int offset) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
             calendar.add(DateField.MONTH.code(), offset);
@@ -204,7 +376,7 @@ public class Dates {
     }
 
     public static Date addYear(Date date, int offset) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
             calendar.add(DateField.YEAR.code(), offset);
@@ -212,30 +384,92 @@ public class Dates {
         }
     }
 
+    public static Date add(Date date, long times, TimeUnit unit) {
+        long time = date.getTime();
+        long fac = unit.toMillis(times);
+        return new Date(time + fac);
+    }
+
+    public static Date lastDayOfPreviousMonth(Date date) {
+        Date ndate = firstDayOfMonth(date);
+        return addDay(ndate, -1);
+    }
+
+    public static Date firstDayOfNextMonth(Date date) {
+        Date ndate = lastDayOfMonth(date);
+        return addDay(ndate, 1);
+    }
+
+    public static int season(Date date) {
+        synchronized (calendarLock) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            int mon = calendar.get(Calendar.MONTH);
+            return mon / 3;
+        }
+    }
+
+    public static Date firstDayOfSeason(Date date) {
+        synchronized (calendarLock) {
+            int season = season(date);
+            int mon = season * 3;
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.MONTH, mon);
+            return calendar.getTime();
+        }
+    }
+
+    public static Date lastDayOfSeason(Date date) {
+        synchronized (calendarLock) {
+            int season = season(date);
+            int mon = season * 3 + 2;
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.MONTH, mon);
+            return calendar.getTime();
+        }
+    }
+
+    public static Date lastDayOfPreviousSeason(Date date) {
+        Date sdate = firstDayOfSeason(date);
+        return addDay(sdate, -1);
+    }
+
+    public static Date firstDayOfNextSeason(Date date) {
+        Date sdate = lastDayOfSeason(date);
+        return addDay(sdate, 1);
+    }
+
+
     public static Date firstSecondOfDay(Date date) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
-            calendar.set(DateField.HOUR.code(), DateField.HOUR.min());
-            calendar.set(DateField.MINUTE.code(), DateField.MINUTE.min());
+            calendar.set(DateField.MILLISECOND.code(), DateField.MILLISECOND.min());
             calendar.set(DateField.SECOND.code(), DateField.SECOND.min());
+            calendar.set(DateField.MINUTE.code(), DateField.MINUTE.min());
+            calendar.set(DateField.HOUR.code(), DateField.HOUR.min());
             return calendar.getTime();
         }
     }
 
     public static Date lastSecondOfDay(Date date) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
-            calendar.set(DateField.HOUR.code(), DateField.HOUR.max());
-            calendar.set(DateField.MINUTE.code(), DateField.MINUTE.max());
+            calendar.set(DateField.MILLISECOND.code(), DateField.MILLISECOND.max());
             calendar.set(DateField.SECOND.code(), DateField.SECOND.max());
+            calendar.set(DateField.MINUTE.code(), DateField.MINUTE.max());
+            calendar.set(DateField.HOUR.code(), DateField.HOUR.max());
             return calendar.getTime();
         }
     }
 
     public static Date firstDayOfMonth(Date date) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
             calendar.set(DateField.DAY.code(), DateField.DAY.min());
@@ -244,7 +478,7 @@ public class Dates {
     }
 
     public static Date lastDayOfMonth(Date date) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
             calendar.set(DateField.DAY.code(), DateField.DAY.min());
@@ -255,7 +489,7 @@ public class Dates {
     }
 
     public static Date firstDayOfYear(Date date) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
             calendar.set(DateField.DAY.code(), DateField.DAY.min());
@@ -265,7 +499,7 @@ public class Dates {
     }
 
     public static Date lastDayOfYear(Date date) {
-        synchronized (lock) {
+        synchronized (calendarLock) {
             Calendar calendar = calendar();
             calendar.setTime(date);
             calendar.set(DateField.MONTH.code(), DateField.MONTH.max());
@@ -280,6 +514,48 @@ public class Dates {
 
     public static Date timestamp2date(long timestamp) {
         return new Date(timestamp * 1000);
+    }
+
+    public static Date localDate2Date(LocalDate val) {
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = ((LocalDate) val).atStartOfDay().atZone(zone).toInstant();
+        return Date.from(instant);
+    }
+
+    public static Date localDateTime2Date(LocalDateTime val) {
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = ((LocalDateTime) val).atZone(zone).toInstant();
+        return Date.from(instant);
+    }
+
+    public static Date calendar2Date(Calendar val) {
+        return val.getTime();
+    }
+
+    public static java.sql.Timestamp date2Timestamp(Date val) {
+        return new java.sql.Timestamp(val.getTime());
+    }
+
+    public static java.sql.Date date2sqlDate(Date val) {
+        return new java.sql.Date(val.getTime());
+    }
+
+    public static LocalDate date2LocalDate(Date val) {
+        Instant instant = new Date(val.getTime()).toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        return LocalDateTime.ofInstant(instant, zone).toLocalDate();
+    }
+
+    public static LocalDateTime date2LocalDateTime(Date val) {
+        Instant instant = new Date(val.getTime()).toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        return LocalDateTime.ofInstant(instant, zone);
+    }
+
+    public static Calendar date2Calendar(Date val) {
+        Calendar ret = Calendar.getInstance();
+        ret.setTime(val);
+        return ret;
     }
 
     private Date date = new Date();

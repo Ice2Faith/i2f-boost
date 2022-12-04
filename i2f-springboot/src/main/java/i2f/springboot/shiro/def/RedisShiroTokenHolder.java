@@ -20,9 +20,9 @@ public class RedisShiroTokenHolder extends AbstractShiroTokenHolder implements I
     public static final TimeUnit EXPIRE_TIME_UNIT=TimeUnit.MINUTES;
 
     @Autowired
-    protected RedisCache redisCache;
+    protected RedisCache<Object> redisCache;
 
-    protected ICache<String> cache;
+    protected ICache<String, Object> cache;
 
     @Override
     protected int getExpireTime() {
@@ -35,7 +35,7 @@ public class RedisShiroTokenHolder extends AbstractShiroTokenHolder implements I
     }
 
     @Override
-    protected ICache<String> getCache() {
+    protected ICache<String, Object> getCache() {
         return cache;
     }
 

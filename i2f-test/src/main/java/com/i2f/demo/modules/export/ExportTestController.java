@@ -1,6 +1,6 @@
 package com.i2f.demo.modules.export;
 
-import i2f.core.map.MapUtil;
+import i2f.core.map.Maps;
 import i2f.extension.wps.excel.easyexcel.util.ExportUtil;
 import i2f.extension.wps.excel.easyexcel.util.WebExcelRespData;
 import i2f.extension.wps.excel.easyexcel.util.core.impl.ListDataProvider;
@@ -26,10 +26,10 @@ public class ExportTestController {
     @RequestMapping("tpl")
     public void exportWithTemplate(HttpServletRequest request, HttpServletResponse response) {
         List<Map<String, Object>> list = new ArrayList<>();
-        list.add(MapUtil.hashMap("no", 1001,
+        list.add(Maps.hashMap("no", 1001,
                 "name", "zhang",
                 "age", 22));
-        list.add(MapUtil.hashMap("no", 1002,
+        list.add(Maps.hashMap("no", 1002,
                 "name", "li",
                 "age", 23));
 

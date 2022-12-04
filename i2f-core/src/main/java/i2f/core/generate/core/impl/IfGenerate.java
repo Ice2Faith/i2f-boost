@@ -3,10 +3,10 @@ package i2f.core.generate.core.impl;
 import i2f.core.annotations.remark.Author;
 import i2f.core.data.Pair;
 import i2f.core.data.Triple;
+import i2f.core.functional.common.IMapper;
 import i2f.core.generate.RegexGenerator;
 import i2f.core.generate.core.IGenerate;
 import i2f.core.generate.core.ObjectFinder;
-import i2f.core.interfaces.IMap;
 import i2f.core.reflect.convert.ConvertResolver;
 import lombok.Data;
 
@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 @Author("i2f")
 @Data
 public class IfGenerate implements IGenerate {
-    public IMap<Object,String> mapper;
+    public IMapper<String, Object> mapper;
     public Object root;
     public Object data;
     public String template;
@@ -56,7 +56,7 @@ public class IfGenerate implements IGenerate {
             String str= RegexGenerator.render(template,param,mapper,basePackages);
             builder.append(str);
         }else{
-            String str= mapper.map(data);
+            String str = mapper.get(data);
             builder.append(str);
         }
         return builder.toString();

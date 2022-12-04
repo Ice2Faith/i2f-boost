@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # jar name
-AppName=$1
+AppName=
 # control option
-ctrlOption=$2
-# control argument
-ctrlArg1=$3
-# app env,for spring active,dev/test/prod
-AppEnv=
-# app port,reset server.port
-AppPort=
+ctrlOption=$1
+AppEnv=test
+
+# try find jar file in current
+if [ "$AppName" = "" ];then
+  AppName=`ls -a | grep -v grep | grep .jar | head -n 1`
+fi
 
 echo "-----------------------"
 echo "jarctrl.sh running..."
@@ -27,6 +27,9 @@ MAX_WAIT=30
 # const variable define
 BOOL_TRUE=1
 BOOL_FALSE=0
+
+RMI_ENABLE=$BOOL_TRUE
+RMI_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9400 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.net.preferIPv4Stack=true"
 
 ENABLE_SHORTCUT=$BOOL_FALSE
 
@@ -47,12 +50,27 @@ PID_PATH=${APP_HOME}/pid.$AppName.txt
 # logback
 ENABLE_LOGBACK=$BOOL_TRUE
 # logging.config
-# LOGBACK_CONFIG_FILE=classpath:logback-spring.xml
-LOGBACK_CONFIG_FILE=resources/logback-spring.xml
+LOGBACK_CONFIG_FILE=classpath:logback-spring.xml
 LOGBACK_APP_NAME=$AppName
 LOGBACK_APP_ENV=
-LOGBACK_APP_LOG_MAX_SIZE=20MB
+LOGBACK_APP_LOG_MAX_SIZE=200MB
 
+if [ $ENABLE_LOGBACK == $BOOL_TRUE ];then
+  if [ ! -f "$LOG_PATH" ];then
+    LOG_PATH=${LOG_DIR}/`ls -t ${LOG_DIR} | grep .log | grep ${AppName}.all. | head -n 1`
+  fi
+  if [ ! -f "$LOG_PATH" ];then
+    LOG_PATH=${LOG_DIR}/`ls -t ${LOG_DIR} | grep .log | grep ${AppName}.info. | head -n 1`
+  fi
+  if [ ! -f "$LOG_PATH" ];then
+    LOG_PATH=${LOG_DIR}/`ls -t ${LOG_DIR} | grep .log | grep ${AppName}.warn. | head -n 1`
+  fi
+  if [ ! -f "$LOG_PATH" ];then
+    LOG_PATH=${LOG_DIR}/`ls -t ${LOG_DIR} | grep .log | grep ${AppName}.error. | head -n 1`
+  fi
+fi
+
+echo $LOG_PATH
 
 # jvm 配置
 # java home,use system default when empty
@@ -85,9 +103,13 @@ if [[ "$JAVA_HOME" -ne "" ]]; then
   JAVA_PATH=${JAVA_HOME}/bin/java
 fi
 
+if [[ $RMI_ENABLE == $BOOL_TRUE ]]; then
+  JVM_OPTS="${JVM_OPTS} ${RMI_OPTS}"
+fi
+
 function help()
 {
-    echo -e "\033[0;31m please input 2nd arg:option \033[0m  \033[0;34m {start|stop|restart|shutdown|reboot|status|log|snapshot|backup|recovery|clean|pack|unpack|pidstop|pidstart|pidreboot|deploy|rollback} \033[0m"
+    echo -e "\033[0;31m please input 2nd arg:option \033[0m  \033[0;34m {start|stop|restart|shutdown|reboot|status|log|snapshot|backup|recovery|clean|pack|unpack|pidstop|pidstart|pidreboot} \033[0m"
     echo -e "\033[0;34m start \033[0m : to run a jar which called AppName"
     echo -e "\033[0;34m stop \033[0m : to stop a jar which called AppName"
     echo -e "\033[0;34m restart \033[0m : to stop and run a jar which called AppName"
@@ -105,8 +127,6 @@ function help()
     echo -e "\033[0;34m pidstop \033[0m : stop AppName by pid file called pid.AppName"
     echo -e "\033[0;34m pidstart \033[0m : start AppName and save pid to file called pid.AppName"
     echo -e "\033[0;34m pidreboot \033[0m : reboot AppName rely pidstop and then pidstart"
-    echo -e "\033[0;34m deploy \033[0m : deploy an .tar.gz file and backup current dir files to ../AppName-rollback"
-    echo -e "\033[0;34m rollback \033[0m : rollback from ../AppName-rollback to current dir and backup current dir files to ../AppName-newest"
     exit 1
 }
 
@@ -116,10 +136,6 @@ function prepareBootJvmOpts()
   if [[ -n "$AppEnv" ]]; then
     JVM_OPTS="$JVM_OPTS -Dspring.profiles.active=$AppEnv"
     echo "-Dspring.profiles.active=$AppEnv"
-  fi
-  if [[ -n "$AppPort" ]]; then
-    JVM_OPTS="$JVM_OPTS -Dserver.port=$AppPort"
-    echo "-Dserver.port=$AppPort"
   fi
   if [[ -n "$USER_TIME_ZONE" ]]; then
     JVM_OPTS="$JVM_OPTS -Duser.timezone=$USER_TIME_ZONE"
@@ -471,27 +487,6 @@ function pidreboot()
   mkcmd
 }
 
-function deploy()
-{
-  rollbackDir=../${AppName}-rollback
-  rm -rf ${rollbackDir}
-  mkdir ${rollbackDir}
-  cp ./* ${rollbackDir}
-  tar -xzvf $ctrlArg1
-}
-
-function rollback()
-{
-  rollbackDir=../${AppName}-rollback
-  newestDir=../${AppName}-newest
-  rm -rf ${newestDir}
-  mkdir ${newestDir}
-  cp -rf ./* ${newestDir}
-  rm -rf ./*
-  cp -rf ${rollbackDir}/* ./
-}
-
-
 case $ctrlOption in
     start)
     start;;
@@ -527,10 +522,6 @@ case $ctrlOption in
     pidstart;;
     pidreboot)
     pidreboot;;
-    deploy)
-    deploy;;
-    rollback)
-    rollback;;
     *)
     help;;
 esac

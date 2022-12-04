@@ -1,7 +1,7 @@
 package i2f.springboot.security.def.token;
 
 import i2f.core.cache.ICache;
-import i2f.core.cache.MemCache;
+import i2f.core.cache.impl.mem.MemCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ public class DefaultTokenHolder extends AbstractTokenHolder{
     public static final int EXPIRE_TIME=30;
     public static final TimeUnit EXPIRE_TIME_UNIT=TimeUnit.MINUTES;
 
-    protected ICache<String> cache=new MemCache<>();
+    protected ICache<String, Object> cache = new MemCache<>();
 
     @Override
     protected int getExpireTime() {
@@ -33,7 +33,7 @@ public class DefaultTokenHolder extends AbstractTokenHolder{
     }
 
     @Override
-    protected ICache<String> getCache() {
+    protected ICache<String, Object> getCache() {
         return cache;
     }
 }

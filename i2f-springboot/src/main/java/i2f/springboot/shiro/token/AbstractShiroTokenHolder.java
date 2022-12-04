@@ -25,31 +25,32 @@ public abstract class AbstractShiroTokenHolder {
 
     protected abstract int getExpireTime();
     protected abstract TimeUnit getExpireTimeUnit();
-    protected abstract ICache<String> getCache();
 
-    public void setToken(String token, IShiroUser obj){
-        getCache().set(getTokenPrefix()+token,getExpireTime(),getExpireTimeUnit(),obj);
+    protected abstract ICache<String, Object> getCache();
+
+    public void setToken(String token, IShiroUser obj) {
+        getCache().set(getTokenPrefix() + token, obj, getExpireTime(), getExpireTimeUnit());
     }
 
-    public IShiroUser getToken(String token){
-        return (IShiroUser) getCache().get(getTokenPrefix()+token);
+    public IShiroUser getToken(String token) {
+        return (IShiroUser) getCache().get(getTokenPrefix() + token);
     }
 
-    public Object refreshToken(String token){
-        return getCache().expire(getTokenPrefix()+token,getExpireTime(),getExpireTimeUnit());
+    public void refreshToken(String token) {
+        getCache().expire(getTokenPrefix() + token, getExpireTime(), getExpireTimeUnit());
     }
 
-    public Object removeToken(String token){
-        return getCache().remove(getTokenPrefix()+token);
+    public void removeToken(String token) {
+        getCache().remove(getTokenPrefix() + token);
     }
 
-    public void setSingleToken(String username,String token,IShiroUser obj){
-        String oldToken=(String)getCache().get(getTokenUserPrefix()+username);
-        if(oldToken!=null && !"".equals(oldToken)){
+    public void setSingleToken(String username, String token, IShiroUser obj) {
+        String oldToken = (String) getCache().get(getTokenUserPrefix() + username);
+        if (oldToken != null && !"".equals(oldToken)) {
             removeToken(oldToken);
         }
-        getCache().set(getTokenUserPrefix()+username,token);
-        setToken(token,obj);
+        getCache().set(getTokenUserPrefix() + username, token);
+        setToken(token, obj);
     }
 
     public void removeSingleToken(String username,String token){

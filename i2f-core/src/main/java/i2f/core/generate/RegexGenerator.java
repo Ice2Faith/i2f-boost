@@ -2,12 +2,12 @@ package i2f.core.generate;
 
 
 import i2f.core.annotations.remark.Author;
+import i2f.core.functional.common.IMapper;
 import i2f.core.generate.core.ObjectFinder;
 import i2f.core.generate.core.impl.*;
 import i2f.core.generate.data.JsonControlMeta;
 import i2f.core.generate.impl.DefaultValueMapper;
 import i2f.core.generate.impl.FileTemplateLoader;
-import i2f.core.interfaces.IMap;
 import i2f.core.reflect.core.ReflectResolver;
 
 import java.util.HashMap;
@@ -136,7 +136,7 @@ public class RegexGenerator {
         return render(template, param,null);
     }
     public static String render(String template, Map<String,Object> param, List<String> basePackages){
-        IMap<Object,String> mapper=new DefaultValueMapper();
+        IMapper<String, Object> mapper = new DefaultValueMapper();
         return render(template, param,mapper,basePackages);
     }
     /**
@@ -268,17 +268,17 @@ public class RegexGenerator {
      * @param param
      * @return
      */
-    public static String render(String template,Map<String,Object> param,IMap<Object,String> mapper,List<String> basePackages){
-        Map<String,Object> preparedParam=new HashMap<>((int)(param.size()*1.5));
-        for(Map.Entry<String, Object> item : param.entrySet()){
-            preparedParam.put(item.getKey(),item.getValue());
+    public static String render(String template, Map<String, Object> param, IMapper<String, Object> mapper, List<String> basePackages) {
+        Map<String, Object> preparedParam = new HashMap<>((int) (param.size() * 1.5));
+        for (Map.Entry<String, Object> item : param.entrySet()) {
+            preparedParam.put(item.getKey(), item.getValue());
         }
-        StringBuilder builder=new StringBuilder((int)(template.length()/0.7));
-        Pattern pattern=Pattern.compile(JSON_CONTROL_REGEX);
-        Matcher matcher=pattern.matcher(template);
+        StringBuilder builder = new StringBuilder((int) (template.length() / 0.7));
+        Pattern pattern = Pattern.compile(JSON_CONTROL_REGEX);
+        Matcher matcher = pattern.matcher(template);
 
-        int tmpIdx=0;
-        int lidx=0;
+        int tmpIdx = 0;
+        int lidx = 0;
         while (matcher.find()){
             MatchResult result=matcher.toMatchResult();
             builder.append(template.substring(lidx,result.start()));
@@ -308,7 +308,7 @@ public class RegexGenerator {
                     Object optp= ObjectFinder.getObjectByDotKeyWithReference(preparedParam,tplId);
                     if(optp!=null){
                         Object val=optp;
-                        tpl= mapper.map(val);
+                        tpl = mapper.get(val);
                     }
                 }
 
@@ -343,7 +343,7 @@ public class RegexGenerator {
                     Object optp=ObjectFinder.getObjectByDotKeyWithReference(preparedParam,tplId);
                     if(optp!=null){
                         Object val=optp;
-                        tpl= mapper.map(val);
+                        tpl = mapper.get(val);
                     }
                 }
 
@@ -458,7 +458,7 @@ public class RegexGenerator {
                     Object optp=ObjectFinder.getObjectByDotKeyWithReference(preparedParam,tplId);
                     if(optp!=null){
                         Object val=optp;
-                        tpl= mapper.map(val);
+                        tpl = mapper.get(val);
                     }
                 }
                 Object obj= ObjectFinder.getObjectByDotKeyWithReference(preparedParam,meta.routeExpression,basePackages);
@@ -535,7 +535,7 @@ public class RegexGenerator {
                     Object optp=ObjectFinder.getObjectByDotKeyWithReference(preparedParam,tplId);
                     if(optp!=null){
                         Object val=optp;
-                        tpl= mapper.map(val);
+                        tpl = mapper.get(val);
                     }
                 }
 
@@ -572,17 +572,17 @@ public class RegexGenerator {
     }
 
     private static String loadTemplate(String loaderClass,String loadKey){
-        IMap<String,String> loader=null;
+        IMapper<String, String> loader = null;
         if(loaderClass!=null && !"".equals(loaderClass)){
             Class clazz= ReflectResolver.getClazz(loaderClass);
             if(clazz!=null){
-                loader=(IMap<String,String>)ReflectResolver.instance(clazz);
+                loader = (IMapper<String, String>) ReflectResolver.instance(clazz);
             }
         }else{
             loader=new FileTemplateLoader();
         }
         if(loader!=null){
-            return loader.map(loadKey);
+            return loader.get(loadKey);
         }
         return null;
     }
@@ -594,32 +594,33 @@ public class RegexGenerator {
      * @return
      */
     public static String generate(String template,Object param){
-        IMap<Object,String> mapper=new DefaultValueMapper();
+        IMapper<String, Object> mapper = new DefaultValueMapper();
         return generate(template, param,mapper,null);
     }
 
     /**
      * 用param进行模板解析为目标字符串,
      * 仅支持解析JSON变量进行模板替换
+     *
      * @param template 模板字符串
-     * @param param 模板参数
-     * @param mapper 参数映射器
+     * @param param    模板参数
+     * @param mapper   参数映射器
      * @return 模板渲染结果
      */
-    public static String generate(String template, Object param, IMap<Object,String> mapper,List<String> basePackages){
-        StringBuilder builder=new StringBuilder((int)(template.length()*1.5));
-        Pattern pattern=Pattern.compile(JSON_PARAM_REGEX);
-        Matcher matcher=pattern.matcher(template);
+    public static String generate(String template, Object param, IMapper<String, Object> mapper, List<String> basePackages) {
+        StringBuilder builder = new StringBuilder((int) (template.length() * 1.5));
+        Pattern pattern = Pattern.compile(JSON_PARAM_REGEX);
+        Matcher matcher = pattern.matcher(template);
 
-        int lidx=0;
-        while (matcher.find()){
-            MatchResult result=matcher.toMatchResult();
-            builder.append(template.substring(lidx,result.start()));
-            lidx=result.end();
-            String group=matcher.group();
+        int lidx = 0;
+        while (matcher.find()) {
+            MatchResult result = matcher.toMatchResult();
+            builder.append(template.substring(lidx, result.start()));
+            lidx = result.end();
+            String group = matcher.group();
             String regItem= group.substring(2,group.length()-1);
-            Object val= ObjectFinder.getObjectByDotKeyWithReference(param,regItem,basePackages);
-            String part=mapper.map(val);
+            Object val = ObjectFinder.getObjectByDotKeyWithReference(param, regItem, basePackages);
+            String part = mapper.get(val);
             builder.append(part);
         }
         builder.append(template.substring(lidx));

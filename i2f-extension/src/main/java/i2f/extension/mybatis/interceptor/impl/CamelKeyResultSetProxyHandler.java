@@ -1,6 +1,6 @@
 package i2f.extension.mybatis.interceptor.impl;
 
-import i2f.core.str.StringUtil;
+import i2f.core.str.Strings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,8 +19,8 @@ public class CamelKeyResultSetProxyHandler extends AbstractResultSetPreProcessPr
         for(Map item : list){
             Map<String, Object> map=new HashMap<>();
             for(Object key : item.keySet()){
-                String skey=String.valueOf(key);
-                String camelKey=StringUtil.toCamel(skey);
+                String skey = String.valueOf(key);
+                String camelKey = Strings.toCamel(skey);
                 map.put(camelKey,item.get(key));
             }
             ret.add(map);

@@ -1,10 +1,9 @@
 package i2f.core.tuple;
 
-/**
- * @author ltb
- * @date 2022/11/9 12:11
- * @desc
- */
-public interface ITuple {
+import java.io.Serializable;
+import java.util.List;
 
+
+public interface ITuple extends Serializable {
+    List<Object> toList();
 }

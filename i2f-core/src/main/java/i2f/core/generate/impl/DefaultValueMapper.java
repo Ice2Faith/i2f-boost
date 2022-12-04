@@ -1,8 +1,8 @@
 package i2f.core.generate.impl;
 
 import i2f.core.annotations.remark.Author;
+import i2f.core.functional.common.IMapper;
 import i2f.core.generate.core.IGenerate;
-import i2f.core.interfaces.IMap;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -19,23 +19,24 @@ import java.util.concurrent.atomic.AtomicReference;
  * @date 2021/10/20
  */
 @Author("i2f")
-public class DefaultValueMapper implements IMap<Object,String> {
-    public String NULL_VAL="null";
-    public String DATE_FMT="yyyy-MM-dd HH:mm:ss SSS";
-    public String ITERABLE_SEPARATOR=",";
-    public String BEGIN_ITERABLE="";
-    public String END_ITERABLE="";
+public class DefaultValueMapper implements IMapper<String, Object> {
+    public String NULL_VAL = "null";
+    public String DATE_FMT = "yyyy-MM-dd HH:mm:ss SSS";
+    public String ITERABLE_SEPARATOR = ",";
+    public String BEGIN_ITERABLE = "";
+    public String END_ITERABLE = "";
+
     @Override
-    public String map(Object val) {
-        if(val==null){
+    public String get(Object val) {
+        if (val == null) {
             return onNull();
         }
-        Class clazz=val.getClass();
-        if(val instanceof Iterable){ // Iterable , Collection , List , Set ...
-            return onIterable((Iterable)val);
+        Class clazz = val.getClass();
+        if (val instanceof Iterable) { // Iterable , Collection , List , Set ...
+            return onIterable((Iterable) val);
         }
-        if(val instanceof Map){
-            return onMap((Map)val);
+        if (val instanceof Map) {
+            return onMap((Map) val);
         }
         if(clazz.isArray()){
             return onArray(val);
@@ -104,7 +105,7 @@ public class DefaultValueMapper implements IMap<Object,String> {
         }
         if(val instanceof AtomicReference){
             Object v=((AtomicReference)val).get();
-            return map(v);
+            return get(v);
         }
         return onCustomObject(val);
     }
@@ -188,8 +189,8 @@ public class DefaultValueMapper implements IMap<Object,String> {
                 builder.append(ITERABLE_SEPARATOR);
             }
             Object cur=it.next();
-            builder.append(map(cur));
-            isFirst=false;
+            builder.append(get(cur));
+            isFirst = false;
         }
         builder.append(END_ITERABLE);
         return builder.toString();

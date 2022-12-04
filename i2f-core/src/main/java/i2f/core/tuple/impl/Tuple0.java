@@ -1,11 +1,19 @@
 package i2f.core.tuple.impl;
 
+import i2f.core.collection.Collections;
 import i2f.core.tuple.ITuple;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * @author ltb
- * @date 2022/11/9 12:12
- * @desc
- */
+import java.util.List;
+
+
+@Data
+@NoArgsConstructor
 public class Tuple0 implements ITuple {
+
+    @Override
+    public List<Object> toList() {
+        return Collections.arrayList();
+    }
 }

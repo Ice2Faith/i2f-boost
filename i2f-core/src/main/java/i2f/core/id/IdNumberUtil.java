@@ -2,7 +2,7 @@ package i2f.core.id;
 
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.date.DateUtil;
+import i2f.core.date.Dates;
 import i2f.core.id.data.IdNumberData;
 import i2f.core.id.data.RegionMap;
 
@@ -34,28 +34,28 @@ public class IdNumberUtil {
         ret.checkSum=ret.idNumber.substring(17,18);
 
         ret.year=ret.date.substring(0,4);
-        ret.month=ret.date.substring(4,6);
-        ret.day=ret.date.substring(6,8);
+        ret.month = ret.date.substring(4, 6);
+        ret.day = ret.date.substring(6, 8);
 
-        ret.sexDesc=Integer.parseInt(ret.sex)%2==0?"女":"男";
-        ret.regionDesc= RegionMap.decode(ret.region);
+        ret.sexDesc = Integer.parseInt(ret.sex) % 2 == 0 ? "女" : "男";
+        ret.regionDesc = RegionMap.decode(ret.region);
 
-        int year=Integer.parseInt(ret.year);
-        int month=Integer.parseInt(ret.month);
-        int day=Integer.parseInt(ret.day);
+        int year = Integer.parseInt(ret.year);
+        int month = Integer.parseInt(ret.month);
+        int day = Integer.parseInt(ret.day);
 
-        ret.isLeap= DateUtil.isLeapYear(year);
-        if(!DateUtil.isLegalDate(year,month,day)){
-            ret.illegalReason="date time not legal";
-            ret.isLegalId=false;
+        ret.isLeap = Dates.isLeapYear(year);
+        if (!Dates.isLegalDate(year, month, day)) {
+            ret.illegalReason = "date time not legal";
+            ret.isLegalId = false;
             return ret;
         }
 
-        ret.isLegalId=true;
+        ret.isLegalId = true;
 
-        try{
-            ret.dateDesc=IdNumberData.dateFmt.parse(ret.date);
-        }catch(Exception e){
+        try {
+            ret.dateDesc = IdNumberData.dateFmt.parse(ret.date);
+        } catch (Exception e) {
 
         }
 

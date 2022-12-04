@@ -1,11 +1,11 @@
 package com.i2f.demo.md5;
 
-import i2f.core.collection.CollectionUtil;
+import i2f.core.collection.Collections;
 import i2f.core.digest.MessageDigestUtil;
 import i2f.core.jdbc.core.IJdbcMeta;
 import i2f.core.jdbc.core.JdbcProvider;
 import i2f.core.jdbc.core.TransactionManager;
-import i2f.core.str.StringUtil;
+import i2f.core.str.Strings;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -48,21 +48,21 @@ public class TestMd5 {
     }
 
     public static void save2db() throws SQLException, IOException {
-        List<String> pass= CollectionUtil.arrayList(
-                "nacos","spring","springboot","springBoot","springcloud","springCloud","rabbitMq","rabbitMQ","zookeeper",
-                "redis","shiro","security","auth","token","session","okhttp","feign","rabbin","actuator","admin","administrator",
-                "anyone","test1","test123","dev","dev1","dev123","test111","test11","dev11","dev111","admin1","admin123","admin111",
-                "root1","root123","root111","svc","web","svc123","svc111","web123","web111","rememberme","rememberMe","bigdata","database",
-                "linux","redhat","centos","windows","macos","aaa","111","111111","11111111","com","cn","http","tcp","ip","udp","icmp","arp",
-                "mysql","oracle","ora","gbase","hbase","hive","sqlserver","kafka","rocket","alibaba","wechat","qq","xiaomi","huawei","sumsung",
-                "oppo","vivo","mybatis","ibatis","springmvc","springMVC","jsp","vue","element","dom","jquery","servlet","jsx","md5","mD5","sha",
-                "SHA","rsa","rSA","aes","aES","except","exception","error","err","notfound","notFound","notFount404","badRequest","badrequest",
-                "skyboy","skygirl"
+        List<String> pass = Collections.arrayList(
+                "nacos", "spring", "springboot", "springBoot", "springcloud", "springCloud", "rabbitMq", "rabbitMQ", "zookeeper",
+                "redis", "shiro", "security", "auth", "token", "session", "okhttp", "feign", "rabbin", "actuator", "admin", "administrator",
+                "anyone", "test1", "test123", "dev", "dev1", "dev123", "test111", "test11", "dev11", "dev111", "admin1", "admin123", "admin111",
+                "root1", "root123", "root111", "svc", "web", "svc123", "svc111", "web123", "web111", "rememberme", "rememberMe", "bigdata", "database",
+                "linux", "redhat", "centos", "windows", "macos", "aaa", "111", "111111", "11111111", "com", "cn", "http", "tcp", "ip", "udp", "icmp", "arp",
+                "mysql", "oracle", "ora", "gbase", "hbase", "hive", "sqlserver", "kafka", "rocket", "alibaba", "wechat", "qq", "xiaomi", "huawei", "sumsung",
+                "oppo", "vivo", "mybatis", "ibatis", "springmvc", "springMVC", "jsp", "vue", "element", "dom", "jquery", "servlet", "jsx", "md5", "mD5", "sha",
+                "SHA", "rsa", "rSA", "aes", "aES", "except", "exception", "error", "err", "notfound", "notFound", "notFount404", "badRequest", "badrequest",
+                "skyboy", "skygirl"
         );
 
         List<String> next=new ArrayList<>();
         for(String item : pass){
-            next.add(StringUtil.firstUpperCase(item));
+            next.add(Strings.firstUpperCase(item));
         }
         pass.addAll(next);
 

@@ -7,11 +7,11 @@ import i2f.core.annotations.remark.Author;
 import i2f.core.check.CheckUtil;
 import i2f.core.file.core.FileMime;
 import i2f.core.file.core.FileSpecies;
-import i2f.core.interfaces.IFilter;
-import i2f.core.interfaces.IMap;
+import i2f.core.functional.common.IFilter;
+import i2f.core.functional.common.IMapper;
 import i2f.core.resource.ResourceUtil;
 import i2f.core.str.Appender;
-import i2f.core.str.StringUtil;
+import i2f.core.str.Strings;
 import i2f.core.stream.StreamUtil;
 
 import java.io.*;
@@ -74,7 +74,7 @@ public class FileUtil {
     }
 
     public static File getFile(String path, String subPath) {
-        return new File(StringUtil.pathGen(path, subPath));
+        return new File(Strings.pathGen(path, subPath));
     }
 
     public static File getFile(File path, String subPath) {
@@ -86,7 +86,7 @@ public class FileUtil {
     }
 
     public static String getNameNoSuffix(String fileName) {
-        return StringUtil.trimExtension(getNameSuffix(fileName));
+        return Strings.trimExtension(getNameSuffix(fileName));
     }
 
     public static String getNameNoSuffix(File file) {
@@ -352,7 +352,7 @@ public class FileUtil {
         return readTxtFile(file,offsetLine,lineCount,ignoreBlankLine,trimLine,null,null);
     }
 
-    public static List<String> readTxtFile(File file, int offsetLine,@CloudBe("-1") int lineCount, boolean ignoreBlankLine, boolean trimLine,@Nullable IFilter<String> filter,@Nullable IMap<String, String> map) throws IOException {
+    public static List<String> readTxtFile(File file, int offsetLine, @CloudBe("-1") int lineCount, boolean ignoreBlankLine, boolean trimLine, @Nullable IFilter<String> filter, @Nullable IMapper<String, String> map) throws IOException {
         InputStream is = new FileInputStream(file);
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         if (offsetLine < 0) {
@@ -392,12 +392,12 @@ public class FileUtil {
             }
 
             if (filter != null) {
-                if (!filter.choice(line)) {
+                if (!filter.test(line)) {
                     continue;
                 }
             }
             if (map != null) {
-                line = map.map(line);
+                line = map.get(line);
             }
             ret.add(line);
             curCount++;
@@ -407,11 +407,11 @@ public class FileUtil {
         return ret;
     }
 
-    public static<T> List<T> readCvsFile(File file, String sepRegex, boolean hasHeadLine, Charset charset,IMap<Map<String,String>,T> mapper) throws IOException {
-        List<Map<String,String>> data=readCvsFile(file, sepRegex, hasHeadLine, charset);
-        List<T> ret=new LinkedList<>();
-        for(Map<String,String> item : data){
-            T val= mapper.map(item);
+    public static <T> List<T> readCvsFile(File file, String sepRegex, boolean hasHeadLine, Charset charset, IMapper<T, Map<String, String>> mapper) throws IOException {
+        List<Map<String, String>> data = readCvsFile(file, sepRegex, hasHeadLine, charset);
+        List<T> ret = new LinkedList<>();
+        for (Map<String, String> item : data) {
+            T val = mapper.get(item);
             ret.add(val);
         }
         return ret;
@@ -449,11 +449,11 @@ public class FileUtil {
         return ret;
     }
 
-    public static File convertByteStream(File inFile,File outFile,IMap<Byte,Byte> mapper) throws IOException {
-        InputStream is=new FileInputStream(inFile);
-        File uoutFile=useParentDir(outFile);
-        OutputStream os=new FileOutputStream(uoutFile);
-        StreamUtil.convertByteStream(is,os,mapper);
+    public static File convertByteStream(File inFile, File outFile, IMapper<Byte, Byte> mapper) throws IOException {
+        InputStream is = new FileInputStream(inFile);
+        File uoutFile = useParentDir(outFile);
+        OutputStream os = new FileOutputStream(uoutFile);
+        StreamUtil.convertByteStream(is, os, mapper);
         is.close();
         os.close();
         return uoutFile;

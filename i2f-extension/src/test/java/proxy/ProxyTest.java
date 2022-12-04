@@ -1,8 +1,8 @@
 package proxy;
 
-import i2f.core.collection.CollectionUtil;
+import i2f.core.collection.Collections;
 import i2f.core.functions.Algorithm;
-import i2f.core.interfaces.impl.SysPrintlnExecutor;
+import i2f.core.functional.impl.SysPrintlnExecutor;
 import i2f.core.proxy.IInvokable;
 import i2f.core.proxy.IProxyHandler;
 import i2f.core.proxy.IProxyProvider;
@@ -46,7 +46,7 @@ public class ProxyTest {
             public Object before(Object context,Object ivkObj, IInvokable invokable, Object... args) {
                 System.out.println("before...");
                 System.out.println("args:");
-                Algorithm.execute(CollectionUtil.arrayList(args),new SysPrintlnExecutor<>());
+                Algorithm.execute(Collections.arrayList(args), new SysPrintlnExecutor<>());
                 System.out.println("before.");
                 return "bad";
             }

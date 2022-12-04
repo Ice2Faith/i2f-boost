@@ -2,7 +2,7 @@ package i2f.core.file.core;
 
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.str.StringUtil;
+import i2f.core.str.Strings;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class FileSpecies {
     }
 
     public static String getSpecieName(String fileName){
-        String cksuff= StringUtil.getExtension(fileName);
+        String cksuff = Strings.getExtension(fileName);
         if("".equals(cksuff)){
             return UNKOWNES;
         }

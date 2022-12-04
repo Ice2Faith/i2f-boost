@@ -1,7 +1,7 @@
 package i2f.core.net.core;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.collection.CollectionUtil;
+import i2f.core.collection.Collections;
 
 import java.net.*;
 import java.util.*;
@@ -17,13 +17,13 @@ public class NetUtil {
     public static Set<NetworkInterface> getNetworkInterfaces() throws SocketException {
         Set<NetworkInterface> ret = new HashSet<>();
         Enumeration<NetworkInterface> allInterfaces = NetworkInterface.getNetworkInterfaces();
-        CollectionUtil.toCollection(ret,allInterfaces);
+        Collections.collect(ret, allInterfaces);
         return ret;
     }
     public static Set<InetAddress> getNetworkInterfaceAddress(NetworkInterface net){
         Set<InetAddress> ret=new HashSet<>();
         Enumeration<InetAddress> addresses=net.getInetAddresses();
-        CollectionUtil.toCollection(ret,addresses);
+        Collections.collect(ret, addresses);
         return ret;
     }
     public static Map<NetworkInterface,Set<InetAddress>> getIpAddresses() throws SocketException {

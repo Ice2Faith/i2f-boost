@@ -1,7 +1,7 @@
 package i2f.spring.chain;
 
 
-import i2f.core.safe.Null;
+import i2f.core.safe.Nulls;
 import i2f.core.thread.LatchRunnable;
 import i2f.spring.context.SpringUtil;
 import i2f.spring.filter.WhiteFilter;
@@ -48,8 +48,8 @@ public class ChainManager {
             }
         }
         return WhiteFilter.antPkgFilter(new HashSet<IChainResolver>(), resolverSet,
-                Null.get(context, ChainContext::getIncludesResolver),
-                Null.get(context, ChainContext::getExcludesResolver),
+                Nulls.get(context, ChainContext::getIncludesResolver),
+                Nulls.get(context, ChainContext::getExcludesResolver),
                 (elem) -> elem.getClass().getName());
     }
 

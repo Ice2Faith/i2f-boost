@@ -1,7 +1,7 @@
 package i2f.springboot.shiro.def;
 
 import i2f.core.cache.ICache;
-import i2f.core.cache.MemCache;
+import i2f.core.cache.impl.mem.MemCache;
 import i2f.springboot.shiro.ShiroConfig;
 import i2f.springboot.shiro.token.AbstractShiroTokenHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class DefaultShiroTokenHolder extends AbstractShiroTokenHolder {
     public static final int EXPIRE_TIME=30;
     public static final TimeUnit EXPIRE_TIME_UNIT=TimeUnit.MINUTES;
 
-    protected ICache<String> cache=new MemCache<>();
+    protected ICache<String, Object> cache = new MemCache<>();
 
     @Override
     protected int getExpireTime() {
@@ -37,7 +37,7 @@ public class DefaultShiroTokenHolder extends AbstractShiroTokenHolder {
     }
 
     @Override
-    protected ICache<String> getCache() {
+    protected ICache<String, Object> getCache() {
         return cache;
     }
 }

@@ -20,7 +20,6 @@
         <!-- 仅依赖jdk1.5,javax,javaee -->
         <module>i2f-core-j2ee</module>
 
-
         <!-- 仅依赖spring5 -->
         <module>i2f-spring</module>
 
@@ -38,6 +37,7 @@
         <module>i2f-agent</module>
 
         <module>i2f-generator</module>
+
 
         <!-- springcloud netflix -->
 

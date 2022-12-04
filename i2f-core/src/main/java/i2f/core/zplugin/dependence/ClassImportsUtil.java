@@ -1,8 +1,8 @@
 package i2f.core.zplugin.dependence;
 
 import i2f.core.file.FileUtil;
-import i2f.core.interfaces.IFilter;
-import i2f.core.interfaces.IMap;
+import i2f.core.functional.common.IFilter;
+import i2f.core.functional.common.IMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -114,12 +114,12 @@ public class ClassImportsUtil {
         }
         List<String> imports = FileUtil.readTxtFile(file, 0, -1, true, true, new IFilter<String>() {
             @Override
-            public boolean choice(String val) {
+            public boolean test(String val) {
                 return val.matches("^import\\s+.+;$");
             }
-        }, new IMap<String, String>() {
+        }, new IMapper<String, String>() {
             @Override
-            public String map(String val) {
+            public String get(String val) {
                 val = val.substring("import".length()).trim();
                 val = val.substring(0, val.length() - 1);
                 return val;

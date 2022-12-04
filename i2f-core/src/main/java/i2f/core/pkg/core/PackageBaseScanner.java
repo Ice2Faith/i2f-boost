@@ -2,7 +2,7 @@ package i2f.core.pkg.core;
 
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.collection.CollectionUtil;
+import i2f.core.collection.Collections;
 import i2f.core.pkg.data.ClassMetaData;
 import i2f.core.resource.ResourceUtil;
 
@@ -277,7 +277,7 @@ public class PackageBaseScanner {
     }
     public static List<String> getShortlyCommonPrefixes(String separator,String separatorRegex,String ... pfxes) {
         Set<String> set=new HashSet<>(36);
-        CollectionUtil.toCollection(set,pfxes);
+        Collections.collect(set, pfxes);
         String[] arr=new String[set.size()];
         int p=0;
         for(String item : set){

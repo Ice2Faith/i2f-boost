@@ -1,7 +1,7 @@
 package i2f.core.lambda.column;
 
+import i2f.core.functional.common.IGetter;
 import i2f.core.lambda.Lambdas;
-import i2f.core.lambda.functional.preset.IBeanGetter;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -64,17 +64,17 @@ public class Columns {
         return col(decide, this.prefix, column, null);
     }
 
-    public <T, R> Columns col(boolean decide, Object prefix, IBeanGetter<T, R> column, Object alias) {
+    public <R, T> Columns col(boolean decide, Object prefix, IGetter<R, T> column, Object alias) {
         String columnName = Lambdas.fieldName(column);
         return col(decide, prefix, columnName, alias);
     }
 
-    public <T, R> Columns col(boolean decide, IBeanGetter<T, R> column, Object alias) {
+    public <R, T> Columns col(boolean decide, IGetter<R, T> column, Object alias) {
         String columnName = Lambdas.fieldName(column);
         return col(decide, columnName, alias);
     }
 
-    public <T, R> Columns col(boolean decide, IBeanGetter<T, R> column) {
+    public <R, T> Columns col(boolean decide, IGetter<R, T> column) {
         String columnName = Lambdas.fieldName(column);
         return col(decide, columnName);
     }
@@ -96,15 +96,15 @@ public class Columns {
         return col(true, column);
     }
 
-    public <T, R> Columns col(Object prefix, IBeanGetter<T, R> column, Object alias) {
+    public <R, T> Columns col(Object prefix, IGetter<R, T> column, Object alias) {
         return col(true, prefix, column, alias);
     }
 
-    public <T, R> Columns col(IBeanGetter<T, R> column, Object alias) {
+    public <R, T> Columns col(IGetter<R, T> column, Object alias) {
         return col(true, column, alias);
     }
 
-    public <T, R> Columns col(IBeanGetter<T, R> column) {
+    public <R, T> Columns col(IGetter<R, T> column) {
         return col(true, column);
     }
 
@@ -137,15 +137,15 @@ public class Columns {
         return this;
     }
 
-    public <T, R> Columns cols(boolean decide, Object prefix, IBeanGetter<T, R>... columns) {
-        for (IBeanGetter<T, R> item : columns) {
+    public <R, T> Columns cols(boolean decide, Object prefix, IGetter<R, T>... columns) {
+        for (IGetter<R, T> item : columns) {
             col(decide, prefix, item, null);
         }
         return this;
     }
 
-    public <T, R> Columns cols(boolean decide, IBeanGetter<T, R>... columns) {
-        for (IBeanGetter<T, R> item : columns) {
+    public <R, T> Columns cols(boolean decide, IGetter<R, T>... columns) {
+        for (IGetter<R, T> item : columns) {
             col(decide, item);
         }
         return this;
@@ -168,11 +168,11 @@ public class Columns {
         return cols(true, columns);
     }
 
-    public <T, R> Columns cols(Object prefix, IBeanGetter<T, R>... columns) {
+    public <R, T> Columns cols(Object prefix, IGetter<R, T>... columns) {
         return cols(true, prefix, columns);
     }
 
-    public <T, R> Columns cols(IBeanGetter<T, R>... columns) {
+    public <R, T> Columns cols(IGetter<R, T>... columns) {
         return cols(true, columns);
     }
 }

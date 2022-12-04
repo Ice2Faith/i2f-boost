@@ -1,7 +1,7 @@
 package i2f.extension.elasticsearch;
 
 import i2f.core.api.ApiPage;
-import i2f.core.array.ArrayUtil;
+import i2f.core.array.Arrays;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -88,7 +88,7 @@ public class EsManager {
                 list.add(new HttpHost(ip,port));
             }
         }
-        HttpHost[] arr= ArrayUtil.toArray(list,HttpHost[].class);
+        HttpHost[] arr = Arrays.collect(list, HttpHost[].class);
         return getClient(arr);
     }
     public static RestHighLevelClient getClient(String host,int port){

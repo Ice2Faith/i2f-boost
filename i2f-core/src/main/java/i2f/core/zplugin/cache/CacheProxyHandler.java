@@ -1,7 +1,7 @@
 package i2f.core.zplugin.cache;
 
 import i2f.core.cache.ICache;
-import i2f.core.cache.MemCache;
+import i2f.core.cache.impl.mem.MemCache;
 import i2f.core.proxy.IInvokable;
 import i2f.core.proxy.impl.BasicProxyHandler;
 import i2f.core.proxy.impl.IMethodAccessInvokable;
@@ -22,13 +22,16 @@ import java.util.concurrent.TimeUnit;
  * @desc
  */
 public class CacheProxyHandler extends BasicProxyHandler {
-    protected ICache<String> cache;
-    public CacheProxyHandler(){
-        cache=new MemCache<>();
+    protected ICache<String, Object> cache;
+
+    public CacheProxyHandler() {
+        cache = new MemCache<>();
     }
-    public CacheProxyHandler(ICache<String> cache){
-        this.cache=cache;
+
+    public CacheProxyHandler(ICache<String, Object> cache) {
+        this.cache = cache;
     }
+
     @Override
     public Object initContext() {
         return System.currentTimeMillis();
@@ -97,7 +100,7 @@ public class CacheProxyHandler extends BasicProxyHandler {
         long expire= ann.expire();
         TimeUnit timeUnit=ann.unit();
         if(expire>=0){
-            cache.set(key,expire,timeUnit,retVal);
+            cache.set(key, retVal, expire, timeUnit);
         }else{
             cache.set(key,retVal);
         }
@@ -118,11 +121,11 @@ public class CacheProxyHandler extends BasicProxyHandler {
         return ret;
     }
 
-    protected void cleanKeys(ICache<String> cache,String ... keys){
+    protected void cleanKeys(ICache<String, Object> cache, String... keys) {
         Set<String> set = cache.keys();
-        for(String item : set){
-            for(String key : keys){
-                if(item.startsWith(key)){
+        for (String item : set) {
+            for (String key : keys) {
+                if (item.startsWith(key)) {
                     cache.remove(item);
                 }
             }
