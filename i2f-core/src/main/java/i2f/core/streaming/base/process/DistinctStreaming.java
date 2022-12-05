@@ -5,6 +5,8 @@ import i2f.core.streaming.AbsStreaming;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -18,12 +20,11 @@ public class DistinctStreaming<E> extends AbsStreaming<E, E> {
     }
 
     @Override
-    public Iterator<E> apply(Iterator<E> iterator) {
-        Set<E> ret = new LinkedHashSet<E>();
-        while (iterator.hasNext()) {
-            E item = iterator.next();
+    public Iterator<E> apply(Iterator<E> iterator, ExecutorService pool) {
+        Set<E> ret = new ConcurrentSkipListSet<>();
+        parallelizeProcess(iterator, pool, (item, collector) -> {
             ret.add(item);
-        }
+        });
         return ret.iterator();
     }
 }

@@ -5,8 +5,7 @@ import i2f.core.streaming.AbsStreaming;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -21,12 +20,9 @@ public class FlatMapStreaming<E, R> extends AbsStreaming<R, E> {
     }
 
     @Override
-    public Iterator<R> apply(Iterator<E> iterator) {
-        List<R> ret = new LinkedList<R>();
-        while (iterator.hasNext()) {
-            E item = iterator.next();
-            mapper.accept(item, ret);
-        }
-        return ret.iterator();
+    public Iterator<R> apply(Iterator<E> iterator, ExecutorService pool) {
+        return parallelizeProcess(iterator, pool, (item, collector) -> {
+            mapper.accept(item, collector);
+        });
     }
 }

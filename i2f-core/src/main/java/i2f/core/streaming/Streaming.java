@@ -58,6 +58,12 @@ public interface Streaming<E> {
 
     <R> R sink(ISinkStreaming<R, E> processor);
 
+    Streaming<E> parallel();
+
+    Streaming<E> sequential();
+
+    boolean isParallel();
+
     Streaming<E> skip(int len);
 
     Streaming<E> limit(int len);

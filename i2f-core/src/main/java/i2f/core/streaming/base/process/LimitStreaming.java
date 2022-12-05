@@ -5,6 +5,7 @@ import i2f.core.streaming.AbsStreaming;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -21,7 +22,7 @@ public class LimitStreaming<E> extends AbsStreaming<E, E> {
     }
 
     @Override
-    public Iterator<E> apply(Iterator<E> rs) {
+    public Iterator<E> apply(Iterator<E> rs, ExecutorService pool) {
         List<E> ret = new LinkedList<E>();
         if (skip < 0 && limit < 0) {
             return rs;

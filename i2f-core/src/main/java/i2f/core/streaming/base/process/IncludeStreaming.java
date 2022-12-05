@@ -6,6 +6,7 @@ import i2f.core.streaming.Streaming;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -20,7 +21,7 @@ public class IncludeStreaming<E> extends AbsStreaming<E, E> {
     }
 
     @Override
-    public Iterator<E> apply(Iterator<E> iterator) {
+    public Iterator<E> apply(Iterator<E> iterator, ExecutorService pool) {
         Set<E> ret = new LinkedHashSet<E>();
         while (iterator.hasNext()) {
             E item = iterator.next();

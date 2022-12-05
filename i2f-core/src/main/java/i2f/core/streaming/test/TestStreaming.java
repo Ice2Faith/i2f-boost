@@ -25,9 +25,14 @@ public class TestStreaming {
                     for (String item : arr) {
                         c.add(item);
                     }
-                })
+                    try {
+                        Thread.sleep(90);
+                    } catch (Exception ex) {
+
+                    }
+                }).parallel()
                 .countBy()
-                .peek(System.out::println)
+                .peek(System.out::println).sequential()
                 .sink(new FileTextLineSinkStreaming<>(cp, (e) -> e.t2 + " > " + e.t1));
     }
 

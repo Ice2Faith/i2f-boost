@@ -2,6 +2,7 @@ package i2f.core.streaming.base.sink;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -16,7 +17,7 @@ public class MaxSinkStreaming<E> extends AbsSinkStreaming<E, E, E> {
     }
 
     @Override
-    protected E sink(Iterator<E> iterator) {
+    protected E sink(Iterator<E> iterator, ExecutorService pool) {
         E ret = null;
         boolean first = false;
         while (iterator.hasNext()) {

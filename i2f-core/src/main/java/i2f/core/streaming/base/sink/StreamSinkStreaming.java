@@ -4,6 +4,7 @@ import i2f.core.streaming.Streaming;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Stream;
 
 /**
@@ -18,7 +19,7 @@ public class StreamSinkStreaming<E> extends AbsSinkStreaming<Stream<E>, E, E> {
     }
 
     @Override
-    protected Stream<E> sink(Iterator<E> iterator) {
+    protected Stream<E> sink(Iterator<E> iterator, ExecutorService pool) {
         LinkedList<E> list = Streaming.stream(iterator).collect(new LinkedList<E>());
         return list.stream();
     }

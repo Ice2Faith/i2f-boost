@@ -3,6 +3,7 @@ package i2f.core.streaming;
 import i2f.core.functional.common.IExecutor;
 import i2f.core.functional.common.IFilter;
 import i2f.core.functional.common.IMapper;
+import i2f.core.functional.consumer.IConsumer2;
 import i2f.core.functional.jvf.*;
 import i2f.core.streaming.api.process.IProcessStreaming;
 import i2f.core.streaming.api.process.ProcessStreaming;
@@ -12,11 +13,11 @@ import i2f.core.streaming.base.KeyedAggregateStreaming;
 import i2f.core.streaming.base.KeyedReduceStreaming;
 import i2f.core.streaming.base.process.*;
 import i2f.core.streaming.base.sink.*;
+import i2f.core.thread.AtomicCountDownLatch;
 import i2f.core.tuple.impl.Tuple2;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Stream;
 
 /**
@@ -27,6 +28,52 @@ import java.util.stream.Stream;
 public abstract class AbsStreaming<R, E> implements Streaming<E>, IProcessStreaming<R, E> {
     public AbsStreaming prev;
     public AbsStreaming next;
+    public Boolean parallel;
+
+    @Override
+    public boolean isParallel() {
+        return parallel != null && parallel;
+    }
+
+    @Override
+    public Streaming<E> parallel() {
+        this.parallel = true;
+        return this;
+    }
+
+    @Override
+    public Streaming<E> sequential() {
+        this.parallel = false;
+        return this;
+    }
+
+    public <OUT, IN> Iterator<OUT> parallelizeProcess(Iterator<IN> iterator, ExecutorService pool, IConsumer2<IN, Collection<OUT>> handler) {
+        List<OUT> ret = Collections.synchronizedList(new LinkedList<>());
+        AtomicCountDownLatch latch = new AtomicCountDownLatch();
+        while (iterator.hasNext()) {
+            IN item = iterator.next();
+            if (pool != null) {
+                latch.count();
+                pool.submit(() -> {
+                    handler.accept(item, ret);
+                    latch.down();
+                });
+            } else {
+                handler.accept(item, ret);
+            }
+        }
+        if (pool != null) {
+            System.out.println("parallel:" + this.getClass().getSimpleName());
+            try {
+                long tms = latch.await();
+                System.out.println("parallel " + tms + "ms done:" + this.getClass().getSimpleName());
+            } catch (Exception e) {
+                throw new IllegalStateException(e.getMessage(), e);
+            }
+
+        }
+        return ret.iterator();
+    }
 
     @Override
     public <R> Streaming<R> process(IProcessStreaming<R, E> processor) {

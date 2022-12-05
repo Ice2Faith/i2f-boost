@@ -3,6 +3,7 @@ package i2f.core.streaming.base.sink;
 import i2f.core.functional.common.IFilter;
 
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -17,7 +18,7 @@ public class AnyMatchSinkStreaming<E> extends AbsSinkStreaming<Boolean, E, E> {
     }
 
     @Override
-    protected Boolean sink(Iterator<E> iterator) {
+    protected Boolean sink(Iterator<E> iterator, ExecutorService pool) {
         while (iterator().hasNext()) {
             E item = iterator.next();
             if (filter.test(item)) {

@@ -3,6 +3,7 @@ package i2f.core.streaming.api.process;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -17,8 +18,8 @@ public class ProcessStreaming<E, R> extends AbsStreaming<R, E> {
     }
 
     @Override
-    public Iterator<R> apply(Iterator<E> iterator) {
-        return processor.apply(iterator);
+    public Iterator<R> apply(Iterator<E> iterator, ExecutorService pool) {
+        return processor.apply(iterator, pool);
     }
 
     @Override

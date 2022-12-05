@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -19,7 +20,7 @@ public class ShuffleStreaming<E> extends AbsStreaming<E, E> {
     }
 
     @Override
-    public Iterator<E> apply(Iterator<E> iterator) {
+    public Iterator<E> apply(Iterator<E> iterator, ExecutorService pool) {
         Random random = new Random();
         List<E> ret = new LinkedList<E>();
         int size = 0;

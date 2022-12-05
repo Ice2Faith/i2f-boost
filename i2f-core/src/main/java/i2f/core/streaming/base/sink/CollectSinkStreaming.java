@@ -2,6 +2,7 @@ package i2f.core.streaming.base.sink;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -16,7 +17,7 @@ public class CollectSinkStreaming<R extends Collection<M>, M, E> extends AbsSink
     }
 
     @Override
-    protected R sink(Iterator<M> iterator) {
+    protected R sink(Iterator<M> iterator, ExecutorService pool) {
         while (iterator.hasNext()) {
             M item = iterator.next();
             col.add(item);

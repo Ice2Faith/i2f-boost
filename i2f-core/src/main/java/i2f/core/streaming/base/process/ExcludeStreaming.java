@@ -4,6 +4,7 @@ import i2f.core.streaming.AbsStreaming;
 import i2f.core.streaming.Streaming;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -18,7 +19,7 @@ public class ExcludeStreaming<E> extends AbsStreaming<E, E> {
     }
 
     @Override
-    public Iterator<E> apply(Iterator<E> iterator) {
+    public Iterator<E> apply(Iterator<E> iterator, ExecutorService pool) {
         Set<E> exSet = new LinkedHashSet<>();
         stream.collect(exSet);
         List<E> ret = new LinkedList<E>();

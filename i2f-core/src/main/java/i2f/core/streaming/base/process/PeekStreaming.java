@@ -4,8 +4,7 @@ import i2f.core.functional.jvf.Consumer;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -20,13 +19,10 @@ public class PeekStreaming<E> extends AbsStreaming<E, E> {
     }
 
     @Override
-    public Iterator<E> apply(Iterator<E> iterator) {
-        List<E> ret = new LinkedList<E>();
-        while (iterator.hasNext()) {
-            E item = iterator.next();
-            ret.add(item);
+    public Iterator<E> apply(Iterator<E> iterator, ExecutorService pool) {
+        return parallelizeProcess(iterator, pool, (item, collector) -> {
+            collector.add(item);
             consumer.accept(item);
-        }
-        return ret.iterator();
+        });
     }
 }

@@ -3,6 +3,7 @@ package i2f.core.streaming.base.sink;
 import i2f.core.functional.common.IExecutor;
 
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -17,11 +18,10 @@ public class EachSinkStreaming<M, E> extends AbsSinkStreaming<Void, M, E> {
     }
 
     @Override
-    protected Void sink(Iterator<M> iterator) {
-        while (iterator.hasNext()) {
-            M item = iterator.next();
+    protected Void sink(Iterator<M> iterator, ExecutorService pool) {
+        parallelizeProcess(iterator, pool, (item, collector) -> {
             executor.accept(item);
-        }
+        });
         return null;
     }
 }

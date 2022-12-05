@@ -8,6 +8,7 @@ import i2f.core.streaming.Streaming;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -26,7 +27,7 @@ public class JoinStreaming<R, E, T> extends AbsStreaming<R, E> {
     }
 
     @Override
-    public Iterator<R> apply(Iterator<E> iterator) {
+    public Iterator<R> apply(Iterator<E> iterator, ExecutorService pool) {
         List<R> ret = new LinkedList<R>();
         List<T> list = new LinkedList<T>();
         stream.collect(list);

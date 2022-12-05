@@ -3,6 +3,7 @@ package i2f.core.streaming.api.sink;
 import i2f.core.streaming.base.sink.AbsSinkStreaming;
 
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -17,8 +18,8 @@ public class SinkStreaming<R, E> extends AbsSinkStreaming<R, E, E> {
     }
 
     @Override
-    protected R sink(Iterator<E> iterator) {
-        return this.sink.sink(iterator);
+    protected R sink(Iterator<E> iterator, ExecutorService pool) {
+        return this.sink.sink(iterator, pool);
     }
 
     @Override

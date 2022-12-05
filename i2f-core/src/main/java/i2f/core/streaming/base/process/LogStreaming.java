@@ -4,6 +4,7 @@ import i2f.core.functional.common.IExecutor;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -20,7 +21,7 @@ public class LogStreaming<E, T> extends AbsStreaming<E, E> {
     }
 
     @Override
-    public Iterator<E> apply(Iterator<E> iterator) {
+    public Iterator<E> apply(Iterator<E> iterator, ExecutorService pool) {
         executor.accept(args);
         return iterator;
     }

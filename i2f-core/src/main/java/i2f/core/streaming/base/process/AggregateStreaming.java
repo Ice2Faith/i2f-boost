@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -21,7 +22,7 @@ public class AggregateStreaming<E, R> extends AbsStreaming<R, E> {
     }
 
     @Override
-    public Iterator<R> apply(Iterator<E> iterator) {
+    public Iterator<R> apply(Iterator<E> iterator, ExecutorService pool) {
         List<R> ret = new LinkedList<R>();
         mapper.accept(iterator, ret);
         return ret.iterator();

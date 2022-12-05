@@ -3,6 +3,7 @@ package i2f.core.streaming.base.sink;
 import i2f.core.functional.jvf.BiFunction;
 
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -17,7 +18,7 @@ public class ReduceSinkStreaming<E> extends AbsSinkStreaming<E, E, E> {
     }
 
     @Override
-    protected E sink(Iterator<E> iterator) {
+    protected E sink(Iterator<E> iterator, ExecutorService pool) {
         E ret = null;
         while (iterator.hasNext()) {
             E item = iterator.next();

@@ -3,6 +3,7 @@ package i2f.core.streaming.api.source;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -17,7 +18,7 @@ public class SourceStreaming<E> extends AbsStreaming<E, E> {
     }
 
     @Override
-    public Iterator<E> apply(Iterator<E> spaceHolder) {
+    public Iterator<E> apply(Iterator<E> spaceHolder, ExecutorService pool) {
         return this.source.iterator();
     }
 

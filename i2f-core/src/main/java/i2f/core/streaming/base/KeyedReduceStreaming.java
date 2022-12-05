@@ -7,6 +7,8 @@ import i2f.core.tuple.Tuples;
 import i2f.core.tuple.impl.Tuple2;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -23,18 +25,18 @@ public class KeyedReduceStreaming<K, E> extends AbsStreaming<Tuple2<K, E>, E> {
     }
 
     @Override
-    public Iterator<Tuple2<K, E>> apply(Iterator<E> iterator) {
+    public Iterator<Tuple2<K, E>> apply(Iterator<E> iterator, ExecutorService pool) {
         List<Tuple2<K, E>> ret = new LinkedList<Tuple2<K, E>>();
-        HashMap<K, E> map = new HashMap<>();
-        while (iterator.hasNext()) {
-            E item = iterator.next();
+        Map<K, E> map = new ConcurrentHashMap<>();
+        parallelizeProcess(iterator, pool, (item, collector) -> {
             K k = key.get(item);
             if (!map.containsKey(k)) {
                 map.put(k, null);
             }
             item = reducer.get(map.get(k), item);
             map.put(k, item);
-        }
+        });
+
         for (Map.Entry<K, E> item : map.entrySet()) {
             ret.add(Tuples.of(item.getKey(), item.getValue()));
         }

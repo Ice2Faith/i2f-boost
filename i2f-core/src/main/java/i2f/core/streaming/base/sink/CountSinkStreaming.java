@@ -1,6 +1,7 @@
 package i2f.core.streaming.base.sink;
 
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -14,7 +15,7 @@ public class CountSinkStreaming<E> extends AbsSinkStreaming<Integer, E, E> {
     }
 
     @Override
-    protected Integer sink(Iterator<E> iterator) {
+    protected Integer sink(Iterator<E> iterator, ExecutorService pool) {
         int cnt = 0;
         while (iterator.hasNext()) {
             E item = iterator.next();

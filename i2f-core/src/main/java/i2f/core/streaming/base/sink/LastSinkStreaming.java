@@ -1,6 +1,7 @@
 package i2f.core.streaming.base.sink;
 
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -14,7 +15,7 @@ public class LastSinkStreaming<E> extends AbsSinkStreaming<E, E, E> {
     }
 
     @Override
-    protected E sink(Iterator<E> iterator) {
+    protected E sink(Iterator<E> iterator, ExecutorService pool) {
         E ret = null;
         while (iterator().hasNext()) {
             ret = iterator.next();

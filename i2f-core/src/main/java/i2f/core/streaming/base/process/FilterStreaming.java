@@ -4,8 +4,7 @@ import i2f.core.functional.common.IFilter;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author ltb
@@ -20,14 +19,11 @@ public class FilterStreaming<E> extends AbsStreaming<E, E> {
     }
 
     @Override
-    public Iterator<E> apply(Iterator<E> iterator) {
-        List<E> ret = new LinkedList<E>();
-        while (iterator.hasNext()) {
-            E item = iterator.next();
+    public Iterator<E> apply(Iterator<E> iterator, ExecutorService pool) {
+        return parallelizeProcess(iterator, pool, (item, collector) -> {
             if (filter.test(item)) {
-                ret.add(item);
+                collector.add(item);
             }
-        }
-        return ret.iterator();
+        });
     }
 }

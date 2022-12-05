@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 public class FileTextLineSinkStreaming<E> implements ISinkStreaming<Integer, E> {
     public File file;
@@ -28,7 +29,7 @@ public class FileTextLineSinkStreaming<E> implements ISinkStreaming<Integer, E> 
     }
 
     @Override
-    public Integer sink(Iterator<E> iterator) {
+    public Integer sink(Iterator<E> iterator, ExecutorService pool) {
         int cnt = 0;
         try {
             while (iterator.hasNext()) {
