@@ -2,6 +2,8 @@ package i2f.core.streaming.base.sink;
 
 import i2f.core.streaming.AbsStreaming;
 import i2f.core.thread.NamingForkJoinPool;
+import i2f.core.tuple.Tuples;
+import i2f.core.tuple.impl.Tuple2;
 
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
@@ -17,10 +19,27 @@ public abstract class AbsSinkStreaming<R, M, E> extends AbsStreaming<M, E> {
         return null;
     }
 
-    protected Iterator result(ExecutorService pool) {
+    protected Tuple2<Iterator, ExecutorService> result() {
+        ExecutorService pool = null;
+        boolean hasParallelOpen = false;
+        Integer parallelCount = null;
         AbsStreaming curr = this;
         while (curr.prev != null) {
+            if (curr.isParallel()) {
+                hasParallelOpen = true;
+            }
+            if (parallelCount == null && curr.parallelize != null) {
+                parallelCount = curr.parallelize;
+            }
             curr = curr.prev;
+        }
+
+        if (hasParallelOpen) {
+            if (parallelCount == null) {
+                parallelCount = 0;
+            }
+            parallelCount = Math.max(parallelCount, Runtime.getRuntime().availableProcessors());
+            pool = NamingForkJoinPool.getPool(parallelCount, "streaming", "task");
         }
 
         AbsStreaming node = curr;
@@ -44,14 +63,13 @@ public abstract class AbsSinkStreaming<R, M, E> extends AbsStreaming<M, E> {
             after = curr.apply(after, curr.isParallel() ? pool : null);
             curr = curr.next;
         }
-        return after;
+        return Tuples.of(after, pool);
     }
 
     public R sink() {
-        int parallelizeCount = Runtime.getRuntime().availableProcessors();
-        int multiFactor = 3;
-        ExecutorService pool = NamingForkJoinPool.getPool(parallelizeCount * multiFactor, "streaming", "task");
-        Iterator rs = result(pool);
+        Tuple2<Iterator, ExecutorService> tuple = result();
+        Iterator rs = tuple.t1;
+        ExecutorService pool = tuple.t2;
         this.create();
         R ret = sink((Iterator<M>) rs, this.isParallel() ? pool : null);
         AbsStreaming curr = this;

@@ -62,6 +62,8 @@ public interface Streaming<E> {
 
     Streaming<E> sequential();
 
+    Streaming<E> parallelize(int cnt);
+
     boolean isParallel();
 
     Streaming<E> skip(int len);

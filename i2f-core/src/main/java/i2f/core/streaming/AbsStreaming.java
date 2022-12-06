@@ -29,6 +29,7 @@ public abstract class AbsStreaming<R, E> implements Streaming<E>, IProcessStream
     public AbsStreaming prev;
     public AbsStreaming next;
     public Boolean parallel;
+    public Integer parallelize;
 
     @Override
     public boolean isParallel() {
@@ -44,6 +45,12 @@ public abstract class AbsStreaming<R, E> implements Streaming<E>, IProcessStream
     @Override
     public Streaming<E> sequential() {
         this.parallel = false;
+        return this;
+    }
+
+    @Override
+    public Streaming<E> parallelize(int cnt) {
+        this.parallelize = cnt;
         return this;
     }
 
