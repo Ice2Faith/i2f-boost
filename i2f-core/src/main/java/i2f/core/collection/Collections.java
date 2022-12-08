@@ -80,15 +80,15 @@ public class Collections {
     }
 
     public static <T, C extends Collection<T>> C collect(C col, Object arr) {
-        return collect(col, Iterators.of(arr));
+        return collect(col, Iterators.ofArray(arr));
     }
 
     public static <T, C extends Collection<T>> C collect(C col, Object arr, @Nullable Predicate<T> filter) {
-        return collect(col, Iterators.of(arr), filter);
+        return collect(col, Iterators.ofArray(arr), filter);
     }
 
     public static <T, C extends Collection<T>> C collect(C col, Object arr, @Nullable Predicate<T> filter, @CloudBe("-1") int offset, @CloudBe("-1") int size) {
-        return collect(col, Iterators.of(arr), filter, offset, size);
+        return collect(col, Iterators.ofArray(arr), filter, offset, size);
     }
 
     public static <T, C extends Collection<T>> C collect(C col, Iterator<T> iterator) {

@@ -304,6 +304,14 @@ public abstract class AbsStreaming<R, E> implements Streaming<E>, IProcessStream
     }
 
     @Override
+    public <K, V, MAP extends Map<K, V>> MAP collect(MAP map, BiSupplier<K, E> key, BiSupplier<V, E> val) {
+        AbsSinkStreaming<MAP, E, E> ret = new CollectMapSinkStreaming<>(map, key, val);
+        ret.prev = this;
+        this.next = ret;
+        return ret.sink();
+    }
+
+    @Override
     public void each(IExecutor<E> executor) {
         AbsSinkStreaming<Void, E, E> ret = new EachSinkStreaming<>(executor);
         ret.prev = this;

@@ -1,9 +1,6 @@
 package i2f.core.iterator;
 
-import i2f.core.iterator.impl.ArrayIterator;
-import i2f.core.iterator.impl.ArrayObjectIterator;
-import i2f.core.iterator.impl.EnumerationIterator;
-import i2f.core.iterator.impl.LineReaderIterator;
+import i2f.core.iterator.impl.*;
 import i2f.core.streaming.Streaming;
 import i2f.core.tuple.ITuple;
 
@@ -22,6 +19,10 @@ import java.util.stream.Stream;
  * @desc
  */
 public class Iterators {
+    public static <T> Iterator<T> ofArgs(T... arr) {
+        return new ArrayIterator<T>(arr);
+    }
+
     public static <T> Iterator<T> of(T[] arr) {
         return new ArrayIterator<T>(arr);
     }
@@ -38,7 +39,7 @@ public class Iterators {
         return new EnumerationIterator<T>(enums);
     }
 
-    public static <T> Iterator<T> of(Object arr) {
+    public static <T> Iterator<T> ofArray(Object arr) {
         return new ArrayObjectIterator<T>(arr);
     }
 
@@ -64,6 +65,26 @@ public class Iterators {
 
     public static Iterator<String> of(InputStream is, Charset charset) {
         return new LineReaderIterator(is, charset);
+    }
+
+    public static Iterator<Byte> ofByte(InputStream is) {
+        return new InputStreamIterator(is);
+    }
+
+    public static Iterator<Character> ofChar(Reader reader) {
+        return new CharReaderIterator(reader);
+    }
+
+    public static Iterator<Character> ofChar(InputStream is, Charset charset) {
+        return new CharReaderIterator(is, charset);
+    }
+
+    public static Iterator<Character> of(String str) {
+        return new StringIterator(str);
+    }
+
+    public static <T> Iterator<T> ofMultiArray(Object obj) {
+        return new MultiDimensionArrayIterator<T>(obj);
     }
 
 }

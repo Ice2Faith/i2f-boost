@@ -365,7 +365,7 @@ public class Appender<T extends Appendable> {
         return addIteratorElem(Iterators.of(arr), separator, open, close, mapper);
     }
     public<E> Appender<T> addReflectArrayElem(Object arr, Object separator, Object open, Object close, IElemAppend<T,E> mapper){
-        return addIteratorElem(Iterators.of(arr), separator, open, close, mapper);
+        return addIteratorElem(Iterators.ofArray(arr), separator, open, close, mapper);
     }
     public<E> Appender<T> addsElem(Object separator, Object open, Object close, IElemAppend<T,E> mapper,E ... arr){
         return addIteratorElem(Iterators.of(arr), separator, open, close, mapper);
@@ -472,19 +472,19 @@ public class Appender<T extends Appendable> {
     }
 
     public Appender<T> addReflectArray(Object arr, Object separator, Object open, Object close, IMapper mapper) {
-        return addIterator(Iterators.of(arr), separator, open, close, mapper);
+        return addIterator(Iterators.ofArray(arr), separator, open, close, mapper);
     }
 
     public Appender<T> addReflectArray(Object arr, Object separator, Object open, Object close) {
-        return addIterator(Iterators.of(arr), separator, open, close);
+        return addIterator(Iterators.ofArray(arr), separator, open, close);
     }
 
     public Appender<T> addReflectArray(Object arr, Object separator) {
-        return addIterator(Iterators.of(arr), separator, null, null);
+        return addIterator(Iterators.ofArray(arr), separator, null, null);
     }
 
     public Appender<T> addReflectArray(Object arr) {
-        return addIterator(Iterators.of(arr), null, null, null);
+        return addIterator(Iterators.ofArray(arr), null, null, null);
     }
     public Appender<T> addsLine(Object ... arr){
         adds(arr);

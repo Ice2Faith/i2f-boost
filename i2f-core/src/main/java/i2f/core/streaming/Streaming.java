@@ -10,14 +10,11 @@ import i2f.core.iterator.impl.EnumerationIterator;
 import i2f.core.streaming.api.process.IProcessStreaming;
 import i2f.core.streaming.api.sink.ISinkStreaming;
 import i2f.core.streaming.api.source.ISourceStreaming;
-import i2f.core.streaming.base.source.SimpleSourceStreaming;
 import i2f.core.streaming.api.source.SourceStreaming;
+import i2f.core.streaming.base.source.SimpleSourceStreaming;
 import i2f.core.tuple.impl.Tuple2;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.Iterator;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -119,6 +116,8 @@ public interface Streaming<E> {
     E reduce(BiFunction<E, E, E> reducer);
 
     <R, C extends Collection<R>> C collect(C col);
+
+    <K, V, MAP extends Map<K, V>> MAP collect(MAP map, BiSupplier<K, E> key, BiSupplier<V, E> val);
 
     void each(IExecutor<E> executor);
 
