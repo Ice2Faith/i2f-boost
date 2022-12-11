@@ -37,6 +37,7 @@
         <module>i2f-agent</module>
 
         <module>i2f-generator</module>
+        <module>i2f-base</module>
 
 
         <!-- springcloud netflix -->
