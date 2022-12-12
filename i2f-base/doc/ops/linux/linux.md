@@ -6,6 +6,9 @@
 -r/-R 递归 recursive
 -f 强制 force
 -h 人类友好 human
+\ 命令中进行换行
+&& 前一个命令正常运行之后，再运行后一个命令
+|| 前一个命令运行完，运行后一个命令
 ```
 
 ---
@@ -121,6 +124,92 @@ vi app.conf
 预览模式下 输入 / 开头，加上需要查找的内容，进行查找内容
 /username
 ```
+
+---
+## 行规则编辑
+- sed 是一个基于行扫描匹配编辑的工具
+- 适用于脚本中修改指定的配置内容
+- 而不用借助vi等工具导致的人工干预过程
+- 命令格式
+```shell script
+sed [选项] [命令] [文件]
+
+[选项] 可选值
+    -e 脚本命令，将命令添加到已有命令中
+    -f 脚本命令，将文件内容添加到已有命令中
+    -n 屏蔽启动输出，需要使用print命令完成输出
+    -i 直接修改源文件
+```
+- 行内替换命令
+```shell script
+替换一行中所有匹配项
+s 替换命令
+  [address]s/pattern/replacement/flags
+  flags 标记
+    n 第几次匹配才替换
+    g 首次匹配替换
+    p 打印匹配的行，一般结合n使用
+    w 将内容写到指定文件
+    & 用正则表达式配
+    \n 匹配第n个子串
+    \ 转义符号
+```
+```shell script
+# 替换第一个匹配
+sed 's/test/hello/1' test.txt
+# 替换第一个匹配
+sed 's/test/hello/g' test.txt
+# 输出修改行
+sed -n 's/test/hello/p' test.txt
+# 路径转义
+sed 's/\root/\home/g' test.txt
+```
+- 删除行
+```shell script
+# 删除第一行
+sed '1d' test.txt
+
+# 删除第二三行
+sed '2,3d' test.txt
+
+# 删除1-3行区间
+sed '/1/,/3/d' test.txt
+
+# 删除第2行到文件尾部
+sed '2,$d' test.txt
+```
+- 添加行
+```shell script
+a 在行后面附加
+i 在行前面附加
+
+sed '1a\
+hello' test.txt
+
+sed '2i\
+hello' test.txt
+```
+- 整行替换
+```shell script
+c 替换整行
+
+sed '2c\
+hello' test.txt
+```
+- 逐字符映射替换
+```shell script
+y 按字符转换
+
+# 1-4 2-5 3-6
+sed 'y/123/456/' test.txt
+```
+- 打印行
+```shell script
+p 打印内容
+
+sed -n '/number 3/p' test.txt
+```
+
 
 ---
 ## 进程
@@ -343,7 +432,7 @@ systemctl enable [服务名]
 systemctl disable [服务名]
 ```
 
-## 防火墙
+## 防火墙 firewalld
 - 查看防火墙状态
 ```shell script
 systemctl status firewalld
@@ -415,6 +504,114 @@ firewall-cmd --zone=public --add-port=80/tcp
 
 firewall-cmd --zone=public --add-port=80/tcp --premanent
 firewall-cmd --reload
+```
+
+
+---
+## 防火墙 iptables
+- iptables 是一个包过滤防火墙
+- 使用前可能需要关闭 firewalld
+- 并且安装iptables
+```shell script
+systemctl stop firewalld
+systemctl disable firewalld
+yum install iptables
+```
+- 具备四种类型的过滤表：
+    - filter(默认过滤表)
+    - nat(地址转换表)
+    - mangle(报文标志修改表)
+    - raw(跟踪数据表)
+- 语法格式
+```shell script
+iptables -t [转换表] [命令] [链表] [参数] -j [动作]
+
+-t [转换表] 可以省略，默认为 filter
+[转换表] 可选值
+    filter
+    nat
+    mangle
+    raw
+[命令] 可选值
+    -A 添加规则
+    -D 删除规则
+    -I 插入规则
+    -F 清空规则
+    -L 列出规则
+    -R 替换规则
+    -Z 清空统计信息
+    -P 设置默认规则
+[参数] 可选值
+    前面加上!表示取反
+    -p 匹配协议 tcp udp icmp all
+    !-p 不匹配协议
+    -s 匹配源地址
+    -d 匹配目标地址
+    -i 匹配入站网卡接口 eth0
+    -o 匹配出站网卡接口
+    --sport 匹配源端口
+    --dport 匹配目标端口
+    --src-range 匹配源地址范围,连续地址，格式：192.168.1.1-192.168.1.100
+    --dst-range 匹配目标地址范围
+    --limit 匹配数据表速率
+    --mac-source 匹配源MAC地址
+    --sports 匹配源端口,连读端口，格式：20:80
+    --dports 匹配目标端口
+    --stste 匹配状态（INVALID/ESTABLISHED/NEW/RELATED）
+    --string 匹配应用层字符串
+[动作] 可选值
+    ACCEPT 允许通过
+    DROP 丢弃
+    REJECT 拒绝通过
+    LOG 记录到syslog日志
+    DNAT 目标地址转换
+    SNAT 源地址转换
+    MASQUERADE 地址欺骗
+    REDIRECT 重定向
+```
+- 查看规则表
+```shell script
+iptables -nvL
+iptables -nvL --line-number
+
+-L 查看列表
+-n 不对IP地址反查
+-v 输出详细信息
+--line-number 显示行号
+-t 有需要可以加上-t查看具体的表，默认filter表
+```
+- 添加规则
+```shell script
+# 丢弃来自192.168.1.4的数据包
+iptables -A INPUT -s 192.168.1.4 -j DROP
+
+iptables -A OUTPUT -p tcp --sport 80 -j ACCEPT
+```
+- 修改规则
+```shell script
+# 需要用到行号,假设查询出来是2
+iptables -R INPUT 2 -s 192.168.1.4 -j ACCEPT
+```
+- 删除规则
+```shell script
+iptables -D INPUT 2
+iptables -D INPUT 2 -s 192.168.1.4 -j ACCEPT
+```
+- 保存配置
+```shell script
+service iptables save
+```
+- 备份规则
+```shell script
+iptables-save > [文件]
+
+iptables-save > /etc/sysconfig/iptables
+```
+- 恢复规则
+```shell script
+iptables-restore < [文件]
+
+iptables-restore < /etc/sysconfig/iptables
 ```
 
 ---
@@ -699,4 +896,18 @@ groupdel test
 groupmod -n [旧组名] [新组名]
 
 groupmod -n test dev
+```
+
+## 杂项
+- 修改主机名
+```shell script
+vim /etc/hostname
+```
+- 编辑host文件
+```shell script
+vim /etc/hosts
+```
+```shell script
+192.168.131.100	master
+192.168.131.101	slave
 ```

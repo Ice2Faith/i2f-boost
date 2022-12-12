@@ -38,7 +38,13 @@ make && make install
 ```
 - 添加环境变量
 ```shell script
+vi /etc/profile.d/env_conf.sh
+```
+```shell script
 export PATH=$PATH:/usr/local/python3/bin/
+```
+```shell script
+source /etc/profile
 ```
 - 安装PIP
 ```shell script
