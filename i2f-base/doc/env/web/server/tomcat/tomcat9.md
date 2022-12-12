@@ -9,7 +9,10 @@
 
 ---
 ## 环境搭建
-- 下载，这里省略
+- 下载
+```shell script
+wget https://mirror.bit.edu.cn/apache/tomcat/tomcat-9/v9.0.44/bin/apache-tomcat-9.0.44.tar.gz
+```
 - 解压:
 ```shell script
 tar -zxvf apache-tomcat-9.0.44.tgz
@@ -17,6 +20,10 @@ tar -zxvf apache-tomcat-9.0.44.tgz
 - 更改配置文件
 ```shell script
 cd apache-tomcat-9.0.44
+```
+- 为脚本增加执行权限
+```shell script
+chmod a+x ./bin/*.sh
 ```
 - 编辑配置文件
 ```shell script
@@ -91,6 +98,14 @@ webapps/app.war
 - 浏览器访问
 ```shell script
 http://[IP]:8080/app
+```
+- 使用配置方式
+    - 修改 conf/server.xml
+    - 同样需要重启tomcat
+```shell script
+<Context path="[context-path]" docBase="[项目相对webapps的路径或绝对路径]" reloadable="true" />
+
+<Context path="" docBase="myproject" reloadable="true" />
 ```
 
 ## 部署静态web（vue）

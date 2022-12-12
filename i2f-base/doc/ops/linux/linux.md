@@ -317,17 +317,164 @@ curl -X POST -H "content-type: application/json" -d '{"username":"admin","age":2
 curl -o ./baidu-index.html http://www.baidu.com
 ```
 
+## 服务
+- 查看状态
+```shell script
+systemctl status [服务名]
+```
+- 停止
+```shell script
+systemctl stop [服务名]
+```
+- 启动
+```shell script
+systemctl start [服务名]
+```
+- 重启
+```shell script
+systemctl restart [服务名]
+```
+- 开机启动
+```shell script
+systemctl enable [服务名]
+```
+- 开机不启动
+```shell script
+systemctl disable [服务名]
+```
+
+## 防火墙
+- 查看防火墙状态
+```shell script
+systemctl status firewalld
+```
+- 停止防火墙
+```shell script
+systemctl stop firewalld
+```
+- 启动防火墙
+```shell script
+systemctl start firewalld
+```
+- 重启防火墙
+```shell script
+systemctl restart firewalld
+```
+- 开机启动
+```shell script
+systemctl enable firewalld
+```
+- 开机不启动
+```shell script
+systemctl disable firewalld
+```
+- 基本语法
+```shell script
+firewall-cmd [选项1] [选项2] [...N]
+```
+- 查看默认区域
+```shell script
+firewall-cmd --get-default-zone
+```
+- 查看支持的区域
+```shell script
+firewall-cmd --get-zones
+```
+- 查看规则列表
+```shell script
+firewall-cmd --list-all
+```
+- 查看所有区域的规则列表
+```shell script
+firewall-cmd --list-all-zones
+```
+- 重载配置
+```shell script
+firewall-cmd --reload
+```
+- 将服务允许通过
+```shell script
+firewall-cmd --zone=public --add-service=[服务的名称]
+
+firewall-cmd --zone=public --add-service=http
+
+--premanent 指定永久模式
+需要配合重载配置使用
+
+firewall-cmd --zone=public --add-service=http --premanent
+firewall-cmd --reload
+```
+- 将端口允许通过
+```shell script
+firewall-cmd --zone=public --add-port=端口号/tcp
+
+firewall-cmd --zone=public --add-port=80/tcp
+
+--premanent 指定永久模式
+需要配合重载配置使用
+
+firewall-cmd --zone=public --add-port=80/tcp --premanent
+firewall-cmd --reload
+```
+
 ---
 ## 磁盘
 - 查看磁盘挂载
 ```shell script
 df -h
 ```
+- 查看所有，包含特殊设备
+```shell script
+df -aT
+```
+- 查询某个路径的磁盘
+```shell script
+df -h [路径]
+
+df -h /etc
+```
 - 查看目录大小
 ```shell script
 du -sh [目录]
 du -sh
 du -sh /usr
+```
+- 列出所有分区
+```shell script
+fdisk -l
+```
+- 磁盘格式化
+```shell script
+mkfs -t [文件系统格式] [装置名]
+
+mkfs /root/swapfile
+mkfs -t ext3 /root/sddisk
+
+查看支持校验的文件系统格式
+mkfs[tab][tab]
+```
+- 磁盘检验
+```shell script
+fsck -Cf -t [文件系统格式] [装置名]
+
+fsck -Cf -t ext3 /dev/hdc2
+
+查看支持校验的文件系统格式
+fsck[tab][tab]
+```
+- 磁盘挂载
+```shell script
+mount -t [文件系统格式] [装置名] [挂载点]
+
+mount /mnt/hdc2 /root/disk2
+mount -t ext3 /mnt/hdc3 /root/disk3
+```
+- 磁盘卸载
+```shell script
+unmount -df [挂载点]
+
+unmount -df /mnt/hdc2
+unmount -df /root/disk3
 ```
 
 ---
@@ -410,3 +557,146 @@ chown -R root:root /app
 ```
 
 
+## 环境变量
+- 配置环境变量
+- 以JAVA_HOME为例
+- 环境变量，在linux配置中
+```shell script
+cat /etc/profile
+```
+- 但是此配置文件，涉及到系统初始化
+- 不建议直接修改此文件
+- 一般是建议在此目录下建立初始化脚本形式
+```shell script
+mkdir /etc/profile.d
+```
+- 建立java的初始化文件
+```shell script
+vi /etc/profile.d/java.sh
+```
+- 添加环境配置
+```shell script
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.131-11.b12.el7.x86_64
+export PATH=$JAVA_HOME/bin:$PATH
+
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+```
+- 保存修改即可
+- 重新应用配置
+```shell script
+source /etc/profile
+```
+- 当然，你也可以直接操作系统配置文件
+- 如果确认没问题的话
+- [解释]为什么能建立profile.d下面任意脚本
+```shell script
+for i in /etc/profile.d/*.sh ; do
+    if [ -r "$i" ]; then
+        if [ "${-#*i}" != "$-" ]; then 
+            . "$i"
+        else
+            . "$i" >/dev/null
+        fi
+    fi
+done
+```
+- 这是profile文件中的一段脚本
+- 可以看到，此脚本扫描了profile.d下面的所有sh脚本进行执行
+- 因此可以这样做
+
+
+## 用户
+- 查看所有用户
+```shell script
+cat /etc/passwd | cut -d : -f 1
+```
+- 用户信息都存放在这个文件中
+```shell script
+cat /etc/passwd
+```
+```shell script
+每一行格式
+按照:分隔
+分别为
+用户名:密码:UID(用户ID):GID(组ID):描述:主目录:默认shell
+
+root:x:0:0:root:/root:/bin/bash
+ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
+```
+- 添加用户
+```shell script
+useradd [用户名]
+
+useradd ftp
+
+-d 参数指定home目录
+-G 参数指定用户组
+-c 参数指定注释信息
+useradd ftp -d /var/ftp/pub -G ftp -c FTP
+```
+- 设置用户密码
+```shell script
+passwd [用户名]
+
+passwd ftp
+# 这里输入密码
+```
+- 切换用户
+```shell script
+su [用户名]
+
+su ftp
+```
+- 删除用户
+```shell script
+userdel [用户名]
+
+userdel ftp
+
+--remove 选项，附加删除用户的home目录
+
+userdel --remove ftp
+```
+- 查看用户是否登录
+```shell script
+who
+```
+- 查看账号是否被锁定
+     - 也就是账号后，是否有 !! 在密码之前
+```shell script
+sudo awk -F: '/[用户名]/ {print $1,$2}' /etc/shadow
+
+sudo awk -F: '/ftp/ {print $1,$2}' /etc/shadow
+```
+- 锁定账号
+```shell script
+sudo passwd -l [用户名]
+
+sudo passwd -l ftp
+```
+- 杀死用户进程
+```shell script
+sudo pkill -KILL -u [用户名]
+
+sudo pkill -KILL -u ftp
+```
+
+## 组
+- 添加组
+```shell script
+groupadd [组名]
+
+groupadd test
+```
+- 删除组
+```shell script
+groupdel [组名]
+
+groupdel test
+```
+- 修改组
+```shell script
+groupmod -n [旧组名] [新组名]
+
+groupmod -n test dev
+```
