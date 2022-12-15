@@ -1,6 +1,9 @@
 package i2f.springboot.redisson.aop;
 
 import i2f.springboot.redisson.RedissonLockProvider;
+import i2f.springboot.redisson.annotation.RedisLock;
+import i2f.springboot.redisson.annotation.RedisReadLock;
+import i2f.springboot.redisson.annotation.RedisWriteLock;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -89,9 +92,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedissonLockAop {
 
-    @Pointcut("@annotation(org.jeecg.config.redisson.annotation.RedisLock)" +
-            "|| @annotation(org.jeecg.config.redisson.annotation.RedisReadLock)" +
-            "|| @annotation(org.jeecg.config.redisson.annotation.RedisWriteLock)")
+    @Pointcut("@annotation(RedisLock)" +
+            "|| @annotation(RedisReadLock)" +
+            "|| @annotation(RedisWriteLock)")
     public void lockPointCut() {
     }
 
@@ -107,7 +110,7 @@ public class RedissonLockAop {
         Object[] args = pjp.getArgs();
         Parameter[] params = method.getParameters();
 
-        org.jeecg.config.redisson.annotation.RedisLock lann = getAnnotation(method, org.jeecg.config.redisson.annotation.RedisLock.class);
+        RedisLock lann = getAnnotation(method, RedisLock.class);
         if (lann != null) {
             String lockName = lann.value();
             Class<?> clazz = lann.clazz();
@@ -158,7 +161,7 @@ public class RedissonLockAop {
             }
         }
 
-        org.jeecg.config.redisson.annotation.RedisWriteLock wann = getAnnotation(method, org.jeecg.config.redisson.annotation.RedisWriteLock.class);
+        RedisWriteLock wann = getAnnotation(method, RedisWriteLock.class);
         if (wann != null) {
             String lockName = wann.value();
             Class<?> clazz = wann.clazz();
@@ -209,7 +212,7 @@ public class RedissonLockAop {
             }
         }
 
-        org.jeecg.config.redisson.annotation.RedisReadLock rann = getAnnotation(method, org.jeecg.config.redisson.annotation.RedisReadLock.class);
+        RedisReadLock rann = getAnnotation(method, RedisReadLock.class);
         if (rann != null) {
             String lockName = rann.value();
             Class<?> clazz = rann.clazz();

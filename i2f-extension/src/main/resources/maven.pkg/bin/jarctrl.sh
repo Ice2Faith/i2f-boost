@@ -7,9 +7,21 @@ ctrlOption=$1
 AppEnv=test
 
 # try find jar file in current
-if [ "$AppName" = "" ];then
-  AppName=`ls -a | grep -v grep | grep .jar | head -n 1`
+if [ "$AppName" == "" ];
+then
+  _p_suffix=.jar
+  _p_path=
+
+  for _p_file in $(ls -a $_p_path | grep -v grep | grep $_p_suffix)
+  do
+      _p_fix=${_p_file##*.}
+      if [ x"$_p_suffix" == x".$_p_fix" ]; then
+         AppName=$_p_file
+         break
+      fi
+  done
 fi
+
 
 echo "-----------------------"
 echo "jarctrl.sh running..."

@@ -14,6 +14,11 @@
 
     <!-- 渐进式模块 -->
     <modules>
+        <module>i2f-base</module>
+
+        <module>dir-diff</module>
+
+
         <!-- 仅依赖jdk1.8,javase -->
         <module>i2f-core</module>
 
@@ -37,7 +42,6 @@
         <module>i2f-agent</module>
 
         <module>i2f-generator</module>
-        <module>i2f-base</module>
 
 
         <!-- springcloud netflix -->

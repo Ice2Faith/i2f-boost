@@ -27,6 +27,8 @@ copy ..\i2f-spring\target\i2f-spring-%I2F_VERSION%.jar %DEPLOY_PATH%
 copy ..\i2f-springboot\target\i2f-springboot-%I2F_VERSION%.jar %DEPLOY_PATH%
 copy ..\i2f-springcloud\target\i2f-springcloud-%I2F_VERSION%.jar %DEPLOY_PATH%
 copy ..\i2f-generator\target\i2f-generator-%I2F_VERSION%.jar %DEPLOY_PATH%
+copy ..\dir-diff\target\dir-diff.jar %DEPLOY_PATH%
+
 
 echo copy poms...
 
@@ -42,5 +44,7 @@ copy ..\i2f-spring\pom.xml %MAVEN_POM_PATH%\i2f-spring-pom.xml
 copy ..\i2f-springboot\pom.xml %MAVEN_POM_PATH%\i2f-springboot-pom.xml
 copy ..\i2f-springcloud\pom.xml %MAVEN_POM_PATH%\i2f-springcloud-pom.xml
 copy ..\i2f-generator\pom.xml %MAVEN_POM_PATH%\i2f-generator-pom.xml
+copy ..\dir-diff\pom.xml %MAVEN_POM_PATH%\dir-diff-pom.xml
+
 
 echo done.
