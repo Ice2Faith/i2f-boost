@@ -289,6 +289,14 @@ public abstract class AbsStreaming<R, E> implements Streaming<E>, IProcessStream
     }
 
     @Override
+    public <K> Streaming<Tuple2<K, Collection<E>>> keyBy(BiSupplier<K, E> key) {
+        AbsStreaming<K, Tuple2<K, Collection<E>>> ret = (AbsStreaming<K, Tuple2<K, Collection<E>>>) new KeyByStreaming<K, E>(key);
+        ret.prev = this;
+        this.next = ret;
+        return ret;
+    }
+
+    @Override
     public Streaming<Tuple2<E, Integer>> countBy() {
         AbsStreaming<E, Tuple2<E, Integer>> ret = (AbsStreaming<E, Tuple2<E, Integer>>) new CountByStreaming<E>();
         ret.prev = this;
@@ -419,6 +427,22 @@ public abstract class AbsStreaming<R, E> implements Streaming<E>, IProcessStream
     @Override
     public boolean allMatch(IFilter<E> filter) {
         AbsSinkStreaming<Boolean, E, E> ret = new AllMatchSinkStreaming<E>(filter);
+        ret.prev = this;
+        this.next = ret;
+        return ret.sink();
+    }
+
+    @Override
+    public String stringify(String open, String separator, String close) {
+        AbsSinkStreaming<String, E, E> ret = new StringifySinkStreaming<E>(open, separator, close);
+        ret.prev = this;
+        this.next = ret;
+        return ret.sink();
+    }
+
+    @Override
+    public <T extends Appendable> T stringify(T appender, String open, String separator, String close) {
+        AbsSinkStreaming<T, E, E> ret = new StringifyAppendableSinkStreaming<T, E>(appender, open, separator, close);
         ret.prev = this;
         this.next = ret;
         return ret.sink();

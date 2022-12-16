@@ -31,6 +31,16 @@ public class TestStreaming {
 
                     }
                 }).parallel()
+                .keyBy(e -> {
+                    if (e.length() >= 3) {
+                        return e.substring(0, 3);
+                    }
+                    return e;
+                })
+                .peek(System.out::println)
+                .flatMap((e, c) -> {
+                    c.addAll(e.t2);
+                })
                 .countBy()
                 .peek(System.out::println).sequential()
                 .sink(new FileTextLineSinkStreaming<>(cp, (e) -> e.t2 + " > " + e.t1));

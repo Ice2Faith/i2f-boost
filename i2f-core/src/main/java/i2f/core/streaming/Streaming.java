@@ -112,6 +112,8 @@ public interface Streaming<E> {
 
     <K, RT> Streaming<Tuple2<K, RT>> keyedAggregate(BiSupplier<K, E> key, BiSupplier<RT, Iterator<E>> mapper);
 
+    <K> Streaming<Tuple2<K, Collection<E>>> keyBy(BiSupplier<K, E> key);
+
     Streaming<Tuple2<E, Integer>> countBy();
 
     E reduce(BiFunction<E, E, E> reducer);
@@ -147,6 +149,18 @@ public interface Streaming<E> {
     boolean anyMatch(IFilter<E> filter);
 
     boolean allMatch(IFilter<E> filter);
+
+    String stringify(String open, String separator, String close);
+
+    default String stringify(String separator) {
+        return stringify(null, separator, null);
+    }
+
+    <T extends Appendable> T stringify(T appender, String open, String separator, String close);
+
+    default <T extends Appendable> T stringify(T appender, String separator) {
+        return stringify(appender, null, separator, null);
+    }
 
     Stream<E> stream();
 
