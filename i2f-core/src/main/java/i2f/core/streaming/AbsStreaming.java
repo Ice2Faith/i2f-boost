@@ -1,5 +1,6 @@
 package i2f.core.streaming;
 
+import i2f.core.delegate.batch.IBatchResolver;
 import i2f.core.functional.common.IExecutor;
 import i2f.core.functional.common.IFilter;
 import i2f.core.functional.common.IMapper;
@@ -304,6 +305,14 @@ public abstract class AbsStreaming<R, E> implements Streaming<E>, IProcessStream
     }
 
     @Override
+    public E[] array(Class<E[]> tarType) {
+        AbsSinkStreaming<E[], E, E> ret = new ArraySinkStreaming<>(tarType);
+        ret.prev = this;
+        this.next = ret;
+        return ret.sink();
+    }
+
+    @Override
     public <K, V, MAP extends Map<K, V>> MAP collect(MAP map, BiSupplier<K, E> key, BiSupplier<V, E> val) {
         AbsSinkStreaming<MAP, E, E> ret = new CollectMapSinkStreaming<>(map, key, val);
         ret.prev = this;
@@ -317,6 +326,22 @@ public abstract class AbsStreaming<R, E> implements Streaming<E>, IProcessStream
         ret.prev = this;
         this.next = ret;
         ret.sink();
+    }
+
+    @Override
+    public <R> List<Tuple2<R, Exception>> batch(int batchCount, IBatchResolver<R, E> resolver, boolean throwEx) {
+        AbsSinkStreaming<List<Tuple2<R, Exception>>, E, E> ret = new BatchSinkStreaming<R, E>(batchCount, resolver, throwEx);
+        ret.prev = this;
+        this.next = ret;
+        return ret.sink();
+    }
+
+    @Override
+    public <R> List<Tuple2<R, Exception>> batch(int batchCount, IBatchResolver<R, E> resolver) {
+        AbsSinkStreaming<List<Tuple2<R, Exception>>, E, E> ret = new BatchSinkStreaming<R, E>(batchCount, resolver);
+        ret.prev = this;
+        this.next = ret;
+        return ret.sink();
     }
 
     @Override

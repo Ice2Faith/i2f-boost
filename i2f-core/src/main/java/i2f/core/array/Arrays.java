@@ -62,6 +62,12 @@ public class Arrays {
         return collect(list, tarType);
     }
 
+    public static <T> T[] collect(@Name("ite") Iterator<T> ite, @Name("tarType") Class<? extends T[]> tarType) {
+        List<T> list = new ArrayList<>();
+        Collections.collect(list, ite);
+        return collect(list, tarType);
+    }
+
 
     public static <T> T[] collect(@Name("col") Collection<T> col, @Name("tarType") Class<? extends T[]> tarType) {
         Object[] arr = new Object[0];

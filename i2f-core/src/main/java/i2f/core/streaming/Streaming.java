@@ -1,5 +1,6 @@
 package i2f.core.streaming;
 
+import i2f.core.delegate.batch.IBatchResolver;
 import i2f.core.functional.common.IExecutor;
 import i2f.core.functional.common.IFilter;
 import i2f.core.functional.common.IMapper;
@@ -117,9 +118,15 @@ public interface Streaming<E> {
 
     <R, C extends Collection<R>> C collect(C col);
 
+    E[] array(Class<E[]> tarType);
+
     <K, V, MAP extends Map<K, V>> MAP collect(MAP map, BiSupplier<K, E> key, BiSupplier<V, E> val);
 
     void each(IExecutor<E> executor);
+
+    <R> List<Tuple2<R, Exception>> batch(int batchCount, IBatchResolver<R, E> resolver, boolean throwEx);
+
+    <R> List<Tuple2<R, Exception>> batch(int batchCount, IBatchResolver<R, E> resolver);
 
     E first();
 
