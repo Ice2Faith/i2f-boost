@@ -23,8 +23,8 @@ cp ../i2f-spring/target/i2f-spring-$I2F_VERSION.jar $DEPLOY_PATH
 cp ../i2f-springboot/target/i2f-springboot-$I2F_VERSION.jar $DEPLOY_PATH
 cp ../i2f-springcloud/target/i2f-springcloud-$I2F_VERSION.jar $DEPLOY_PATH
 cp ../i2f-generator/target/i2f-generator-$I2F_VERSION.jar $DEPLOY_PATH
-cp ../dir-diff/target/dir-diff.jar $DEPLOY_PATH
-
+cp ../itl-ddiff/target/itl-ddiff.jar $DEPLOY_PATH
+cp ../itl-crypt/target/itl-crypt.jar $DEPLOY_PATH
 
 echo copy poms...
 
@@ -40,6 +40,7 @@ cp ../i2f-spring/pom.xml $MAVEN_POM_PATH/i2f-spring-pom.xml
 cp ../i2f-springboot/pom.xml $MAVEN_POM_PATH/i2f-springboot-pom.xml
 cp ../i2f-springcloud/pom.xml $MAVEN_POM_PATH/i2f-springcloud-pom.xml
 cp ../i2f-generator/pom.xml $MAVEN_POM_PATH/i2f-generator-pom.xml
-cp ../dir-diff/pom.xml $MAVEN_POM_PATH/dir-diff-pom.xml
+cp ../itl-ddiff/pom.xml $MAVEN_POM_PATH/itl-ddiff-pom.xml
+cp ../itl-crypt/pom.xml $MAVEN_POM_PATH/itl-crypt-pom.xml
 
 echo done.

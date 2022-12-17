@@ -911,3 +911,59 @@ vim /etc/hosts
 192.168.131.100	master
 192.168.131.101	slave
 ```
+- 查看CPU
+```shell script
+lscpu
+```
+- 查看内存
+```shell script
+lsmem
+```
+- 查看登录用户
+```shell script
+lslogins
+```
+- 查看块设备
+```shell script
+lsblk
+```
+- 查看USB
+```shell script
+lsusb
+```
+- 查看版本
+```shell script
+cat /proc/version
+```
+- 查看CPU信息
+```shell script
+cat /proc/cpuinfo
+```
+- 查看内存信息
+```shell script
+cat /proc/meminfo
+```
+- 查看虚拟内存
+```shell script
+cat /proc/swaps
+```
+- 时间同步
+```shell script
+yum -y install ntp
+systemctl enable ntpd
+systemctl start ntpd
+timedatectl set-ntp yes
+ntpdate -u cn.pool.ntp.org
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime   
+watch -n 1 'date`
+```
+- 性能查看
+```shell script
+sar
+top
+iostat
+vmstat
+perf
+
+yum install -y perf
+```

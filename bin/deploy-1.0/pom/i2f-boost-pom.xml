@@ -16,7 +16,9 @@
     <modules>
         <module>i2f-base</module>
 
-        <module>dir-diff</module>
+        <module>itl-ddiff</module>
+
+        <module>itl-crypt</module>
 
 
         <!-- 仅依赖jdk1.8,javase -->

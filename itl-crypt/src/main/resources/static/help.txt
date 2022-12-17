@@ -1,0 +1,49 @@
+itl-crypt
+提供命令行上进行部分的加解密或者编解码操作
+
+命令行参数：
+[选项] [参数]
+
+[选项]
+help 查看帮助
+- 以下部分为基础部分
+base64-en Base64.getEncoder()
+base64-de Base64.getDecoder()
+base64-url-en Base64.getUrlEncoder()
+base64-url-de Base64.getUrlDecoder()
+url-en URLEncoder
+url-de URLDecoder
+md2 MessageDigest.getInstance("MD2")
+md5 MessageDigest.getInstance("MD5")
+sha-1 MessageDigest.getInstance("SHA-1")
+sha-224 MessageDigest.getInstance("SHA-224")
+sha-256 MessageDigest.getInstance("SHA-256")
+sha-384 MessageDigest.getInstance("SHA-384")
+sha-512 MessageDigest.getInstance("SHA-512")
+hmac-md2 Mac.getInstance("HmacMD2")
+hmac-md5 Mac.getInstance("HmacMD5")
+hmac-sha-1 Mac.getInstance("HmacSHA1")
+hmac-sha-224 Mac.getInstance("HmacSHA224")
+hmac-sha-256 Mac.getInstance("HmacSHA256")
+hmac-sha-384 Mac.getInstance("HmacSHA384")
+hmac-sha-512 Mac.getInstance("HmacSHA512")
+
+- 以下部分为spring-security中PasswordEncoder的实例
+- 均带有pe前缀
+pe-argon2 Argon2PasswordEncoder()
+pe-bcrypt BCryptPasswordEncoder()
+pe-ldap-sha LdapShaPasswordEncoder()
+pe-md2 MessageDigestPasswordEncoder("MD2")
+pe-md4 Md4PasswordEncoder()
+pe-md5 MessageDigestPasswordEncoder("MD5")
+pe-no-op NoOpPasswordEncoder.getInstance()
+pe-pbkdf2 Pbkdf2PasswordEncoder()
+pe-pbkdf2-sec Pbkdf2PasswordEncoder(args[0])
+pe-scrypt SCryptPasswordEncoder()
+pe-sha-1 MessageDigestPasswordEncoder("SHA-1")
+pe-sha-224 MessageDigestPasswordEncoder("SHA-224")
+pe-sha-256 MessageDigestPasswordEncoder("SHA-256")
+pe-sha-384 MessageDigestPasswordEncoder("SHA-384")
+pe-sha-512 MessageDigestPasswordEncoder("SHA-512")
+
+
