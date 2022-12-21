@@ -8,9 +8,11 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -19,17 +21,20 @@ import java.util.concurrent.CountDownLatch;
  * @desc
  */
 @Data
-public class TcpServer implements ITcpConnector{
+public class TcpServer implements ITcpConnector {
+    public static final String CTX_KEY_ADDR = "addr";
+    public static final String CTX_KEY_PORT = "port";
     protected int port;
     protected ServerSocketChannel serverChannel;
     protected Selector selector;
     protected ITcpServerListener listener;
     protected CountDownLatch latch;
-    protected CopyOnWriteArrayList<SocketChannel> clients=new CopyOnWriteArrayList<>();
-    public TcpServer(int port,ITcpServerListener listener){
-        this.port=port;
-        this.listener=listener;
-        latch=new CountDownLatch(1);
+    protected ConcurrentHashMap<SocketChannel, Map<String, Object>> clientsMap = new ConcurrentHashMap<>();
+
+    public TcpServer(int port, ITcpServerListener listener) {
+        this.port = port;
+        this.listener = listener;
+        latch = new CountDownLatch(1);
     }
     @Override
     public ITcpConnector start() throws IOException {
@@ -50,22 +55,31 @@ public class TcpServer implements ITcpConnector{
             while(iterator.hasNext()){
                 SelectionKey item= iterator.next();
                 try{
-                    if(item.isAcceptable()){
+                    if(item.isAcceptable()) {
                         ServerSocketChannel ssc = (ServerSocketChannel) item.channel();
-                        SocketChannel sc=ssc.accept();
-                        if(sc.isConnectionPending()){
+                        SocketChannel sc = ssc.accept();
+                        if (sc.isConnectionPending()) {
                             sc.finishConnect();
                         }
                         sc.configureBlocking(false);
-                        sc.register(selector,SelectionKey.OP_READ|SelectionKey.OP_WRITE,null);
-                        clients.add(sc);
-                        listener.onAccept(sc,this);
+                        sc.register(selector, SelectionKey.OP_READ, null);
+
+                        listener.onAccept(sc, this);
+                        InetSocketAddress addr = (InetSocketAddress) sc.getRemoteAddress();
+                        Map<String, Object> scContext = new HashMap<>();
+                        scContext.put(CTX_KEY_ADDR, addr.getAddress().getHostAddress());
+                        scContext.put(CTX_KEY_PORT, addr.getPort());
+                        clientsMap.put(sc, scContext);
                     }else if(item.isReadable()){
                         SocketChannel sc = (SocketChannel) item.channel();
                         try{
                             listener.onRead(sc, this);
-                        }catch(IOException e){
-                            NioSocketClosedResolver.resolveIoException(sc,e);
+                        }catch(IOException e) {
+                            boolean closed = NioSocketClosedResolver.resolveIoException(sc, e);
+                            if (closed) {
+                                listener.onClosed(sc, this);
+                                clientsMap.remove(sc);
+                            }
                         }
                     }else if(item.isWritable()){
                         SocketChannel sc = (SocketChannel) item.channel();

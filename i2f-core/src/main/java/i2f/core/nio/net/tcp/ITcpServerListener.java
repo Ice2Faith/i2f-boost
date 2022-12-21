@@ -9,8 +9,10 @@ import java.nio.channels.SocketChannel;
  * @date 2022/5/11 9:59
  * @desc
  */
-public interface ITcpServerListener extends ITcpListener{
+public interface ITcpServerListener extends ITcpListener {
     void onBind(ServerSocketChannel ssc, TcpServer server) throws IOException;
 
     void onAccept(SocketChannel sc, TcpServer server) throws IOException;
+
+    void onClosed(SocketChannel sc, TcpServer server) throws IOException;
 }

@@ -29,6 +29,7 @@ public class NioSocketClosedResolver {
     public static boolean resolveIoException(SocketChannel channel,IOException ex) throws IOException{
         if(isNioClosed(ex)){
             channel.close();
+            return true;
         }
         throw ex;
     }
