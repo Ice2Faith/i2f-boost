@@ -10,7 +10,7 @@
 ## 安装
 - 下载
 ```shell script
-wget -c https://dlcdn.apache.org/hadoop/common/hadoop-3.2.3/hadoop-3.2.3.tar.gz
+wget -c https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/common/hadoop-3.2.3/hadoop-3.2.3.tar.gz
 ```
 - 解包
 ```shell script
@@ -48,6 +48,111 @@ source /etc/profile
 ```shell script
 hadoop version
 ```
+
+## 单机部署
+- 进入hadoop路径
+```shell script
+cd hadoop-3.2.3
+```
+- 编辑hadoop配置
+```shell script
+vi ./etc/hadoop/core-site.xml
+```
+```xml
+<property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://[HOST]:9000</value>
+</property>
+```
+- 创建hadoop目录
+```shell script
+# 创建数据目录
+mkdir -p /home/hadoop3/data/buf
+# 创建临时目录
+mkdir -p /home/hadoop3/data/tmp
+# 创建name-node数据目录
+mkdir -p /home/hadoop3/nm/localdir
+```
+- 为目录添加权限
+```shell script
+chmod -R a+rwx /home/hadoop3/data
+chmod -R a+rwd /home/hadoop3/nm
+```
+- 编辑hdfs配置
+```shell script
+vi ./etc/hadoop/hdfs-site.xml
+```
+```xml
+<!--指定hdfs中namenode的存储位置-->
+<property>
+ <name>dfs.namenode.name.dir</name> 
+ <value>/home/hadoop3/nm/localdir</value>
+</property>
+<!--指定hdfs中datanode的存储位置-->
+<property>
+ <name>dfs.datanode.data.dir</name>
+ <value>/home/hadoop3/data/buf</value>
+</property>
+```
+- 格式化nm
+```shell script
+hadoop namenode -format
+```
+- 编辑hdfs启动脚本和停止脚本
+```shell script
+vi ./sbin/start-dfs.sh
+vi ./sbin/stop-dfs.sh
+```
+```shell script
+HDFS_DATANODE_USER=root
+HADOOP_SECURE_DN_USER=hdfs
+HDFS_NAMENODE_USER=root
+HDFS_SECONDARYNAMENODE_USER=root
+```
+- 编辑yarn启动脚本和停止脚本
+```shell script
+vi ./sbin/start-yarn.sh
+vi ./sbin/stop-yarn.sh
+```
+```shell script
+YARN_RESOURCEMANAGER_USER=root
+HADOOP_SECURE_DN_USER=yarn
+YARN_NODEMANAGER_USER=root
+```
+- 创建hadoop用户
+```shell script
+useradd hdfs
+```
+- 设置hadoop用户的密码
+```shell script
+passwd hdfs
+```
+- 生成rsa密钥对
+```shell script
+ssh-keygen -t rsa
+```
+- 配置自身的可信
+```shell script
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+
+ssh-copy-id -i ~/.ssh/id_rsa.pub hdfs@localhost
+```
+- 需要输入刚才的hadoop用户的密码
+- 启动hdfs
+```shell script
+./sbin/start-dfs.sh
+```
+- 查看进程
+```shell script
+jps
+```
+- 看到以下三个进程，表示启动成功
+```shell script
+DataNode
+NameNode
+SecondaryNameNode
+```
+
 
 
 ## 配置集群

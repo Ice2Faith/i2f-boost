@@ -7,9 +7,13 @@
 - 因此本机可以免密登录
 
 ## 配置
+- 安装openssh
+```shell script
+yum install -y openssh
+```
 - 本机创建RSA秘钥
 ```shell script
-ssh-kengen -t rsa
+ssh-keygen -t rsa
 ```
 - 复制刚创建的秘钥公钥
 ```shell script
