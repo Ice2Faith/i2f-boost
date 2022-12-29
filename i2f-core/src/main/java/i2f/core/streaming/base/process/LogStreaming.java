@@ -1,6 +1,7 @@
 package i2f.core.streaming.base.process;
 
 import i2f.core.functional.common.IExecutor;
+import i2f.core.iterator.impl.LazyIterator;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Iterator;
@@ -22,7 +23,9 @@ public class LogStreaming<E, T> extends AbsStreaming<E, E> {
 
     @Override
     public Iterator<E> apply(Iterator<E> iterator, ExecutorService pool) {
-        executor.accept(args);
-        return iterator;
+        return new LazyIterator<>(() -> {
+            executor.accept(args);
+            return iterator;
+        });
     }
 }

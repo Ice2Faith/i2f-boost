@@ -1,6 +1,7 @@
 package i2f.core.streaming.base.process;
 
 import i2f.core.functional.jvf.Consumer;
+import i2f.core.iterator.impl.LazyIterator;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Iterator;
@@ -20,9 +21,11 @@ public class PeekStreaming<E> extends AbsStreaming<E, E> {
 
     @Override
     public Iterator<E> apply(Iterator<E> iterator, ExecutorService pool) {
-        return parallelizeProcess(iterator, pool, (item, collector) -> {
-            collector.add(item);
-            consumer.accept(item);
+        return new LazyIterator<>(() -> {
+            return parallelizeProcess(iterator, pool, (item, collector) -> {
+                collector.add(item);
+                consumer.accept(item);
+            });
         });
     }
 }

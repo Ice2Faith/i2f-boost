@@ -1,5 +1,6 @@
 package i2f.core.streaming.base.process;
 
+import i2f.core.iterator.impl.LazyIterator;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Iterator;
@@ -23,22 +24,24 @@ public class LimitStreaming<E> extends AbsStreaming<E, E> {
 
     @Override
     public Iterator<E> apply(Iterator<E> rs, ExecutorService pool) {
-        List<E> ret = new LinkedList<E>();
-        if (skip < 0 && limit < 0) {
-            return rs;
-        }
-        int idx = 0;
-        int cnt = 0;
-        while (rs.hasNext()) {
-            E item = rs.next();
-            if (idx >= skip || skip < 0) {
-                if (cnt < limit || limit < 0) {
-                    ret.add(item);
-                }
-                cnt++;
+        return new LazyIterator<>(() -> {
+            List<E> ret = new LinkedList<E>();
+            if (skip < 0 && limit < 0) {
+                return rs;
             }
-            idx++;
-        }
-        return ret.iterator();
+            int idx = 0;
+            int cnt = 0;
+            while (rs.hasNext()) {
+                E item = rs.next();
+                if (idx >= skip || skip < 0) {
+                    if (cnt < limit || limit < 0) {
+                        ret.add(item);
+                    }
+                    cnt++;
+                }
+                idx++;
+            }
+            return ret.iterator();
+        });
     }
 }

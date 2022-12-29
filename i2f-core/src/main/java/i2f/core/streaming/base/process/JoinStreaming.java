@@ -2,6 +2,7 @@ package i2f.core.streaming.base.process;
 
 import i2f.core.functional.jvf.BiFunction;
 import i2f.core.functional.jvf.BiPredicate;
+import i2f.core.iterator.impl.LazyIterator;
 import i2f.core.streaming.AbsStreaming;
 import i2f.core.streaming.Streaming;
 
@@ -28,19 +29,21 @@ public class JoinStreaming<R, E, T> extends AbsStreaming<R, E> {
 
     @Override
     public Iterator<R> apply(Iterator<E> iterator, ExecutorService pool) {
-        List<R> ret = new LinkedList<R>();
-        List<T> list = new LinkedList<T>();
-        stream.collect(list);
-        while (iterator.hasNext()) {
-            E item = iterator.next();
-            for (T titem : list) {
-                if (joiner.test(item, titem)) {
-                    R next = processor.get(item, titem);
-                    ret.add(next);
+        return new LazyIterator<>(() -> {
+            List<R> ret = new LinkedList<R>();
+            List<T> list = new LinkedList<T>();
+            stream.collect(list);
+            while (iterator.hasNext()) {
+                E item = iterator.next();
+                for (T titem : list) {
+                    if (joiner.test(item, titem)) {
+                        R next = processor.get(item, titem);
+                        ret.add(next);
+                    }
                 }
             }
-        }
-        stream.collect(ret);
-        return ret.iterator();
+            stream.collect(ret);
+            return ret.iterator();
+        });
     }
 }

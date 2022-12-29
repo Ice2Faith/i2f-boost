@@ -1,5 +1,6 @@
 package i2f.core.streaming.base.process;
 
+import i2f.core.iterator.impl.LazyIterator;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Comparator;
@@ -22,12 +23,14 @@ public class SortStreaming<E> extends AbsStreaming<E, E> {
 
     @Override
     public Iterator<E> apply(Iterator<E> iterator, ExecutorService pool) {
-        List<E> ret = new LinkedList<E>();
-        while (iterator.hasNext()) {
-            E item = iterator.next();
-            ret.add(item);
-        }
-        ret.sort(comparator);
-        return ret.iterator();
+        return new LazyIterator<>(() -> {
+            List<E> ret = new LinkedList<E>();
+            while (iterator.hasNext()) {
+                E item = iterator.next();
+                ret.add(item);
+            }
+            ret.sort(comparator);
+            return ret.iterator();
+        });
     }
 }

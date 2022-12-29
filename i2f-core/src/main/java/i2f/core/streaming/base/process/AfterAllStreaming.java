@@ -1,6 +1,7 @@
 package i2f.core.streaming.base.process;
 
 import i2f.core.functional.common.IFilter;
+import i2f.core.iterator.impl.LazyIterator;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Iterator;
@@ -22,17 +23,19 @@ public class AfterAllStreaming<E> extends AbsStreaming<E, E> {
 
     @Override
     public Iterator<E> apply(Iterator<E> iterator, ExecutorService pool) {
-        List<E> ret = new LinkedList<E>();
-        boolean keepAlive = false;
-        while (iterator.hasNext()) {
-            E item = iterator.next();
-            if (!keepAlive && filter.test(item)) {
-                keepAlive = true;
+        return new LazyIterator<>(() -> {
+            List<E> ret = new LinkedList<E>();
+            boolean keepAlive = false;
+            while (iterator.hasNext()) {
+                E item = iterator.next();
+                if (!keepAlive && filter.test(item)) {
+                    keepAlive = true;
+                }
+                if (keepAlive) {
+                    ret.add(item);
+                }
             }
-            if (keepAlive) {
-                ret.add(item);
-            }
-        }
-        return ret.iterator();
+            return ret.iterator();
+        });
     }
 }

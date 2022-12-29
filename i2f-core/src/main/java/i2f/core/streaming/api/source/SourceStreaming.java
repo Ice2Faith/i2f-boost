@@ -1,5 +1,6 @@
 package i2f.core.streaming.api.source;
 
+import i2f.core.iterator.impl.LazyIterator;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Iterator;
@@ -19,7 +20,9 @@ public class SourceStreaming<E> extends AbsStreaming<E, E> {
 
     @Override
     public Iterator<E> apply(Iterator<E> spaceHolder, ExecutorService pool) {
-        return this.source.iterator();
+        return new LazyIterator<>(() -> {
+            return this.source.iterator();
+        });
     }
 
     @Override

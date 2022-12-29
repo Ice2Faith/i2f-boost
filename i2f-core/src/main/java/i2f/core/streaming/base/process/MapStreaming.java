@@ -1,6 +1,7 @@
 package i2f.core.streaming.base.process;
 
 import i2f.core.functional.common.IMapper;
+import i2f.core.iterator.impl.LazyIterator;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Iterator;
@@ -20,8 +21,10 @@ public class MapStreaming<E, R> extends AbsStreaming<R, E> {
 
     @Override
     public Iterator<R> apply(Iterator<E> iterator, ExecutorService pool) {
-        return parallelizeProcess(iterator, pool, (item, collector) -> {
-            collector.add(mapper.get(item));
+        return new LazyIterator<>(() -> {
+            return parallelizeProcess(iterator, pool, (item, collector) -> {
+                collector.add(mapper.get(item));
+            });
         });
     }
 }

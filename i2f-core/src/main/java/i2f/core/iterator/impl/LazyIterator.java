@@ -1,10 +1,11 @@
 package i2f.core.iterator.impl;
 
 import i2f.core.functional.jvf.Supplier;
+import i2f.core.lazy.Lazyable;
 
 import java.util.Iterator;
 
-public class LazyIterator<T> implements Iterator<T> {
+public class LazyIterator<T> implements Iterator<T>, Lazyable {
     private boolean isRequire = false;
     private Supplier<Iterator<T>> iteratorSupplier;
     private Iterator<T> realIterator;
@@ -13,7 +14,7 @@ public class LazyIterator<T> implements Iterator<T> {
         this.iteratorSupplier = iteratorSupplier;
     }
 
-    private void requireCheck() {
+    private synchronized void requireCheck() {
         if (!isRequire) {
             this.realIterator = iteratorSupplier.get();
         }

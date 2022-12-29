@@ -1,6 +1,7 @@
 package i2f.core.streaming.base.process;
 
 import i2f.core.functional.common.IFilter;
+import i2f.core.iterator.impl.LazyIterator;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Iterator;
@@ -20,16 +21,18 @@ public class OrFilterStreaming<E> extends AbsStreaming<E, E> {
 
     @Override
     public Iterator<E> apply(Iterator<E> iterator, ExecutorService pool) {
-        if (filters == null || filters.length == 0) {
-            return iterator;
-        }
-        return parallelizeProcess(iterator, pool, (item, collector) -> {
-            for (IFilter<E> filter : filters) {
-                if (filter.test(item)) {
-                    collector.add(item);
-                    break;
-                }
+        return new LazyIterator<>(() -> {
+            if (filters == null || filters.length == 0) {
+                return iterator;
             }
+            return parallelizeProcess(iterator, pool, (item, collector) -> {
+                for (IFilter<E> filter : filters) {
+                    if (filter.test(item)) {
+                        collector.add(item);
+                        break;
+                    }
+                }
+            });
         });
     }
 }

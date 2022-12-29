@@ -1,6 +1,7 @@
 package i2f.core.streaming.base.process;
 
 import i2f.core.functional.jvf.BiConsumer;
+import i2f.core.iterator.impl.LazyIterator;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Collection;
@@ -21,8 +22,10 @@ public class FlatMapStreaming<E, R> extends AbsStreaming<R, E> {
 
     @Override
     public Iterator<R> apply(Iterator<E> iterator, ExecutorService pool) {
-        return parallelizeProcess(iterator, pool, (item, collector) -> {
-            mapper.accept(item, collector);
+        return new LazyIterator<>(() -> {
+            return parallelizeProcess(iterator, pool, (item, collector) -> {
+                mapper.accept(item, collector);
+            });
         });
     }
 }

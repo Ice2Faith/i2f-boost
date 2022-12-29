@@ -1,5 +1,6 @@
 package i2f.core.streaming.base.process;
 
+import i2f.core.iterator.impl.LazyIterator;
 import i2f.core.streaming.AbsStreaming;
 import i2f.core.streaming.Streaming;
 
@@ -20,15 +21,17 @@ public class ExcludeStreaming<E> extends AbsStreaming<E, E> {
 
     @Override
     public Iterator<E> apply(Iterator<E> iterator, ExecutorService pool) {
-        Set<E> exSet = new LinkedHashSet<>();
-        stream.collect(exSet);
-        List<E> ret = new LinkedList<E>();
-        while (iterator.hasNext()) {
-            E item = iterator.next();
-            if (!exSet.contains(item)) {
-                ret.add(item);
+        return new LazyIterator<>(() -> {
+            Set<E> exSet = new LinkedHashSet<>();
+            stream.collect(exSet);
+            List<E> ret = new LinkedList<E>();
+            while (iterator.hasNext()) {
+                E item = iterator.next();
+                if (!exSet.contains(item)) {
+                    ret.add(item);
+                }
             }
-        }
-        return ret.iterator();
+            return ret.iterator();
+        });
     }
 }

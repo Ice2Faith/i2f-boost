@@ -1,6 +1,7 @@
 package i2f.core.streaming.base.process;
 
 import i2f.core.functional.jvf.BiConsumer;
+import i2f.core.iterator.impl.LazyIterator;
 import i2f.core.streaming.AbsStreaming;
 
 import java.util.Collection;
@@ -23,8 +24,10 @@ public class AggregateStreaming<E, R> extends AbsStreaming<R, E> {
 
     @Override
     public Iterator<R> apply(Iterator<E> iterator, ExecutorService pool) {
-        List<R> ret = new LinkedList<R>();
-        mapper.accept(iterator, ret);
-        return ret.iterator();
+        return new LazyIterator<>(() -> {
+            List<R> ret = new LinkedList<R>();
+            mapper.accept(iterator, ret);
+            return ret.iterator();
+        });
     }
 }
