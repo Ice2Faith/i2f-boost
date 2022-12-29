@@ -6,37 +6,41 @@ import i2f.core.lazy.Lazyable;
 import java.util.Iterator;
 
 public class LazyIterator<T> implements Iterator<T>, Lazyable {
-    private boolean isRequire = false;
-    private Supplier<Iterator<T>> iteratorSupplier;
-    private Iterator<T> realIterator;
+    private volatile boolean isRequire = false;
+    private Supplier<Iterator<T>> supplier;
+    private Iterator<T> iterator;
 
-    public LazyIterator(Supplier<Iterator<T>> iteratorSupplier) {
-        this.iteratorSupplier = iteratorSupplier;
+    public LazyIterator(Supplier<Iterator<T>> supplier) {
+        this.supplier = supplier;
     }
 
-    private synchronized void requireCheck() {
-        if (!isRequire) {
-            this.realIterator = iteratorSupplier.get();
+    private void requireCheck() {
+        if (isRequire) {
+            return;
         }
-        isRequire = true;
+        synchronized (this) {
+            if (!isRequire) {
+                this.iterator = supplier.get();
+            }
+            isRequire = true;
+        }
     }
 
     @Override
     public boolean hasNext() {
         requireCheck();
-        isRequire = true;
-        return realIterator.hasNext();
+        return iterator.hasNext();
     }
 
     @Override
     public T next() {
         requireCheck();
-        return realIterator.next();
+        return iterator.next();
     }
 
     @Override
     public void remove() {
         requireCheck();
-        realIterator.remove();
+        iterator.remove();
     }
 }

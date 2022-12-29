@@ -1,7 +1,7 @@
 package i2f.core.streaming.api.source;
 
 import i2f.core.iterator.impl.LazyIterator;
-import i2f.core.streaming.AbsStreaming;
+import i2f.core.streaming.base.AbsStreaming;
 
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;

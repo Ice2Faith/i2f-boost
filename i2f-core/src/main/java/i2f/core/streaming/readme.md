@@ -6,8 +6,12 @@
     - 提供了直接暴露的流接口
 - AbsStreaming
     - 提供了每个流操作可以进行的操作的抽象包装
+- GroupingStreaming
+    - 提供了按照键分组的分组流接口
+- GroupingStreamingImpl
+    - 提供了每个分组流操作的具体封装
 ```java
-ArrayList<String> collect = Streams.stream(1, 5, 3, 7, 6, 2, 8, 4, 9)
+ArrayList<String> collect = Streams.of(1, 5, 3, 7, 6, 2, 8, 4, 9)
                 // 过滤大于2的元素
                 .filter((e) -> e > 2)
                 // 过滤小于8的元素
@@ -62,7 +66,7 @@ Stream.of(1,2,3,4) // 一开始，是java-stream
 
 // 下面使用streaming构造
 // 可以发现，使用时一样的
-Streaming.stream(5,6,7,8)
+Streaming.of(5,6,7,8)
     .map(e->e*2)
     .collect(Collectors.toStreaming()) // 这里，原本就是streaming了，这里多重复包装了一次
     .peek(System.out::println)
@@ -74,4 +78,18 @@ Streaming.stream(5,6,7,8)
     .collect(Collectors.toStreaming())
     .collect(Collectors.toArrayList())
     .forEach(System.out::println);
+```
+
+## 分组流 group-streaming
+```java
+Streaming.of(1, 2, 3, 4, 5) // 构造普通流
+    .groupBy(e -> e % 2) // 进行分组
+    .groupParallel() // 设置分组的并行
+    .groupParallelize(3) // 设置分组的并行度
+    .parallel() // 设置分组中元素的并行
+    .parallelize(3) // 设置分组中元素的并行度
+    .map(e -> e * 2) // 在分组内做map，也就是对每个分组的每个元素做
+    .filter(e -> e > 5) // 在分组内做filter，也就是对每个分组进行filter
+    .stream() // 转换为streaming，键值对
+    .each(System.out::println); // 这是streaming的each遍历方法
 ```

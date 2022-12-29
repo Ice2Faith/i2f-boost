@@ -25,7 +25,7 @@ public interface GroupStreaming<K, E> {
 
     GroupStreaming<K, E> groupParallelize(int cnt);
 
-    Streaming<Tuple2<K, Collection<E>>> streaming();
+    Streaming<Tuple2<K, Collection<E>>> stream();
 
     Streaming<E> flat();
 

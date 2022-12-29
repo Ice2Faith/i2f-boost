@@ -1,6 +1,6 @@
 package i2f.core.streaming.base.sink;
 
-import i2f.core.streaming.AbsStreaming;
+import i2f.core.streaming.base.AbsStreaming;
 import i2f.core.thread.NamingForkJoinPool;
 import i2f.core.tuple.Tuples;
 import i2f.core.tuple.impl.Tuple2;

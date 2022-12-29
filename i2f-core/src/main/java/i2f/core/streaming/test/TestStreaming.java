@@ -26,7 +26,7 @@ public class TestStreaming {
                 .parallelize(3)
                 .map(e -> e * 2)
                 .filter(e -> e > 5)
-                .streaming()
+                .stream()
                 .each(System.out::println);
     }
 

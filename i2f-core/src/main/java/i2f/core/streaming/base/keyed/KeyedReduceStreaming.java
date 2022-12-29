@@ -1,9 +1,9 @@
-package i2f.core.streaming.base;
+package i2f.core.streaming.base.keyed;
 
 import i2f.core.functional.jvf.BiFunction;
 import i2f.core.functional.jvf.BiSupplier;
 import i2f.core.iterator.impl.LazyIterator;
-import i2f.core.streaming.AbsStreaming;
+import i2f.core.streaming.base.AbsStreaming;
 import i2f.core.tuple.Tuples;
 import i2f.core.tuple.impl.Tuple2;
 

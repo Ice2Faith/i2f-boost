@@ -13,6 +13,7 @@ import i2f.core.streaming.api.sink.ISinkStreaming;
 import i2f.core.streaming.api.source.ISourceStreaming;
 import i2f.core.streaming.api.source.SourceStreaming;
 import i2f.core.streaming.base.source.SimpleSourceStreaming;
+import i2f.core.streaming.group.GroupStreamingImpl;
 import i2f.core.tuple.impl.Tuple2;
 
 import java.util.*;
