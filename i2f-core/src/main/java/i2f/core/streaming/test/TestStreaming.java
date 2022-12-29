@@ -18,10 +18,23 @@ import java.util.stream.Stream;
  */
 public class TestStreaming {
     public static void main(String[] args) {
+        Streaming.of(1, 2, 3, 4, 5)
+                .groupBy(e -> e % 2)
+                .groupParallel()
+                .groupParallelize(3)
+                .parallel()
+                .parallelize(3)
+                .map(e -> e * 2)
+                .filter(e -> e > 5)
+                .streaming()
+                .each(System.out::println);
+    }
+
+    public void testBasic() {
         File file = new File("D:\\word.txt");
         File cp = new File("D:\\word.cnt.txt");
 
-        Streaming.stream(new FileTextLineSourceStreaming(file))
+        Streaming.of(new FileTextLineSourceStreaming(file))
                 .<String>flatMap((e, c) -> {
                     String[] arr = e.split("\\s+");
                     for (String item : arr) {
@@ -61,7 +74,7 @@ public class TestStreaming {
                 .collect(Collectors.toStreaming())
                 .collect(Collectors.toArrayList())
                 .forEach(System.out::println);
-        Streaming.stream(5, 6, 7, 8)
+        Streaming.of(5, 6, 7, 8)
                 .map(e -> e * 2)
                 .collect(Collectors.toStreaming())
                 .peek(System.out::println)
@@ -77,7 +90,7 @@ public class TestStreaming {
 
     public void test1() {
 
-        ArrayList<String> collect = Streaming.stream(1, 5, 3, 7, 6, 2, 8, 4, 9)
+        ArrayList<String> collect = Streaming.of(1, 5, 3, 7, 6, 2, 8, 4, 9)
                 // 过滤大于2的元素
                 .filter((e) -> e > 2)
                 // 过滤小于8的元素
@@ -132,7 +145,7 @@ public class TestStreaming {
 
         System.out.println("===============================================");
 
-        Integer sum = Streaming.stream(1, 2, 3, 4, 5, 6)
+        Integer sum = Streaming.of(1, 2, 3, 4, 5, 6)
                 .reduce((e1, e2) -> {
                     if (e1 == null) {
                         e1 = 0;
@@ -143,10 +156,10 @@ public class TestStreaming {
 
         System.out.println("===============================================");
 
-        Streaming.stream(1, 2, 3, 4, 5)
+        Streaming.of(1, 2, 3, 4, 5)
                 .peek(System.out::println)
                 .log((pram) -> System.out.println("--------------------"))
-                .join(Streaming.stream("3", "4", "5", "6", "7"),
+                .join(Streaming.of("3", "4", "5", "6", "7"),
                         (v1, v2) -> String.valueOf(v1).equals(String.valueOf(v2)),
                         (v1, v2) -> v1 + "=" + v2)
                 .peek(System.out::println)

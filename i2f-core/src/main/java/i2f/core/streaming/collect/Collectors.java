@@ -129,7 +129,7 @@ public class Collectors {
         }, new Function<Collection<ELEM>, Streaming<ELEM>>() {
             @Override
             public Streaming<ELEM> apply(Collection<ELEM> elems) {
-                return Streaming.stream(elems);
+                return Streaming.of(elems);
             }
         }, characteristics);
     }

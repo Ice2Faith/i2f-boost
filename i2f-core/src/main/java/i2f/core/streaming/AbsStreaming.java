@@ -56,7 +56,7 @@ public abstract class AbsStreaming<R, E> implements Streaming<E>, IProcessStream
         return this;
     }
 
-    public <OUT, IN> Iterator<OUT> parallelizeProcess(Iterator<IN> iterator, ExecutorService pool, IConsumer2<IN, Collection<OUT>> handler) {
+    public static <OUT, IN> Iterator<OUT> parallelizeProcess(Iterator<IN> iterator, ExecutorService pool, IConsumer2<IN, Collection<OUT>> handler) {
         List<OUT> ret = Collections.synchronizedList(new LinkedList<>());
         AtomicCountDownLatch latch = new AtomicCountDownLatch();
         while (iterator.hasNext()) {
@@ -72,10 +72,8 @@ public abstract class AbsStreaming<R, E> implements Streaming<E>, IProcessStream
             }
         }
         if (pool != null) {
-            System.out.println("parallel:" + this.getClass().getSimpleName());
             try {
                 long tms = latch.await();
-                System.out.println("parallel " + tms + "ms done:" + this.getClass().getSimpleName());
             } catch (Exception e) {
                 throw new IllegalStateException(e.getMessage(), e);
             }
@@ -463,5 +461,10 @@ public abstract class AbsStreaming<R, E> implements Streaming<E>, IProcessStream
         ret.prev = this;
         this.next = ret;
         return ret.sink();
+    }
+
+    @Override
+    public <K> GroupStreamingImpl<K, E> groupBy(BiSupplier<K, E> key) {
+        return GroupStreamingImpl.of(this, key);
     }
 }

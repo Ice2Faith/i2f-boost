@@ -20,7 +20,7 @@ public class StreamSinkStreaming<E> extends AbsSinkStreaming<Stream<E>, E, E> {
 
     @Override
     protected Stream<E> sink(Iterator<E> iterator, ExecutorService pool) {
-        LinkedList<E> list = Streaming.stream(iterator).collect(new LinkedList<E>());
+        LinkedList<E> list = Streaming.of(iterator).collect(new LinkedList<E>());
         return list.stream();
     }
 }

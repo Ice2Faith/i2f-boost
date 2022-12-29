@@ -25,31 +25,31 @@ import java.util.stream.Stream;
  * @desc
  */
 public interface Streaming<E> {
-    static <T> Streaming<T> stream(Iterator<T> iterator) {
+    static <T> Streaming<T> of(Iterator<T> iterator) {
         return new SimpleSourceStreaming<T>(iterator);
     }
 
-    static <T> Streaming<T> stream(Iterable<T> iterable) {
+    static <T> Streaming<T> of(Iterable<T> iterable) {
         return new SimpleSourceStreaming<T>(iterable.iterator());
     }
 
-    static <T> Streaming<T> stream(T... arr) {
+    static <T> Streaming<T> of(T... arr) {
         return new SimpleSourceStreaming<T>(new ArrayIterator<>(arr));
     }
 
-    static <T> Streaming<T> stream(Object arr) {
+    static <T> Streaming<T> of(Object arr) {
         return new SimpleSourceStreaming<T>(new ArrayObjectIterator<>(arr));
     }
 
-    static <T> Streaming<T> stream(Enumeration<T> enumeration) {
+    static <T> Streaming<T> of(Enumeration<T> enumeration) {
         return new SimpleSourceStreaming<T>(new EnumerationIterator<>(enumeration));
     }
 
-    static <T> Streaming<T> stream(Stream<T> stream) {
+    static <T> Streaming<T> of(Stream<T> stream) {
         return new SimpleSourceStreaming<T>(stream.iterator());
     }
 
-    static <T> Streaming<T> stream(ISourceStreaming<T> stream) {
+    static <T> Streaming<T> of(ISourceStreaming<T> stream) {
         return new SourceStreaming<T>(stream);
     }
 
@@ -167,4 +167,5 @@ public interface Streaming<E> {
 
     Stream<E> stream();
 
+    <K> GroupStreamingImpl<K, E> groupBy(BiSupplier<K, E> key);
 }
