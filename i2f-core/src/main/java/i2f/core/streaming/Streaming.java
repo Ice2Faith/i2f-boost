@@ -16,6 +16,7 @@ import i2f.core.streaming.base.source.SimpleSourceStreaming;
 import i2f.core.tuple.impl.Tuple2;
 
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 /**
@@ -161,6 +162,8 @@ public interface Streaming<E> {
     default <T extends Appendable> T stringify(T appender, String separator) {
         return stringify(appender, null, separator, null);
     }
+
+    <R, A> R collect(Collector<E, A, R> collector);
 
     Stream<E> stream();
 

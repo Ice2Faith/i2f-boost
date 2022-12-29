@@ -2,12 +2,14 @@ package i2f.core.streaming.test;
 
 
 import i2f.core.streaming.Streaming;
+import i2f.core.streaming.collect.Collectors;
 import i2f.core.streaming.support.sink.FileTextLineSinkStreaming;
 import i2f.core.streaming.support.source.FileTextLineSourceStreaming;
 import i2f.core.tuple.Tuples;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 /**
  * @author ltb
@@ -44,6 +46,33 @@ public class TestStreaming {
                 .countBy()
                 .peek(System.out::println).sequential()
                 .sink(new FileTextLineSinkStreaming<>(cp, (e) -> e.t2 + " > " + e.t1));
+    }
+
+    public void streamConvert() {
+        Stream.of(1, 2, 3, 4)
+                .map(e -> e * 2)
+                .collect(Collectors.toStreaming())
+                .peek(System.out::println)
+                .map(e -> e * 2)
+                .stream()
+                .map(e -> e * 2)
+                .collect(Collectors.toArrayList())
+                .stream()
+                .collect(Collectors.toStreaming())
+                .collect(Collectors.toArrayList())
+                .forEach(System.out::println);
+        Streaming.stream(5, 6, 7, 8)
+                .map(e -> e * 2)
+                .collect(Collectors.toStreaming())
+                .peek(System.out::println)
+                .map(e -> e * 2)
+                .stream()
+                .map(e -> e * 2)
+                .collect(Collectors.toArrayList())
+                .stream()
+                .collect(Collectors.toStreaming())
+                .collect(Collectors.toArrayList())
+                .forEach(System.out::println);
     }
 
     public void test1() {

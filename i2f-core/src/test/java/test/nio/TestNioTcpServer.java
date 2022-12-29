@@ -36,7 +36,7 @@ public class TestNioTcpServer {
                 buffer.flip();
                 buffer.get(bts,0,len);
                 String str=new String(bts,0,len);
-                System.out.println("client("+sc.getRemoteAddress()+") say:"+str);
+                System.out.println("client(" + sc.getRemoteAddress() + ") say:" + str);
 
                 buffer.rewind();
                 sc.write(buffer);
@@ -44,6 +44,11 @@ public class TestNioTcpServer {
 
             @Override
             public void onWrite(SocketChannel sc, ITcpConnector server) throws IOException {
+
+            }
+
+            @Override
+            public void onClosed(SocketChannel sc, TcpServer server) throws IOException {
 
             }
         }).start();

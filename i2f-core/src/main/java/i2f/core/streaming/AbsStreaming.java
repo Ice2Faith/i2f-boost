@@ -19,6 +19,7 @@ import i2f.core.tuple.impl.Tuple2;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 /**
@@ -443,6 +444,14 @@ public abstract class AbsStreaming<R, E> implements Streaming<E>, IProcessStream
     @Override
     public <T extends Appendable> T stringify(T appender, String open, String separator, String close) {
         AbsSinkStreaming<T, E, E> ret = new StringifyAppendableSinkStreaming<T, E>(appender, open, separator, close);
+        ret.prev = this;
+        this.next = ret;
+        return ret.sink();
+    }
+
+    @Override
+    public <R, A> R collect(Collector<E, A, R> collector) {
+        AbsSinkStreaming<R, E, E> ret = new CollectorSinkStreaming<R, A, E>(collector);
         ret.prev = this;
         this.next = ret;
         return ret.sink();
