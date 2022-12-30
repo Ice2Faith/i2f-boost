@@ -44,6 +44,7 @@
         <module>i2f-agent</module>
 
         <module>i2f-generator</module>
+        <module>itl-chrome-spider</module>
 
 
         <!-- springcloud netflix -->
