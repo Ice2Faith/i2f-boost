@@ -11,7 +11,7 @@ import i2f.core.net.http.rest.annotations.*;
 import i2f.core.proxy.impl.BasicDynamicProxyHandler;
 import i2f.core.reflect.convert.ConvertResolver;
 import i2f.core.reflect.core.ReflectResolver;
-import i2f.core.text.IFormatTextProcessor;
+import i2f.core.serialize.IStringSerializer;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -25,17 +25,19 @@ import java.util.Map;
  * @desc
  */
 public class RestClientProxyHandler extends BasicDynamicProxyHandler {
-    protected IFormatTextProcessor processor;
-    public RestClientProxyHandler(IFormatTextProcessor processor){
-        this.processor=processor;
+    protected IStringSerializer processor;
+
+    public RestClientProxyHandler(IStringSerializer processor) {
+        this.processor = processor;
     }
+
     @Override
     public Object resolve(Object context, Object ivkObj, Method method, Object... args) {
-        HttpRequest request=new HttpRequest();
-        Class clazz=method.getDeclaringClass();
-        Parameter[] parameters= method.getParameters();
-        RestClient client= ReflectResolver.findAnnotation(clazz,RestClient.class,false);
-        if(client==null){
+        HttpRequest request = new HttpRequest();
+        Class clazz = method.getDeclaringClass();
+        Parameter[] parameters = method.getParameters();
+        RestClient client = ReflectResolver.findAnnotation(clazz, RestClient.class, false);
+        if (client == null) {
             throw new BoostException("interface not an RestClient interface");
         }
 
@@ -193,7 +195,7 @@ public class RestClientProxyHandler extends BasicDynamicProxyHandler {
             }else if(ConvertResolver.isValueConvertible(content,retType)){
                 ret=ConvertResolver.tryConvertible(content,retType);
             }else{
-                ret=processor.parseText(content,retType);
+                ret = processor.deserialize(content, retType);
             }
         }catch(Exception e){
 

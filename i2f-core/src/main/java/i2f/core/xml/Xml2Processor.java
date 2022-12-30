@@ -10,17 +10,17 @@ import i2f.core.annotations.remark.Author;
 @Author("i2f")
 public class Xml2Processor implements IXmlProcessor {
     @Override
-    public String toText(Object obj) {
+    public String serialize(Object obj) {
         return Xml2.toXml(obj);
     }
 
     @Override
-    public <T> T parseText(String json, Class<T> clazz) {
+    public <T> T deserialize(String json, Class<T> clazz) {
         throw new UnsupportedOperationException("Xml2 un-support parseText.");
     }
 
     @Override
-    public <T> T parseTextRef(String json, Object typeToken) {
+    public <T> T deserialize(String json, Object typeToken) {
         throw new UnsupportedOperationException("Xml2 un-support parseTextRef.");
     }
 }

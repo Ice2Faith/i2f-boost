@@ -36,13 +36,13 @@ public class JacksonUtil {
         return mapper;
     }
     public static String toJson(Object obj)  {
-        return getMapper().toText(obj);
+        return getMapper().serialize(obj);
     }
     public static<T> T parseObj(String json,Class<T> clazz)   {
-        return getMapper().parseText(json,clazz);
+        return getMapper().deserialize(json, clazz);
     }
     public static<T> T parseRef(String json, TypeReference<T> ref)   {
-        return getMapper().parseTextRef(json,ref);
+        return getMapper().deserialize(json, ref);
     }
     public static Map<String,Object> bean2Map(Object bean)   {
         return getMapper().bean2Map(bean);

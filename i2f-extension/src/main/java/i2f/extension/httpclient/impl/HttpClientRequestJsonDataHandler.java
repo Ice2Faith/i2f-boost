@@ -23,7 +23,7 @@ public class HttpClientRequestJsonDataHandler implements IHttpRequestBodyHandler
     public void writeBody(Map<String, Object> data, HttpRequest request, Object output, Object... args) throws IOException {
         HttpEntityEnclosingRequestBase httpContext=(HttpEntityEnclosingRequestBase)output;
 
-        String content= jsonProcessor.toText(data);
+        String content = jsonProcessor.serialize(data);
 
         httpContext.setEntity(new StringEntity(content,"application/json","utf-8"));
     }

@@ -1,6 +1,6 @@
 package i2f.core.hash.impl;
 
-import i2f.core.serialize.ISerializer;
+import i2f.core.serialize.IBytesSerializer;
 
 /**
  * @author ltb
@@ -8,7 +8,7 @@ import i2f.core.serialize.ISerializer;
  * @desc
  */
 public class JsHashProvider<T> extends IByteArrayHashProvider<T> {
-    public JsHashProvider(ISerializer serializer) {
+    public JsHashProvider(IBytesSerializer serializer) {
         super(serializer);
     }
 

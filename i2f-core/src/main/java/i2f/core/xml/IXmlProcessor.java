@@ -1,7 +1,7 @@
 package i2f.core.xml;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.text.IFormatTextProcessor;
+import i2f.core.serialize.IStringSerializer;
 
 /**
  * @author ltb
@@ -9,6 +9,6 @@ import i2f.core.text.IFormatTextProcessor;
  * @desc
  */
 @Author("i2f")
-public interface IXmlProcessor extends IFormatTextProcessor {
+public interface IXmlProcessor extends IStringSerializer {
 
 }

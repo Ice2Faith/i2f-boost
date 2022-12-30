@@ -1,6 +1,6 @@
 package i2f.core.hash.impl;
 
-import i2f.core.serialize.ISerializer;
+import i2f.core.serialize.IBytesSerializer;
 
 /**
  * @author ltb
@@ -8,7 +8,7 @@ import i2f.core.serialize.ISerializer;
  * @desc
  */
 public class ApHashProvider<T> extends IByteArrayHashProvider<T> {
-    public ApHashProvider(ISerializer serializer) {
+    public ApHashProvider(IBytesSerializer serializer) {
         super(serializer);
     }
 

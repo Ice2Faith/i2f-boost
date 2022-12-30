@@ -16,7 +16,7 @@ public class FastJsonUtil {
      * @return Json串
      */
     public static<T> String toJson(T obj) throws IOException {
-        return processor.toText(obj);
+        return processor.serialize(obj);
     }
 
     /**
@@ -29,7 +29,7 @@ public class FastJsonUtil {
      * @return 类对象
      */
     public static <T> T fromJson(String json,Class<T> clazz) throws IOException {
-        return processor.parseText(json,clazz);
+        return processor.deserialize(json, clazz);
     }
 
     /**
@@ -41,6 +41,6 @@ public class FastJsonUtil {
      * @return 对象集合
      */
     public static <T> T fromJson(String json, TypeReference<T> type) throws IOException {
-        return processor.parseTextRef(json,type);
+        return processor.deserialize(json, type);
     }
 }

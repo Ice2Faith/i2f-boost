@@ -2,7 +2,6 @@ package i2f.extension.zookeeper;
 
 import i2f.core.collection.Collections;
 import i2f.core.text.FormatTextSerializer;
-import i2f.core.text.ITextSerializer;
 import i2f.extension.json.gson.GsonJsonProcessor;
 import i2f.extension.zookeeper.exception.ZookeeperException;
 import org.apache.zookeeper.CreateMode;
@@ -19,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * @desc
  */
 public class ZookeeperManager {
-    private ITextSerializer serializer=new FormatTextSerializer(new GsonJsonProcessor());
+    private FormatTextSerializer serializer = new FormatTextSerializer(new GsonJsonProcessor());
     private ZooKeeper zooKeeper;
     public ZookeeperManager(){
 
@@ -61,12 +60,12 @@ public class ZookeeperManager {
 
 
     public byte[] obj2ZkData(Object obj){
-        return serializer.serialize(obj);
+        return serializer.asBytesSerializer().serialize(obj);
     }
 
 
     public Object zkData2Obj(byte[] data){
-       return serializer.deserialize(data);
+        return serializer.asBytesSerializer().deserialize(data, null);
     }
 
     public String parentPath(String path){

@@ -23,7 +23,7 @@ public class HttpClientRequestXmlDataHandler implements IHttpRequestBodyHandler 
     public void writeBody(Map<String, Object> data, HttpRequest request, Object output, Object... args) throws IOException {
         HttpEntityEnclosingRequestBase httpContext=(HttpEntityEnclosingRequestBase)output;
 
-        String content= xmlProcessor.toText(data);
+        String content = xmlProcessor.serialize(data);
 
         httpContext.setEntity(new StringEntity(content,"text/xml","utf-8"));
     }

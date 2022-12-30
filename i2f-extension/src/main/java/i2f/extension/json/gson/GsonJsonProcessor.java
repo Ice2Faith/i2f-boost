@@ -30,23 +30,24 @@ public class GsonJsonProcessor extends AbstractJsonProcessor {
 
     @Override
     public Map<String, Object> bean2Map(Object obj) {
-        String json=toText(obj);
-        return parseTextRef(json,new TypeToken<Map<String,Object>>(){});
+        String json = serialize(obj);
+        return deserialize(json, new TypeToken<Map<String, Object>>() {
+        });
     }
 
     @Override
-    public String toText(Object obj) {
+    public String serialize(Object obj) {
         return getGson().toJson(obj);
     }
 
     @Override
-    public <T> T parseText(String text, Class<T> clazz) {
-        return getGson().fromJson(text,clazz);
+    public <T> T deserialize(String text, Class<T> clazz) {
+        return getGson().fromJson(text, clazz);
     }
 
     @Override
-    public <T> T parseTextRef(String text, Object typeToken) {
-        TypeToken<T> token=(TypeToken<T>)typeToken;
-        return getGson().fromJson(text,token.getType());
+    public <T> T deserialize(String text, Object typeToken) {
+        TypeToken<T> token = (TypeToken<T>) typeToken;
+        return getGson().fromJson(text, token.getType());
     }
 }

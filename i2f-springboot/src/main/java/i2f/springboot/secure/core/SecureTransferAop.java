@@ -171,8 +171,8 @@ public class SecureTransferAop implements InitializingBean {
             }
             log.debug("method params["+i+"] called "+parameter.getName()+" secure decrypt." );
             String ddata=secureTransfer.decrypt(data,aesKey);
-            ddata=processor.parseText(ddata,String.class);
-            args[i]=ddata;
+            ddata = processor.deserialize(ddata, String.class);
+            args[i] = ddata;
             hasProcess=true;
         }
         log.debug("aop process...");

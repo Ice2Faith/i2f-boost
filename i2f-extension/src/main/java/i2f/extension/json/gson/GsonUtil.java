@@ -18,7 +18,7 @@ public class GsonUtil {
      * @return Json串
      */
     public static<T>String toJson(T obj) throws IOException {
-        return processor.toText(obj);
+        return processor.serialize(obj);
     }
 
     /**
@@ -31,7 +31,7 @@ public class GsonUtil {
      * @return 类对象
      */
     public static<T>T fromJson(String json,Class<T>clazz) throws IOException {
-        return processor.parseText(json,clazz);
+        return processor.deserialize(json, clazz);
     }
 
 
@@ -44,7 +44,8 @@ public class GsonUtil {
      * @return 对象集合
      */
     public static<T>T fromJsonTypeToken(String json) throws IOException {
-        return processor.parseTextRef(json,new TypeToken<T>(){});
+        return processor.deserialize(json, new TypeToken<T>() {
+        });
     }
 
     public static JsonObject formJson(String json){

@@ -13,8 +13,8 @@ public abstract class AbstractJsonProcessor implements IJsonProcessor {
 
     @Override
     public <T> T map2Bean(Map<String, Object> map, Class<T> clazz) {
-        String json=toText(map);
-        return parseText(json,clazz);
+        String json = serialize(map);
+        return deserialize(json, clazz);
     }
 
 }

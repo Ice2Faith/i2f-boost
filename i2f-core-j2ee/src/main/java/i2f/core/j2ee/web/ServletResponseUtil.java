@@ -20,7 +20,7 @@ public class ServletResponseUtil {
     }
 
     public static void respJson(HttpServletResponse response, Object obj, IJsonProcessor processor) throws Exception{
-        String json= processor.toText(obj);
+        String json = processor.serialize(obj);
         respJsonString(response,json);
     }
     public static void respJsonString(HttpServletResponse response, String content) throws Exception{
@@ -36,7 +36,7 @@ public class ServletResponseUtil {
     }
 
     public static void respXml(HttpServletResponse response, Object obj, IXmlProcessor processor) throws Exception{
-        String json= processor.toText(obj);
+        String json = processor.serialize(obj);
         respXmlString(response,json);
     }
     public static void respXmlString(HttpServletResponse response,String content) throws Exception{

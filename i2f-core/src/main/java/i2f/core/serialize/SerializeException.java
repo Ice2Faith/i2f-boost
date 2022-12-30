@@ -1,13 +1,6 @@
-package i2f.core.serialize.exception;
+package i2f.core.serialize;
 
-import i2f.core.exception.BoostException;
-
-/**
- * @author ltb
- * @date 2022/4/14 11:15
- * @desc
- */
-public class SerializeException extends BoostException {
+public class SerializeException extends RuntimeException {
     public SerializeException() {
     }
 
@@ -22,4 +15,5 @@ public class SerializeException extends BoostException {
     public SerializeException(Throwable cause) {
         super(cause);
     }
+
 }

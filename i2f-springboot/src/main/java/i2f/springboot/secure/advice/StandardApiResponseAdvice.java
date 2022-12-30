@@ -81,7 +81,7 @@ public class StandardApiResponseAdvice implements ResponseBodyAdvice<Object>, In
     protected Object returnObj(Object obj,boolean isReturnString){
         // 如果原始controller的返回值类型为string，则在这里处理之后也需要返回string，否则将会出错
         if(isReturnString){
-            return processor.toText(obj);
+            return processor.serialize(obj);
         }
         return obj;
     }

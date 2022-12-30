@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import i2f.spring.serialize.jackson.AbsJacksonSerializer;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -15,7 +16,7 @@ import java.util.TimeZone;
  * @date 2022/10/4 15:22
  * @desc
  */
-public class JacksonSerializer {
+public class JacksonSerializer extends AbsJacksonSerializer {
     private static ObjectMapper mapper = null;
 
     public static ObjectMapper serializer() {
@@ -32,6 +33,11 @@ public class JacksonSerializer {
             }
         }
         return mapper;
+    }
+
+    @Override
+    public ObjectMapper getMapper() {
+        return serializer();
     }
 
     public static String toJson(Object obj) throws Exception {

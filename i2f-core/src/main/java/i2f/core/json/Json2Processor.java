@@ -19,17 +19,17 @@ public class Json2Processor extends AbstractJsonProcessor {
     }
 
     @Override
-    public String toText(Object obj) {
+    public String serialize(Object obj) {
         return Json2.toJson(obj);
     }
 
     @Override
-    public <T> T parseText(String json, Class<T> clazz) {
+    public <T> T deserialize(String json, Class<T> clazz) {
         throw new UnsupportedOperationException("Json2 un-support parseText.");
     }
 
     @Override
-    public <T> T parseTextRef(String json, Object typeToken) {
+    public <T> T deserialize(String json, Object typeToken) {
         throw new UnsupportedOperationException("Json2 un-support parseTextRef.");
     }
 }

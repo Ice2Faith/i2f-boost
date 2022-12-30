@@ -26,8 +26,8 @@ public class HttpJsonRequestBodyHandler implements IHttpRequestBodyHandler {
     }
     @Override
     public void writeBody(Map<String, Object> data, HttpRequest request,Object output, Object ... args) throws IOException {
-        OutputStream tos=(OutputStream)output;
-        String json=processor.toText(data);
+        OutputStream tos = (OutputStream) output;
+        String json = processor.serialize(data);
         tos.write(json.getBytes());
         tos.flush();
     }

@@ -64,7 +64,7 @@ public class PublicExceptionResolver implements HandlerExceptionResolver {
             ex.printStackTrace();
             response.setContentType("application/json;charset=utf-8");
             response.setStatus(200);
-            response.getWriter().write(processor.toText(data));
+            response.getWriter().write(processor.serialize(data));
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }

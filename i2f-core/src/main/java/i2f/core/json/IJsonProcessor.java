@@ -1,7 +1,7 @@
 package i2f.core.json;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.text.IFormatTextProcessor;
+import i2f.core.serialize.IStringSerializer;
 
 import java.util.Map;
 
@@ -11,7 +11,8 @@ import java.util.Map;
  * @desc
  */
 @Author("i2f")
-public interface IJsonProcessor extends IFormatTextProcessor {
-    <T> T map2Bean(Map<String,Object> map,Class<T> clazz);
-    Map<String,Object> bean2Map(Object obj);
+public interface IJsonProcessor extends IStringSerializer {
+    <T> T map2Bean(Map<String, Object> map, Class<T> clazz);
+
+    Map<String, Object> bean2Map(Object obj);
 }

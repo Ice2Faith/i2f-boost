@@ -190,7 +190,7 @@ public class SecureTransfer implements InitializingBean {
     }
 
     public String encrypt(Object obj,String aesKey){
-        return AESUtil.encryptJsonAfterBase64(processor.toText(obj),aesKey);
+        return AESUtil.encryptJsonAfterBase64(processor.serialize(obj), aesKey);
     }
 
     public String encryptJson(String json,String aesKey){

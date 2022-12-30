@@ -1,7 +1,7 @@
 package i2f.core.hash.impl;
 
 import i2f.core.hash.IHashProvider;
-import i2f.core.serialize.ISerializer;
+import i2f.core.serialize.IBytesSerializer;
 
 /**
  * @author ltb
@@ -9,9 +9,9 @@ import i2f.core.serialize.ISerializer;
  * @desc
  */
 public abstract class IByteArrayHashProvider<T> implements IHashProvider<T> {
-    protected ISerializer serializer;
+    protected IBytesSerializer serializer;
 
-    public IByteArrayHashProvider(ISerializer serializer) {
+    public IByteArrayHashProvider(IBytesSerializer serializer) {
         this.serializer = serializer;
     }
 

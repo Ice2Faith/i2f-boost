@@ -13,25 +13,27 @@ import java.util.Map;
  */
 public class FastJsonProcessor extends AbstractJsonProcessor {
 
+
     @Override
-    public String toText(Object obj) {
+    public String serialize(Object obj) {
         return JSON.toJSONString(obj);
     }
 
     @Override
-    public <T> T parseText(String text, Class<T> clazz) {
-        return JSON.parseObject(text,clazz);
+    public <T> T deserialize(String text, Class<T> clazz) {
+        return JSON.parseObject(text, clazz);
     }
 
     @Override
-    public <T> T parseTextRef(String text, Object typeToken) {
-        TypeReference<T> typeRef=(TypeReference<T>)typeToken;
-        return JSON.parseObject(text,typeRef);
+    public <T> T deserialize(String text, Object typeToken) {
+        TypeReference<T> typeRef = (TypeReference<T>) typeToken;
+        return JSON.parseObject(text, typeRef);
     }
 
     @Override
     public Map<String, Object> bean2Map(Object obj) {
-        String json=toText(obj);
-        return parseTextRef(json,new TypeReference<Map<String,Object>>(){});
+        String json = serialize(obj);
+        return deserialize(json, new TypeReference<Map<String, Object>>() {
+        });
     }
 }

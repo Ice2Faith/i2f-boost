@@ -38,9 +38,9 @@ public class TestFormatTextSerializer {
         String text=null;
         Object val=null;
         System.out.println("------------------");
-        text=serializer.serializeAsText(obj);
+        text = serializer.serialize(obj);
         System.out.println(text);
-        val=serializer.deserializeFromText(text);
+        val = serializer.deserialize(text, null);
         System.out.println(val);
     }
 }
