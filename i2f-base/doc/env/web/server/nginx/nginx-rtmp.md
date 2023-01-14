@@ -396,3 +396,136 @@ ffplay -f dshow -i video="BisonCam,NB Pro"
 ```shell script
 https://www.cnblogs.com/zhangmingda/p/12638985.html
 ```
+
+## 添加鉴权机制
+- 为了防止被滥用，需要添加鉴权功能
+- 原理是使用nginx-rtmp模块提供的回调能力
+- 在推流时和在播放时，进行鉴权，鉴权通过之后，才进行推流或者播放
+
+### 实现
+- 更改nginx的rtmp配置
+    - 也就是添加 on_publish 和 on_play 回调
+    - 在 live 和 hls 两个节点下，都添加了鉴权的服务定向
+```shell script
+# 点播/直播功能实现配置rtmp协议
+rtmp {
+    server {
+        listen 11935;
+        chunk_size 4000;
+        application vod {
+            play /root/rtmp/vod/flvs/; # 点播媒体存放目录
+        }
+        application live {
+            live on;
+            on_publish http://127.0.0.1:11936/api/rtmp/auth;
+            on_play http://127.0.0.1:11936/api/rtmp/auth;
+        }
+        # HLS直播配置
+        application hls {
+            live on;
+            on_publish http://127.0.0.1:11936/api/rtmp/auth;
+            on_play http://127.0.0.1:11936/api/rtmp/auth;
+            hls on;
+            hls_path /root/rtmp/live/hls; # 视频流存放地址
+            hls_fragment 5s;
+            hls_playlist_length 15s;
+            hls_continuous on; # 连续模式。
+            hls_cleanup off;    # 对多余的切片进行删除。
+            hls_nested on;     # 嵌套模式。
+        }
+    }
+    # 日志配置
+    access_log logs/rtmp_access.log;
+
+}
+```
+- 编写对应的鉴权服务
+- nginx 会将URL参数和Nginx的内部参数
+- 以POST的方式用application/x-www-form-urlencoded格式提交给回调接口
+- 接口成功响应需要HTTP Status为2xx
+- 响应失败为5xx,4xx等
+- 并且响应的数据为JSON格式
+- 格式如下：
+    - 分别是成功和失败的响应报文
+```json
+{"code": 200,"detail": "SUCCESS"}
+```
+```json
+{"code": 500,"detail": "ERROR"}
+```
+- 这里以JAVA的spring-mvc编写为例
+- 这个代码也包含在本项目中，模块为： itl-nginx-rtmp-auth-server
+- controller代码
+```java
+package i2f.nginx.rtmp.auth.server.controller;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+
+/**
+ * @author i2f
+ * @date 2023/1/14 20:47
+ * @desc
+ */
+@Slf4j
+@RestController
+@RequestMapping("/api/rtmp")
+public class RtmpAuthController {
+
+    @Value("${rtmp.auth.access-token:}")
+    private String accessToken;
+
+    /**
+     * nginxData字段介绍
+     * call=play。
+     * addr - 客户端 IP 地址。
+     * app - application 名。
+     * flashVer - 客户端 flash 版本。
+     * swfUrl - 客户端 swf url。
+     * tcUrl - tcUrl。
+     * pageUrl - 客户端页面 url。
+     * name - 流名。
+     *
+     * @param nginxData
+     * @param token
+     * @return
+     */
+    @PostMapping(value = "/auth")
+    public Object auth(@RequestParam Map<String,Object> nginxData,
+                           @RequestParam(value="token",required = false)String token,
+                           HttpServletResponse response) {
+        log.info("nginxData:"+nginxData);
+        log.info("token:"+token);
+        if(!StringUtils.isEmpty(accessToken)){
+            if(!accessToken.equals(token)){
+                log.error("auth failure!");
+                response.setStatus(500);
+                return "{\"code\":500,\"detail\":\"ERROR\"}";
+            }
+        }
+        log.info("auth success!");
+        return "{\"code\":200,\"detail\":\"SUCCESS\"}";
+    }
+
+}
+```
+- 对应的项目配置
+```yaml
+server:
+  port: 11936
+
+rtmp:
+  auth:
+    access-token: ltb12315
+```
+- 这个示例中，使用个固定的token
+- 实际情况中，可以使用用户登录系统的token来做校验即可
+- 并且这个token不能太长，因为在nginx-rtmp源码中，限定了URL的长度为512字节
