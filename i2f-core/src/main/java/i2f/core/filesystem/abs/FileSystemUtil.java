@@ -8,6 +8,15 @@ import java.util.Stack;
 
 public class FileSystemUtil {
     public static void recursiveMkdirs(IFile file) {
+        if ("".equals(file.getPath())) {
+            return;
+        }
+        if (".".equals(file.getPath())) {
+            return;
+        }
+        if ("/".equals(file.getPath())) {
+            return;
+        }
         if (!file.getDirectory().isExists()) {
             recursiveMkdirs(file.getDirectory());
         }

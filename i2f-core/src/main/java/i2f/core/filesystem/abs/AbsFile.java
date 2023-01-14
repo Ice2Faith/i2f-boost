@@ -117,16 +117,7 @@ public abstract class AbsFile implements IFile {
 
     @Override
     public IFile getDirectory() {
-        String sep = pathSeparator();
-        String path = this.getPath();
-        int idx = path.lastIndexOf(sep);
-        if (idx >= 0) {
-            return getFile(path.substring(0, idx));
-        }
-        if (path.startsWith(sep)) {
-            return getFile(sep);
-        }
-        return getFile(".");
+        return getFileSystem().getDirectory(getPath());
     }
 
 

@@ -52,8 +52,10 @@ public abstract class AbsFileSystem implements IFileSystem {
     public IFile getDirectory(String path) {
         String fullPath = getAbsolutePath(path);
         int idx = fullPath.lastIndexOf(pathSeparator());
-        if (idx >= 0) {
+        if (idx > 0) {
             return getFile(fullPath.substring(0, idx));
+        } else if (idx == 0) {
+            return getFile(pathSeparator());
         }
         if (fullPath.startsWith(pathSeparator())) {
             return getFile(pathSeparator());
