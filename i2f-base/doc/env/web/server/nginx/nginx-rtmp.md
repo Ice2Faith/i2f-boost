@@ -454,6 +454,11 @@ rtmp {
 {"code": 500,"detail": "ERROR"}
 ```
 - 这里以JAVA的spring-mvc编写为例
+- 我们需要给连接加上一个token作为访问令牌
+- 也就是将推流或者拉流的URL变为如下形式，添加token参数
+```
+rtmp://[IP]:11935/live/aaa?token=123456
+```
 - 这个代码也包含在本项目中，模块为： itl-nginx-rtmp-auth-server
 - controller代码
 ```java
@@ -524,7 +529,7 @@ server:
 
 rtmp:
   auth:
-    access-token: ltb12315
+    access-token: 123456
 ```
 - 这个示例中，使用个固定的token
 - 实际情况中，可以使用用户登录系统的token来做校验即可
