@@ -49,11 +49,13 @@
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-core</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-core-j2ee</artifactId>
+            <version>1.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.servlet</groupId>
@@ -65,6 +67,7 @@
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-spring</artifactId>
+            <version>1.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.servlet</groupId>
@@ -76,6 +79,7 @@
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-extension</artifactId>
+            <version>1.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.servlet</groupId>
