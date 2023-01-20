@@ -69,7 +69,6 @@ public class NettyServer extends NettyTcpEndPoint {
                         channel.pipeline().addLast("idle monitor", new IdleStateHandler(3 * idleTimeoutSeconds, 0, 0, TimeUnit.SECONDS));
                     }
                     NettyProtocol.initChannel(channel, maxFrameLength);
-                    handler.beforeInitChannel(channel);
                     if (loggingHandler != null) {
                         channel.pipeline().addLast(loggingHandler);
                     }
@@ -87,6 +86,7 @@ public class NettyServer extends NettyTcpEndPoint {
                             }
                         });
                     }
+                    handler.beforeInitChannel(channel);
                     channel.pipeline().addLast(new ChannelInboundHandlerAdapter() {
                         @Override
                         public void channelActive(ChannelHandlerContext ctx) throws Exception {

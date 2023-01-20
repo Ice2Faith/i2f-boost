@@ -15,6 +15,7 @@
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-core</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <dependency>

@@ -44,7 +44,7 @@ public class TestZookeeper {
         boolean ex= cache.exists("token_zhangsan");
 
         tb.setAge(24);
-        cache.set("token_zhangsan",30, TimeUnit.SECONDS,tb);
+        cache.set("token_zhangsan",tb,30, TimeUnit.SECONDS);
 
         if(ex){
             TestBean rtb=(TestBean) cache.get("token_zhangsan");

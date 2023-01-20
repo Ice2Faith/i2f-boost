@@ -46,7 +46,7 @@
         <module>i2f-generator</module>
         <module>itl-chrome-spider</module>
 
-
+        <module>itl-nginx-rtmp-auth-server</module>
         <!-- springcloud netflix -->
 
 
