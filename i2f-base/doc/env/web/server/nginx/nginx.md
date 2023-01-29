@@ -229,3 +229,8 @@ http {
 ```shell script
 ./start.sh
 ```
+
+- 编辑配置相关问题
+    - 不要使用tab键进行对齐，否则可能有问题
+    - 编辑完配置之后，最好先验证配置没有问题verify.sh
+    - 再重载配置使得配置生效reload.sh
