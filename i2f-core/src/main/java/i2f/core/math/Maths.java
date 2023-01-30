@@ -70,7 +70,14 @@ public class Maths {
      * @return
      */
     public static double smoothRate(double begin, double end, double ref) {
-        return (ref - begin) / (end - begin);
+        double rate = (ref - begin) / (end - begin);
+        if (Double.isNaN(rate)) {
+            return 0;
+        }
+        if (Double.isInfinite(rate)) {
+            return 1;
+        }
+        return rate;
     }
 
     public static double smoothRate(long begin, long end, long ref) {
