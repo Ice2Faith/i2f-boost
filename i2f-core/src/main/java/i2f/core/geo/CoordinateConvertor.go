@@ -17,7 +17,10 @@ package main
 // http://blog.csdn.net/sinat_34719507/article/details/60904361
 import (
 	"errors"
+	"fmt"
 	"math"
+	"os"
+	"os/exec"
 )
 
 var InvalidGPS = errors.New("invalid gps!")
@@ -276,4 +279,135 @@ func WGS84ToBDMC(lng, lat float64) (float64, float64, error) {
 
 func main() {
 	// you should delete main method and copy this file to your project
+	const title = "GEO Coordinate Converter V1.0 (go)"
+	cmd("title " + title)
+	cmd("color f0")
+	var coordTypeMap = [][]string{
+		[]string{"GCJ02", "WGS84"},
+		[]string{"WGS84", "GCJ02"},
+		[]string{"GCJ02", "BD09"},
+		[]string{"BD09", "GCJ02"},
+		[]string{"BD09", "WGS84"},
+		[]string{"WGS84", "BD0"},
+		[]string{"WebMC", "WGS84"},
+		[]string{"WGS84", "WebMC"},
+		[]string{"BDMC", "GCJ02"},
+		[]string{"GCJ02", "BDMC"},
+		[]string{"BDMC", "WGS84"},
+		[]string{"BDMC", "BD09C"},
+		[]string{"WGS84", "BDMC"},
+	}
+	for {
+		cmd("cls")
+		fmt.Println("-----------------------------------------")
+		fmt.Printf("    %v   \n", title)
+		for i := 0; i < len(coordTypeMap); i++ {
+			item := coordTypeMap[i]
+			fmt.Printf(" %v. %v --> %v \n", i+1, item[0], item[1])
+		}
+		fmt.Println(" 0. exit ")
+		fmt.Println("-----------------------------------------")
+		stdin("please choice:")
+
+		var sel int
+		fmt.Scan(&sel)
+		flushin()
+
+		if sel == 0 {
+			break
+		}
+
+		for {
+			fmt.Printf("coord [%v] ---> [%v] \n", coordTypeMap[sel-1][0], coordTypeMap[sel-1][1])
+			stdinf("please input [%v] lng,lat:\n", coordTypeMap[sel-1][0])
+			var lng, lat float64
+			fmt.Scanf("%f,%f", &lng, &lat)
+			flushin()
+
+			var (
+				rlng, rlat float64
+				err        error
+			)
+			if sel == 1 {
+				rlng, rlat, err = GCJ02ToWGS84(lng, lat)
+			} else if sel == 2 {
+				rlng, rlat, err = WGS84ToGCJ02(lng, lat)
+			} else if sel == 3 {
+				rlng, rlat, err = GCJ02ToBD09(lng, lat)
+			} else if sel == 4 {
+				rlng, rlat, err = BD09ToGCJ02(lng, lat)
+			} else if sel == 5 {
+				rlng, rlat, err = BD09ToWGS84(lng, lat)
+			} else if sel == 6 {
+				rlng, rlat, err = WGS84ToBD09(lng, lat)
+			} else if sel == 7 {
+				rlng, rlat, err = WebMCToWGS84(lng, lat)
+			} else if sel == 8 {
+				rlng, rlat, err = WGS84ToWebMC(lng, lat)
+			} else if sel == 9 {
+				rlng, rlat, err = BDMCToGCJ02(lng, lat)
+			} else if sel == 10 {
+				rlng, rlat, err = GCJ02ToBDMC(lng, lat)
+			} else if sel == 11 {
+				rlng, rlat, err = BDMCToWGS84(lng, lat)
+			} else if sel == 12 {
+				rlng, rlat, err = BDMCToBD09(lng, lat)
+			} else if sel == 13 {
+				rlng, rlat, err = WGS84ToBDMC(lng, lat)
+			}
+
+			if err != nil {
+				fmt.Println(err)
+			} else {
+				stdoutf("[%v] : %v,%v\n", coordTypeMap[sel-1][1], rlng, rlat)
+			}
+
+			stdin("enter [enter] continue,else exit.")
+			var line string
+			fmt.Scanln(&line)
+
+			if line != "" {
+				break
+			}
+		}
+
+		pause()
+	}
+}
+
+func stdin(tips string) {
+	fmt.Println(tips)
+	fmt.Print(">/ ")
+}
+
+func stdinf(tips string, args ...any) {
+	fmt.Printf(tips+"\n", args...)
+	fmt.Print(">/ ")
+}
+
+func stdout(str string) {
+	fmt.Print("$> ")
+	fmt.Println(str)
+}
+
+func stdoutf(str string, args ...any) {
+	fmt.Print("$> ")
+	fmt.Printf(str+"\n", args...)
+}
+
+func pause() {
+	cmd("pause")
+}
+
+func cmd(line string) {
+	cmd := exec.Command("cmd", "/c", line)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
+}
+
+func flushin() {
+	var _nop string
+	fmt.Scanln(&_nop)
 }
