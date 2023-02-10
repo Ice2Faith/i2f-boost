@@ -1,0 +1,57 @@
+goboot:
+  application:
+    name: go-server
+  profiles:
+    active: dev
+  server:
+    port: 8080
+    bannerPath: ./banner.txt
+    contextPath: /api
+    staticResources:
+      enable: true
+      urlPath: /static
+      filePath: ./static
+    templateResources:
+      enable: true
+      filePath: ./templates/**/*.html
+    https:
+      enable: false
+      pemPath: ./https/server.pem
+      keyPath: ./https/server.key
+    gzip:
+      enable: false
+      level: DefaultCompression
+      excludeExtensions:
+        - .mp4
+      excludePaths:
+        - /api/
+      excludePathRegexes:
+        - "*download"
+    proxy:
+      - name: github.com
+        path: /github/
+        redirect: http://github.com/
+    mapping:
+      - /api/
+    cors:
+      enable: true
+      allowAllOrigins: true
+      allowOrigins:
+        - http://localhost/
+      allowMethods:
+        - GET
+        - PUT
+        - DELETE
+        - POST
+        - PATCH
+        - OPTIONS
+      allowHeaders:
+        - token
+        - Origin
+        - secure
+        - Auth
+      exposeHeaders:
+        - Content-Length
+      allowCredentials: true
+      maxAgeMinutes: 0
+

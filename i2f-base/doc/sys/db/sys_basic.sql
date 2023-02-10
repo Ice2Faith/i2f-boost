@@ -156,22 +156,75 @@ create table sys_user_dept
 create unique index unq_user_dept
 on sys_user_dept(user_id,dept_id);
 
+drop table if exists sys_log;
+CREATE TABLE sys_log (
+  id bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  src_system varchar(50)  COMMENT '来源系统',
+  src_module varchar(50)  COMMENT '来源模块',
+  src_label varchar(50)  COMMENT '来源标签',
+  log_location varchar(500)  COMMENT '日志位置（className）',
+  log_type int  COMMENT '日志类型：0 登录日志，1 登出日志，2 注册日志，3 注销日志，4 接口日志，5 输出日志，6 服务器状态，7 服务异常，8 调用日志，9 回调日志',
+  log_content text COMMENT '日志内容',
+  log_level int  COMMENT '日志级别：0 ERROR，1 WARN，2 INFO，3 DEBUG，4 TRACE',
+  operate_type int  COMMENT '操作类型：0 查询，1 新增，2 修改，3 删除，4 申请，5 审批，6 导入，7 导出',
+  log_key varchar(300)  COMMENT '日志键',
+  log_val varchar(300)  COMMENT '日志值',
+  trace_id varchar(64)  COMMENT '跟踪ID',
+  trace_level int  COMMENT '跟踪层次',
+  user_id varchar(64)  COMMENT '操作用户账号',
+  user_name varchar(256)  COMMENT '操作用户名称',
+  client_ip varchar(256)  COMMENT '客户端IP',
+  java_method varchar(1024)  COMMENT '请求java方法',
+  except_type int  COMMENT '异常分类，0 Exception,1 RuntimeException,2 Error,3 Throwable,4 SQLException',
+  except_class varchar(500)  COMMENT '异常类',
+  except_msg varchar(500)  COMMENT '异常信息',
+  except_stack text COMMENT '异常堆栈',
+  request_url varchar(2048)  COMMENT '请求路径',
+  request_param text COMMENT '请求参数',
+  request_type varchar(10)  COMMENT '请求类型',
+  cost_time bigint  COMMENT '耗时，毫秒',
+  create_time datetime  COMMENT '创建时间',
+  PRIMARY KEY (id),
+  KEY idx_system_module_label (src_system,src_module,src_label),
+  KEY idx_log_type (log_type),
+  KEY idx_log_level (log_level),
+  KEY idx_operate_type (operate_type),
+  KEY idx_user_id (user_id)
+) ENGINE=MyISAM  COMMENT='系统日志表';
+
+create index idx_system_module_label
+on sys_log(src_system,src_module,src_label);
+
+create index idx_log_type
+on sys_log(log_type);
+
+create index idx_log_level
+on sys_log(log_level);
+
+create index idx_operate_type
+on sys_log(operate_type);
+
+create index idx_user_id
+on sys_log(user_id);
+
+
+
 
 
 -- ---------------------------------------------------------------------------------------------
 
 
-INSERT INTO sys_config (group_key,group_name,type_key,type_name,entry_id,entry_key,entry_name,entry_desc,entry_order,parent_entry_id,param_desc,param1,param2,param3,param4,param5,status,`level`,valid_time,invalid_time,mod_flag,del_flag,sys_flag,create_time,create_user,update_time,update_user) VALUES
+INSERT INTO sys_config (group_key,group_name,type_key,type_name,entry_id,entry_key,entry_name,entry_desc,entry_order,parent_entry_id,param_desc,param1,param2,param3,param4,param5,status,level,valid_time,invalid_time,mod_flag,del_flag,sys_flag,create_time,create_user,update_time,update_user) VALUES
 	 (1,'sys',1,'app',1,'app:name','开放平台',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL,'2023-01-20 12:36:19','3000-01-01 00:00:00',1,0,1,'2023-01-20 12:36:19','1',NULL,NULL),
 	 (1,'sys',1,'app',2,'app:icon','/app.icon',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL,'2023-01-20 12:36:19','3000-01-01 00:00:00',1,0,1,'2023-01-20 12:36:19','1',NULL,NULL),
 	 (1,'sys',1,'app',3,'app:admin:login:bgimg','/admin/login.png',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL,'2023-01-20 12:36:20','3000-01-01 00:00:00',1,0,1,'2023-01-20 12:36:20','1',NULL,NULL),
 	 (1,'sys',1,'app',4,'app:mobile:login:bgimg','/mobile/login.png',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL,'2023-01-20 12:36:20','3000-01-01 00:00:00',1,0,1,'2023-01-20 12:36:20','1',NULL,NULL);
 
-INSERT INTO sys_dept (name,remark,parent_id,`level`,status,create_time,create_user,update_time,update_user) VALUES
+INSERT INTO sys_dept (name,remark,parent_id,level,status,create_time,create_user,update_time,update_user) VALUES
 	 ('开放集团','根',NULL,0,1,'2023-01-20 11:47:54','1',NULL,NULL),
 	 ('开放软件公司','一公司',1,1,1,'2023-01-20 12:37:32','1',NULL,NULL);
 
-INSERT INTO sys_resources (name,menu_key,`type`,url,perm_key,remark,parent_id,status,create_time,create_user,update_time,update_user) VALUES
+INSERT INTO sys_resources (name,menu_key,type,url,perm_key,remark,parent_id,status,create_time,create_user,update_time,update_user) VALUES
 	 ('首页','home',0,'/home','home:index',NULL,NULL,1,'2023-01-20 11:52:57','1',NULL,NULL),
 	 ('用户管理','admin:user',0,'/user','user:admin',NULL,NULL,1,'2023-01-20 11:56:48','1',NULL,NULL),
 	 ('角色管理','admin:role',0,'/role','role:admin',NULL,NULL,1,'2023-01-20 11:56:48','1',NULL,NULL),
@@ -192,7 +245,7 @@ INSERT INTO sys_resources (name,menu_key,`type`,url,perm_key,remark,parent_id,st
 	 ('新增角色','add:role',2,'/role/add','role:add',NULL,3,1,'2023-01-20 12:09:58','1',NULL,NULL),
 	 ('更新角色','update:role',2,'/role/update','role:update',NULL,3,1,'2023-01-20 12:09:59','1',NULL,NULL),
 	 ('删除角色','delete:role',2,'/role/delete','role:delete',NULL,3,1,'2023-01-20 12:09:59','1',NULL,NULL);
-INSERT INTO sys_resources (name,menu_key,`type`,url,perm_key,remark,parent_id,status,create_time,create_user,update_time,update_user) VALUES
+INSERT INTO sys_resources (name,menu_key,type,url,perm_key,remark,parent_id,status,create_time,create_user,update_time,update_user) VALUES
 	 ('变更角色资源','change:role:resources',2,'/role/resources','role:resources:change',NULL,3,1,'2023-01-20 12:16:04','1',NULL,NULL),
 	 ('查看资源列表','list:resources',1,'/resources/list','resources:list',NULL,4,1,'2023-01-20 12:30:34','1',NULL,NULL),
 	 ('查看资源详情','detail:resources',2,'/resources/detail','resources:detail',NULL,4,1,'2023-01-20 12:30:34','1',NULL,NULL),
