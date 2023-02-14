@@ -106,7 +106,6 @@ goboot:
   server:
     port: 8080
     bannerPath: ./banner.txt
-    contextPath: /api
     staticResources:
       enable: true
       urlPath: /static
@@ -114,12 +113,35 @@ goboot:
     templateResources:
       enable: true
       filePath: ./templates/**/*.html
+    session:
+      enable: true
+      # cookie/redis
+      impl: cookie
+      secretKey: 123456
+      sessionKey: go-session
+    redis:
+      enable: true
+      host: 127.0.0.1
+      port: 6379
+      password: ltb12315
+      database: 0
+    datasource:
+      enable: true
+      # mysql/postgres
+      driver: mysql
+      host: 127.0.0.1
+      port: 6379
+      url: user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
+      username: root
+      password: 123456
+      database: test_db
     https:
       enable: false
       pemPath: ./https/server.pem
       keyPath: ./https/server.key
     gzip:
       enable: false
+      # BestCompression/BestSpeed/DefaultCompression/NoCompression
       level: DefaultCompression
       excludeExtensions:
         - .mp4
@@ -160,7 +182,13 @@ goboot:
 go get github.com/gin-gonic/gin
 go get github.com/gin-contrib/gzip
 go get github.com/gin-contrib/cors
+go get github.com/gin-contrib/sessions
 go get github.com/go-yaml/yaml
+go get github.com/redis/go-redis/v9
+go get github.com/gin-contrib/sessions/redis@v0.0.5
+go get github.com/google/uuid
+go get github.com/go-sql-driver/mysql
+go get github.com/lib/pq
 ```
 - 第六步，启动运行
 ```shell script
@@ -208,8 +236,6 @@ goboot:
     port: 8080
     # 也可以配置自己的启动banner
     bannerPath: ./banner.txt
-    # 可以指定context-path，目前暂未支持
-    contextPath: /api
     # 静态资源配置  
     staticResources:
       # 是否启用
@@ -224,6 +250,50 @@ goboot:
       enable: true
       # 模板文件的匹配规则  
       filePath: ./templates/**/*.html
+    # session 配置部分
+    session:
+      # 是否开启session
+      enable: true
+      # 使用的session存储类型，目前有以下两种可选
+      # 当选redis时，必须配置redis
+      # cookie/redis
+      impl: cookie
+      # session存储的加密秘钥
+      secretKey: 123456
+      # session在客户端的cookie键名称
+      sessionKey: go-session
+    # redis 配置
+    redis:
+      # 是否开启redis
+      enable: true
+      # redis 主机
+      host: 127.0.0.1
+      # redis 端口
+      port: 6379
+      # redis 访问密码
+      password: ltb12315
+      # redis 使用的数据库
+      database: 0
+    # 数据源配置
+    datasource:
+      # 是否启用数据源
+      enable: true
+      # 数据源驱动类型，支持以下类型
+      # mysql/postgres
+      driver: mysql
+      # 数据源主机
+      host: 127.0.0.1
+      # 数据源端口
+      port: 3306
+      # 当url有配置时，按照url配置进行，其他数据源参数无效
+      # 没有配置时，使用其他参数解析
+      url: user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
+      # 数据源用户名
+      username: root
+      # 数据源密码
+      password: 123456
+      # 数据源数据库
+      database: test_db
     # HTTPS的配置部分
     https:
       # 是否启用
@@ -287,7 +357,8 @@ goboot:
 ## 接口开发
 - 接口开发，可以使用gin框架自己的方式
 - 也可以使用配置中的mapping自动映射两种模式
-- 两种模式，都是基于封装的goboot
+- 也可以实现GobootController接口定义分组路由
+- 三种种模式，都是基于封装的goboot
 
 ### gin模式接口开发
 - gin模式，就是通过应用实例，获取App属性，得到gin.Engine实现
@@ -337,6 +408,23 @@ engine.GET("/", func(c *gin.Context) {
         - 二： helloWorld --> HelloWorld
         - 三： hello-world --> HelloWorld
         - 四： hello-go/hello-gin --> HelloGo_HelloGin
+    - 针对restful类型接口，限制请求方式的适配
+        - 在映射函数的定义上
+        - 如果是X*_开头的函数，将限定为指定规则对应的请求方式
+        - 具体的关系如下
+            - XG_ --> GET
+            - XU_ --> PUT
+            - XP_ --> POST
+            - XD_ --> DELETE
+            - XH_ --> PATCH
+            - XA_ --> ANY
+        - 对于包含这些前缀的函数
+        - 映射的路径匹配的函数名
+        - 将去除这些后缀后进行匹配
+        - 举例：
+            - 方法名：XP_Get_User
+            - 则对应的请求：POST /get/user
+            - 当使用其他请求类型时，将404：GET /get/user
     - 映射函数的要求：
         - 入参可以有多个
         - 顺序可以任意
@@ -348,6 +436,9 @@ engine.GET("/", func(c *gin.Context) {
             - request * http.Request
             - resp * goboot.ApiResp
             - ctxResp * goboot.CtxResp
+            - redis * redis.Client
+            - redisCli * goboot.RedisCli
+            - session sessions.Session
             - 自定义绑定请求参数的结构体
                 - 注意，必须是结构体类型
                 - 结构体支持值类型或指针类型
@@ -394,6 +485,41 @@ func main() {
 - 第一步，确认配置文件中的mapping有添加
 - 第二步，编写一个符合mapping要求的结构体，也就是具有方法
 - 第三步，调用boot对象的AddHandles方法，添加处理的所有结构体
+
+### GobootController 路由分组模式
+- 这个模式，其实也是自动路由的一种变体
+- 之前的mapping模式相当于全局自动映射
+- 而controller模式，则是分组的自动映射模式
+- 使用上和mapping一样，只不过处理的结构体
+- 也就是说，定义的处理函数，和mapping模式一样定义即可
+- 需要实现接口 GobootController
+    - 关于实现接口，在Golang中，接口的实现，不需要什么implements/extends等关键字
+    - 只需要将接口中的每个方法在结构体中实现即可
+- 下面就以一个示例来说明
+- 首先，定义自己的mapping结构体
+- 实现接口中定义个path方法
+```go
+// 定义处理结构
+type AdminController struct {
+}
+// 实现接口方法，返回这个分组路由为 /admin/
+func (con *AdminController) Path() string {
+	return "/admin/"
+}
+// 添加自己的路径映射处理函数
+func (admin *AdminController) XP_Get(ctx *goboot.CtxResp) any {
+	return ctx.ApiJsonOk("ok")
+}
+```
+- 将controller添加到路由中
+```go
+// 拿到应用对象
+app := goboot.GetDefaultApplication()
+// 添加controller
+app.AddControllers(&AdminController{})
+// 运行应用
+app.Run()
+```
 
 ## 自动映射函数
 - 上面说了mapping模式的自动映射函数
@@ -497,6 +623,55 @@ func (api *Api) Login(resp *goboot.CtxResp,user * User) *goboot.CtxResp {
 }
 ```
 
+## 主要函数或结构
+- 常量：DefaultConfigFile ，指定了默认的配置文件的名称 为 ./goboot.yml
+- 常量：DefaultBannerText ，指定了默认的应用banner的文本值
+- 结构：ApiResp ，定义了标准的接口返回结构，code，msg，data
+    - 以及包含了常用的填值结构方法
+    - 以及包含了针对gin的JSON返回的结构方法Gin*系列
+    - 以及全局静态方法Api*系列
+- 常量：ApiCodeOk ，指定了默认的ApiResp返回正常时的code值
+- 常量：APiCodeErr ，指定了默认的ApiResp异常返回时的code值
+- 结构：Tokens ，定了了几个结构方法，用于获取UUID和从请求中获取token的结构方法
+- 结构：CtxResp ，是最常用的mapping系列自动映射函数中最常用的一个入参，包含了context,session,app
+    - 以及包含了对ApiResp结构响应JSON的ApiJson*系列结构函数
+    - 以及包含了原始gin响应的Json/string/html函数
+    - 以及包含了对session设置获取的Session*系列函数
+- 函数：Log* 系列全局函数，使用自定义的控制台数据日志
+- 结构：GobootConfig 定义了解析配置文件的根配置结构
+    - 此结构包含了整个配置文件中的配置信息
+    - 如有需要，可以进行获取
+- 结构：GobootApplication 是封装的goboot的应用实例结构
+    - 整个goboot的上下文，引擎等都在此结构中进行包含
+    - 其中包含了，gin.Engine,GobootConfig,Handlers,GobootLifecycleListener,RedisCli,GobootController,sql.DB
+    - 此实例，通过Get*Application系列函数进行初始化获取
+    - 最终设置完毕之后，使用结构函数 Run 来启动一个应用
+- 接口：GobootController 是针对 GobootApplication 中Controllers定义的接口
+    - 用于定义分组路由的自动映射
+    - 其中包含一个 Path 方法，用于获取分组路由的路径
+- 结构：RedisCli 是对 redis.Client 的简单封装
+    - 主要是为了简化原来的redis.Client的使用
+    - 目前提供了简单的GET和set方法
+- 函数类型： GobootListener 定义了在应用初始化和启动的各个生命周期进行监听的接口函数
+    - 可以用于监听对应周期应用的状态
+    - 或者在对应的周期进行修改应用配置的目的
+- 结构：GobootLifecycleListener 定义了一组声明周期各个环节的监听集合
+    - 用来组装 GobootListener
+- 函数：GetDefaultApplication 用来获取一个默认配置文件配置的应用实例
+    - 实际上是使用默认配置 goboot.yml 调用 GetApplication 来获取应用实例
+    - 这也是最常用的一个函数
+- 函数：GetApplication 支持监听器的根据指定配置文件获取应用实例
+    - 实际上是使用 ResolveGobootConfig 来获取配置结构，调用 GetConfigApplication 来获取应用实例
+- 函数：GetConfigApplication 直接根据配置结构获取应用实例
+- 函数：ReadGobootConfig 将指定的配置文件，解析为配置结构
+- 函数：ResolveGobootConfig 读取指定的配置文件，并根据Profiles重定向读取配置
+- 函数：MappingHandler 负责进行结构的路径自动映射，实现函数调用的处理方法
+    - 这个方法服务于自动映射mapping和GobootController
+    - 实现将请求按照规则，调用目标函数的过程
+- 函数：HandleMappingMethodArg 负责实现参数类型的实际参数的自动绑定
+    - 是为 MappingHandler 实现自动注入函数调用入参的核心函数调用
+- 函数：ProxyHandler 负责进行实现proxy配置进行自动代理的处理函数
+
 ### 测试Demo
 - 文件结构
 ```shell script
@@ -520,6 +695,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -566,11 +742,45 @@ func (user *User) User_Info(c *gin.Context, post User, boot *goboot.GobootApplic
 
 }
 
+func (user *User) Session_Set(ctx *goboot.CtxResp) any {
+	ctx.SessionSet("user", "admin")
+	return ctx.ApiJsonOk("ok")
+}
+
+func (user *User) Session_Get(ctx *goboot.CtxResp, session sessions.Session) any {
+	val := ctx.SessionGet("user")
+	val = session.Get("user")
+	return ctx.ApiJsonOk(val)
+}
+
+func (user *User) Redis_Set(ctx *goboot.CtxResp, redis *goboot.RedisCli) any {
+	redis.Set("user", "root")
+	return ctx.ApiJsonOk("ok")
+}
+
+func (user *User) Redis_Get(ctx *goboot.CtxResp, redis *goboot.RedisCli) any {
+	val := redis.Get("user")
+	return ctx.ApiJsonOk(val)
+}
+
+type AdminController struct {
+}
+
+func (con *AdminController) Path() string {
+	return "/admin/"
+}
+
+func (admin *AdminController) XP_Get(ctx *goboot.CtxResp) any {
+	return ctx.ApiJsonOk("ok")
+}
+
 func main() {
 	app := goboot.GetDefaultApplication()
 
 	app.AddHandlers(&Api{}).
 		AddHandlers(&User{})
+
+	app.AddControllers(&AdminController{})
 
 	app.App.GET("/", func(c *gin.Context) {
 		stime := time.Now().Format("2006-01-02 15:04:05")
@@ -582,6 +792,7 @@ func main() {
 
 	app.Run()
 }
+
 
 ```
 - 模板文件
@@ -613,7 +824,6 @@ goboot:
   server:
     port: 8080
     bannerPath: ./banner.txt
-    contextPath: /api
     staticResources:
       enable: true
       urlPath: /static
@@ -621,12 +831,35 @@ goboot:
     templateResources:
       enable: true
       filePath: ./templates/**/*.html
+    session:
+      enable: true
+      # cookie/redis
+      impl: cookie
+      secretKey: 123456
+      sessionKey: go-session
+    redis:
+      enable: true
+      host: 127.0.0.1
+      port: 6379
+      password: ltb12315
+      database: 0
+    datasource:
+      enable: true
+      # mysql/postgres
+      driver: mysql
+      host: 127.0.0.1
+      port: 6379
+      url: user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
+      username: root
+      password: 123456
+      database: test_db
     https:
       enable: false
       pemPath: ./https/server.pem
       keyPath: ./https/server.key
     gzip:
       enable: false
+      # BestCompression/BestSpeed/DefaultCompression/NoCompression
       level: DefaultCompression
       excludeExtensions:
         - .mp4
@@ -661,6 +894,4 @@ goboot:
         - Content-Length
       allowCredentials: true
       maxAgeMinutes: 0
-
-
 ```

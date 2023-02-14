@@ -6,7 +6,6 @@ goboot:
   server:
     port: 8080
     bannerPath: ./banner.txt
-    contextPath: /api
     staticResources:
       enable: true
       urlPath: /static
@@ -14,12 +13,35 @@ goboot:
     templateResources:
       enable: true
       filePath: ./templates/**/*.html
+    session:
+      enable: true
+      # cookie/redis
+      impl: cookie
+      secretKey: 123456
+      sessionKey: go-session
+    redis:
+      enable: true
+      host: 127.0.0.1
+      port: 6379
+      password: ltb12315
+      database: 0
+    datasource:
+      enable: true
+      # mysql/postgres
+      driver: mysql
+      host: 127.0.0.1
+      port: 6379
+      url: user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
+      username: root
+      password: 123456
+      database: test_db
     https:
       enable: false
       pemPath: ./https/server.pem
       keyPath: ./https/server.key
     gzip:
       enable: false
+      # BestCompression/BestSpeed/DefaultCompression/NoCompression
       level: DefaultCompression
       excludeExtensions:
         - .mp4

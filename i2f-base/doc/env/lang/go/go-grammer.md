@@ -432,12 +432,333 @@ for {
 - 其中，对于break和continue的使用，和其他语言一致
 
 ### switch 语句
+- switch语言，大体和其他语言一样
+- 但是，有几点区别
+    - switch 变量可以支持表达式
+    - case 部分可以支持表达式
+    - case 部分可以支持不同类型
+    - 每个case 默认break
+    - 如果需要实现C语言中的case穿透，需要使用fallthrough关键字
+    - default 语句不需要放在case最后
+    - 独有的type-switch语法判断类型
+- 下面，直接给出一个案例简单说明
+```go
+package main
 
+import "fmt"
+
+func main() {
+   /* 定义局部变量 */
+   var grade string = "B"
+   var marks int = 90
+
+   switch marks {
+      case 90: grade = "A"
+      case 80: grade = "B"
+      case 50,60,70 : grade = "C"
+      default: grade = "D"  
+   }
+
+   switch {
+      case grade == "A" :
+         fmt.Printf("优秀!\n" )    
+      case grade == "B", grade == "C" :
+         fmt.Printf("良好\n" )      
+      case grade == "D" :
+         fmt.Printf("及格\n" )      
+      case grade == "F":
+         fmt.Printf("不及格\n" )
+      default:
+         fmt.Printf("差\n" );
+   }
+   fmt.Printf("你的等级是 %s\n", grade );      
+}
+```
+- 独有的type-switch
+```go
+package main
+
+import "fmt"
+
+func main() {
+   var x interface{}
+     
+   switch i := x.(type) {
+      case nil:  
+         fmt.Printf(" x 的类型 :%T",i)                
+      case int:  
+         fmt.Printf("x 是 int 型")                      
+      case float64:
+         fmt.Printf("x 是 float64 型")          
+      case func(int) float64:
+         fmt.Printf("x 是 func(int) 型")                      
+      case bool, string:
+         fmt.Printf("x 是 bool 或 string 型" )      
+      default:
+         fmt.Printf("未知型")    
+   }  
+}
+```
 ## 数组与切片
+- 数组和切片放在一起说明
+- 大部分操作相同
+- 区别在于数组是长度固定的
+- 而切片是可变长度的
+- 下面看下声明变量的差别
+```go
+// 数组，长度为3
+var arr1 [3]int
+
+// 数组，长度初始化自动推断，自动推断结果长度为4
+var arr2 [...]int{1,2,3,4}
+
+// 切片
+var spl1 []int
+
+// 切片并赋值
+var sp2 []int{1,2,3}
+
+// 切片
+sp3 := []int{1,2,3}
+
+// 使用内建函数make创建切片，长度为5，容量为10
+sp4 := make([]int,5,10)
+```
+- 切片和数组的访问，都是通过下标访问
+- 小标从0开始
+```go
+// 数组访问
+var arr [...]int{1,2,3,4}
+arr1 := arr[0]
+arr[1] = 9
+
+// 切片访问
+var spl []int{1,2,3,4}
+spl1 := spl[0]
+spl[1] = 9
+```
+- 切片，通过切片语法[开始小标:结束小标]进行切片
+- 获得一个新的序列，包含开始，不包含结束
+- 数组和切片都支持切片
+```go
+arr := []int{1,2,3,4}
+
+// 取0-2个，得到[1,2]
+arr1 := arr[0:2]
+
+// 取从2之后的所有，得到[3,4]
+arr2 := arr[2:]
+
+// 取截止到2的所有，得到[1,2]
+arr3 := arr[:2]
+```
+- 增加元素，数组是不可变长度的
+- 因此，只有切片可以增加元素
+- 使用内建函数append添加元素
+```go
+arr := []int{1,2}
+// 添加单个元素
+arr = append(arr,2)
+
+// 通过后置解包操作符...来添加多个元素
+// 这就是切片的合并
+arr1 := []int{3,4}
+arr = append(arr,arr1...)
+```
+- 删除元素，数组不可变，没有删除
+- 删除，没有内建命令
+- 而是借助切片后合并的方式实现
+```go
+arr := []int{1,2,3}
+
+// 删除第二个元素
+arr = append(arr[:1],arr[2:]...)
+```
 
 ## 映射
+- 映射，也叫map
+- 是一个K-V类型的数据结构
+- 定义，类型：map[键类型]值类型
+- 初始化
+```go
+// 使用声明加申请空间方式
+var mp map[int]string
+mp = make(map[int]string)
+
+// 使用立即声明
+mp2 := map[int]string{}
+
+// 立即声明并赋值
+// 注意，赋值中，每行都需要以逗号结尾
+mp3 := map[int]string{
+    1:"ONE",
+    2:"TWO",
+}
+```
+- 增加和更新操作，通过中括号进行
+```go
+mp := map[int]string{}
+
+mp[1]="A"
+mp[2]="B"
+
+mp[1]="C"
+
+str := mp[1]
+```
+- 判断是否存在，需要借助取值的第二个参数
+```go
+mp := map[int]string{}
+
+mp[1]="A"
+
+val,existes := mp[1]
+if exists {
+    fmt.Println(val)
+}
+
+// 也可以合并写
+if _,ok := mp[1]; ok {
+    fmt.Println("exists")
+}
+```
+- 删除，通过内建函数delete实现
+```go
+mp := map[int]string{}
+
+mp[1]="A"
+
+delete(mp,1)
+```
 
 ## 类型定义
+- 通过type关键字定义
+- 可以定义普通类型
+```go
+type MyInt int
+```
+- 可以定义接口
+```go
+type MyInterface interface{
+}
+```
+- 可以定义结构体
+```go
+type MyStruct struct{
+}
+```
+- 可以定义函数
+```go
+type MyFunc func(int,int)int
 
+// 实现一个函数定义
+var fc MyFunc
+
+fc=func(num1,num2)int{
+    return num1+num2
+}
+
+rs := fc(1,2)
+```
 
 ## 结构体
+- 结构体，是对一组属性和操作封装的集合
+- Go中的结构体，带有其他语言中类的概念
+- 注意，结构体中，属性名的大小写开头，也表示权限
+- 大写开头，表示共有，其他包也可以访问
+- 小写开头，表示私有，自由自己包可以访问
+- 也就是说，如果其他框架想要使用，必须得大写
+- 比如序列化框架json/xml等
+- 否则，一旦小写，其他框架访问不到，就可能发生意料之外的事
+- 定义结构体
+```shell script
+type 结构体名称 struct{
+  属性名 类型 `TAG名称:"TAG值"`
+}
+```
+- 例如
+```go
+type User struct{
+    Username string `json:"username"`
+    Age int
+}
+```
+- 为结构绑定方法函数
+```shell script
+func (变量名 结构体类型) 函数名(参数列表)返回值列表{
+  函数体
+}
+```
+- 结构体类型中，值类型不能修改结构体
+- 只有指针类型可以，这也是go中，结构体是值传递导致的
+```go
+func (user *User) SetUsername(name string){
+    user.Username=name
+}
+func (user User) GetAge()int{
+    return user.Age
+}
+```
+- 结构的访问，通过.访问，不论是否是指针类型
+```go
+// 值类型
+user := User{
+    Username: "zhang",
+    Age: 12
+}
+
+fmt.Println(user.Username)
+
+user.Age=22
+
+user.SetUsername("li")
+
+// 指针类型
+user1 := &User{
+    Username: "zhang",
+    Age: 12
+}
+fmt.Println(user1.Username)
+
+user1.Age=22
+
+user1.SetUsername("li")
+```
+
+
+## 接口
+- 接口，只定义标准
+- 不定义实现
+- 也就是定义一些列函数
+- 特殊的，interface{}是一个空接口，是任何结构的都实现的接口
+```go
+type Animal interface{
+    Eat()
+    Say(string)
+    GetName()string
+}
+```
+- 其他的结构负责实现接口
+- 在go中，不需要实现接口时指定特殊的关键字
+- 只需要覆盖接口中的方法即可
+- 例如下面的示例
+```go
+type Dog struct{
+
+}
+func (dog Dog)Eat(){
+    fmt.Println("狗在吃")
+}
+func (dog *Dog)Say(str string){
+    fmt.Printf("狗说：%v\n",str)
+}
+func (dog *Dog)GetName()string{
+    return "Alex"
+}
+func (dog *Dog)See(){
+     fmt.Println("狗在看")
+}
+```
+
+
+

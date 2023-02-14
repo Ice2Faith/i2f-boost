@@ -9,10 +9,17 @@ package goboot
 // go get github.com/gin-gonic/gin
 // go get github.com/gin-contrib/gzip
 // go get github.com/gin-contrib/cors
+// go get github.com/gin-contrib/sessions
 // go get github.com/go-yaml/yaml
+// go get github.com/redis/go-redis/v9
+// go get github.com/gin-contrib/sessions/redis@v0.0.5
+// go get github.com/google/uuid
+// go get github.com/go-sql-driver/mysql
+// go get github.com/lib/pq
 // /////////////////////////////////////////////////////////
 import (
-	"errors"
+	"context"
+	"database/sql"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -26,7 +33,14 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
+	_ "github.com/lib/pq"
+	goredis "github.com/redis/go-redis/v9"
 	"gopkg.in/yaml.v2"
 )
 
@@ -160,12 +174,53 @@ func ApiError(code int, msg string) *ApiResp {
 }
 
 // /////////////////////////////////////////////////////////
+// goboot 令牌验证区
+// /////////////////////////////////////////////////////////
+type Tokens struct {
+}
+
+func (tk Tokens) MakeUUID() string {
+	uid, err := uuid.NewRandom()
+	if err != nil {
+		panic(err)
+	}
+	return uid.String()
+}
+func (tk Tokens) MakeNumberUUID() uint32 {
+	uid, err := uuid.NewRandom()
+	if err != nil {
+		panic(err)
+	}
+	return uid.ID()
+}
+func (tk Tokens) MakeToken() string {
+	str := tk.MakeUUID()
+	return strings.ReplaceAll(str, "-", "")
+}
+
+func (tk Tokens) FindToken(c *gin.Context, tokenName string) string {
+	token := c.GetHeader(tokenName)
+	if token == "" {
+		token = c.Query(tokenName)
+	}
+	if token == "" {
+		token = c.PostForm(tokenName)
+	}
+	if token == "" {
+		token = c.Param(tokenName)
+	}
+	return token
+}
+
+// /////////////////////////////////////////////////////////
 // goboot 上下文响应区
 // /////////////////////////////////////////////////////////
 
 // 定义一个直接响应的上下文包装结构
 type CtxResp struct {
 	Context *gin.Context
+	Session sessions.Session
+	App     *GobootApplication
 }
 
 // 定义响应ApiResp的JSON函数
@@ -201,6 +256,18 @@ func (api *CtxResp) String(format string, args ...interface{}) *CtxResp {
 // 定义普通模板响应函数
 func (api *CtxResp) Html(template string, obj interface{}) *CtxResp {
 	api.Context.HTML(200, template, obj)
+	return api
+}
+
+// 获取session
+func (api *CtxResp) SessionGet(key interface{}) interface{} {
+	return api.Session.Get(key)
+}
+
+// 设置session
+func (api *CtxResp) SessionSet(key interface{}, val interface{}) *CtxResp {
+	api.Session.Set(key, val)
+	api.Session.Save()
 	return api
 }
 
@@ -251,9 +318,8 @@ type Profiles struct {
 
 // 服务器配置
 type Server struct {
-	Port        int    `yaml:"port"`
-	BannerPath  string `yaml:"bannerPath"`
-	ContextPath string `yaml:"contextPath"`
+	Port       int    `yaml:"port"`
+	BannerPath string `yaml:"bannerPath"`
 
 	StaticResources   StaticResources   `yaml:"staticResources"`
 	TemplateResources TemplateResources `yaml:"templateResources"`
@@ -262,6 +328,9 @@ type Server struct {
 	Cors              Cors              `yaml:"cors"`
 	Proxy             []Proxy           `yaml:"proxy"`
 	Mapping           []string          `yaml:"mapping"`
+	Session           Session           `yaml:"session"`
+	Redis             Redis             `yaml:"redis"`
+	Datasource        Datasource        `yaml:"datasource"`
 }
 
 // 静态资源配置
@@ -275,6 +344,35 @@ type StaticResources struct {
 type TemplateResources struct {
 	Enable   bool   `yaml:"enable"`
 	FilePath string `yaml:"filePath"`
+}
+
+// Session 配置
+type Session struct {
+	Enable     bool   `yaml:"enable"`
+	Impl       string `yaml:"impl"`
+	SecretKey  string `yaml:"secretKey"`
+	SessionKey string `yaml:"sessionKey"`
+}
+
+// Redis 配置
+type Redis struct {
+	Enable   bool   `yaml:"enable"`
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Password string `yaml:"password"`
+	Database int    `yaml:"database"`
+}
+
+// Datasource 配置
+type Datasource struct {
+	Enable   bool   `yaml:"enable"`
+	Driver   string `yaml:"driver"`
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Url      string `yaml:"url"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+	Database int    `yaml:"database"`
 }
 
 // HTTPS配置
@@ -318,10 +416,45 @@ type Cors struct {
 
 // 应用实例
 type GobootApplication struct {
-	App       *gin.Engine
-	Config    *GobootConfig
-	Handlers  []interface{}
-	Listeners *GobootLifecycleListener
+	App         *gin.Engine
+	Config      *GobootConfig
+	Handlers    []interface{}
+	Listeners   *GobootLifecycleListener
+	Redis       *RedisCli
+	Controllers []GobootController
+	Db          *sql.DB
+}
+
+// 控制器，需要提供基础路径
+type GobootController interface {
+	Path() string
+}
+
+func (app *GobootApplication) AddControllers(handlers ...GobootController) *GobootApplication {
+	app.Controllers = append(app.Controllers, handlers...)
+	return app
+}
+
+// redis 客户端封装
+type RedisCli struct {
+	Redis   *goredis.Client
+	Context context.Context
+}
+
+func (redis *RedisCli) Set(key string, val interface{}) *goredis.StatusCmd {
+	return redis.Redis.Set(redis.Context, key, val, 0)
+}
+func (redis *RedisCli) SetExpire(key string, val interface{}, expire time.Duration) *goredis.StatusCmd {
+	return redis.Redis.Set(redis.Context, key, val, expire)
+}
+func (redis *RedisCli) GetCheck(key string) (string, error) {
+	cmd := redis.Redis.Get(redis.Context, key)
+	return cmd.Result()
+}
+func (redis *RedisCli) Get(key string) string {
+	cmd := redis.Redis.Get(redis.Context, key)
+	val, _ := cmd.Result()
+	return val
 }
 
 // 应用监听器
@@ -490,6 +623,58 @@ func GetConfigApplication(config *GobootConfig, listener *GobootLifecycleListene
 
 	server := boot.Config.Goboot.Server
 
+	// 配置 redis
+	if server.Redis.Enable {
+		if server.Redis.Port == 0 {
+			server.Redis.Port = 6379
+		}
+		if server.Redis.Host == "" {
+			server.Redis.Host = "127.0.0.1"
+		}
+		redisAddr := fmt.Sprintf("%v:%v", server.Redis.Host, server.Redis.Port)
+		boot.Redis = &RedisCli{
+			Redis: goredis.NewClient(&goredis.Options{
+				Addr:     redisAddr,
+				Password: server.Redis.Password,
+				DB:       server.Redis.Database,
+			}),
+			Context: context.Background(),
+		}
+	}
+
+	// 数据源配置
+	if server.Datasource.Enable {
+		if server.Datasource.Host == "" {
+			server.Datasource.Host = "127.0.0.1"
+		}
+		if server.Datasource.Driver == "mysql" {
+			url := server.Datasource.Url
+			if url == "" {
+				// user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
+				url = fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?tls=skip-verify&autocommit=true", server.Datasource.Username, server.Datasource.Password, server.Datasource.Host, server.Datasource.Port, server.Datasource.Database)
+			}
+			db, err := sql.Open(server.Datasource.Driver, url)
+			if err != nil {
+				panic(err)
+			}
+			boot.Db = db
+		} else if server.Datasource.Driver == "postgres" {
+			if server.Datasource.Port == 0 {
+				server.Datasource.Port = 5432
+			}
+			url := server.Datasource.Url
+			if url == "" {
+				// postgres://pqgotest:password@localhost/pqgotest?sslmode=verify-full
+				url = fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=verify-full", server.Datasource.Username, server.Datasource.Password, server.Datasource.Host, server.Datasource.Port, server.Datasource.Database)
+			}
+			db, err := sql.Open(server.Datasource.Driver, url)
+			if err != nil {
+				panic(err)
+			}
+			boot.Db = db
+		}
+	}
+
 	LogInfo("goboot before use.")
 	invokeListeners(boot, boot.Listeners.OnBeforeUse)
 
@@ -552,6 +737,36 @@ func GetConfigApplication(config *GobootConfig, listener *GobootLifecycleListene
 		engine.Use(gzip.Gzip(gzipLevel, options...))
 	}
 
+	// 配置 session
+	if server.Session.Enable {
+		if server.Session.SessionKey == "" {
+			server.Session.SessionKey = "go-session"
+		}
+
+		// 判断是否使用redis作为session-store
+		sessionImpl := server.Session.Impl
+		if sessionImpl == "redis" {
+			if !server.Redis.Enable {
+				panic("redis session require enable redis config [goboot.server.redis.enable]")
+			}
+			if server.Redis.Port == 0 {
+				server.Redis.Port = 6379
+			}
+			if server.Redis.Host == "" {
+				server.Redis.Host = "127.0.0.1"
+			}
+			redisAddr := fmt.Sprintf("%v:%v", server.Redis.Host, server.Redis.Port)
+			store, err := redis.NewStore(server.Redis.Database, "tcp", redisAddr, server.Redis.Password, []byte(server.Session.SecretKey))
+			if err != nil {
+				panic(err)
+			}
+			engine.Use(sessions.Sessions(server.Session.SessionKey, store))
+		} else {
+			store := cookie.NewStore([]byte(server.Session.SecretKey))
+			engine.Use(sessions.Sessions(server.Session.SessionKey, store))
+		}
+	}
+
 	LogInfo("goboot before static resources.")
 	invokeListeners(boot, boot.Listeners.OnBeforeStaticResources)
 
@@ -602,7 +817,7 @@ func GetConfigApplication(config *GobootConfig, listener *GobootLifecycleListene
 			LogInfo("goboot mapping, path: %v", item)
 			engine.Any(fmt.Sprintf("%v*proxyPath", item), func(c *gin.Context) {
 				proxyPath := c.Param("proxyPath")
-				MappingHandler(boot, c, item, proxyPath)
+				MappingHandler(boot, c, proxyPath, boot.Handlers...)
 			})
 		}
 	}
@@ -613,20 +828,26 @@ func GetConfigApplication(config *GobootConfig, listener *GobootLifecycleListene
 	return boot
 }
 
+// GET,PUT,POST,DELETE,PATCH
+// XG_,XU_,XP_,XD_,XH_,XA_
 // 处理mapping自动映射
 // 将配置中的mapping自动按照URL路径映射
-func MappingHandler(boot *GobootApplication, c *gin.Context, proxy string, proxyPath string) {
+func MappingHandler(boot *GobootApplication, c *gin.Context, proxyPath string, handlers ...interface{}) {
 	// 处理自动映射的异常为404
+	errorMsg := "request not found."
 	defer func() {
 		err := recover()
 		if err != nil {
-			c.String(404, "request not found.")
+			c.String(404, errorMsg)
 		}
 	}()
 
-	if len(boot.Handlers) == 0 {
-		panic(errors.New("goboot not found mapping handlers"))
+	if len(handlers) == 0 {
+		errorMsg = "not found any handlers."
+		panic(errorMsg)
 	}
+
+	requestMethod := c.Request.Method
 
 	// 将路径转换为函数名
 	paths := strings.Split(proxyPath, "/")
@@ -657,7 +878,7 @@ func MappingHandler(boot *GobootApplication, c *gin.Context, proxy string, proxy
 	}
 
 	// 遍历处理器，查找符合映射规则的函数
-	for _, handler := range boot.Handlers {
+	for _, handler := range handlers {
 		// 类型
 		htype := reflect.TypeOf(handler)
 		// 实际类型
@@ -672,8 +893,35 @@ func MappingHandler(boot *GobootApplication, c *gin.Context, proxy string, proxy
 			mcnt := htype.NumMethod()
 			for i := 0; i < mcnt; i++ {
 				mm := htype.Method(i)
+				funcName := mm.Name
+				funcMethod := ""
+				if strings.HasPrefix(funcName, "XG_") {
+					funcMethod = "GET"
+					funcName = funcName[3:]
+				} else if strings.HasPrefix(funcName, "XP_") {
+					funcMethod = "POST"
+					funcName = funcName[3:]
+				} else if strings.HasPrefix(funcName, "XU_") {
+					funcMethod = "PUT"
+					funcName = funcName[3:]
+				} else if strings.HasPrefix(funcName, "XD_") {
+					funcMethod = "DELETE"
+					funcName = funcName[3:]
+				} else if strings.HasPrefix(funcName, "XH_") {
+					funcMethod = "PATCH"
+					funcName = funcName[3:]
+				} else if strings.HasPrefix(funcName, "XA_") {
+					funcMethod = ""
+					funcName = funcName[3:]
+				}
 				// 如果函数名匹配
-				if mm.Name == methodName {
+				if funcName == methodName {
+					if funcMethod != "" {
+						if funcMethod != requestMethod {
+							errorMsg = "request method allow, require only " + funcMethod
+							panic(errorMsg)
+						}
+					}
 					// 拿到函数对象
 					method := reflect.ValueOf(handler).MethodByName(mm.Name)
 					// 获取入参个数
@@ -683,7 +931,7 @@ func MappingHandler(boot *GobootApplication, c *gin.Context, proxy string, proxy
 					// 为每个函数入参注入值
 					for p := 0; p < paramCnt; p++ {
 						arg := method.Type().In(p)
-						val, ok := handleMappingMethodArg(arg, boot, c)
+						val, ok := HandleMappingMethodArg(arg, boot, c)
 						if ok {
 							callArgs = append(callArgs, val)
 						} else {
@@ -705,19 +953,31 @@ func MappingHandler(boot *GobootApplication, c *gin.Context, proxy string, proxy
 	}
 
 	// 执行到这里，说明没有任何函数匹配
-	panic(errors.New("goboot not found any mapping handle method in handlers"))
+	errorMsg = "not found any handler method in handlers"
+	panic(errorMsg)
 }
 
 // 为自动映射的方法添加调用参数
 // 实现对boot，ctx,engine,request的方法入参自动注入
 // 对结构体的请求参数自动填充能力
-func handleMappingMethodArg(arg reflect.Type, boot *GobootApplication, c *gin.Context) (reflect.Value, bool) {
+func HandleMappingMethodArg(arg reflect.Type, boot *GobootApplication, c *gin.Context) (reflect.Value, bool) {
 	engine := boot.App
 	request := c.Request
 	resp := ApiOk(nil)
 	ctxResp := &CtxResp{
 		Context: c,
+		Session: nil,
+		App:     boot,
 	}
+	redis := boot.Redis.Redis
+	redisCli := boot.Redis
+	if boot.Config.Goboot.Server.Session.Enable {
+		ctxResp.Session = sessions.Default(c)
+		if arg.String() == "sessions.Session" {
+			return reflect.ValueOf(ctxResp.Session), true
+		}
+	}
+
 	// 如果是指针类型的参数
 	if arg.Kind() == reflect.Ptr {
 		// 分别判断是否是支持注入的内置类型，如果是，直接注入
@@ -733,6 +993,10 @@ func handleMappingMethodArg(arg reflect.Type, boot *GobootApplication, c *gin.Co
 			return reflect.ValueOf(boot), true
 		} else if arg.Elem() == reflect.TypeOf(*engine) {
 			return reflect.ValueOf(engine), true
+		} else if arg.Elem() == reflect.TypeOf(*redisCli) {
+			return reflect.ValueOf(redisCli), true
+		} else if arg.Elem() == reflect.TypeOf(*redis) {
+			return reflect.ValueOf(redis), true
 		} else if arg.Elem().Kind() == reflect.Struct {
 			// 如果不是预定义的，但是是结构体，则自动请求参数绑定注入
 			bindParam := reflect.New(arg.Elem()).Interface()
@@ -777,6 +1041,21 @@ func (boot *GobootApplication) Run() {
 	server := boot.Config.Goboot.Server
 
 	LogInfo("goboot run ...")
+
+	// 配置控制器
+	if len(boot.Controllers) > 0 {
+		LogInfo("goboot enbale %v controllers(s)", len(boot.Controllers))
+		for _, item := range boot.Controllers {
+			groupPath := item.Path()
+			groupRouters := engine.Group(groupPath)
+			{
+				groupRouters.Any("/*proxyPath", func(c *gin.Context) {
+					proxyPath := c.Param("proxyPath")
+					MappingHandler(boot, c, proxyPath, item)
+				})
+			}
+		}
+	}
 
 	LogInfo("goboot brfore banner.")
 	invokeListeners(boot, boot.Listeners.OnBeforeBanner)
