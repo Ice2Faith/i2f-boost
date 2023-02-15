@@ -16,6 +16,9 @@ package goboot
 // go get github.com/google/uuid
 // go get github.com/go-sql-driver/mysql
 // go get github.com/lib/pq
+// go get gorm.io/gorm
+// go get gorm.io/driver/mysql
+// go get gorm.io/driver/postgres
 // /////////////////////////////////////////////////////////
 import (
 	"context"
@@ -42,6 +45,9 @@ import (
 	_ "github.com/lib/pq"
 	goredis "github.com/redis/go-redis/v9"
 	"gopkg.in/yaml.v2"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 // /////////////////////////////////////////////////////////
@@ -331,6 +337,7 @@ type Server struct {
 	Session           Session           `yaml:"session"`
 	Redis             Redis             `yaml:"redis"`
 	Datasource        Datasource        `yaml:"datasource"`
+	Gorm              Gorm              `yaml:"gorm"`
 }
 
 // 静态资源配置
@@ -372,7 +379,12 @@ type Datasource struct {
 	Url      string `yaml:"url"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
-	Database int    `yaml:"database"`
+	Database string `yaml:"database"`
+}
+
+// Gorm 配置
+type Gorm struct {
+	Enable bool `yaml:"enable"`
 }
 
 // HTTPS配置
@@ -423,6 +435,7 @@ type GobootApplication struct {
 	Redis       *RedisCli
 	Controllers []GobootController
 	Db          *sql.DB
+	GormDb      *gorm.DB
 }
 
 // 控制器，需要提供基础路径
@@ -640,6 +653,7 @@ func GetConfigApplication(config *GobootConfig, listener *GobootLifecycleListene
 			}),
 			Context: context.Background(),
 		}
+		LogInfo("goboot redis config, connect to: %v", redisAddr)
 	}
 
 	// 数据源配置
@@ -658,6 +672,22 @@ func GetConfigApplication(config *GobootConfig, listener *GobootLifecycleListene
 				panic(err)
 			}
 			boot.Db = db
+
+			LogInfo("goboot datasource(mysql) config, connect to: %v", url)
+
+			// 提供gorm连接
+			if server.Gorm.Enable {
+				gormDB, err := gorm.Open(mysql.New(mysql.Config{
+					Conn: boot.Db,
+				}), &gorm.Config{})
+				if err != nil {
+					panic(err)
+				}
+				boot.GormDb = gormDB
+
+				LogInfo("goboot gorm(mysql) config.")
+			}
+
 		} else if server.Datasource.Driver == "postgres" {
 			if server.Datasource.Port == 0 {
 				server.Datasource.Port = 5432
@@ -672,7 +702,25 @@ func GetConfigApplication(config *GobootConfig, listener *GobootLifecycleListene
 				panic(err)
 			}
 			boot.Db = db
+
+			LogInfo("goboot datasource(postgres) config, connect to: %v", url)
+
+			// 提供gorm连接
+			if server.Gorm.Enable {
+				gormDB, err := gorm.Open(postgres.New(postgres.Config{
+					Conn: boot.Db,
+				}), &gorm.Config{})
+				if err != nil {
+					panic(err)
+				}
+				boot.GormDb = gormDB
+
+				LogInfo("goboot gorm(postgres) config.")
+			}
+		} else {
+			LogWarn("goboot datasource config not support auto config, type : %v", server.Datasource.Driver)
 		}
+
 	}
 
 	LogInfo("goboot before use.")
@@ -739,6 +787,7 @@ func GetConfigApplication(config *GobootConfig, listener *GobootLifecycleListene
 
 	// 配置 session
 	if server.Session.Enable {
+		LogInfo("goboot enable session.")
 		if server.Session.SessionKey == "" {
 			server.Session.SessionKey = "go-session"
 		}
@@ -761,9 +810,11 @@ func GetConfigApplication(config *GobootConfig, listener *GobootLifecycleListene
 				panic(err)
 			}
 			engine.Use(sessions.Sessions(server.Session.SessionKey, store))
+			LogInfo("goboot enable session(redis).")
 		} else {
 			store := cookie.NewStore([]byte(server.Session.SecretKey))
 			engine.Use(sessions.Sessions(server.Session.SessionKey, store))
+			LogInfo("goboot enable session(cookie).")
 		}
 	}
 
@@ -971,6 +1022,7 @@ func HandleMappingMethodArg(arg reflect.Type, boot *GobootApplication, c *gin.Co
 	}
 	redis := boot.Redis.Redis
 	redisCli := boot.Redis
+	gormDb := boot.GormDb
 	if boot.Config.Goboot.Server.Session.Enable {
 		ctxResp.Session = sessions.Default(c)
 		if arg.String() == "sessions.Session" {
@@ -995,6 +1047,8 @@ func HandleMappingMethodArg(arg reflect.Type, boot *GobootApplication, c *gin.Co
 			return reflect.ValueOf(engine), true
 		} else if arg.Elem() == reflect.TypeOf(*redisCli) {
 			return reflect.ValueOf(redisCli), true
+		} else if arg.Elem() == reflect.TypeOf(*gormDb) {
+			return reflect.ValueOf(gormDb), true
 		} else if arg.Elem() == reflect.TypeOf(*redis) {
 			return reflect.ValueOf(redis), true
 		} else if arg.Elem().Kind() == reflect.Struct {

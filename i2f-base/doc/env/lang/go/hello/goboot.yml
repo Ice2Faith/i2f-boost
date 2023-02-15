@@ -26,15 +26,18 @@ goboot:
       password: ltb12315
       database: 0
     datasource:
-      enable: true
+      enable: false
       # mysql/postgres
       driver: mysql
       host: 127.0.0.1
       port: 6379
-      url: user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
+      # url: user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
+      url: root:123456@tcp(127.0.0.1:3306)/test_db?charset=utf8mb4&parseTime=True&loc=Local
       username: root
       password: 123456
       database: test_db
+    gorm:
+      enable: true
     https:
       enable: false
       pemPath: ./https/server.pem

@@ -135,6 +135,8 @@ goboot:
       username: root
       password: 123456
       database: test_db
+    gorm:
+      enable: true
     https:
       enable: false
       pemPath: ./https/server.pem
@@ -189,6 +191,9 @@ go get github.com/gin-contrib/sessions/redis@v0.0.5
 go get github.com/google/uuid
 go get github.com/go-sql-driver/mysql
 go get github.com/lib/pq
+go get gorm.io/gorm
+go get gorm.io/driver/mysql
+go get gorm.io/driver/postgres
 ```
 - 第六步，启动运行
 ```shell script
@@ -294,6 +299,10 @@ goboot:
       password: 123456
       # 数据源数据库
       database: test_db
+    # ORM 配置
+    gorm:
+      # 是否启用 ORM
+      enable: true
     # HTTPS的配置部分
     https:
       # 是否启用
@@ -439,6 +448,8 @@ engine.GET("/", func(c *gin.Context) {
             - redis * redis.Client
             - redisCli * goboot.RedisCli
             - session sessions.Session
+            - db *sql.DB
+            - gormDb * gorm.DB
             - 自定义绑定请求参数的结构体
                 - 注意，必须是结构体类型
                 - 结构体支持值类型或指针类型
@@ -643,7 +654,7 @@ func (api *Api) Login(resp *goboot.CtxResp,user * User) *goboot.CtxResp {
     - 如有需要，可以进行获取
 - 结构：GobootApplication 是封装的goboot的应用实例结构
     - 整个goboot的上下文，引擎等都在此结构中进行包含
-    - 其中包含了，gin.Engine,GobootConfig,Handlers,GobootLifecycleListener,RedisCli,GobootController,sql.DB
+    - 其中包含了，gin.Engine,GobootConfig,Handlers,GobootLifecycleListener,RedisCli,GobootController,sql.DB,gorm.DB
     - 此实例，通过Get*Application系列函数进行初始化获取
     - 最终设置完毕之后，使用结构函数 Run 来启动一个应用
 - 接口：GobootController 是针对 GobootApplication 中Controllers定义的接口
@@ -853,6 +864,8 @@ goboot:
       username: root
       password: 123456
       database: test_db
+    gorm:
+      enable: true
     https:
       enable: false
       pemPath: ./https/server.pem

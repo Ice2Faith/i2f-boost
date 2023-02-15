@@ -278,6 +278,7 @@ fmt.Println(1,2,true,"aaa")
         - %v : 直接输出值
         - %T : 输出类型
         - %d/%f/%.2f: 这些和C语言一致
+        - %#v : 带结构类型输出值，可以用来查看结构的具体结构和值
     - 转义符号
         - \r\n\t 都是常见的转义符号
 ```shell script
@@ -724,6 +725,35 @@ user1.Age=22
 
 user1.SetUsername("li")
 ```
+- 结构的包含/结构继承
+- 在golang中，通过给结构嵌入匿名结构的方式
+- 可以嵌入一个结构，并可以通过直接访问方式进行嵌入结构的访问
+```go
+// 定义键盘结构
+type Keyboard struct{
+    Key int
+    EventCode int
+}
+// 定义计算机结构，嵌入键盘结构
+type Computer struct{
+    Core int
+    Memory int
+    Keyboard // 匿名嵌入
+}
+
+// 这时候，在访问不冲突的前提下
+// 可以直接贯穿访问
+com := Computer{}
+
+// 可以直接访问
+k := com.Keyboard.Key
+k = com.Key
+
+// 但是如果嵌入多个匿名结构
+// 多个匿名结构中存在同名属性时
+// 就需要具名完全访问
+k = com.Keyboard.Key
+```
 
 
 ## 接口
@@ -760,5 +790,176 @@ func (dog *Dog)See(){
 }
 ```
 
+## 包
+- 在前面的内容中
+- 每个main.go中
+- 第一行都是 package main
+- 这就是说明这个包是main包
+- 在go中，包只需要一级即可
+- 一般来说，包名和文件夹名称相同
+- 比如，如果在 hello 文件夹下，一般就称为hello包
+- 特别的，除了main包，绝大多数不是在同名的文件夹下
+### 包的声明
+- 通过package关键字声明包
+- 包名只包含一级，不包含多级包
+- 而且，包声明必须在第一行
+```go
+package main
+package hello
+package github.com
+```
+### 包的导入
+- 通过import关键字导入包
+- 导入的实际是包路径
+- 导入某个包，实际是导入GOPATH下面指定的文件夹的所有内容
+```go
+import "fmt"
+```
+- 同时，一般导入多个，合并写
+- 通过圆括号包含
+```go
+import (
+    "fmt"
+    "os"
+)
+```
+- 导入重命名，当两个包名字重复时
+- 可以使用重命名导入
+- 通过包名前加别名
+```go
+import (
+    "hello/rpc"
+    trpc "test/rpc"
+)
+
+// 使用时
+// 原来：rpc.GetRpcServer()
+// 变成： trpc.GetRpcServer()
+```
+- 匿名导入，当导入包，但是包中不直接使用时
+- 在golang中，导入的包必须使用
+- 否则会被编译器排除报错
+- 例如，最常见的驱动包，包含数据库驱动包
+- 这时候，包是必须导入的，但是包缺没有直接使用
+- 这时候就需要使用你们导入
+- 通过包名前加匿名下划线
+```go
+import (
+    "fmt"
+    _ "mysql/driver/sql"
+)
+```
+### 包管理
+- 使用 gomod 进行管理
+- 具体细节查看 go-mod.md
 
 
+## JSON/XML的序列化和反序列化
+- 序列化和反序列化是很常用的功能
+- 这两个过程互为逆过程
+- 存在于内存结构和字符串之间转换
+- 在golang中，也就表示在string和struct之间的转换
+- 转换一般需要借助反射，以及结构的TAG标签进行
+- 下面直接给出示例
+```go
+type Region struct{
+    Code int `xml:"code" json:"code"`
+    Name string `json:"name" xml:"name"`
+    Level int `json:"level" xml:"level"`
+}
+```
+- 上面，通过结构的TAG标签指定了JSON和XML序列化和反序列化时对应的名称
+- 可以看出，只是Pascal属性名和Camel序列化名字的区别
+- 也就是首字母大小写的区别
+- 为什么需要这么干？
+- 因为，在golang中，首字母的大小写，表示权限
+- 大写表示所有包都可以访问
+- 小写表示只有自己的包可以访问
+- 由于序列化和反序列化过程，借助反射实现，反射受限于权限
+- 因此，如果属性时小写开头，则无法被反射到，也就无法被序列化识别到
+- 下面给出JSON的序列化和反序列化流程
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type Region struct {
+	Code  int    `xml:"code" json:"code"`
+	Name  string `json:"name" xml:"name"`
+	Level int    `json:"level" xml:"level"`
+}
+
+func main() {
+	reg := Region{
+		Code:  1001,
+		Name:  "河北省",
+		Level: 1,
+	}
+	bytes, err := json.Marshal(reg)
+	if err != nil {
+		fmt.Println(err)
+	}
+	str := string(bytes)
+	fmt.Println(str)
+
+	rev := Region{}
+	err = json.Unmarshal([]byte(str), &rev)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("%#v\n", rev)
+}
+```
+- 下面是运行结果
+```shell script
+{"code":1001,"name":"河北省","level":1}
+main.Region{Code:1001, Name:"河北省", Level:1}
+```
+- 下面给出XML的序列化和反序列化流程
+```go
+package main
+
+import (
+	"encoding/xml"
+	"fmt"
+)
+
+type Region struct {
+	Code  int    `xml:"code" json:"code"`
+	Name  string `json:"name" xml:"name"`
+	Level int    `json:"level" xml:"level"`
+}
+
+func main() {
+	reg := Region{
+		Code:  1001,
+		Name:  "河北省",
+		Level: 1,
+	}
+	bytes, err := xml.Marshal(reg)
+	if err != nil {
+		fmt.Println(err)
+	}
+	str := string(bytes)
+	fmt.Println(str)
+
+	rev := Region{}
+	err = xml.Unmarshal([]byte(str), &rev)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("%#v\n", rev)
+}
+```
+- 运行结果如下
+```shell script
+<Region><code>1001</code><name>河北省</name><level>1</level></Region>
+main.Region{Code:1001, Name:"河北省", Level:1}
+```
+- 可以明确的看到
+- 使用上，基本没有差异
+- 都是通过 Marshal 方法传入一个结构，返回字节切片和错误
+- 都是通过 Unmarshal 方法传入一个字节切片和结构地址，返回错误
