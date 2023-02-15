@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="i2f.springboot.log.test.mapper.DatabaseSysLogMapper">
+
+    <insert id="insertSelective">
+        insert into sys_log
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.id!=null">
+                id,
+            </if>
+            <if test="post.srcSystem!=null and post.srcSystem!=''">
+                src_system,
+            </if>
+            <if test="post.srcModule!=null and post.srcModule!=''">
+                src_module,
+            </if>
+            <if test="post.srcLabel!=null and post.srcLabel!=''">
+                src_label,
+            </if>
+
+            <if test="post.logLocation!=null and post.logLocation!=''">
+                log_location,
+            </if>
+            <if test="post.logType!=null">
+                log_type,
+            </if>
+            <if test="post.logContent!=null and post.logContent!=''">
+                log_content,
+            </if>
+            <if test="post.logLevel!=null">
+                log_level,
+            </if>
+            <if test="post.operateType!=null">
+                operate_type,
+            </if>
+
+            <if test="post.logKey!=null and post.logKey!=''">
+                log_key,
+            </if>
+            <if test="post.logVal!=null and post.logVal!=''">
+                log_val,
+            </if>
+
+            <if test="post.traceId!=null and post.traceId!=''">
+                trace_id,
+            </if>
+            <if test="post.traceLevel!=null">
+                trace_level,
+            </if>
+
+            <if test="post.userId!=null and post.userId!=''">
+                user_id,
+            </if>
+            <if test="post.userName!=null and post.userName!=''">
+                user_name,
+            </if>
+
+            <if test="post.clientIp!=null and post.clientIp!=''">
+                client_ip,
+            </if>
+            <if test="post.javaMethod!=null and post.javaMethod!=''">
+                java_method,
+            </if>
+
+            <if test="post.exceptType!=null">
+                except_type,
+            </if>
+            <if test="post.exceptClass!=null and post.exceptClass!=''">
+                except_class,
+            </if>
+            <if test="post.exceptMsg!=null and post.exceptMsg!=''">
+                except_msg,
+            </if>
+            <if test="post.exceptStack!=null and post.exceptStack!=''">
+                except_stack,
+            </if>
+
+            <if test="post.requestUrl!=null and post.requestUrl!=''">
+                request_url,
+            </if>
+            <if test="post.requestParam!=null and post.requestParam!=''">
+                request_param,
+            </if>
+            <if test="post.requestType!=null and post.requestType!=''">
+                request_type,
+            </if>
+
+            <if test="post.costTime!=null">
+                cost_time,
+            </if>
+            <if test="post.createTime!=null">
+                create_time,
+            </if>
+        </trim>
+        )
+        values
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.id!=null">
+                #{post.id},
+            </if>
+            <if test="post.srcSystem!=null and post.srcSystem!=''">
+                #{post.srcSystem},
+            </if>
+            <if test="post.srcModule!=null and post.srcModule!=''">
+                #{post.srcModule},
+            </if>
+            <if test="post.srcLabel!=null and post.srcLabel!=''">
+                #{post.srcLabel},
+            </if>
+
+            <if test="post.logLocation!=null and post.logLocation!=''">
+                #{post.logLocation},
+            </if>
+            <if test="post.logType!=null">
+                #{post.logType},
+            </if>
+            <if test="post.logContent!=null and post.logContent!=''">
+                #{post.logContent},
+            </if>
+            <if test="post.logLevel!=null">
+                #{post.logLevel},
+            </if>
+            <if test="post.operateType!=null">
+                #{post.operateType},
+            </if>
+
+            <if test="post.logKey!=null and post.logKey!=''">
+                #{post.logKey},
+            </if>
+            <if test="post.logVal!=null and post.logVal!=''">
+                #{post.logVal},
+            </if>
+
+            <if test="post.traceId!=null and post.traceId!=''">
+                #{post.traceId},
+            </if>
+            <if test="post.traceLevel!=null">
+                #{post.traceLevel},
+            </if>
+
+            <if test="post.userId!=null and post.userId!=''">
+                #{post.userId},
+            </if>
+            <if test="post.userName!=null and post.userName!=''">
+                #{post.userName},
+            </if>
+
+            <if test="post.clientIp!=null and post.clientIp!=''">
+                #{post.clientIp},
+            </if>
+            <if test="post.javaMethod!=null and post.javaMethod!=''">
+                #{post.javaMethod},
+            </if>
+
+            <if test="post.exceptType!=null">
+                #{post.exceptType},
+            </if>
+            <if test="post.exceptClass!=null and post.exceptClass!=''">
+                #{post.exceptClass},
+            </if>
+            <if test="post.exceptMsg!=null and post.exceptMsg!=''">
+                #{post.exceptMsg},
+            </if>
+            <if test="post.exceptStack!=null and post.exceptStack!=''">
+                #{post.exceptStack},
+            </if>
+
+            <if test="post.requestUrl!=null and post.requestUrl!=''">
+                #{post.requestUrl},
+            </if>
+            <if test="post.requestParam!=null and post.requestParam!=''">
+                #{post.requestParam},
+            </if>
+            <if test="post.requestType!=null and post.requestType!=''">
+                #{post.requestType},
+            </if>
+
+            <if test="post.costTime!=null">
+                #{post.costTime},
+            </if>
+            <if test="post.createTime!=null">
+                #{post.createTime},
+            </if>
+
+        </trim>
+        )
+    </insert>
+
+</mapper>
