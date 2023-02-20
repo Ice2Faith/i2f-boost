@@ -53,3 +53,14 @@ jasypt-std-pbe-de StandardPBEStringEncryptor.decrypt()
 jasypt-algo-pbe-en StandardPBEStringEncryptor.encrypt() 指定算法
 jasypt-algo-pbe-de StandardPBEStringEncryptor.decrypt() 指定算法
 
+- 以下部分为jce中的实例
+aes-utf8-en 使用jce的AES/ECB/PKCS5Padding算法encrypt加密输入为utf8的字符串
+aes-utf8-de 使用jce的AES/ECB/PKCS5Padding算法decrypt加密输入为utf8的字符串
+aes-keygen-utf8-en 使用jce的AES/ECB/PKCS5Padding基于Keygen生成key算法encrypt加密输入为utf8的字符串
+aes-keygen-utf8-de 使用jce的AES/ECB/PKCS5Padding基于Keygen生成key算法decrypt加密输入为utf8的字符串
+aes-b64-en 使用jce的AES/ECB/PKCS5Padding算法encrypt加密输入为base64的字符串
+aes-b64-de 使用jce的AES/ECB/PKCS5Padding算法decrypt加密输入为base64的字符串
+aes-keygen-b64-en 使用jce的AES/ECB/PKCS5Padding基于Keygen生成key算法encrypt加密输入为base64的字符串
+aes-keygen-b64-de 使用jce的AES/ECB/PKCS5Padding基于Keygen生成key算法decrypt加密输入为base64的字符串
+
+

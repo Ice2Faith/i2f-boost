@@ -2,7 +2,7 @@ package i2f.extension.cron;
 
 import com.cronutils.model.Cron;
 import com.cronutils.model.CronType;
-import com.iems.job.util.NamingThreadFactory;
+import i2f.core.thread.NamingThreadFactory;
 
 import java.io.IOException;
 import java.security.SecureRandom;
