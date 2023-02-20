@@ -2,6 +2,10 @@ package i2f.tool.crypt;
 
 import i2f.tool.crypt.menus.HelpMenuHandler;
 import i2f.tool.crypt.menus.base.*;
+import i2f.tool.crypt.menus.github.jasypt.JasyptStandardPBEAlgoDecoderMenuHandler;
+import i2f.tool.crypt.menus.github.jasypt.JasyptStandardPBEAlgoEncoderMenuHandler;
+import i2f.tool.crypt.menus.github.jasypt.JasyptStandardPBEDecoderMenuHandler;
+import i2f.tool.crypt.menus.github.jasypt.JasyptStandardPBEEncoderMenuHandler;
 import i2f.tool.crypt.menus.spring.security.*;
 
 import java.util.Map;
@@ -56,6 +60,11 @@ public class CryptMain {
         addMenuHandler(new SHA256PasswordEncoderMenuHandler());
         addMenuHandler(new SHA384PasswordEncoderMenuHandler());
         addMenuHandler(new SHA512PasswordEncoderMenuHandler());
+
+        addMenuHandler(new JasyptStandardPBEEncoderMenuHandler());
+        addMenuHandler(new JasyptStandardPBEDecoderMenuHandler());
+        addMenuHandler(new JasyptStandardPBEAlgoEncoderMenuHandler());
+        addMenuHandler(new JasyptStandardPBEAlgoDecoderMenuHandler());
     }
 
     public static void main(String[] args) {
