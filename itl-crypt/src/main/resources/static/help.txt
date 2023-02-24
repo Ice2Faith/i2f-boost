@@ -48,6 +48,10 @@ pe-sha-512 MessageDigestPasswordEncoder("SHA-512")
 
 - 以下部分为jasypt-spring-boot中的实例
 - 均带有jasypt前缀
+jasypt-txt-en BasicTextEncryptor.encrypt()
+jasypt-txt-de BasicTextEncryptor.decrypt()
+jasypt-strong-txt-en StrongTextEncryptor.encrypt()
+jasypt-strong-txt-de StrongTextEncryptor.decrypt()
 jasypt-std-pbe-en StandardPBEStringEncryptor.encrypt()
 jasypt-std-pbe-de StandardPBEStringEncryptor.decrypt()
 jasypt-algo-pbe-en StandardPBEStringEncryptor.encrypt() 指定算法
