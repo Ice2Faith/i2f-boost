@@ -586,6 +586,7 @@ function renderVideos(list) {
     if (!list) {
         return;
     }
+    let purityMode = $("#ckbPurityMode").prop('checked');
     for (let i = 0; i < list.length; i++) {
         let item = list[i];
         let type = item.type;
@@ -593,6 +594,7 @@ function renderVideos(list) {
             type = 'image';
         }
         let typeCoverHtml = '';
+        let authorAvatar = item.authorAvatar;
         if (type == 'video') {
             typeCoverHtml = '' +
                 '                <video controls width="100%">' +
@@ -611,10 +613,12 @@ function renderVideos(list) {
         }
         let html = '<div class="card box-container">' +
             '            <div class="box-author" >' +
-            '                <img class="box-avatar" src="' + item.authorAvatar + '"/>' +
-            '                <div class="box-nickname active" onclick="openInNewTab(\'' + item.authorHome + '\')">' +
-            '                   ' + item.authorName + ' ' +
-            '                </div>' +
+            (purityMode ? '' :
+                    '                <img class="box-avatar" src="' + item.authorAvatar + '"/>' +
+                    '                <div class="box-nickname active" onclick="openInNewTab(\'' + item.authorHome + '\')">' +
+                    '                   ' + item.authorName + ' ' +
+                    '                </div>'
+            ) +
             '                <div class="btn-download downloadClass" url="' + item.url + '" name="' + item.filename + '">' +
             '                    下载' +
             '                </div>' +
@@ -624,9 +628,11 @@ function renderVideos(list) {
             '                    ' + item.title + '' +
             '                </a>' +
             '            </div>' +
-            '            <div class="box-cover">' +
-            typeCoverHtml +
-            '            </div>' +
+            (purityMode ? '' :
+                    '            <div class="box-cover">' +
+                    typeCoverHtml +
+                    '            </div>'
+            ) +
             '        </div>';
 
         $("#content").append(html);

@@ -225,16 +225,17 @@ function forceHackInit() {
 	console.log('eval inject script');
 	var hackHtml =
 		'<div class="hackArea">' +
-		'' +
-		'<span class="hackBtn">可编辑<input id="hackEditable" type="checkbox"/></span>' +
-		'<span class="hackBtn" id="hackHrefs">打印链接</span>' +
-		'<span class="hackBtn" id="hackImgs">打印图片</span>' +
-		'<span class="hackBtn" id="hackVideos">打印视频</span>' +
-		'<span class="hackBtn" id="hackAudios">打印音频</span>' +
-		'<span class="hackBtn" id="hackMergeImages">聚合图片</span>' +
-		'<span class="hackBtn" id="hackMergeVideos">聚合视频</span>' +
-		'<span class="hackBtn" id="hackMergeAudios">聚合音频</span>' +
-		'<span class="hackBtn" id="hackConsole">控制台</span>' +
+        '' +
+        '<span class="hackBtn">可编辑<input id="hackEditable" type="checkbox"/></span>' +
+        '<span class="hackBtn" id="hackHrefs">打印链接</span>' +
+        '<span class="hackBtn" id="hackImgs">打印图片</span>' +
+        '<span class="hackBtn" id="hackVideos">打印视频</span>' +
+        '<span class="hackBtn" id="hackAudios">打印音频</span>' +
+        '<span class="hackBtn" id="hackMergeImages">聚合图片</span>' +
+        '<span class="hackBtn" id="hackMergeVideos">聚合视频</span>' +
+        '<span class="hackBtn" id="hackMergeAudios">聚合音频</span>' +
+        '<span class="hackBtn" id="hackMergeTables">聚合表格</span>' +
+        '<span class="hackBtn" id="hackConsole">控制台</span>' +
 		'<span class="hackBtn" id="hackObj">挂载</span>' +
 		'' +
 		'</div>' +
@@ -296,7 +297,8 @@ function forceHackInit() {
 		printfAllAudios();
 	});
 
-	$("#hackObj").click(function () {
+
+    $("#hackObj").click(function () {
 		console.log('mount $hk', $hk);
 		document.$hk = $hk;
 		console.log('mount document.$hk', document.$hk);
@@ -315,16 +317,20 @@ function forceHackInit() {
 
 
 	$("#hackMergeImages").click(function () {
-		mergeAllImages();
-	});
+        mergeAllImages();
+    });
 
-	$("#hackMergeVideos").click(function () {
-		mergeAllVideos();
-	});
+    $("#hackMergeVideos").click(function () {
+        mergeAllVideos();
+    });
 
-	$("#hackMergeAudios").click(function () {
-		mergeAllAudios();
-	});
+    $("#hackMergeAudios").click(function () {
+        mergeAllAudios();
+    });
+
+    $("#hackMergeTables").click(function () {
+        mergeAllTables();
+    });
 }
 
 forceHackInit();
@@ -357,46 +363,69 @@ function printfAllVideos() {
 
 // 获取所有音频资源
 function printfAllAudios() {
-	let ados = document.querySelectorAll('audio source');
-	for (let i = 0; i < ados.length; i++) {
-		console.log(ados[i].src);
-	}
+    let ados = document.querySelectorAll('audio source');
+    for (let i = 0; i < ados.length; i++) {
+        console.log(ados[i].src);
+    }
+}
+
+function showPurityBodyDoms(doms, sepHtml) {
+    let styles = document.querySelectorAll('body > style');
+    let scripts = document.querySelectorAll('body > script');
+    document.body.innerHTML = '';
+    for (let i = 0; i < doms.length; i++) {
+        if (i > 0 && sepHtml) {
+            document.body.innerHTML += sepHtml;
+        }
+        document.body.append(doms[i]);
+    }
+    for (let i = 0; i < styles.length; i++) {
+        document.body.append(styles[i]);
+    }
+    for (let i = 0; i < styles.length; i++) {
+        document.body.append(scripts[i]);
+    }
 }
 
 // 聚合所有图片
 function mergeAllImages() {
-	let elems = document.querySelectorAll('img');
-	let first = document.body.firstChild;
-	for (let i = 0; i < elems.length; i++) {
-		elems[i].style = 'width:30%;max-height:100vh;';
-		elems[i].className = 'none';
-		document.body.insertBefore(elems[i], first)
-	}
-	scrollTo(0, 0);
+    let elems = document.querySelectorAll('img');
+    for (let i = 0; i < elems.length; i++) {
+        elems[i].style = 'width:30%;max-height:100vh;';
+        elems[i].className = 'none';
+    }
+    showPurityBodyDoms(elems);
+    scrollTo(0, 0);
 }
 
 // 聚合所有视频
 function mergeAllVideos() {
-	let elems = document.querySelectorAll('video');
-	let first = document.body.firstChild;
-	for (let i = 0; i < elems.length; i++) {
-		elems[i].style = 'width:100%;max-height:100vh;';
-		elems[i].className = 'none';
-		elems[i].controls = true;
-		document.body.insertBefore(elems[i], first)
-	}
-	scrollTo(0, 0);
+    let elems = document.querySelectorAll('video');
+    for (let i = 0; i < elems.length; i++) {
+        elems[i].style = 'width:100%;max-height:100vh;';
+        elems[i].className = 'none';
+        elems[i].controls = true;
+    }
+    showPurityBodyDoms(elems);
+    scrollTo(0, 0);
 }
 
 // 聚合所有音频
 function mergeAllAudios() {
-	let elems = document.querySelectorAll('audio');
-	let first = document.body.firstChild;
-	for (let i = 0; i < elems.length; i++) {
-		elems[i].style = 'width:50%;max-height:100vh;';
-		elems[i].className = 'none';
-		elems[i].controls = true;
-		document.body.insertBefore(elems[i], first)
-	}
-	scrollTo(0, 0);
+    let elems = document.querySelectorAll('audio');
+    for (let i = 0; i < elems.length; i++) {
+        elems[i].style = 'width:50%;max-height:100vh;';
+        elems[i].className = 'none';
+        elems[i].controls = true;
+    }
+    showPurityBodyDoms(elems);
+    scrollTo(0, 0);
+}
+
+
+// 聚合所有表格
+function mergeAllTables() {
+    let elems = document.querySelectorAll('table');
+    showPurityBodyDoms(elems, '<hr/>');
+    scrollTo(0, 0);
 }

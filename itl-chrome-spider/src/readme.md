@@ -103,9 +103,5 @@
     - 适当增大即可，太大了，可能自己的电脑性能不好，或者网络不好，也是白搭
 
     
-## 更多
-### 拓展程序开发教程参考
-```
-https://developer.mozilla.org/zh-CN/docs/Mozilla/Add-ons/WebExtensions/Your_first_WebExtension
-```
+	
 	
