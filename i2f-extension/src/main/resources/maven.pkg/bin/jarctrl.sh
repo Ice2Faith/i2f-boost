@@ -1,539 +1,697 @@
 #!/bin/bash
 
-# jar name
-AppName=
-# control option
-ctrlOption=$1
-AppEnv=test
+# 菜单选项
+Option=$1
 
-# try find jar file in current
-if [ "$AppName" == "" ];
-then
-  _p_suffix=.jar
-  _p_path=
+# jar包文件名
+JarName=$2
 
-  for _p_file in $(ls -a $_p_path | grep -v grep | grep $_p_suffix)
-  do
-      _p_fix=${_p_file##*.}
-      if [ x"$_p_suffix" == x".$_p_fix" ]; then
-         AppName=$_p_file
-         break
-      fi
-  done
-fi
+# jar包相对本脚本的路径
+# 脚本将会先cd到此路径作为工作路径
+# 有配置则使用
+JarPath=
 
+# 查询日志的最后多少行
+TAIL_LOG_LINES=300
 
-echo "-----------------------"
-echo "jarctrl.sh running..."
-echo "AppName: $AppName"
-echo "ctrlOption: $ctrlOption"
-echo "-----------------------"
+# 查询异常的最后多少行
+TAIL_EXCEPT_LINES=3000
 
-# AppName jar relative this bash's location
-# when jar in parent dir
-# it should be ..
-jarRelativePath=
+# 查询异常之后的多少行
+TAIL_EXCEPT_AFTER_LINES=30
 
-# max wait kill force timeout
-MAX_WAIT=30
-# const variable define
+# ##################################################################################################################
+# 常量定义区
+# ##################################################################################################################
 BOOL_TRUE=1
 BOOL_FALSE=0
 
-RMI_ENABLE=$BOOL_TRUE
-RMI_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9400 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.net.preferIPv4Stack=true"
+# ##################################################################################################################
+# 常用配置区
+# ##################################################################################################################
 
-ENABLE_SHORTCUT=$BOOL_FALSE
+# Springboot 配置常见配置区
+# 是否开启Springboot配置
+# 必须是定义的BOOL常量
+ENABLE_SPRING_CFG=$BOOL_FALSE
+# 应用启动的端口重定义
+# 有值/非空则使用
+SPRING_SERVER_PORT=8080
+# 应用使用的配置文件重定义
+# 有值/非空则使用
+SPRING_PROFILES_ACTIVE=test
+# 应用名称重定义
+# 有值/非空则使用
+SPRING_APPLICATION_NAME=
+# 应用的根日志级别重定义
+# 有值/非空则使用
+SPRING_LOGGING_LEVEL_ROOT=info
 
-APP_HOME=`pwd`
-if [[ "$jarRelativePath" -ne "" ]]; then
-  APP_HOME="$(cd `dirname $0`/$jarRelativePath; pwd)"
-  cd ${APP_HOME}
-fi
-
-
-# jvm opts
-JVM_OPTS="-Djar.name=$AppName"
-LOG_DIR_NAME=logs
-LOG_DIR=${APP_HOME}/${LOG_DIR_NAME}
-LOG_PATH=${LOG_DIR}/${AppName}.log
-PID_PATH=${APP_HOME}/pid.$AppName.txt
-
-# logback
-ENABLE_LOGBACK=$BOOL_TRUE
-# logging.config
+# logback 配置区
+# 是否开启Logback配置
+# 必须是定义的BOOL常量
+ENABLE_LOGBACK_CFG=$BOOL_FALSE
+# 指定logback的启动配置文件重定义
+# 有值/非空则使用
 LOGBACK_CONFIG_FILE=classpath:logback-spring.xml
-LOGBACK_APP_NAME=$AppName
-LOGBACK_APP_ENV=
-LOGBACK_APP_LOG_MAX_SIZE=200MB
+# 指定logback的应用名称重定义，也就是启动参数 -Dlogback.app.name
+# 有值/非空则使用
+LOGBACK_APP_NAME=
+# 指定logback的应用环境重定义，也就是启动参数 -Dlogback.app.env
+# 有值/非空则使用
+LOGBACK_APP_ENV=test
+# 指定logback的最大日志大小重定义，也就是启动参数 -Dlogback.app.log.max.size
+# 有值/非空则使用
+LOGBACK_APP_LOG_MAX_SIZE=500MB
 
-if [ $ENABLE_LOGBACK == $BOOL_TRUE ];then
-  if [ ! -f "$LOG_PATH" ];then
-    LOG_PATH=${LOG_DIR}/`ls -t ${LOG_DIR} | grep .log | grep ${AppName}.all. | head -n 1`
-  fi
-  if [ ! -f "$LOG_PATH" ];then
-    LOG_PATH=${LOG_DIR}/`ls -t ${LOG_DIR} | grep .log | grep ${AppName}.info. | head -n 1`
-  fi
-  if [ ! -f "$LOG_PATH" ];then
-    LOG_PATH=${LOG_DIR}/`ls -t ${LOG_DIR} | grep .log | grep ${AppName}.warn. | head -n 1`
-  fi
-  if [ ! -f "$LOG_PATH" ];then
-    LOG_PATH=${LOG_DIR}/`ls -t ${LOG_DIR} | grep .log | grep ${AppName}.error. | head -n 1`
-  fi
-fi
+# Java 配置区
+# 指定已用所使用的的JAVA_HOME
+# 有值/非空则使用
+APP_JAVA_HOME=
 
-echo $LOG_PATH
-
-# jvm 配置
-# java home,use system default when empty
-JAVA_HOME=
-# not as opts when empty
+# JVM 常见配置区
+# 是否开启Jvm配置
+# 必须是定义的BOOL常量
+ENABLE_JVM_CFG=$BOOL_FALSE
+# 指定jvm的时区
+# 有值/非空则使用
 USER_TIME_ZONE=Asia/Shanghai
-# not as opts when empty
+# 指定jvm的最小堆
+# 有值/非空则使用
 XMS_SIZE=512M
-# not as opts when empty
-XMX_SIZE=512M
-# not as opts when empty
+# 指定jvm的最大堆
+# 有值/非空则使用
+XMX_SIZE=2048M
+# 指定线程空间大小
+# 有值/非空则使用
+XSS_SIZE=1M
+# 指定堆外内存
+# 有值/非空则使用
 PERM_SIZE=256M
-# not as opts when empty
-MAX_PERM_SIZE=512M
-# not as opts when empty
-DUMP_OOM=1
-# not as opts when empty
-PRINT_GC=1
-# not as opts when empty
-PARALLEL_GC=1
-# not as opts when empty
+# 指定最大堆外内存
+# 有值/非空则使用
+MAX_PERM_SIZE=2048M
+# 指定是否开启OOM是生产dump文件
+# 必须是定义的BOOL值
+# 有值/非空则使用
+DUMP_OOM=$BOOL_TRUE
+# 指定是否开启打印GC日志
+# 必须是定义的BOOL值
+# 有值/非空则使用
+PRINT_GC=$BOOL_TRUE
+# 指定是否适用ParallelGC
+# 必须是定义的BOOL值
+# 有值/非空则使用
+PARALLEL_GC=$BOOL_TRUE
+# 指定新生代的占比
+# 有值/非空则使用
 NEW_RATIO=1
-# not as opts when empty
+# 指定幸存取的占比
+# 有值/非空则使用
 SURVIVOR_RATIO=30
+# 指定是否适用G1GC
+# 必须是定义的BOOL值
+# 有值/非空则使用
+G1_GC=$BOOL_FALSE
 
-# java executable path
-JAVA_PATH=java
-# use point java when java home not empty
-if [[ "$JAVA_HOME" -ne "" ]]; then
-  JAVA_PATH=${JAVA_HOME}/bin/java
-fi
+# jmx 配置，可以使用 visualvm 监控堆栈
+# 指定是否开启JMX
+# 必须是定义的BOOL值
+ENABLE_JMX_CFG=$BOOL_FALSE
+# 指定JMX的连接端口
+# 有值/非空则使用
+JMX_PORT=9440
 
-if [[ $RMI_ENABLE == $BOOL_TRUE ]]; then
-  JVM_OPTS="${JVM_OPTS} ${RMI_OPTS}"
-fi
+# ##################################################################################################################
+# 内部函数定义区
+# ##################################################################################################################
 
+
+# 定义函数的入参和返回值
+# 公共变量，在函数调用时使用
+# 自行控制堆栈变量
+_func_arg1=
+_func_arg2=
+_func_arg3=
+_func_arg4=
+_func_ret=
+
+# 清空函数的入参和返回值
+# 用在准备调用函数之前执行
+function cleanFuncParams() {
+    _func_arg1=
+    _func_arg2=
+    _func_arg3=
+    _func_arg4=
+    _func_ret=
+}
+
+# 从指定的目录中查找指定后缀的文件
+# 入参：后缀，路径
+# 返回值：文件名
+function findOneSuffixFileInPath() {
+  _p_suffix=$_func_arg1
+  _p_path=$_func_arg2
+  _func_ret=
+
+  for _p_file in $(ls -aS $_p_path | grep -v grep | grep $_p_suffix)
+  do
+      _p_fix=${_p_file##*.}
+      if [ x"$_p_suffix" == x".$_p_fix" ]; then
+         _func_ret=$_p_file
+         break
+      fi
+  done
+}
+
+# 根据端口号查询进程号，仅针对java进程
+# 入参：端口号
+# 返回值：PID
+function findPidByPort() {
+  _p_port=$_func_arg1
+  _func_ret=
+
+  _p_pid=`netstat -nlp | grep java | grep -v grep | grep :${_p_port} | awk '{print $7}' | awk -F '[ / ]' '{print $1}'`
+  _func_ret=$_p_pid
+}
+
+# 根据jar包文件名，查找进程号，仅针对java进程
+# 入参：jar文件名
+# 返回值：PID
+function findPidByJarName() {
+  _p_jar_name=$_func_arg1
+  _func_ret=
+
+  _p_pid=`ps -ef | grep java | grep -v grep | grep ${_p_jar_name} | awk '{print $2}'`
+  _func_ret=$_p_pid
+}
+
+# 根据进程号文件、端口号、jar文件名三个条件，综合查找进程号，仅针对java进程
+# 入参：存放PID的文件，对应的应用端口，jar文件名
+# 返回值：PID
+function getPid() {
+    _p_pid_file=$_func_arg1
+    _p_port=$_func_arg2
+    _p_jar_name=$_func_arg3
+
+    _p_pid=
+
+    # 从PID文件查找PID
+    if [[ -n "${_p_pid_file}" ]]; then
+      _p_pid=$(cat ${_p_pid_file})
+      echo -e "\033[0;34m pid file \033[0m  find pid= \033[0;34m $_p_pid \033[0m "
+    fi
+
+    # 检查PID是正在运行，在运行则退出
+    if [[ -n "${_p_pid}" ]]; then
+      cleanFuncParams
+      _func_arg1=$_p_pid
+      _func_ret=$BOOL_FALSE
+      verifyPidIsRunning
+      _p_running=$_func_ret
+      if [ $_p_running == $BOOL_TRUE ];then
+        _func_ret=$_p_pid
+        return
+      fi
+    fi
+
+    _p_pid=
+
+    # 如果启用了Spring配置并且指定了端口
+    # 根据端口查找PID
+    if [[ -n "${_p_port}" ]]; then
+      cleanFuncParams
+      _func_arg1=$_p_port
+      _func_ret=
+      findPidByPort
+      _p_pid=$_func_ret
+      echo -e "\033[0;34m port \033[0m find pid= \033[0;34m $_p_pid \033[0m"
+    fi
+
+    # 检查PID是正在运行，在运行则退出
+    if [[ -n "${_p_pid}" ]]; then
+      cleanFuncParams
+      _func_arg1=$_p_pid
+      _func_ret=$BOOL_FALSE
+      verifyPidIsRunning
+      _p_running=$_func_ret
+      if [ $_p_running == $BOOL_TRUE ];then
+        _func_ret=$_p_pid
+        return
+      fi
+    fi
+
+    _p_pid=
+
+    # 如果还是没有PID，则直接使用jar包名称查找PID
+    # 根据端口查找PID
+    if [[ -n "${_p_jar_name}" ]]; then
+        cleanFuncParams
+        _func_arg1=$_p_jar_name
+        _func_ret=
+        findPidByJarName
+        _p_pid=$_func_ret
+        echo -e "\033[0;34m jar file \033[0m find pid= \033[0;34m $_p_pid \033[0m"
+    fi
+
+    # 检查PID是正在运行，在运行则退出
+    if [[ -n "${_p_pid}" ]]; then
+      cleanFuncParams
+      _func_arg1=$_p_pid
+      _func_ret=$BOOL_FALSE
+      verifyPidIsRunning
+      _p_running=$_func_ret
+      if [ $_p_running == $BOOL_TRUE ];then
+        _func_ret=$_p_pid
+        return
+      fi
+    fi
+
+    _func_ret=
+}
+
+# 验证指定的进程号是否在运行
+# 入参：pid
+# 返回值：定义的BOOL值
+function verifyPidIsRunning() {
+  _p_pid=$_func_arg1
+  _func_ret=$BOOL_FALSE
+
+  for _p_item in $(ps -ef | grep -v grep | awk '{print $2}' | xargs echo)
+  do
+    if [ x"$_p_item" == x"$_p_pid" ]; then
+       _func_ret=$BOOL_TRUE
+       break
+    fi
+  done
+}
+
+# 打印帮助信息
 function help()
 {
-    echo -e "\033[0;31m please input 2nd arg:option \033[0m  \033[0;34m {start|stop|restart|shutdown|reboot|status|log|snapshot|backup|recovery|clean|pack|unpack|pidstop|pidstart|pidreboot} \033[0m"
-    echo -e "\033[0;34m start \033[0m : to run a jar which called AppName"
-    echo -e "\033[0;34m stop \033[0m : to stop a jar which called AppName"
-    echo -e "\033[0;34m restart \033[0m : to stop and run a jar which called AppName"
-    echo -e "\033[0;34m shutdown \033[0m : to shutdown(force kill) a jar which called AppName"
-    echo -e "\033[0;34m reboot \033[0m : to shutdown and run a jar which called AppName"
-    echo -e "\033[0;34m status \033[0m : to check run status for a jar which called AppName"
-    echo -e "\033[0;34m log \033[0m : to lookup the log for a jar which called AppName"
-    echo -e "\033[0;34m except \033[0m : to lookup the exception log for a jar which called AppName"
-    echo -e "\033[0;34m snapshot \033[0m : to make a snapshot to ./snapshot for a jar which called AppName"
-    echo -e "\033[0;34m backup \033[0m : to backup to ./backup a jar which called AppName"
-    echo -e "\033[0;34m recovery \033[0m : to recovery from ./backup and save current to ./newest for a jar which called AppName"
-    echo -e "\033[0;34m clean \033[0m : to clean dirs ./backup ./snapshot ./newest ./logs for a jar which called AppName"
-    echo -e "\033[0;34m pack \033[0m : zip upk_AppName to AppName and backup source AppName to src_AppName"
-    echo -e "\033[0;34m unpack \033[0m : unzip AppName to upk_AppName"
-    echo -e "\033[0;34m pidstop \033[0m : stop AppName by pid file called pid.AppName"
-    echo -e "\033[0;34m pidstart \033[0m : start AppName and save pid to file called pid.AppName"
-    echo -e "\033[0;34m pidreboot \033[0m : reboot AppName rely pidstop and then pidstart"
+    echo -e "\033[0;31m please input 1st arg:Option \033[0m"
+    echo -e "    options: \033[0;34m {start|stop|restart|status|log|except|backup|rollback} \033[0m"
+    echo -e "\033[0;34m start    \033[0m : to run a jar which called JarName"
+    echo -e "\033[0;34m stop     \033[0m : to stop a jar which called JarName"
+    echo -e "\033[0;34m restart  \033[0m : to stop and run a jar which called JarName"
+    echo -e "\033[0;34m status   \033[0m : to check run status for a jar which called JarName"
+    echo -e "\033[0;34m log      \033[0m : to lookup the log for a jar which called JarName"
+    echo -e "\033[0;34m except   \033[0m : to lookup the exception log for a jar which called JarName"
+    echo -e "\033[0;34m backup   \033[0m : to backup to jar to backup dir for a jar which called JarName"
+    echo -e "\033[0;34m rollback \033[0m : to rollback from backup dir and backup to rollback dir for a jar which called JarName"
+
     exit 1
 }
 
-function prepareBootJvmOpts()
-{
-  echo "----jvm opts begin----"
-  if [[ -n "$AppEnv" ]]; then
-    JVM_OPTS="$JVM_OPTS -Dspring.profiles.active=$AppEnv"
-    echo "-Dspring.profiles.active=$AppEnv"
-  fi
-  if [[ -n "$USER_TIME_ZONE" ]]; then
-    JVM_OPTS="$JVM_OPTS -Duser.timezone=$USER_TIME_ZONE"
-    echo "-Duser.timezone=$USER_TIME_ZONE"
-  fi
-  if [[ -n "$XMS_SIZE" ]]; then
-    JVM_OPTS="$JVM_OPTS -Xms$XMS_SIZE"
-    echo "-Xms$XMS_SIZE"
-  fi
-  if [[ -n "$XMX_SIZE" ]]; then
-    JVM_OPTS="$JVM_OPTS -Xmx$XMX_SIZE"
-    echo "-Xmx$XMX_SIZE"
-  fi
-  if [[ -n "$PERM_SIZE" ]]; then
-    JVM_OPTS="$JVM_OPTS -XX:PermSize=$PERM_SIZE"
-    echo "-XX:PermSize=$PERM_SIZE"
-  fi
-  if [[ -n "$MAX_PERM_SIZE" ]]; then
-    JVM_OPTS="$JVM_OPTS -XX:MaxPermSize=$MAX_PERM_SIZE"
-    echo "-XX:MaxPermSize=$MAX_PERM_SIZE"
-  fi
-  if [[ -n "$DUMP_OOM" ]]; then
-    JVM_OPTS="$JVM_OPTS -XX:+HeapDumpOnOutOfMemoryError"
-    echo "-XX:+HeapDumpOnOutOfMemoryError"
-  fi
-  if [[ -n "$PRINT_GC" ]]; then
-    JVM_OPTS="$JVM_OPTS -XX:+PrintGCDateStamps  -XX:+PrintGCDetails"
-    echo "-XX:+PrintGCDateStamps  -XX:+PrintGCDetails"
-  fi
-  if [[ -n "$PARALLEL_GC" ]]; then
-    JVM_OPTS="$JVM_OPTS -XX:+UseParallelGC -XX:+UseParallelOldGC"
-    echo "-XX:+UseParallelGC -XX:+UseParallelOldGC"
-  fi
-  if [[ -n "$PARALLEL_GC" ]]; then
-    JVM_OPTS="$JVM_OPTS -XX:+UseParallelGC -XX:+UseParallelOldGC"
-    echo "-XX:+UseParallelGC -XX:+UseParallelOldGC"
-  fi
-  if [[ -n "$NEW_RATIO" ]]; then
-    JVM_OPTS="$JVM_OPTS -XX:NewRatio=$NEW_RATIO"
-    echo "-XX:NewRatio=$NEW_RATIO"
-  fi
-  if [[ -n "$SURVIVOR_RATIO" ]]; then
-    JVM_OPTS="$JVM_OPTS -XX:SurvivorRatio=$SURVIVOR_RATIO"
-    echo "-XX:SurvivorRatio=$SURVIVOR_RATIO"
-  fi
+# ##################################################################################################################
+# 脚本定义区
+# ##################################################################################################################
+# java 定义
+JAVA_PATH=java
+# 应用名定义
+AppName=
+# 工作路径定义
+WORK_DIR=
+# 日志路径定义
+LOG_DIR=
+# 日志文件定义
+LOG_FILE=
+# PID文件定义
+PID_FILE=
+# 启动信息文件定义
+BOOT_META_FILE=
+# JVM 启动参数定义
+JVM_OPTS=
 
-  if [ $ENABLE_LOGBACK == $BOOL_TRUE ];then
-    echo "----logback begin----"
-    if [[ -n "$LOGBACK_CONFIG_FILE" ]]; then
-      JVM_OPTS="$JVM_OPTS -Dlogging.config=$LOGBACK_CONFIG_FILE"
-      echo "-Dlogging.config=$LOGBACK_CONFIG_FILE"
+# 其他文件路径
+META_DIR=
+# 备份路径
+BACKUP_DIR=
+# 回滚路径
+ROLLBACK_DIR=
+
+# 准备Spring的启动参数
+function prepareSpringCfg(){
+    if [[ -n "${SPRING_APPLICATION_NAME}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -Dspring.application.name=${SPRING_APPLICATION_NAME}"
+    fi
+    if [[ -n "${SPRING_SERVER_PORT}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -Dserver.port=${SPRING_SERVER_PORT}"
+    fi
+    if [[ -n "${SPRING_PROFILES_ACTIVE}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}"
+    fi
+    if [[ -n "${SPRING_LOGGING_LEVEL_ROOT}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -Dlogging.level.root=${SPRING_LOGGING_LEVEL_ROOT}"
+    fi
+}
+# 准备logback的启动参数
+function prepareLogbackCfg() {
+    if [[ -n "${LOGBACK_CONFIG_FILE}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -Dlogging.config=${LOGBACK_CONFIG_FILE}"
+    fi
+    if [[ -n "${LOGBACK_APP_NAME}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -Dlogback.app.name=${LOGBACK_APP_NAME}"
+    fi
+    if [[ -n "${LOGBACK_APP_ENV}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -Dlogback.app.env=${LOGBACK_APP_ENV}"
+    fi
+    if [[ -n "${LOGBACK_APP_LOG_MAX_SIZE}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -Dlogback.app.log.max.size=${LOGBACK_APP_LOG_MAX_SIZE}"
+    fi
+}
+# 准备jvm的启动参数
+function prepareJvmCfg() {
+    if [[ -n "${USER_TIME_ZONE}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -Duser.timezone=${USER_TIME_ZONE}"
+    fi
+    if [[ -n "${XMS_SIZE}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -Xms${XMS_SIZE}"
+    fi
+    if [[ -n "${XMX_SIZE}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -Xmx${XMX_SIZE}"
+    fi
+    if [[ -n "${XSS_SIZE}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -Xss${XSS_SIZE}"
+    fi
+    if [[ -n "${PERM_SIZE}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -XX:PermSize=${PERM_SIZE}"
+    fi
+    if [[ -n "${MAX_PERM_SIZE}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -XX:MaxPermSize=${MAX_PERM_SIZE}"
+    fi
+    if [ $DUMP_OOM == $BOOL_TRUE ];then
+      JVM_OPTS="${JVM_OPTS} -XX:+HeapDumpOnOutOfMemoryError"
+    fi
+    if [ $PRINT_GC == $BOOL_TRUE ];then
+      JVM_OPTS="${JVM_OPTS} -XX:+PrintGCDateStamps  -XX:+PrintGCDetails"
+    fi
+    if [ $PARALLEL_GC == $BOOL_TRUE ];then
+      JVM_OPTS="${JVM_OPTS} -XX:+UseParallelGC -XX:+UseParallelOldGC"
+    fi
+    if [[ -n "${NEW_RATIO}" ]]; then
+      JVM_OPTS="${JVM_OPTS} -XX:NewRatio=${NEW_RATIO}"
+    fi
+    if [[ -n "${SURVIVOR_RATIO}" ]]; then
+      JVM_OPTS="$JVM_OPTS -XX:SurvivorRatio=${SURVIVOR_RATIO}"
+    fi
+    if [ $G1_GC == $BOOL_TRUE ];then
+      JVM_OPTS="${JVM_OPTS} -XX:+UseG1GC"
+    fi
+}
+# 准备jmx的启动参数
+function prepareJmxCfg(){
+  if [[ -n "${JMX_PORT}" ]]; then
+    JVM_OPTS="${JVM_OPTS} -Dcom.sun.management.jmxremote"
+    JVM_OPTS="${JVM_OPTS} -Dcom.sun.management.jmxremote.port=${JMX_PORT}"
+    JVM_OPTS="${JVM_OPTS} -Dcom.sun.management.jmxremote.authenticate=false"
+    JVM_OPTS="${JVM_OPTS} -Dcom.sun.management.jmxremote.ssl=false"
+    JVM_OPTS="${JVM_OPTS} -Djava.net.preferIPv4Stack=true"
+  fi
+}
+# 准备JVM的所有启动参数
+function prepareJvmOpts() {
+    JVM_OPTS="-Djar.name=$JarName"
+
+    if [ $ENABLE_SPRING_CFG == $BOOL_TRUE ];then
+      prepareSpringCfg
     fi
 
-    if [[ -n "$LOGBACK_APP_NAME" ]]; then
-      JVM_OPTS="$JVM_OPTS -Dlogback.app.name=$LOGBACK_APP_NAME"
-      echo "-Dlogback.app.name=$LOGBACK_APP_NAME"
-    fi
-    if [[ -n "$LOGBACK_APP_ENV" ]]; then
-      JVM_OPTS="$JVM_OPTS -Dlogback.app.env=$LOGBACK_APP_ENV"
-      echo "-Dlogback.app.env=$LOGBACK_APP_ENV"
-    fi
-    if [[ -n "$LOGBACK_APP_LOG_MAX_SIZE" ]]; then
-      JVM_OPTS="$JVM_OPTS -Dlogback.app.log.max.size=$LOGBACK_APP_LOG_MAX_SIZE"
-      echo "-Dlogback.app.log.max.size=$LOGBACK_APP_LOG_MAX_SIZE"
-    fi
-    if [[ -n "$LOG_DIR_NAME" ]]; then
-      JVM_OPTS="$JVM_OPTS -Dlogback.app.log.dir.name=$LOG_DIR_NAME"
-      echo "-Dlogback.app.log.dir.name=$LOG_DIR_NAME"
-    fi
-    echo "----logback end----"
-  fi
-
-  echo "----jvm opts end----"
-}
-
-
-if [ "$ctrlOption" = "" ];
-then
-    help
-fi
-
-if [ "$AppName" = "" ];
-then
-    echo -e "\033[0;31m please input 1st arg:appName \033[0m"
-    exit 1
-fi
-
-
-PID=""
-function query()
-{
-  PID=""
-  PID=`ps -ef |grep java|grep $AppName|grep -v grep|awk '{print $2}'`
-}
-
-CMD=""
-function mkcmd()
-{
-  if [ x"$CMD" != x"" ]; then
-    if [[ $ENABLE_SHORTCUT == $BOOL_TRUE ]];then
-      echo "./jarctrl.sh $CMD" > ./$CMD.sh
-      chmod a+x ./$CMD.sh
-    fi
-  fi
-}
-
-function start()
-{
-    prepareBootJvmOpts
-
-    query
-
-    if [ x"$PID" != x"" ]; then
-        echo "$AppName is running..."
-    else
-        chmod a+x $AppName
-        mkdir ${LOG_DIR}
-        if [[ $ENABLE_LOGBACK == $BOOL_TRUE ]]; then
-          nohup $JAVA_PATH -jar  $JVM_OPTS $AppName >/dev/null 2>&1 &
-        else
-          nohup $JAVA_PATH -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 &
-        fi
-        chmod a+r $LOG_DIR/*.log
-        echo "Start $AppName success..."
-        sleep 3
-        query
-        if [ x"$PID" != x"" ]; then
-          echo "$AppName is running ok."
-        else
-          echo "$AppName maybe Interrupted!"
-        fi
+    if [ $ENABLE_LOGBACK_CFG == $BOOL_TRUE ];then
+      prepareLogbackCfg
     fi
 
-    CMD="start"
-    mkcmd
-}
-
-function stop()
-{
-    echo "Stop $AppName"
-
-    PID=""
-    query
-
-    if [ x"$PID" != x"" ]; then
-        kill -TERM $PID
-        echo "$AppName (pid:$PID) exiting..."
-        CUR_WAIT=0
-        while [ x"$PID" != x"" ]
-        do
-            sleep 1
-            query
-            CUR_WAIT=`expr ${CUR_WAIT} + 1`
-            echo "wait $AppName stop timeout $CUR_WAIT..."
-            if [ $CUR_WAIT == $MAX_WAIT ];then
-              echo "$AppName has timeout of max wait stop,force kill run..."
-              kill -9 $PID
-            fi
-        done
-        echo "$AppName exited."
-    else
-        echo "$AppName already stopped."
+    if [ $ENABLE_JVM_CFG == $BOOL_TRUE ];then
+      prepareJvmCfg
     fi
 
-    CMD="stop"
-    mkcmd
-}
-
-
-function shutdown()
-{
-    echo "Shutdown $AppName"
-
-    PID=""
-    query(){
-      PID=""
-        PID=`ps -ef |grep java|grep $AppName|grep -v grep|awk '{print $2}'`
-    }
-
-    query
-    if [ x"$PID" != x"" ]; then
-        kill -9 $PID
-        echo "$AppName (pid:$PID) shutdown..."
-        while [ x"$PID" != x"" ]
-        do
-            sleep 1
-            query
-            kill -9 $PID
-        done
-        echo "$AppName shutdown."
-    else
-        echo "$AppName already shutdown."
+    if [ $ENABLE_JMX_CFG == $BOOL_TRUE ];then
+       prepareJmxCfg
     fi
-
-    CMD="shutdown"
-    mkcmd
 }
 
-function reboot()
-{
-    shutdown
-    sleep 2
-    start
+# 启动jar
+function start() {
+  mkdir -p $META_DIR
 
-    CMD="reboot"
-    mkcmd
-}
-
-function restart()
-{
-    stop
-    sleep 2
-    start
-
-    CMD="restart"
-    mkcmd
-}
-
-function status()
-{
-    PID=`ps -ef |grep java|grep $AppName|grep -v grep|wc -l`
-    if [ $PID != 0 ];then
-        echo "$AppName is running..."
-    else
-        echo "$AppName is not running..."
-    fi
-
-    CMD="status"
-    mkcmd
-}
-
-function log()
-{
-    tail -f -n 500 $LOG_PATH
-}
-
-function except()
-{
-    tail -f -n 5000 $LOG_PATH | grep -inA50 exception
-}
-
-function snapshot()
-{
-  mkdir ./snapshot
-  TIME_NOW=$(date "+%Y%m%d%H%M%S")
-  cp $AppName ./snapshot/$AppName.$TIME_NOW
-  echo "$AppName has snapshot as $AppName.$TIME_NOW."
-}
-
-function backup()
-{
-  mkdir ./backup
-  cp $AppName ./backup
-  TIME_NOW=$(date "+%Y%m%d%H%M%S")
-  echo $TIME_NOW > ./backup/_time
-  echo "$AppName has backup."
-}
-
-function recovery()
-{
-  mkdir ./newest
-  mv $AppName ./newest
-  TIME_NOW=$(date "+%Y%m%d%H%M%S")
-  echo $TIME_NOW > ./newest/_time
-  cp ./backup/$AppName ./
-  echo "$AppName has recovery."
-}
-
-function clean()
-{
-  rm -rf ./backup ./newest ./snapshot ./logs ./start.sh ./stop.sh ./reboot.sh ./shutdown.sh ./restart.sh ./status.sh
-  echo "clean done."
-}
-
-function unpack()
-{
-  rm -rf ./upk_$AppName
-  unzip $AppName -d ./upk_$AppName
-  echo "$AppName has unpack."
-}
-
-function pack()
-{
-  mv $AppName ./src_$AppName
-  zip -q -r $AppName ./upk_$AppName
-  rm -rf ./upk_$AppName
-  echo "$AppName has pack."
-}
-
-
-function pidstop()
-{
-  if [ -d ${PID_PATH} ]; then
-    echo "not pid file found:$PID_PATH"
-    return
-  fi
-
-  FPID=$(cat ${PID_PATH})
-  if [[ "$FPID" -ne "" ]]; then
-      echo "kill pid is:$FPID"
-      kill -9 $FPID
-      echo "" > $PID_PATH
-  else
-    echo "not pid found."
-  fi
-
-  CMD="pidstop"
-  mkcmd
-}
-
-function pidstart()
-{
-  prepareBootJvmOpts
-
-  if [ ! -d ${PID_PATH} ]; then
+  if [ ! -d ${PID_FILE} ]; then
     echo "not pid file,create..."
-    touch ${PID_PATH}
+    touch ${PID_FILE}
   fi
 
-  FPID=$(cat ${PID_PATH})
-  if [[ "$FPID" -ne "" ]]; then
-      echo "process has running ..."
+  cleanFuncParams
+  _func_arg1=$PID_FILE
+  _func_arg2=
+  _func_arg3=$JarName
+  if [ $ENABLE_SPRING_CFG == $BOOL_TRUE ];then
+    _func_arg2=$SPRING_SERVER_PORT
+  fi
+  getPid
+  _p_pid=$_func_ret
+
+  if [[ -n "$_p_pid" ]]; then
+      echo -e "\033[0;31m process has running ... \033[0m"
       return
   fi
 
-  echo "" > $PID_PATH
-  chmod a+x $AppName
-  mkdir ${LOG_DIR}
-  if [[ $ENABLE_LOGBACK == $BOOL_TRUE ]]; then
-    nohup $JAVA_PATH -jar  $JVM_OPTS $AppName >/dev/null 2>&1 & echo $! > $PID_PATH
+  prepareJvmOpts
+  _p_now=$(date "+%Y-%m-%d %H:%M:%S")
+
+  echo -e "\033[0;34m JAVA_PATH  \033[0m : $JAVA_PATH"
+  echo -e "\033[0;34m JVM_OPTS   \033[0m : $JVM_OPTS"
+  echo -e "\033[0;34m START_TIME \033[0m : $_p_now"
+
+  echo "" > $PID_FILE
+
+  mkdir -p ${LOG_DIR}
+
+  if [ $ENABLE_LOGBACK_CFG == $BOOL_TRUE ];then
+    nohup $JAVA_PATH -jar  $JVM_OPTS $JarName > /dev/null 2>&1 & echo $! > $PID_FILE
+    echo -e "\033[0;34m logback \033[0m start ..."
   else
-    nohup $JAVA_PATH -jar  $JVM_OPTS $AppName > $LOG_PATH 2>&1 & echo $! > $PID_PATH
+    nohup $JAVA_PATH -jar  $JVM_OPTS $JarName > $LOG_FILE 2>&1 & echo $! > $PID_FILE
+    echo -e "\033[0;34m sysout \033[0m start ..."
   fi
 
+  echo "JAVA_PATH  : $JAVA_PATH" > $BOOT_META_FILE
+  echo "JVM_OPTS   : $JVM_OPTS" >> $BOOT_META_FILE
+  echo "START_TIME : $_p_now" >> $BOOT_META_FILE
+
   chmod a+r $LOG_DIR/*.log
-  echo "Start $AppName success..."
+  chmod a+r $META_DIR/*.txt
 
-  CMD="pidstart"
-  mkcmd
+  _p_pid=`cat $PID_FILE`
+  echo -e "start \033[0;34m $JarName \033[0m success on pid \033[0;34m $_p_pid \033[0m ..."
 }
 
-function pidreboot()
-{
-    pidstop
+# 停止jar
+function stop() {
+
+    cleanFuncParams
+    _func_arg1=$PID_FILE
+    _func_arg2=
+    _func_arg3=$JarName
+    if [ $ENABLE_SPRING_CFG == $BOOL_TRUE ];then
+      _func_arg2=$SPRING_SERVER_PORT
+    fi
+    getPid
+    _p_pid=$_func_ret
+
+    if [[ -n "$_p_pid" ]]; then
+        echo -e "kill pid is: \033[0;34m $_p_pid \033[0m"
+        kill -9 $_p_pid
+        echo "" > $PID_FILE
+    else
+      echo -e "\033[0;31m not pid found, app already stopped. \033[0m"
+    fi
+}
+
+# 重启jar
+function restart() {
+    stop
     sleep 2
-    pidstart
-
-  CMD="pidreboot"
-  mkcmd
+    start
 }
 
-case $ctrlOption in
+# 查看应用状态
+function status() {
+    cleanFuncParams
+    _func_arg1=$PID_FILE
+    _func_arg2=
+    _func_arg3=$JarName
+    if [ $ENABLE_SPRING_CFG == $BOOL_TRUE ];then
+      _func_arg2=$SPRING_SERVER_PORT
+    fi
+    getPid
+    _p_pid=$_func_ret
+
+    if [[ -n "$_p_pid" ]]; then
+        echo -e "app is \033[0;34m running \033[0m on pid: \033[0;34m $_p_pid \033[0m"
+    else
+      echo -e "app was \033[0;31m stopped \033[0m ."
+    fi
+}
+
+# 查看应用日志
+function log() {
+    _p_log_file=`ls -t ${LOG_DIR} | grep .log | grep -v grep | grep ${AppName} | head -n 1`
+    if [[ "${_p_log_file}" = "" ]]; then
+      echo -e "\033[0;31m not found ${AppName}*.log , try find most newest log file... \033[0m"
+      _p_log_file=`ls -t ${LOG_DIR} | grep .log | grep -v grep | head -n 1`
+    fi
+    if [[ -n "$_p_log_file" ]]; then
+        echo -e "\033[0;34m found log file ${LOG_DIR}/$_p_log_file \033[0m"
+        tail -f -n $TAIL_LOG_LINES ${LOG_DIR}/$_p_log_file
+    else
+      echo -e "\033[0;31m not found log file like ${AppName}*.log. \033[0m"
+    fi
+}
+
+# 查看应用的异常日志
+function except() {
+    _p_log_file=`ls -t ${LOG_DIR} | grep .log | grep -v grep | grep ${AppName} | head -n 1`
+    if [[ "${_p_log_file}" = "" ]]; then
+      echo -e "\033[0;31m not found ${AppName}*.log , try find most newest log file... \033[0m"
+      _p_log_file=`ls -t ${LOG_DIR} | grep .log | grep -v grep | head -n 1`
+    fi
+    if [[ -n "$_p_log_file" ]]; then
+        echo -e "\033[0;34m found log file ${LOG_DIR}/$_p_log_file \033[0m"
+        tail -f -n $TAIL_EXCEPT_LINES ${LOG_DIR}/$_p_log_file | grep -inA $TAIL_EXCEPT_AFTER_LINES exception
+    else
+      echo -e "\033[0;31m not found log file like ${AppName}*.log. \033[0m"
+    fi
+}
+
+# 备份应用
+function backup() {
+    _p_now=$(date "+%Y%m%d%H%M%S")
+    _p_backup_now=$BACKUP_DIR/$_p_now
+    mkdir -p $_p_backup_now
+    cp ${JarName} ${_p_backup_now}/${JarName}
+    echo "$_p_backup_now/${JarName}" > $BACKUP_DIR/_last
+    echo -e "\033[0;34m $JarName \033[0m has backup to \033[0;34m $_p_backup_now/$JarName \033[0m"
+}
+
+# 回滚应用
+function rollback() {
+    mkdir -p $ROLLBACK_DIR
+    mv ${JarName} ${ROLLBACK_DIR}/${JarName}
+
+    _p_backup_path=`cat $BACKUP_DIR/_last`
+    if [[ -n "$_p_backup_path" ]]; then
+      echo -e "\033[0;34m $JarName \033[0m has rollback from \033[0;34m $_p_backup_path \033[0m"
+      cp $_p_backup_path ./${JarName}
+    else
+      echo -e "\033[0;31m not found file $BACKUP_DIR/_last \033[0m"
+    fi
+}
+
+# ##################################################################################################################
+# 脚本正式处理逻辑
+# ##################################################################################################################
+# 如果没有指定选项，给出帮助并退出
+if [ "$Option" = "" ];
+then
+    help
+    exit 1
+fi
+
+# 如果指定了APP_JAVA_HOME,则使用APP_JAVA_HOME下面的JAVA
+if [[ "$APP_JAVA_HOME" -ne "" ]]; then
+  JAVA_PATH=${APP_JAVA_HOME}/bin/java
+fi
+
+# 如果定义了jar的路径，则先进入路径
+if [[ -n "${JarPath}" ]]; then
+  cd $JarPath
+fi
+
+# 从当前文件夹查找jar文件
+if [ "$JarName" == "" ];
+then
+  cleanFuncParams
+  _func_arg1=.jar
+  _func_arg2=
+  findOneSuffixFileInPath
+  JarName=$_func_ret
+fi
+
+# 如果依旧没有jar文件，则失败退出
+if [ "$JarName" = "" ];
+then
+    echo -e "\033[0;31m please input 2nd arg:jarName \033[0m"
+    exit 1
+fi
+
+# 根据JarName截取AppName
+#AppName=`basename $JarName .jar`
+AppName=${JarName%.*}
+
+# 处理Logback的AppName
+# 如果配置了Spring配置，
+# 且有配置SpringApplicationName，
+# 则使用此名称作为Logback的AppName
+# 否则使用jar包的AppName
+if [[ "${LOGBACK_APP_NAME}" = "" ]]; then
+  if [ $ENABLE_SPRING_CFG == $BOOL_TRUE ];then
+    if [[ -n "${SPRING_APPLICATION_NAME}" ]]; then
+      LOGBACK_APP_NAME=$SPRING_APPLICATION_NAME
+    fi
+  fi
+fi
+
+if [[ "${LOGBACK_APP_NAME}" = "" ]]; then
+  LOGBACK_APP_NAME=$AppName
+fi
+
+# 初始化工作路径以及相关的路径
+WORK_DIR=`pwd`
+LOG_DIR=${WORK_DIR}/logs
+LOG_FILE=${LOG_DIR}/${AppName}.log
+
+META_DIR=${WORK_DIR}/metas
+
+BOOT_META_FILE=${META_DIR}/meta.${AppName}.txt
+PID_FILE=${META_DIR}/pid.${AppName}.txt
+BACKUP_DIR=${META_DIR}/backup
+ROLLBACK_DIR=${META_DIR}/rollback
+
+# 打印基本配置信息
+echo "-----------------------"
+echo -e "\033[0;34m AppName     \033[0m : $AppName"
+echo -e "\033[0;34m JarName     \033[0m : $JarName"
+echo -e "\033[0;34m Option      \033[0m : $Option"
+echo -e "\033[0;34m WorkDir     \033[0m : $WORK_DIR"
+echo -e "\033[0;34m LogDir      \033[0m : $LOG_DIR"
+echo -e "\033[0;34m LogFile     \033[0m : $LOG_FILE"
+echo -e "\033[0;34m PidFile     \033[0m : $PID_FILE"
+echo -e "\033[0;34m BootFile    \033[0m : $BOOT_META_FILE"
+echo -e "\033[0;34m BackupDir   \033[0m : $BACKUP_DIR"
+echo -e "\033[0;34m RollbackDir \033[0m : $ROLLBACK_DIR"
+echo "-----------------------"
+
+
+# ##################################################################################################################
+# 函数分配区
+# ##################################################################################################################
+
+case $Option in
     start)
     start;;
     stop)
     stop;;
     restart)
     restart;;
-    shutdown)
-    shutdown;;
-    reboot)
-    reboot;;
     status)
     status;;
     log)
     log;;
     except)
     except;;
-    snapshot)
-    snapshot;;
     backup)
     backup;;
-    recovery)
-    recovery;;
-    clean)
-    clean;;
-    unpack)
-    unpack;;
-    pack)
-    pack;;
-    pidstop)
-    pidstop;;
-    pidstart)
-    pidstart;;
-    pidreboot)
-    pidreboot;;
+    rollback)
+    rollback;;
     *)
     help;;
 esac
