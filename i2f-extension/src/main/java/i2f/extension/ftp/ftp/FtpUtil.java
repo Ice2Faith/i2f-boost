@@ -1,7 +1,7 @@
 package i2f.extension.ftp.ftp;
 
 import i2f.core.file.FileUtil;
-import i2f.extension.ftp.IFtpMetaMeta;
+import i2f.extension.ftp.ftp.data.IFtpMeta;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -14,13 +14,15 @@ import java.io.*;
  * @date 2021/11/1
  */
 public class FtpUtil  implements Closeable {
-    private IFtpMetaMeta meta;
+    private IFtpMeta meta;
     private FTPClient ftpClient;
-    public FtpUtil(IFtpMetaMeta meta){
+
+    public FtpUtil(IFtpMeta meta) {
         setMeta(meta);
     }
-    public FtpUtil setMeta(IFtpMetaMeta meta){
-        this.meta=meta;
+
+    public FtpUtil setMeta(IFtpMeta meta) {
+        this.meta = meta;
         return this;
     }
 

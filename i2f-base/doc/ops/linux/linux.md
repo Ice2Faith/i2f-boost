@@ -967,3 +967,33 @@ perf
 
 yum install -y perf
 ```
+
+## too many open files (打开的文件数过多)
+- 检查打开文件数限制
+```shell script
+ulimit -a
+```
+- 查看open files 项的值
+- 检查指定进程打开的文件数
+```shell script
+lsof -p ${pid} | wc -l
+```
+- 临时修改最大文件数
+- 非root用户只能4096，root用户可以65535
+- 这种修改方式，主机重启就失效了
+```shell script
+ulimit -n 4096
+```
+- 永久修改最大文件数
+- 编辑文件，末尾添加
+```shell script
+vi /etc/security/limits.conf
+```
+```shell script
+# 在最后加入
+* soft nofile 65535
+* hard nofile 65535
+```
+- 同时，为了使得当前运行的生效
+- 也是用临时修改方式修改一下
+- 重新查看文件限制即可
