@@ -1,8 +1,5 @@
-package i2f.extension.ftp.data;
+package i2f.extension.ftp.ftp.data;
 
-import i2f.core.net.INetAddressMeta;
-import i2f.core.secure.ILoginMeta;
-import i2f.extension.ftp.IFtpMetaMeta;
 
 /**
  * @author ltb
@@ -10,16 +7,18 @@ import i2f.extension.ftp.IFtpMetaMeta;
  * @desc
  */
 
-public class FtpMeta implements IFtpMetaMeta {
+public class FtpMeta implements IFtpMeta {
     protected String host;
     protected int port;
     protected String username;
     protected String password;
-    public FtpMeta(){
+
+    public FtpMeta() {
 
     }
-    public FtpMeta setHost(String host){
-        this.host=host;
+
+    public FtpMeta setHost(String host) {
+        this.host = host;
         return this;
     }
     public FtpMeta setPort(int port){
@@ -34,33 +33,24 @@ public class FtpMeta implements IFtpMetaMeta {
         this.password=password;
         return this;
     }
-    public FtpMeta setNetAddress(INetAddressMeta addr){
-        this.host= addr.getHost();
-        this.port= addr.getPort();
-        return this;
-    }
-    public FtpMeta setLogin(ILoginMeta login){
-        this.username= login.getUsername();
-        this.password=login.getPassword();
-        return this;
-    }
+
     @Override
     public String getHost() {
-        return null;
+        return host;
     }
 
     @Override
     public int getPort() {
-        return 0;
+        return port;
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return username;
     }
 
     @Override
     public String getPassword() {
-        return null;
+        return password;
     }
 }

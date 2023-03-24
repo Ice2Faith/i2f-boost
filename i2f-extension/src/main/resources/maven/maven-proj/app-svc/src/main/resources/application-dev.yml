@@ -1,0 +1,7 @@
+# 应用配置
+server:
+  # 端口配置
+  port: 8080
+  servlet:
+    # 上下文配置
+    context-path: /

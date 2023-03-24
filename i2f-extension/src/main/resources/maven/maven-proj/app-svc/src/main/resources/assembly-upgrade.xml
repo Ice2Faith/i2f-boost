@@ -1,5 +1,5 @@
 <assembly>
-    <id>all</id>
+    <id>upgrade</id>
     <formats>
         <!-- 指定最终生成全量包形式 -->
         <!-- zip,tar,tar.gz,tar.bz2,jar,dir,war -->
@@ -7,29 +7,25 @@
     </formats>
     <!-- 使用包含基本目录，包含将会带一层目录 -->
     <includeBaseDirectory>true</includeBaseDirectory>
-    <!-- 依赖包的输出路径 -->
+
+    <!-- 如果是多模块项目，需要包含其他模块依赖包的输出路径 -->
     <dependencySets>
         <dependencySet>
             <outputDirectory>/lib</outputDirectory>
+            <excludes>
+                <exclude>${project.groupId}:${project.artifactId}</exclude>
+            </excludes>
+            <includes>
+                <include>${project.groupId}:*</include>
+            </includes>
         </dependencySet>
     </dependencySets>
 
     <!-- 需要打包的文件 -->
     <fileSets>
-        <!-- bin，一些脚本，例如启动停止脚本 -->
-        <fileSet>
-            <directory>bin</directory>
-            <outputDirectory>.</outputDirectory>
-            <filtered>true</filtered>
-            <includes>
-                <include>*.sh</include>
-                <include>*.j2</include>
-            </includes>
-            <fileMode>0744</fileMode>
-            <lineEnding>unix</lineEnding>
-        </fileSet>
 
         <!-- 每一个fileSet做的工作都是将编译出来的target目录下的文件directory，按照一定规则输出到outputDirectory -->
+        <!-- 升级包常常包含多模块下其他依赖模块的依赖包 -->
         <fileSet>
             <directory>lib</directory>
             <outputDirectory>lib</outputDirectory>
@@ -37,7 +33,6 @@
                 <include>*.jar</include>
                 <include>*.j2</include>
             </includes>
-
         </fileSet>
 
         <!-- jar -->
@@ -53,26 +48,25 @@
         <fileSet>
             <directory>src/main/resources</directory>
             <outputDirectory>resources</outputDirectory>
+            <excludes>
+                <exclude>*logback*.xml</exclude>
+            </excludes>
             <includes>
+                <include>templates/**</include>
+                <include>static/**</include>
+                <include>public/**</include>
+
+                <include>i18n/**</include>
+                <include>META-INF/**</include>
+
                 <include>mapper/**</include>
-                <include>logback/**</include>
-                <include>*.properties</include>
-                <include>*.yml</include>
-                <include>*.yaml</include>
-                <include>*.j2</include>
-                <include>*.config</include>
-                <include>logback-spring.xml</include>
+                <include>*mapper*/**</include>
+
+                <include>*mybatis*/**</include>
+
+                <include>*spring*.xml</include>
             </includes>
         </fileSet>
 
-        <!-- 这里logback直接打包到resources中即可，不必单独打包 -->
-        <!-- logback -->
-<!--        <fileSet>-->
-<!--            <directory>src/main/resources/logback</directory>-->
-<!--            <outputDirectory>logback</outputDirectory>-->
-<!--            <includes>-->
-<!--                <include>*.xml</include>-->
-<!--            </includes>-->
-<!--        </fileSet>-->
     </fileSets>
 </assembly>
