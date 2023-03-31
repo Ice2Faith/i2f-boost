@@ -8,8 +8,13 @@ goboot:
     bannerPath: ./banner.txt
     staticResources:
       enable: true
-      urlPath: /static
-      filePath: ./static
+      items:
+        - urlPath: /dist
+          filePath: ./dist
+          tryFiles: index.htm index.html
+        - urlPath: /static
+          filePath: ./static
+          tryFiles: index.htm index.html
     templateResources:
       enable: true
       filePath: ./templates/**/*.html

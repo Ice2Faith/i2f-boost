@@ -340,11 +340,17 @@ type Server struct {
 	Gorm              Gorm              `yaml:"gorm"`
 }
 
-// 静态资源配置
-type StaticResources struct {
-	Enable   bool   `yaml:"enable"`
+// 静态资源项配置
+type StaticResourcesItem struct {
 	UrlPath  string `yaml:"urlPath"`
 	FilePath string `yaml:"filePath"`
+	TryFiles string `yaml:"tryFiles"`
+}
+
+// 静态资源配置
+type StaticResources struct {
+	Enable bool                  `yaml:"enable"`
+	Items  []StaticResourcesItem `yaml:"items"`
 }
 
 // 模板渲染配置
@@ -823,11 +829,41 @@ func GetConfigApplication(config *GobootConfig, listener *GobootLifecycleListene
 
 	// 配置静态资源
 	if server.StaticResources.Enable {
-		LogInfo("goboot enable static resources, mapping: %v --> %v", server.StaticResources.UrlPath, server.StaticResources.FilePath)
-		if _, err := os.Stat(server.StaticResources.FilePath); os.IsNotExist(err) {
-			os.MkdirAll(server.StaticResources.FilePath, 0777)
+		for _, staticItem := range server.StaticResources.Items {
+			LogInfo("goboot enable static resources, mapping: %v --> %v", staticItem.UrlPath, staticItem.FilePath)
+			if _, err := os.Stat(staticItem.FilePath); os.IsNotExist(err) {
+				os.MkdirAll(staticItem.FilePath, 0777)
+			}
+			engine.Static(staticItem.UrlPath, staticItem.FilePath)
 		}
-		engine.Static(server.StaticResources.UrlPath, server.StaticResources.FilePath)
+		// 处理404时的资源的try files处理
+		engine.NoRoute(func(c *gin.Context) {
+			reqPath := c.Request.URL.Path
+			if !strings.HasSuffix(reqPath, "/") {
+				reqPath = reqPath + "/"
+			}
+			for _, staticItem := range server.StaticResources.Items {
+				urlPath := staticItem.UrlPath
+				if !strings.HasSuffix(urlPath, "/") {
+					urlPath = urlPath + "/"
+				}
+				if !strings.HasPrefix(reqPath, urlPath) {
+					continue
+				}
+				filesArr := strings.Split(staticItem.TryFiles, " ")
+				for _, fileItem := range filesArr {
+					if fileItem == "" {
+						continue
+					}
+					tryFile := staticItem.FilePath + "/" + fileItem
+					_, err := os.Stat(tryFile)
+					if err == nil {
+						LogInfo("[try files] url: %v try to %v", reqPath, urlPath+fileItem)
+						c.File(tryFile)
+					}
+				}
+			}
+		})
 	}
 
 	LogInfo("goboot before templates resources.")

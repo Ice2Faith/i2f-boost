@@ -123,3 +123,41 @@ Go Doc
 - 选择全部安装（Install All）
 - 等待插件全部安装完毕（Successed）
 - 接下来正常开发即可
+
+## linux 下安装GO环境
+- 下载安装包
+```shell script
+wget https://golang.google.cn/dl/go1.19.linux-amd64.tar.gz
+```
+- 解包
+```shell script
+tar -xzvf go1.19.linux-amd64.tar.gz
+```
+- 重命名
+```shell script
+mv go go-1.19
+```
+- 进入路径，获取完整路径
+```shell script
+cd go-1.19
+```
+```
+pwd
+```
+- 添加环境变量
+```shell script
+vi /etc/profile
+```
+```shell script
+export PATH=$PATH:/root/env/go-1.19
+```
+- 应用环境变量
+```shell script
+source /etc/profile
+```
+- 测试安装情况
+```shell script
+go version
+```
+- 配置go的环境变量
+- 和windows环境一样
