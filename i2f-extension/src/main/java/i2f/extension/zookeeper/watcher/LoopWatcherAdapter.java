@@ -1,5 +1,6 @@
 package i2f.extension.zookeeper.watcher;
 
+import i2f.extension.zookeeper.ZookeeperManager;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.WatchedEvent;
@@ -13,33 +14,33 @@ import org.apache.zookeeper.ZooKeeper;
 @Data
 @Slf4j
 public class LoopWatcherAdapter extends AbsLoopWatcher {
-    protected ZooKeeper keeper;
+    protected ZookeeperManager manager;
     protected String path;
     protected IWatchProcessor processor;
     private Watcher watcher;
 
-    public LoopWatcherAdapter(ZooKeeper keeper,String path){
-        this.keeper=keeper;
-        this.path=path;
+    public LoopWatcherAdapter(ZookeeperManager manager, String path) {
+        this.manager = manager;
+        this.path = path;
     }
 
-    public LoopWatcherAdapter(ZooKeeper keeper, String path, IWatchProcessor processor) {
-        this.keeper = keeper;
+    public LoopWatcherAdapter(ZookeeperManager manager, String path, IWatchProcessor processor) {
+        this.manager = manager;
         this.path = path;
         this.processor = processor;
     }
 
-    public LoopWatcherAdapter(ZooKeeper keeper, String path, Watcher watcher) {
-        this.keeper = keeper;
+    public LoopWatcherAdapter(ZookeeperManager manager, String path, Watcher watcher) {
+        this.manager = manager;
         this.path = path;
         this.watcher = watcher;
     }
 
     @Override
     public boolean onProcess(WatchedEvent event) {
-        if(processor!=null){
-            return processor.process(event,this);
-        }else if(watcher!=null){
+        if (processor != null) {
+            return processor.process(event, this);
+        } else if (watcher != null) {
             watcher.process(event);
         }
         return true;
@@ -47,7 +48,7 @@ public class LoopWatcherAdapter extends AbsLoopWatcher {
 
     @Override
     public ZooKeeper getZooKeeper() {
-        return keeper;
+        return manager.zk();
     }
 
     @Override

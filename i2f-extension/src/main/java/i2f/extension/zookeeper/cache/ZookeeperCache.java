@@ -1,9 +1,7 @@
 package i2f.extension.zookeeper.cache;
 
 import i2f.core.cache.ICache;
-import i2f.core.json.IJsonProcessor;
 import i2f.extension.zookeeper.ZookeeperManager;
-import org.apache.zookeeper.ZooKeeper;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -15,24 +13,18 @@ import java.util.concurrent.TimeUnit;
  */
 public class ZookeeperCache implements ICache<String, Object> {
     private String prefix = "/cache";
-    private ZooKeeper zooKeeper;
-    private IJsonProcessor processor;
     private ZookeeperManager manager;
 
-    public ZookeeperCache(ZooKeeper zooKeeper, IJsonProcessor processor) {
+    public ZookeeperCache(ZookeeperManager manager) {
         this.prefix = "/cache";
-        this.zooKeeper = zooKeeper;
-        this.processor = processor;
-        manager = new ZookeeperManager(zooKeeper);
-        manager.makePaths(prefix);
+        this.manager = manager;
+        manager.mkdirs(prefix);
     }
 
-    public ZookeeperCache(String prefix,ZooKeeper zooKeeper,IJsonProcessor processor){
-        this.prefix=prefix;
-        this.zooKeeper=zooKeeper;
-        this.processor=processor;
-        manager=new ZookeeperManager(zooKeeper);
-        manager.makePaths(prefix);
+    public ZookeeperCache(String prefix, ZookeeperManager manager) {
+        this.prefix = prefix;
+        this.manager = manager;
+        manager.mkdirs(prefix);
     }
 
     public String getPath(String key){

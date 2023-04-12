@@ -1,6 +1,7 @@
 package i2f.extension.zookeeper.watcher;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.zookeeper.AddWatchMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
@@ -14,12 +15,12 @@ public abstract class AbsLoopWatcher implements Watcher {
 
     @Override
     public final void process(WatchedEvent event) {
-        boolean loop=onProcess(event);
-        if(loop){
-            try{
-                getZooKeeper().exists(getPath(),this);
-            }catch(Exception e){
-                log.warn("watcher {} next loop set failure.",getPath());
+        boolean loop = onProcess(event);
+        if (loop) {
+            try {
+                getZooKeeper().addWatch(getPath(), this, AddWatchMode.PERSISTENT_RECURSIVE);
+            } catch (Exception e) {
+                log.warn("watcher {} next loop set failure.", getPath());
             }
         }
     }

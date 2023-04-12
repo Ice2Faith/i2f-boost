@@ -17,20 +17,22 @@ import java.util.concurrent.CountDownLatch;
 public abstract class ZkConnectWatcher implements Watcher {
     protected CountDownLatch latch;
     protected Object[] args;
-    public ZkConnectWatcher(CountDownLatch latch,Object ... args){
-        this.latch=latch;
-        this.args=args;
+
+    public ZkConnectWatcher(CountDownLatch latch, Object... args) {
+        this.latch = latch;
+        this.args = args;
     }
+
     @Override
     public void process(WatchedEvent event) {
-        if(Event.KeeperState.SyncConnected==event.getState()){
+        if (Event.KeeperState.SyncConnected == event.getState()) {
             onConnected(event);
         }
         processEvent(event);
     }
 
-    public void onConnected(WatchedEvent event){
-        if(latch!=null){
+    public void onConnected(WatchedEvent event) {
+        if (latch != null) {
             latch.countDown();
         }
     }

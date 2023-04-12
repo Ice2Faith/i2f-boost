@@ -14,19 +14,22 @@ import java.util.concurrent.CountDownLatch;
  */
 @Getter
 @Setter
-public class ZkConnectWatcherAdapter extends ZkConnectWatcher{
+public class ZkConnectWatcherAdapter extends ZkConnectWatcher {
     protected Watcher watcher;
-    public ZkConnectWatcherAdapter(CountDownLatch latch,Watcher watcher,Object ... args){
-        super(latch,args);
-        this.watcher=watcher;
+
+    public ZkConnectWatcherAdapter(CountDownLatch latch, Watcher watcher, Object... args) {
+        super(latch, args);
+        this.watcher = watcher;
     }
-    public ZkConnectWatcherAdapter(Watcher watcher,Object ... args){
-        super(new CountDownLatch(1),args);
-        this.watcher=watcher;
+
+    public ZkConnectWatcherAdapter(Watcher watcher, Object... args) {
+        super(new CountDownLatch(1), args);
+        this.watcher = watcher;
     }
+
     @Override
     public void processEvent(WatchedEvent event) {
-        if(watcher!=null){
+        if (watcher != null) {
             watcher.process(event);
         }
     }

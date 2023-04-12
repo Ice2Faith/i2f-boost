@@ -967,6 +967,10 @@ perf
 
 yum install -y perf
 ```
+- 查看CPU型号和主频
+```shell script
+cat /proc/cpuinfo | grep name | cut -f2 -d:
+```
 
 ## too many open files (打开的文件数过多)
 - 检查打开文件数限制
