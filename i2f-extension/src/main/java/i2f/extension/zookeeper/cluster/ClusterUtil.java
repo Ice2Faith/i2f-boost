@@ -1,6 +1,5 @@
 package i2f.extension.zookeeper.cluster;
 
-
 import i2f.extension.zookeeper.ZookeeperConfig;
 import i2f.extension.zookeeper.ZookeeperManager;
 import i2f.extension.zookeeper.cluster.impl.ZookeeperClusterProvider;

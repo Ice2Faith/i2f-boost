@@ -1,6 +1,8 @@
 package i2f.extension.zookeeper;
 
+
 import i2f.extension.zookeeper.exception.ZookeeperException;
+import i2f.extension.zookeeper.listener.ZookeeperManagerListener;
 import i2f.extension.zookeeper.watcher.IWatchProcessor;
 import i2f.extension.zookeeper.watcher.LoopWatcherAdapter;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,6 +29,7 @@ public class ZookeeperManager {
 
     private volatile ZookeeperConfig config;
     private volatile ZooKeeper zooKeeper;
+    private volatile CopyOnWriteArrayList<ZookeeperManagerListener> listeners = new CopyOnWriteArrayList<>();
 
     public ZookeeperManager() {
 
@@ -35,8 +39,20 @@ public class ZookeeperManager {
         reload(config);
     }
 
+    public ZookeeperManager addListener(ZookeeperManagerListener listener) {
+        listeners.add(listener);
+        return this;
+    }
+
     public void reload(ZookeeperConfig config) {
         try {
+            for (ZookeeperManagerListener listener : listeners) {
+                try {
+                    listener.onBefore(this);
+                } catch (Exception e) {
+                    log.error("zookeeper listener reload before error: " + e.getMessage(), e);
+                }
+            }
             synchronized (ZookeeperManager.class) {
                 this.config = config;
                 this.zooKeeper = ZookeeperUtil.getConnectedZookeeper(config.getConnectString(),
@@ -48,8 +64,22 @@ public class ZookeeperManager {
                                     log.warn("zookeeper session expired,try connect again.");
                                     reload(ZookeeperManager.this.config);
                                 }
+                                for (ZookeeperManagerListener listener : listeners) {
+                                    try {
+                                        listener.onEvent(event, ZookeeperManager.this);
+                                    } catch (Exception e) {
+                                        log.error("zookeeper listener event error: " + e.getMessage(), e);
+                                    }
+                                }
                             }
                         });
+            }
+            for (ZookeeperManagerListener listener : listeners) {
+                try {
+                    listener.onAfter(this);
+                } catch (Exception e) {
+                    log.error("zookeeper listener reload after error: " + e.getMessage(), e);
+                }
             }
         } catch (Exception e) {
             throw new ZookeeperException(e.getMessage(), e);

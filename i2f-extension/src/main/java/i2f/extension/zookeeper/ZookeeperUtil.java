@@ -14,12 +14,13 @@ import java.util.concurrent.CountDownLatch;
  */
 public class ZookeeperUtil {
     public static ZooKeeper getZookeeper(String connectString, int sessionTimeout, Watcher watcher) throws IOException {
-        ZooKeeper zooKeeper=new ZooKeeper(connectString,sessionTimeout,watcher);
+        ZooKeeper zooKeeper = new ZooKeeper(connectString, sessionTimeout, watcher);
         return zooKeeper;
     }
-    public static ZooKeeper getConnectedZookeeper(String connectString,int sessionTimeout,Watcher watcher) throws IOException, InterruptedException {
-        CountDownLatch latch=new CountDownLatch(1);
-        ZooKeeper zooKeeper= getZookeeper(connectString, sessionTimeout, new ZkConnectWatcherAdapter(latch,watcher));
+
+    public static ZooKeeper getConnectedZookeeper(String connectString, int sessionTimeout, Watcher watcher) throws IOException, InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        ZooKeeper zooKeeper = getZookeeper(connectString, sessionTimeout, new ZkConnectWatcherAdapter(latch, watcher));
         latch.await();
         return zooKeeper;
     }

@@ -1,8 +1,9 @@
 package i2f.extension.zookeeper.cluster.impl;
 
-
 import i2f.extension.zookeeper.ZookeeperManager;
 import i2f.extension.zookeeper.cluster.AbsClusterProvider;
+import i2f.extension.zookeeper.exception.ZookeeperException;
+import i2f.extension.zookeeper.listener.ZookeeperManagerListener;
 import i2f.extension.zookeeper.watcher.IWatchProcessor;
 import i2f.extension.zookeeper.watcher.LoopWatcherAdapter;
 import lombok.extern.slf4j.Slf4j;
@@ -31,14 +32,25 @@ public class ZookeeperClusterProvider extends AbsClusterProvider implements IWat
         this.listenPath = listenPath;
         this.zookeeperManager = zookeeperManager;
         init();
+        this.zookeeperManager.addListener(new ZookeeperManagerListener() {
+            @Override
+            public void onAfter(ZookeeperManager manager) {
+                try {
+                    init();
+                } catch (Exception e) {
+                    throw new ZookeeperException(e.getMessage(), e);
+                }
+            }
+        });
     }
 
     public void init() throws Exception {
+
         // init
         zookeeperManager.mkdirs(listenPath);
         // watcher
         log.info("cluster listen :" + listenPath);
-        zookeeperManager.watchLoop(listenPath, this, true);
+        zookeeperManager.watchLoop(listenPath, ZookeeperClusterProvider.this, true);
         // registry
         String path = listenPath + "/" + guid();
         log.info("cluster registry:" + path);
