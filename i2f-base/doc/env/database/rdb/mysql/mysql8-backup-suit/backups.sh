@@ -2,7 +2,7 @@
 esc_per=\%
 esc_srp=\#
 
-bak_dir=./backup_db
+bak_dir=./db_backup
 
 # 获取完整路径
 bak_dir=`realpath $bak_dir`

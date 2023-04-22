@@ -2,7 +2,9 @@
 
 -- ----------------------------------------------------
 -- 查看连接进程
-select a.`USER`,
+select 
+concat('kill ',a.ID,';') kill_sql,
+a.`USER`,
 substring_index(a.HOST ,':' ,1) as ip,
 a.DB,
 a.COMMAND,
@@ -13,8 +15,9 @@ from information_schema.PROCESSLIST a
 where a.`USER` !='event_scheduler'
 order by a.`TIME` desc;
 
+
 -- 查看IP连接进程排行
-select ip,count(*) as cnt
+select ip,DB,count(*) as cnt
 from (
 	select a.`USER`,
 	substring_index(a.HOST ,':' ,1) as ip,
@@ -26,11 +29,11 @@ from (
 	from information_schema.PROCESSLIST a
 	where a.`USER` !='event_scheduler'
 ) a
-group by ip
+group by ip,DB
 order by cnt desc;
 
 -- 查看IP的cmd排行
-select ip,command,count(*) as cnt
+select ip,DB,command,count(*) as cnt
 from (
 	select a.`USER`,
 	substring_index(a.HOST ,':' ,1) as ip,
@@ -42,7 +45,7 @@ from (
 	from information_schema.PROCESSLIST a
 	where a.`USER` !='event_scheduler'
 ) a
-group by ip,command
+group by ip,DB,command
 order by cnt desc;
 
 -- 查看大于30s占用时长排行
