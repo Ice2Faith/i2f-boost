@@ -1,6 +1,7 @@
 package i2f.core.graphics.d2.polygon;
 
 import i2f.core.data.Pair;
+import i2f.core.geo.GeoUtil;
 import i2f.core.graphics.d2.Point;
 
 import java.util.ArrayList;
@@ -172,6 +173,39 @@ public class PolygonLocationTool {
             arr[i] = nlList.get(i);
         }
         return windInPolygonOnDownAxisY(nlPoint, arr);
+    }
+
+
+    public static boolean windInPolygon(Point target, List<Point> points) {
+        Pair<Point, List<Point>> normalizePair = normalize(target, points);
+        Point nlPoint = normalizePair.getKey();
+        List<Point> nlList = normalizePair.getVal();
+
+        Point[] arr = new Point[nlList.size()];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = nlList.get(i);
+        }
+        return windInPolygonOnUpAxisY(nlPoint, arr);
+    }
+
+    public static boolean windInCircle(Point target, Point center, double radius) {
+        double disMeter = geoDistance(target, center);
+        return disMeter <= radius;
+    }
+
+    public static double geoDistance(Point begin, Point end) {
+        // 采用等比例缩放方式，减少浮点数经度问题
+        double scale = 1000;
+        Point dbegin = new Point(begin.getX() * scale, begin.getY() * scale);
+        Point dend = new Point(end.getX() * scale, end.getY() * scale);
+        double dis = distance(dbegin, dend);
+        dis = dis / scale;
+        return GeoUtil.lat382meter(dis);
+    }
+
+
+    public static double distance(Point begin, Point end) {
+        return Math.sqrt(Math.pow(end.getX() - begin.getX(), 2.0) + Math.pow(end.getY() - begin.getY(), 2.0));
     }
 
 }
