@@ -73,6 +73,7 @@ public abstract class AbsStreaming<R, E> implements Streaming<E>, IProcessStream
                 handler.accept(item, ret);
             }
         }
+        latch.finish();
         if (pool != null) {
             try {
                 long tms = latch.await();
