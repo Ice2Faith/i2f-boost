@@ -971,6 +971,10 @@ yum install -y perf
 ```shell script
 cat /proc/cpuinfo | grep name | cut -f2 -d:
 ```
+- 查看PID的执行文件路径
+```shell script
+lsof -p ${pid} | grep cmd
+```
 
 ## too many open files (打开的文件数过多)
 - 检查打开文件数限制
@@ -1001,3 +1005,53 @@ vi /etc/security/limits.conf
 - 同时，为了使得当前运行的生效
 - 也是用临时修改方式修改一下
 - 重新查看文件限制即可
+
+## 性能监控
+- 推荐工具安装(iostat,vmstat)
+```shell script
+yum -y install sysstat
+```
+- 查看磁盘IO情况
+```shell script
+iostat -dmx 1
+```
+- 查看CPU情况
+```shell script
+top -c
+按键：1 t t H m m
+```
+- 总览
+```shell script
+vmstat -t -a 1 5
+```
+- 磁盘总览
+```shell script
+vmstat -d
+```
+- 查看磁盘IO情况
+```shell script
+sar -u
+```
+- 性能工具
+```shell script
+yum -y install perf
+```
+- 统计运行情况
+	- 一段事件之后Ctrl+C终止即可出结果
+```shell script
+perf stat
+```
+- 统计指定PID的运行情况
+```shell script
+perf stat -p [PID]
+```
+- 实时性能监控
+```shell script
+perf top -g
+```
+- 组合监控报表
+```shell script
+perf record -F 99 -a -g -- sleep 60
+perf report -n
+perf report -n --stdio
+```
