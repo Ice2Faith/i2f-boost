@@ -24,6 +24,8 @@
         <!-- 仅依赖jdk1.8,javase -->
         <module>i2f-core</module>
 
+        <module>i2f-streaming</module>
+
         <!-- 仅依赖jdk1.5,javax,javaee -->
         <module>i2f-core-j2ee</module>
 
