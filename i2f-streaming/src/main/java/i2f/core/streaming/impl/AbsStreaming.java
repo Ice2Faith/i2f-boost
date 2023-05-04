@@ -8,10 +8,13 @@ import i2f.core.streaming.keyed.impl.AbsKeyedStreaming;
 import i2f.core.streaming.keyed.process.KeyedStreamingProcessor;
 import i2f.core.streaming.keyed.sink.KeyedStreamingSinker;
 import i2f.core.streaming.process.ProcessWrappers;
+import i2f.core.streaming.process.StreamingProcessCollectParallelWrapper;
 import i2f.core.streaming.process.StreamingProcessor;
 import i2f.core.streaming.rich.RichStreamingWrapper;
 import i2f.core.streaming.sink.SinkWrappers;
 import i2f.core.streaming.sink.StreamingSinker;
+import i2f.core.tuple.Selectors;
+import i2f.core.tuple.impl.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -329,9 +332,11 @@ public class AbsStreaming<E> implements Streaming<E> {
     }
 
     @Override
-    public Streaming<E> fork(Consumer<Streaming<E>> consumer) {
-        inject(consumer);
-        return process(ProcessWrappers.fork(consumer));
+    public Streaming<E> fork(Consumer<Streaming<E>>... consumers) {
+        for (Consumer<Streaming<E>> consumer : consumers) {
+            inject(consumer);
+        }
+        return process(ProcessWrappers.fork(consumers));
     }
 
     @Override
@@ -442,5 +447,116 @@ public class AbsStreaming<E> implements Streaming<E> {
     @Override
     public <R extends Number> NumberStreaming<R> number(Function<E, R> mapper) {
         return (AbsNumberStreaming<R>) AbsNumberStreaming.source(iterator, mapper).setContext(copyContext());
+    }
+
+    @Override
+    public Streaming<Map<Integer, Optional<Object>>> mapper(Function<E, ?>... mappers) {
+        return process(new StreamingProcessCollectParallelWrapper<E, Map<Integer, Optional<Object>>>() {
+            @Override
+            public void handle(E elem, Consumer<Map<Integer, Optional<Object>>> consumer) {
+                Map<Integer, Optional<Object>> val = Selectors.mapper(elem, mappers);
+                consumer.accept(val);
+            }
+        });
+    }
+
+    @Override
+    public <V1> Streaming<Tuple1<V1>> select(Function<E, V1> mapper1) {
+        return process(new StreamingProcessCollectParallelWrapper<E, Tuple1<V1>>() {
+            @Override
+            public void handle(E elem, Consumer<Tuple1<V1>> consumer) {
+                consumer.accept(Selectors.select(elem, mapper1));
+            }
+        });
+    }
+
+    @Override
+    public <V1, V2> Streaming<Tuple2<V1, V2>> select(Function<E, V1> mapper1, Function<E, V2> mapper2) {
+        return process(new StreamingProcessCollectParallelWrapper<E, Tuple2<V1, V2>>() {
+            @Override
+            public void handle(E elem, Consumer<Tuple2<V1, V2>> consumer) {
+                consumer.accept(Selectors.select(elem, mapper1, mapper2));
+            }
+        });
+    }
+
+    @Override
+    public <V1, V2, V3> Streaming<Tuple3<V1, V2, V3>> select(Function<E, V1> mapper1, Function<E, V2> mapper2, Function<E, V3> mapper3) {
+        return process(new StreamingProcessCollectParallelWrapper<E, Tuple3<V1, V2, V3>>() {
+            @Override
+            public void handle(E elem, Consumer<Tuple3<V1, V2, V3>> consumer) {
+                consumer.accept(Selectors.select(elem, mapper1, mapper2, mapper3));
+            }
+        });
+    }
+
+    @Override
+    public <V1, V2, V3, V4> Streaming<Tuple4<V1, V2, V3, V4>> select(Function<E, V1> mapper1, Function<E, V2> mapper2, Function<E, V3> mapper3, Function<E, V4> mapper4) {
+        return process(new StreamingProcessCollectParallelWrapper<E, Tuple4<V1, V2, V3, V4>>() {
+            @Override
+            public void handle(E elem, Consumer<Tuple4<V1, V2, V3, V4>> consumer) {
+                consumer.accept(Selectors.select(elem, mapper1, mapper2, mapper3, mapper4));
+            }
+        });
+    }
+
+    @Override
+    public <V1, V2, V3, V4, V5> Streaming<Tuple5<V1, V2, V3, V4, V5>> select(Function<E, V1> mapper1, Function<E, V2> mapper2, Function<E, V3> mapper3, Function<E, V4> mapper4, Function<E, V5> mapper5) {
+        return process(new StreamingProcessCollectParallelWrapper<E, Tuple5<V1, V2, V3, V4, V5>>() {
+            @Override
+            public void handle(E elem, Consumer<Tuple5<V1, V2, V3, V4, V5>> consumer) {
+                consumer.accept(Selectors.select(elem, mapper1, mapper2, mapper3, mapper4, mapper5));
+            }
+        });
+    }
+
+    @Override
+    public <V1, V2, V3, V4, V5, V6> Streaming<Tuple6<V1, V2, V3, V4, V5, V6>> select(Function<E, V1> mapper1, Function<E, V2> mapper2, Function<E, V3> mapper3, Function<E, V4> mapper4, Function<E, V5> mapper5, Function<E, V6> mapper6) {
+        return process(new StreamingProcessCollectParallelWrapper<E, Tuple6<V1, V2, V3, V4, V5, V6>>() {
+            @Override
+            public void handle(E elem, Consumer<Tuple6<V1, V2, V3, V4, V5, V6>> consumer) {
+                consumer.accept(Selectors.select(elem, mapper1, mapper2, mapper3, mapper4, mapper5, mapper6));
+            }
+        });
+    }
+
+    @Override
+    public <V1, V2, V3, V4, V5, V6, V7> Streaming<Tuple7<V1, V2, V3, V4, V5, V6, V7>> select(Function<E, V1> mapper1, Function<E, V2> mapper2, Function<E, V3> mapper3, Function<E, V4> mapper4, Function<E, V5> mapper5, Function<E, V6> mapper6, Function<E, V7> mapper7) {
+        return process(new StreamingProcessCollectParallelWrapper<E, Tuple7<V1, V2, V3, V4, V5, V6, V7>>() {
+            @Override
+            public void handle(E elem, Consumer<Tuple7<V1, V2, V3, V4, V5, V6, V7>> consumer) {
+                consumer.accept(Selectors.select(elem, mapper1, mapper2, mapper3, mapper4, mapper5, mapper6, mapper7));
+            }
+        });
+    }
+
+    @Override
+    public <V1, V2, V3, V4, V5, V6, V7, V8> Streaming<Tuple8<V1, V2, V3, V4, V5, V6, V7, V8>> select(Function<E, V1> mapper1, Function<E, V2> mapper2, Function<E, V3> mapper3, Function<E, V4> mapper4, Function<E, V5> mapper5, Function<E, V6> mapper6, Function<E, V7> mapper7, Function<E, V8> mapper8) {
+        return process(new StreamingProcessCollectParallelWrapper<E, Tuple8<V1, V2, V3, V4, V5, V6, V7, V8>>() {
+            @Override
+            public void handle(E elem, Consumer<Tuple8<V1, V2, V3, V4, V5, V6, V7, V8>> consumer) {
+                consumer.accept(Selectors.select(elem, mapper1, mapper2, mapper3, mapper4, mapper5, mapper6, mapper7, mapper8));
+            }
+        });
+    }
+
+    @Override
+    public <V1, V2, V3, V4, V5, V6, V7, V8, V9> Streaming<Tuple9<V1, V2, V3, V4, V5, V6, V7, V8, V9>> select(Function<E, V1> mapper1, Function<E, V2> mapper2, Function<E, V3> mapper3, Function<E, V4> mapper4, Function<E, V5> mapper5, Function<E, V6> mapper6, Function<E, V7> mapper7, Function<E, V8> mapper8, Function<E, V9> mapper9) {
+        return process(new StreamingProcessCollectParallelWrapper<E, Tuple9<V1, V2, V3, V4, V5, V6, V7, V8, V9>>() {
+            @Override
+            public void handle(E elem, Consumer<Tuple9<V1, V2, V3, V4, V5, V6, V7, V8, V9>> consumer) {
+                consumer.accept(Selectors.select(elem, mapper1, mapper2, mapper3, mapper4, mapper5, mapper6, mapper7, mapper8, mapper9));
+            }
+        });
+    }
+
+    @Override
+    public <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> Streaming<Tuple10<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10>> select(Function<E, V1> mapper1, Function<E, V2> mapper2, Function<E, V3> mapper3, Function<E, V4> mapper4, Function<E, V5> mapper5, Function<E, V6> mapper6, Function<E, V7> mapper7, Function<E, V8> mapper8, Function<E, V9> mapper9, Function<E, V10> mapper10) {
+        return process(new StreamingProcessCollectParallelWrapper<E, Tuple10<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10>>() {
+            @Override
+            public void handle(E elem, Consumer<Tuple10<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10>> consumer) {
+                consumer.accept(Selectors.select(elem, mapper1, mapper2, mapper3, mapper4, mapper5, mapper6, mapper7, mapper8, mapper9, mapper10));
+            }
+        });
     }
 }

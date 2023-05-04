@@ -292,7 +292,7 @@ public class ProcessWrappers {
         };
     }
 
-    public static <E> StreamingProcessor<E, E> fork(Consumer<Streaming<E>> consumer) {
+    public static <E> StreamingProcessor<E, E> fork(Consumer<Streaming<E>>... consumers) {
         return new StreamingProcessCollectWrapper<E, E>() {
             @Override
             public void collect(Iterator<E> iterator, Consumer<E> collector) {
@@ -302,7 +302,9 @@ public class ProcessWrappers {
                     collector.accept(val);
                     list.add(val);
                 }
-                consumer.accept(Streaming.source(list));
+                for (Consumer<Streaming<E>> consumer : consumers) {
+                    consumer.accept(Streaming.source(list));
+                }
             }
         };
     }

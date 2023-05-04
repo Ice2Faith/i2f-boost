@@ -8,6 +8,7 @@ import i2f.core.streaming.iterator.LazyIterator;
 import i2f.core.streaming.keyed.KeyedStreaming;
 import i2f.core.streaming.process.StreamingProcessor;
 import i2f.core.streaming.sink.StreamingSinker;
+import i2f.core.tuple.impl.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -171,7 +172,7 @@ public interface Streaming<E> {
 
     Streaming<E> peek(Consumer<E> consumer, Object... args);
 
-    Streaming<E> fork(Consumer<Streaming<E>> consumer);
+    Streaming<E> fork(Consumer<Streaming<E>>... consumers);
 
     Streaming<E> join(Streaming<E> streaming);
 
@@ -212,4 +213,82 @@ public interface Streaming<E> {
     <R extends Number> NumberStreaming<R> number(Function<E, R> mapper);
 
     Map<Measure, Object> measures(Measure... measures);
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    Streaming<Map<Integer, Optional<Object>>> mapper(Function<E, ?>... mappers);
+
+    <V1> Streaming<Tuple1<V1>> select(Function<E, V1> mapper1);
+
+    <V1, V2> Streaming<Tuple2<V1, V2>> select(Function<E, V1> mapper1,
+                                              Function<E, V2> mapper2
+    );
+
+    <V1, V2, V3> Streaming<Tuple3<V1, V2, V3>> select(Function<E, V1> mapper1,
+                                                      Function<E, V2> mapper2,
+                                                      Function<E, V3> mapper3
+    );
+
+    <V1, V2, V3, V4> Streaming<Tuple4<V1, V2, V3, V4>> select(Function<E, V1> mapper1,
+                                                              Function<E, V2> mapper2,
+                                                              Function<E, V3> mapper3,
+                                                              Function<E, V4> mapper4
+    );
+
+    <V1, V2, V3, V4, V5> Streaming<Tuple5<V1, V2, V3, V4, V5>> select(Function<E, V1> mapper1,
+                                                                      Function<E, V2> mapper2,
+                                                                      Function<E, V3> mapper3,
+                                                                      Function<E, V4> mapper4,
+                                                                      Function<E, V5> mapper5
+    );
+
+    <V1, V2, V3, V4, V5, V6> Streaming<Tuple6<V1, V2, V3, V4, V5, V6>> select(Function<E, V1> mapper1,
+                                                                              Function<E, V2> mapper2,
+                                                                              Function<E, V3> mapper3,
+                                                                              Function<E, V4> mapper4,
+                                                                              Function<E, V5> mapper5,
+                                                                              Function<E, V6> mapper6
+    );
+
+    <V1, V2, V3, V4, V5, V6, V7> Streaming<Tuple7<V1, V2, V3, V4, V5, V6, V7>> select(Function<E, V1> mapper1,
+                                                                                      Function<E, V2> mapper2,
+                                                                                      Function<E, V3> mapper3,
+                                                                                      Function<E, V4> mapper4,
+                                                                                      Function<E, V5> mapper5,
+                                                                                      Function<E, V6> mapper6,
+                                                                                      Function<E, V7> mapper7
+    );
+
+    <V1, V2, V3, V4, V5, V6, V7, V8> Streaming<Tuple8<V1, V2, V3, V4, V5, V6, V7, V8>> select(Function<E, V1> mapper1,
+                                                                                              Function<E, V2> mapper2,
+                                                                                              Function<E, V3> mapper3,
+                                                                                              Function<E, V4> mapper4,
+                                                                                              Function<E, V5> mapper5,
+                                                                                              Function<E, V6> mapper6,
+                                                                                              Function<E, V7> mapper7,
+                                                                                              Function<E, V8> mapper8
+    );
+
+    <V1, V2, V3, V4, V5, V6, V7, V8, V9> Streaming<Tuple9<V1, V2, V3, V4, V5, V6, V7, V8, V9>> select(Function<E, V1> mapper1,
+                                                                                                      Function<E, V2> mapper2,
+                                                                                                      Function<E, V3> mapper3,
+                                                                                                      Function<E, V4> mapper4,
+                                                                                                      Function<E, V5> mapper5,
+                                                                                                      Function<E, V6> mapper6,
+                                                                                                      Function<E, V7> mapper7,
+                                                                                                      Function<E, V8> mapper8,
+                                                                                                      Function<E, V9> mapper9
+    );
+
+    <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> Streaming<Tuple10<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10>> select(Function<E, V1> mapper1,
+                                                                                                                 Function<E, V2> mapper2,
+                                                                                                                 Function<E, V3> mapper3,
+                                                                                                                 Function<E, V4> mapper4,
+                                                                                                                 Function<E, V5> mapper5,
+                                                                                                                 Function<E, V6> mapper6,
+                                                                                                                 Function<E, V7> mapper7,
+                                                                                                                 Function<E, V8> mapper8,
+                                                                                                                 Function<E, V9> mapper9,
+                                                                                                                 Function<E, V10> mapper10
+    );
 }
