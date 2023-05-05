@@ -411,7 +411,7 @@ function prepareJmxCfg(){
     JVM_OPTS="${JVM_OPTS} -Djava.net.preferIPv4Stack=true"
   fi
   if [[ -n "${JMX_HOST}" ]]; then
-    JVM_OPTS="${JVM_OPTS} -Djava.rmi.server.hostname=${JMX_PORT}"
+    JVM_OPTS="${JVM_OPTS} -Djava.rmi.server.hostname=${JMX_HOST}"
   fi
 }
 # 准备JVM的所有启动参数
