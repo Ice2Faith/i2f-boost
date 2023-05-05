@@ -43,12 +43,15 @@
                 <include>*.jar</include>
             </includes>
         </fileSet>
-
         <!-- config，打包配置文件到resource文件夹，之前在pom.xml中已经排除了这些不打包到jar中，这是分离配置的第二部 -->
         <fileSet>
             <directory>src/main/resources</directory>
             <outputDirectory>resources</outputDirectory>
             <excludes>
+                <exclude>bin/**</exclude>
+                <exclude>assembly/**</exclude>
+                <exclude>*assembly*.xml</exclude>
+                <exclude>logback/**</exclude>
                 <exclude>*logback*.xml</exclude>
             </excludes>
             <includes>
@@ -65,6 +68,14 @@
                 <include>*mybatis*/**</include>
 
                 <include>*spring*.xml</include>
+
+                <include>*.properties</include>
+                <include>*.yml</include>
+                <include>*.yaml</include>
+                <include>*.conf</include>
+                <include>*.j2</include>
+                <include>*.config</include>
+                <include>*.txt</include>
             </includes>
         </fileSet>
 

@@ -12,7 +12,7 @@ JarName=$2
 JarPath=
 
 # 查询日志的最后多少行
-TAIL_LOG_LINES=300
+TAIL_LOG_LINES=1000
 
 # 查询异常的最后多少行
 TAIL_EXCEPT_LINES=3000
@@ -70,6 +70,8 @@ LOGBACK_APP_LOG_MAX_SIZE=500MB
 APP_JAVA_HOME=
 
 # JVM 常见配置区
+# JVM 启动参数定义，此参数不受 ENABLE_JVM_CFG 控制
+JVM_OPTS=
 # 是否开启Jvm配置
 # 必须是定义的BOOL常量
 ENABLE_JVM_CFG=$BOOL_FALSE
@@ -121,6 +123,7 @@ ENABLE_JMX_CFG=$BOOL_FALSE
 # 指定JMX的连接端口
 # 有值/非空则使用
 JMX_PORT=9440
+JMX_HOST=
 
 # ##################################################################################################################
 # 内部函数定义区
@@ -320,8 +323,7 @@ LOG_FILE=
 PID_FILE=
 # 启动信息文件定义
 BOOT_META_FILE=
-# JVM 启动参数定义
-JVM_OPTS=
+
 
 # 其他文件路径
 META_DIR=
@@ -408,10 +410,13 @@ function prepareJmxCfg(){
     JVM_OPTS="${JVM_OPTS} -Dcom.sun.management.jmxremote.ssl=false"
     JVM_OPTS="${JVM_OPTS} -Djava.net.preferIPv4Stack=true"
   fi
+  if [[ -n "${JMX_HOST}" ]]; then
+    JVM_OPTS="${JVM_OPTS} -Djava.rmi.server.hostname=${JMX_PORT}"
+  fi
 }
 # 准备JVM的所有启动参数
 function prepareJvmOpts() {
-    JVM_OPTS="-Djar.name=$JarName"
+    JVM_OPTS="${JVM_OPTS} -Djar.name=$JarName"
 
     if [ $ENABLE_SPRING_CFG == $BOOL_TRUE ];then
       prepareSpringCfg
@@ -532,13 +537,24 @@ function status() {
     fi
 }
 
+function findLogFile() {
+      _func_ret=
+
+      _p_log_file=`ls -t ${LOG_DIR} | grep .log | grep -v grep | grep ${AppName} | head -n 1`
+      if [[ "${_p_log_file}" = "" ]]; then
+        echo -e "\033[0;31m not found ${AppName}*.log , try find most newest log file... \033[0m"
+        _p_log_file=`ls -t ${LOG_DIR} | grep .log | grep -v grep | head -n 1`
+      fi
+
+      _func_ret=$_p_log_file
+}
+
 # 查看应用日志
 function log() {
-    _p_log_file=`ls -t ${LOG_DIR} | grep .log | grep -v grep | grep ${AppName} | head -n 1`
-    if [[ "${_p_log_file}" = "" ]]; then
-      echo -e "\033[0;31m not found ${AppName}*.log , try find most newest log file... \033[0m"
-      _p_log_file=`ls -t ${LOG_DIR} | grep .log | grep -v grep | head -n 1`
-    fi
+    cleanFuncParams
+    findLogFile
+    _p_log_file=$_func_ret
+
     if [[ -n "$_p_log_file" ]]; then
         echo -e "\033[0;34m found log file ${LOG_DIR}/$_p_log_file \033[0m"
         tail -f -n $TAIL_LOG_LINES ${LOG_DIR}/$_p_log_file
@@ -549,11 +565,10 @@ function log() {
 
 # 查看应用的异常日志
 function except() {
-    _p_log_file=`ls -t ${LOG_DIR} | grep .log | grep -v grep | grep ${AppName} | head -n 1`
-    if [[ "${_p_log_file}" = "" ]]; then
-      echo -e "\033[0;31m not found ${AppName}*.log , try find most newest log file... \033[0m"
-      _p_log_file=`ls -t ${LOG_DIR} | grep .log | grep -v grep | head -n 1`
-    fi
+    cleanFuncParams
+    findLogFile
+    _p_log_file=$_func_ret
+
     if [[ -n "$_p_log_file" ]]; then
         echo -e "\033[0;34m found log file ${LOG_DIR}/$_p_log_file \033[0m"
         tail -f -n $TAIL_EXCEPT_LINES ${LOG_DIR}/$_p_log_file | grep -inA $TAIL_EXCEPT_AFTER_LINES exception
@@ -589,93 +604,112 @@ function rollback() {
 # ##################################################################################################################
 # 脚本正式处理逻辑
 # ##################################################################################################################
-# 如果没有指定选项，给出帮助并退出
-if [ "$Option" = "" ];
-then
-    help
-    exit 1
-fi
 
-# 如果指定了APP_JAVA_HOME,则使用APP_JAVA_HOME下面的JAVA
-if [[ "$APP_JAVA_HOME" -ne "" ]]; then
-  JAVA_PATH=${APP_JAVA_HOME}/bin/java
-fi
+# 准备运行Jar包的上下文
+function prepareAppContext(){
+      # 如果指定了APP_JAVA_HOME,则使用APP_JAVA_HOME下面的JAVA
+      if [[ "$APP_JAVA_HOME" -ne "" ]]; then
+        JAVA_PATH=${APP_JAVA_HOME}/bin/java
+      fi
 
-# 如果定义了jar的路径，则先进入路径
-if [[ -n "${JarPath}" ]]; then
-  cd $JarPath
-fi
+      # 如果定义了jar的路径，则先进入路径
+      if [[ -n "${JarPath}" ]]; then
+        cd $JarPath
+      fi
 
-# 从当前文件夹查找jar文件
-if [ "$JarName" == "" ];
-then
-  cleanFuncParams
-  _func_arg1=.jar
-  _func_arg2=
-  findOneSuffixFileInPath
-  JarName=$_func_ret
-fi
+      # 从当前文件夹查找jar文件
+      if [ "$JarName" == "" ];
+      then
+        cleanFuncParams
+        _func_arg1=.jar
+        _func_arg2=
+        findOneSuffixFileInPath
+        JarName=$_func_ret
+      fi
 
-# 如果依旧没有jar文件，则失败退出
-if [ "$JarName" = "" ];
-then
-    echo -e "\033[0;31m please input 2nd arg:jarName \033[0m"
-    exit 1
-fi
+      # 如果依旧没有jar文件，则失败退出
+      if [ "$JarName" = "" ];
+      then
+          echo -e "\033[0;31m please input 2nd arg:jarName \033[0m"
+          exit 1
+      fi
 
-# 根据JarName截取AppName
-#AppName=`basename $JarName .jar`
-AppName=${JarName%.*}
+      # 根据JarName截取AppName
+      #AppName=`basename $JarName .jar`
+      AppName=${JarName%.*}
 
-# 处理Logback的AppName
-# 如果配置了Spring配置，
-# 且有配置SpringApplicationName，
-# 则使用此名称作为Logback的AppName
-# 否则使用jar包的AppName
-if [[ "${LOGBACK_APP_NAME}" = "" ]]; then
-  if [ $ENABLE_SPRING_CFG == $BOOL_TRUE ];then
-    if [[ -n "${SPRING_APPLICATION_NAME}" ]]; then
-      LOGBACK_APP_NAME=$SPRING_APPLICATION_NAME
-    fi
-  fi
-fi
+      # 处理Logback的AppName
+      # 如果配置了Spring配置，
+      # 且有配置SpringApplicationName，
+      # 则使用此名称作为Logback的AppName
+      # 否则使用jar包的AppName
+      if [[ "${LOGBACK_APP_NAME}" = "" ]]; then
+        if [ $ENABLE_SPRING_CFG == $BOOL_TRUE ];then
+          if [[ -n "${SPRING_APPLICATION_NAME}" ]]; then
+            LOGBACK_APP_NAME=$SPRING_APPLICATION_NAME
+          fi
+        fi
+      fi
 
-if [[ "${LOGBACK_APP_NAME}" = "" ]]; then
-  LOGBACK_APP_NAME=$AppName
-fi
+      if [[ "${LOGBACK_APP_NAME}" = "" ]]; then
+        LOGBACK_APP_NAME=$AppName
+      fi
 
-# 初始化工作路径以及相关的路径
-WORK_DIR=`pwd`
-LOG_DIR=${WORK_DIR}/logs
-LOG_FILE=${LOG_DIR}/${AppName}.log
+      # 初始化工作路径以及相关的路径
+      WORK_DIR=`pwd`
+      LOG_DIR=${WORK_DIR}/logs
+      LOG_FILE=${LOG_DIR}/${AppName}.log
+      META_DIR=${WORK_DIR}/metas
 
-META_DIR=${WORK_DIR}/metas
+      BOOT_META_FILE=${META_DIR}/meta.${AppName}.txt
+      PID_FILE=${META_DIR}/pid.${AppName}.txt
+      BACKUP_DIR=${META_DIR}/backup
+      ROLLBACK_DIR=${META_DIR}/rollback
 
-BOOT_META_FILE=${META_DIR}/meta.${AppName}.txt
-PID_FILE=${META_DIR}/pid.${AppName}.txt
-BACKUP_DIR=${META_DIR}/backup
-ROLLBACK_DIR=${META_DIR}/rollback
+      cleanFuncParams
+      findLogFile
+      _p_log_file=$_func_ret
 
-# 打印基本配置信息
-echo "-----------------------"
-echo -e "\033[0;34m AppName     \033[0m : $AppName"
-echo -e "\033[0;34m JarName     \033[0m : $JarName"
-echo -e "\033[0;34m Option      \033[0m : $Option"
-echo -e "\033[0;34m WorkDir     \033[0m : $WORK_DIR"
-echo -e "\033[0;34m LogDir      \033[0m : $LOG_DIR"
-echo -e "\033[0;34m LogFile     \033[0m : $LOG_FILE"
-echo -e "\033[0;34m PidFile     \033[0m : $PID_FILE"
-echo -e "\033[0;34m BootFile    \033[0m : $BOOT_META_FILE"
-echo -e "\033[0;34m BackupDir   \033[0m : $BACKUP_DIR"
-echo -e "\033[0;34m RollbackDir \033[0m : $ROLLBACK_DIR"
-echo "-----------------------"
+      if [[ -n "$_p_log_file" ]]; then
+        LOG_FILE=${LOG_DIR}/$_p_log_file
+      fi
+}
+
+# 打印运行Jar包的上下文
+function printAppContext(){
+      # 打印基本配置信息
+      echo "-----------------------"
+      echo -e "\033[0;34m AppName     \033[0m : $AppName"
+      echo -e "\033[0;34m JarName     \033[0m : $JarName"
+      echo -e "\033[0;34m Option      \033[0m : $Option"
+      echo -e "\033[0;34m WorkDir     \033[0m : $WORK_DIR"
+      echo -e "\033[0;34m LogDir      \033[0m : $LOG_DIR"
+      echo -e "\033[0;34m LogFile     \033[0m : $LOG_FILE"
+      echo -e "\033[0;34m PidFile     \033[0m : $PID_FILE"
+      echo -e "\033[0;34m BootFile    \033[0m : $BOOT_META_FILE"
+      echo -e "\033[0;34m BackupDir   \033[0m : $BACKUP_DIR"
+      echo -e "\033[0;34m RollbackDir \033[0m : $ROLLBACK_DIR"
+      echo "-----------------------"
+}
+
 
 
 # ##################################################################################################################
 # 函数分配区
 # ##################################################################################################################
 
-case $Option in
+function mainApp(){
+  # 如果没有指定选项，给出帮助并退出
+  if [ "$Option" = "" ];
+  then
+      help
+      exit 1
+  fi
+
+  prepareAppContext
+  printAppContext
+
+  case $Option in
     start)
     start;;
     stop)
@@ -694,4 +728,7 @@ case $Option in
     rollback;;
     *)
     help;;
-esac
+  esac
+}
+
+mainApp
