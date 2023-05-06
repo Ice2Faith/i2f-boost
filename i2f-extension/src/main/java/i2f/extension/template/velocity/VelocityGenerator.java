@@ -12,6 +12,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 public class VelocityGenerator {
     /**
@@ -49,10 +50,10 @@ public class VelocityGenerator {
                 params = GsonUtil.fromJsonTypeToken(json);
             }
         }
-        batchRender(templatePath,params,outputPath,charset);
+        batchRender(templatePath, params, outputPath, charset);
     }
 
-    public static void batchRender(String templatePath, Map<String,Object> params, String outputPath, String charset) throws IOException {
+    public static void batchRender(String templatePath, Map<String, Object> params, String outputPath, String charset) throws IOException {
         File ipath = new File(templatePath);
         if (!ipath.exists()) {
             return;
@@ -65,19 +66,19 @@ public class VelocityGenerator {
         for (File item : files) {
             if (item.isFile()) {
                 String name = item.getName();
-                if (name.endsWith(".vm" )) {
+                if (name.endsWith(".vm")) {
                     String tpl = readFileText(item.getAbsolutePath(), charset);
                     String rs = render(tpl, params);
                     String sname = name.substring(0, name.length() - ".vm".length());
-                    int idx = rs.indexOf("\n" );
+                    int idx = rs.indexOf("\n");
                     if (idx >= 0) {
                         String fileNameLine = rs.substring(0, idx);
-                        if (rs.startsWith("#filename " )) {
+                        if (rs.startsWith("#filename ")) {
                             rs = rs.substring(idx + 1);
                             String fileName = fileNameLine.substring("#filename ".length());
                             fileName = fileName.trim();
                             if (!"".equals(fileName)) {
-                                int pidx = sname.lastIndexOf("." );
+                                int pidx = sname.lastIndexOf(".");
                                 String suffix = "";
                                 if (pidx >= 0) {
                                     suffix = sname.substring(pidx);
@@ -113,7 +114,7 @@ public class VelocityGenerator {
             String line = null;
             while ((line = reader.readLine()) != null) {
                 builder.append(line);
-                builder.append("\n" );
+                builder.append("\n");
             }
         }
         return builder.toString();
@@ -131,12 +132,12 @@ public class VelocityGenerator {
     public static String render(String template, Map<String, Object> params) throws IOException {
 //        URL url=Thread.currentThread().getContextClassLoader().getResource("");
 //        String filePath=url.getFile();
-        String filePath = System.getProperty("java.io.tmpdir" );
+        String filePath = System.getProperty("java.io.tmpdir");
 
-        String fileName = "_tpl_" + System.currentTimeMillis() + ".vm";
+        String fileName = "_tpl_" + UUID.randomUUID().toString().replaceAll("-", "") + ".vm";
         File file = new File(filePath, fileName);
         OutputStream os = new FileOutputStream(file);
-        os.write(template.getBytes("UTF-8" ));
+        os.write(template.getBytes("UTF-8"));
         os.flush();
         os.close();
         String rs = render(null, false, file.getAbsolutePath(), params);
@@ -159,7 +160,7 @@ public class VelocityGenerator {
         VelocityEngine engine = new VelocityEngine();
 
         if (isInClassPath) {
-            engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath" );
+            engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
             engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
         } else {
             File file = new File(fileName);
@@ -167,8 +168,9 @@ public class VelocityGenerator {
             fileName = file.getName();
         }
 
-        engine.setProperty(Velocity.ENCODING_DEFAULT, "UTF-8" );
-        engine.setProperty(Velocity.OUTPUT_ENCODING, "UTF-8" );
+        engine.setProperty(Velocity.ENCODING_DEFAULT, "UTF-8");
+        engine.setProperty(Velocity.OUTPUT_ENCODING, "UTF-8");
+        engine.setProperty(Velocity.INPUT_ENCODING, "UTF-8");
         //有指定配置则使用配置覆盖
         if (config == null || config.isEmpty()) {
             engine.init();
@@ -193,3 +195,4 @@ public class VelocityGenerator {
     }
 
 }
+
