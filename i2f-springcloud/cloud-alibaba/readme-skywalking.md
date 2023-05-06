@@ -26,6 +26,29 @@ http://localhost:8080
     - UI界面：8080
     - 信息收集：11800
     - UI接口：12800
+- 可以修改webapp配置
+```
+cd webapps
+vi webapp.yml
+```
+```
+# web的访问端口
+server.port=8080
+# 采集器后端的地址
+# 这里的端口，要和采集后端保持一致
+collector.ribbon.listOfService=127.0.0.1:12800
+```
+- 也可以修改采集器的配置
+```
+cd config
+vi application.yml
+```
+```
+# 表示采集器core的配置，默认指向core.default节点
+core.selector=${SW_CORE:default}
+# 表示采集器的采集端口12800，web端指向的收集器端口要和这里对应
+core.default.restPort=${SW_CORE_REST_PORT:12800}
+```
 
 
 ## 客户端启动

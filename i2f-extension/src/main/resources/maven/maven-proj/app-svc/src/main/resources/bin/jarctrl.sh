@@ -123,7 +123,20 @@ ENABLE_JMX_CFG=$BOOL_FALSE
 # 指定JMX的连接端口
 # 有值/非空则使用
 JMX_PORT=9440
+# 如果出现visualvm连接不上，则这里设置为主机的IP地址
 JMX_HOST=
+
+# 是否开启Skywalking链路追踪
+ENABLE_SKYWALKING=$BOOL_FALSE
+# skywalking的agent的jar名称，这里是固定的，不用更改
+SKYWALKING_AGENT_JAR=skywalking-agent.jar
+# skywalking的agent的路径，也就是下面存放SKYWALKING_AGENT_JAR的路径
+# 需要为完整路径，因为agent的依赖包需要通过完整路径的方式才能找到
+SKYWALKING_AGENT_PATH=/home/skywalking/agent
+# 指定skywalking的应用名称，不指定默认使用jar名称
+SKYWALKING_SERVICE_NAME=
+# 指定skywalking的采集主机
+SKYWALKING_BACKENT_SERIVCE_ADDR=127.0.0.1:11800
 
 # ##################################################################################################################
 # 内部函数定义区
@@ -414,6 +427,35 @@ function prepareJmxCfg(){
     JVM_OPTS="${JVM_OPTS} -Djava.rmi.server.hostname=${JMX_HOST}"
   fi
 }
+# 准备skywalking的启动参数
+# -javaagent:/home/skywalking/agent/skywalking-agent.jar=agent.service_name=appname,collector.backend_service=127.0.0.1:11800
+function prepareSkywalkingCfg(){
+  if [ ! -d "${SKYWALKING_AGENT_PATH}" ];then
+    echo skywalking config fail, cause by skywalking agent path ${SKYWALKING_AGENT_PATH} not exists.
+    return
+  fi
+
+  _p_skywalking_agent_jar_full_path=$SKYWALKING_AGENT_PATH/$SKYWALKING_AGENT_JAR
+  if [ ! -f "${_p_skywalking_agent_jar_full_path}" ];then
+    echo skywalking config fail, cause by skywalking agent jar ${_p_skywalking_agent_jar_full_path} not exists.
+    return
+  fi
+
+  _p_skywalking_service_name=$SKYWALKING_SERVICE_NAME
+
+  if [ "$_p_skywalking_service_name" = "" ];then
+    _p_skywalking_service_name=$AppName
+  fi
+
+  _p_skywalking_args="-javaagent:${_p_skywalking_agent_jar_full_path}=agent.service_name=${_p_skywalking_service_name}"
+
+  if [[ -n "${SKYWALKING_BACKENT_SERIVCE_ADDR}" ]]; then
+    _p_skywalking_args="${_p_skywalking_args},collector.backend_service=${SKYWALKING_BACKENT_SERIVCE_ADDR}"
+  fi
+
+  JVM_OPTS="${JVM_OPTS} ${_p_skywalking_args}"
+}
+
 # 准备JVM的所有启动参数
 function prepareJvmOpts() {
     JVM_OPTS="${JVM_OPTS} -Djar.name=$JarName"
@@ -432,6 +474,10 @@ function prepareJvmOpts() {
 
     if [ $ENABLE_JMX_CFG == $BOOL_TRUE ];then
        prepareJmxCfg
+    fi
+
+    if [ $ENABLE_SKYWALKING == $BOOL_TRUE ];then
+       prepareSkywalkingCfg
     fi
 }
 
