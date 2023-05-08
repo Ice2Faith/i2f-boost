@@ -62,10 +62,54 @@
         <div>精简模式</div>
         <input id="ckbPurityMode" type="checkbox"/>
     </div>
+    <dic class="card box-checkbox">
+        导出：
+        <span class="btn-common" id="exportJson">JSON</span>
+        <span class="btn-common" id="exportUrl">URL</span>
+    </dic>
     <span id="copytips" style="display:none;">复制成功！</span>
 </div>
 <div class="card">
 
+</div>
+<div class="card">
+    <div class="box-checkbox">
+        <div>请求匹配器</div>
+        <input id="ckbMatcher" type="checkbox"/>
+    </div>
+    <span class="card box-checkbox">
+        属性：
+        <span class="card" id="matcherPropertyCount"></span>
+        <span class="btn-common" id="matcherPropertyDownload">下载</span>
+    </span>
+    <span class="card box-checkbox">
+        视频：
+        <span class="card" id="matcherVideoCount"></span>
+        <span class="btn-common" id="matcherVideoDownload">下载</span>
+    </span>
+    <span class="card box-checkbox">
+        直播：
+        <span class="card" id="matcherLiveCount"></span>
+        <span class="btn-common" id="matcherLiveDownload">下载</span>
+    </span>
+    <span class="card box-checkbox">
+        音频：
+        <span class="card" id="matcherAudioCount"></span>
+        <span class="btn-common" id="matcherAudioDownload">下载</span>
+    </span>
+    <span class="card box-checkbox">
+        图片：
+        <span class="card" id="matcherImageCount"></span>
+        <span class="btn-common" id="matcherImageDownload">下载</span>
+    </span>
+    <span class="card box-checkbox">
+        文档：
+        <span class="card" id="matcherDocumentCount"></span>
+        <span class="btn-common" id="matcherDocumentDownload">下载</span>
+    </span>
+    <span class="card box-checkbox">
+        <span class="btn-common" id="matcherClean">清空</span>
+    </span>
 </div>
 <div class="card">
     <!-- 抖音 -->
@@ -222,6 +266,20 @@
 
     .help-tips:hover .help-body {
         display: block;
+    }
+
+    .btn-common {
+        padding: 2px;
+        margin: 2px;
+        background-color: skyblue;
+        border: solid 1px deepskyblue;
+        color: white;
+        font-weight: bolder;
+    }
+
+    .btn-common:hover {
+        background-color: orange;
+        border: solid 1px orangered;
     }
 
     .btn-foo-circle {

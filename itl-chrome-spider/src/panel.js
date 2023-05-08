@@ -50,6 +50,19 @@ function saveAs(blob, filename) {
     }
 }
 
+function saveTextAs(text, filename) {
+    saveAs(new Blob([text], {
+        type: 'text/plain'
+    }), filename)
+}
+
+function saveObjJsonAs(obj, filename) {
+    let text = JSON.stringify(obj, null, 4)
+    saveAs(new Blob([text], {
+        type: 'text/plain'
+    }), filename)
+}
+
 /**
  * 下载
  * @param  {String} url 目标文件地址
@@ -85,6 +98,21 @@ $("#downloadAll").click(function () {
     $.each(contentList, function (index, item) {
         download(item.url, item.name);
     });
+});
+
+$("#exportJson").click(function () {
+    if (contentList.length > 0) {
+        saveObjJsonAs(contentList, "export.json")
+    }
+});
+
+$("#exportUrl").click(function () {
+    let text = '';
+    for (let i = 0; i < contentList.length; i++) {
+        let url = contentList[i].url;
+        text += url + '\n';
+    }
+    saveTextAs(text, "urls.txt")
 });
 
 function copyUrls2Clipbord() {
@@ -147,7 +175,7 @@ function isRepeatResource(type, url, filename) {
 }
 
 const PARSE_ITEM_CLASS = {
-    type: 'video/audio/image',
+    type: 'video/audio/image/doc',
     url: null,
     title: null,
     img: null,
@@ -175,6 +203,181 @@ function mergeIntoList(src, dst) {
             dst.push(item);
         }
     }
+}
+
+let globalPropertyMatcherList = []
+let globalVideoMatcherList = []
+let globalAudioMatcherList = []
+let globalLiveMatcherList = []
+let globalImageMatcherList = []
+let globalDocumentMatcherList = []
+
+$("#matcherPropertyDownload").bind('click', function () {
+    if (globalPropertyMatcherList.length > 0) {
+        saveObjJsonAs(globalPropertyMatcherList, "property.json")
+        globalPropertyMatcherList = []
+    }
+})
+
+$("#matcherVideoDownload").bind('click', function () {
+    if (globalVideoMatcherList.length > 0) {
+        saveObjJsonAs(globalVideoMatcherList, "video.json")
+        globalVideoMatcherList = []
+    }
+})
+
+$("#matcherLiveDownload").bind('click', function () {
+    if (globalLiveMatcherList.length > 0) {
+        saveObjJsonAs(globalLiveMatcherList, "live.json")
+        globalLiveMatcherList = []
+    }
+})
+
+$("#matcherAudioDownload").bind('click', function () {
+    if (globalAudioMatcherList.length > 0) {
+        saveObjJsonAs(globalAudioMatcherList, "audio.json")
+        globalAudioMatcherList = []
+    }
+})
+
+$("#matcherImageDownload").bind('click', function () {
+    if (globalImageMatcherList.length > 0) {
+        saveObjJsonAs(globalImageMatcherList, "image.json")
+        globalImageMatcherList = []
+    }
+})
+
+$("#matcherDocumentDownload").bind('click', function () {
+    if (globalDocumentMatcherList.length > 0) {
+        saveObjJsonAs(globalDocumentMatcherList, "document.json")
+        globalDocumentMatcherList = []
+    }
+})
+
+$("#matcherClean").bind('click', function () {
+    globalPropertyMatcherList = []
+    globalVideoMatcherList = []
+    globalAudioMatcherList = []
+    globalLiveMatcherList = []
+    globalImageMatcherList = []
+    globalDocumentMatcherList = []
+    updateMatcherCount()
+})
+
+function stringContaintsAny(str, arr = []) {
+    for (let i = 0; i < arr.length; i++) {
+        if (str.indexOf(arr[i]) >= 0) {
+            return true
+        }
+    }
+    return false
+}
+
+function objectRecursiveMatcher(url, route, obj) {
+    Object.keys(obj).sort().forEach(function (key) {
+        let val = obj[key]
+        let lkey = key.toLowerCase();
+        let nextRoute = route + "." + key;
+        if (lkey.indexOf('url') >= 0) {
+            let elem = {
+                type: 'property',
+                url,
+                route: nextRoute,
+                val
+            }
+            globalPropertyMatcherList.push(elem)
+            log('url property', elem)
+        }
+        let jval = JSON.stringify(val)
+        if (jval.startsWith("\"") && jval.endsWith("\"")) {
+            let lval = val.toLowerCase()
+            if (stringContaintsAny(lval, [".mp4", ".flv", ".mkv", ".rmvb", ".wmv", ".avi", ".mpeg", ".mov"])) {
+                let elem = {
+                    type: 'video',
+                    url,
+                    route: nextRoute,
+                    val
+                }
+                globalVideoMatcherList.push(elem)
+                log('url video', elem)
+            } else if (stringContaintsAny(lval, [".m3u8", ".hls", ".ts"])) {
+                let elem = {
+                    type: 'live',
+                    url,
+                    route: nextRoute,
+                    val
+                }
+                globalLiveMatcherList.push(elem)
+                log('url live', elem)
+            } else if (stringContaintsAny(lval, [".mp3", ".wav", ".mp2", ".flac", ".aac", ".ogg"])) {
+                let elem = {
+                    type: 'audio',
+                    url,
+                    route: nextRoute,
+                    val
+                }
+                globalAudioMatcherList.push(elem)
+                log('url audio', elem)
+            } else if (stringContaintsAny(lval, [".jpg", ".png", ".gif", ".webp", ".jpeg", ".bmp"])) {
+                let elem = {
+                    type: 'image',
+                    url,
+                    route: nextRoute,
+                    val
+                }
+                globalImageMatcherList.push(elem)
+                log('url image', elem)
+            } else if (stringContaintsAny(lval, [".txt",
+                ".doc", ".docx",
+                ".xls", ".xlsx",
+                ".ppt", ".pptx",
+                ".md", ".json", ".sql",
+                ".sh", ".bat", ".exe", ".apk",
+                ".zip", ".tar", ".tgz", ".img", ".iso", ".rar", ".7z"
+            ])) {
+                let elem = {
+                    type: 'doc',
+                    url,
+                    route: nextRoute,
+                    val
+                }
+                globalDocumentMatcherList.push(elem)
+                log('url doc', elem)
+            }
+        } else if (jval.startsWith("{") && jval.endsWith("}")) {
+            objectRecursiveMatcher(url, nextRoute, val)
+        } else if (jval.startsWith("[") && jval.endsWith("]")) {
+            for (let i = 0; i < val.length; i++) {
+                let arrNextRoute = nextRoute + "[" + i + "]"
+                objectRecursiveMatcher(url, arrNextRoute, val[i])
+            }
+        }
+    })
+}
+
+function updateMatcherCount() {
+    $("#matcherPropertyCount").html(globalPropertyMatcherList.length + '')
+
+    $("#matcherVideoCount").html(globalVideoMatcherList.length + '')
+
+    $("#matcherLiveCount").html(globalLiveMatcherList.length + '')
+
+    $("#matcherAudioCount").html(globalAudioMatcherList.length + '')
+
+    $("#matcherImageCount").html(globalImageMatcherList.length + '')
+
+    $("#matcherDocumentCount").html(globalDocumentMatcherList.length + '')
+}
+
+function responseBodyMatcher(url, headers, res) {
+    if (!res) {
+        return
+    }
+    if (!$("#ckbMatcher").prop("checked")) {
+        return
+    }
+    objectRecursiveMatcher(url, "", res)
+    updateMatcherCount()
 }
 
 // 解析头条视频
@@ -699,7 +902,7 @@ chrome.devtools.network.onRequestFinished.addListener(async (...args) => {
                 : [],
             ['image']);
         if (obj.url) {
-            obj.type = 'audio';
+            obj.type = 'image';
             if (!obj.title || obj.title == '') {
                 obj.title = 'download.jpg';
             }
@@ -721,7 +924,7 @@ chrome.devtools.network.onRequestFinished.addListener(async (...args) => {
                 'officedocument',
                 'zip', 'tar']);
         if (obj.url) {
-            obj.type = 'audio';
+            obj.type = 'doc';
             if (!obj.title || obj.title == '') {
                 obj.title = 'download.doc';
             }
@@ -760,6 +963,8 @@ chrome.devtools.network.onRequestFinished.addListener(async (...args) => {
     if (!respObj) {
         return;
     }
+
+    responseBodyMatcher(url, responseHeader, respObj)
 
     try {
 
