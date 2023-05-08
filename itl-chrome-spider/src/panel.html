@@ -32,6 +32,10 @@
 <span class="btn-foo-circle btn-weibo-web">
         <a target="_blank" href="https://www.weibo.com/">微</a>
     </span>
+<span class="btn-foo-circle btn-kuaishou-web">
+        <a target="_blank" href="https://www.kuaishou.com/">快</a>
+    </span>
+
 <textarea style="display:none;z-index: 1;" id="downUrls" rows="2"></textarea>
 <div class="card help-tips">
     <div class="help-head">【操作说明】视频(抖音/头条/微博)下载助手（鼠标悬浮此处查看）</div>
@@ -62,6 +66,10 @@
         <div>精简模式</div>
         <input id="ckbPurityMode" type="checkbox"/>
     </div>
+    <div class="box-checkbox">
+        <div>展开面板</div>
+        <input id="ckbExtendsControlPanel" type="checkbox"/>
+    </div>
     <dic class="card box-checkbox">
         导出：
         <span class="btn-common" id="exportJson">JSON</span>
@@ -69,128 +77,138 @@
     </dic>
     <span id="copytips" style="display:none;">复制成功！</span>
 </div>
-<div class="card">
+<div id="controlPanel" class="card">
+    <div class="card">
+        <div class="box-checkbox">
+            <div>请求匹配器</div>
+            <input id="ckbMatcher" type="checkbox"/>
+        </div>
+        <span class="card box-checkbox">
+            属性：
+            <span class="card" id="matcherPropertyCount"></span>
+            <span class="btn-common" id="matcherPropertyDownload">下载</span>
+        </span>
+        <span class="card box-checkbox">
+            视频：
+            <span class="card" id="matcherVideoCount"></span>
+            <span class="btn-common" id="matcherVideoDownload">下载</span>
+        </span>
+        <span class="card box-checkbox">
+            直播：
+            <span class="card" id="matcherLiveCount"></span>
+            <span class="btn-common" id="matcherLiveDownload">下载</span>
+        </span>
+        <span class="card box-checkbox">
+            音频：
+            <span class="card" id="matcherAudioCount"></span>
+            <span class="btn-common" id="matcherAudioDownload">下载</span>
+        </span>
+        <span class="card box-checkbox">
+            图片：
+            <span class="card" id="matcherImageCount"></span>
+            <span class="btn-common" id="matcherImageDownload">下载</span>
+        </span>
+        <span class="card box-checkbox">
+            文档：
+            <span class="card" id="matcherDocumentCount"></span>
+            <span class="btn-common" id="matcherDocumentDownload">下载</span>
+        </span>
+        <span class="card box-checkbox">
+            <span class="btn-common" id="matcherClean">清空</span>
+        </span>
+    </div>
+    <div class="card">
+        <!-- 抖音 -->
+        <div class="box-checkbox btn-tiktok-web">
+            <div>抖音</div>
+        </div>
+        <div class="box-checkbox">
+            <div>喜欢列表</div>
+            <input id="ckbTiktokFavorite" type="checkbox"/>
+        </div>
+        <div class="box-checkbox">
+            <div>收藏列表</div>
+            <input id="ckbTiktokCollection" type="checkbox"/>
+        </div>
+        <div class="box-checkbox">
+            <div>个人作品</div>
+            <input id="ckbTiktokPost" type="checkbox"/>
+        </div>
+        <div class="box-checkbox">
+            <div>相关推荐</div>
+            <input id="ckbTiktokRelated" type="checkbox"/>
+        </div>
+        <div class="box-checkbox">
+            <div>观看历史</div>
+            <input id="ckbTiktokHistory" type="checkbox"/>
+        </div>
+    </div>
+    <div class="card">
+        <!-- 头条 -->
+        <div class="box-checkbox btn-toutiao-web">
+            <div>头条</div>
+        </div>
+        <div class="box-checkbox">
+            <div>小视频</div>
+            <input id="ckbToutiaoUserShortVideo" type="checkbox"/>
+        </div>
+        <div class="box-checkbox">
+            <div>微头条</div>
+            <input id="ckbToutiaoUserUgc" type="checkbox"/>
+        </div>
+        <div class="box-checkbox">
+            <div>视频</div>
+            <input id="ckbToutiaoUserVideo" type="checkbox"/>
+        </div>
+    </div>
+    <div class="card">
+        <!-- 微博 -->
+        <div class="box-checkbox btn-weibo-web">
+            <div>微博</div>
+        </div>
+        <div class="box-checkbox">
+            <div>个人微博</div>
+            <input id="ckbWeiboUserHome" type="checkbox"/>
+        </div>
+        <div class="box-checkbox">
+            <div>个人视频</div>
+            <input id="ckbWeiboUserVideo" type="checkbox"/>
+        </div>
+    </div>
+    <div class="card">
+        <!-- 快手 -->
+        <div class="box-checkbox btn-kuaishou-web">
+            <div>快手</div>
+        </div>
+        <div class="box-checkbox">
+            <div>个人主页</div>
+            <input id="ckbKuaishouUserHome" type="checkbox"/>
+        </div>
+    </div>
+    <div class="card">
+        <div class="box-checkbox">
+            <div>后缀嗅探</div>
+            <input id="ckbSpySuffixType" type="checkbox"/>
+        </div>
+        <div class="box-checkbox">
+            <div>嗅探视频</div>
+            <input id="ckbSpyVideo" type="checkbox"/>
+        </div>
+        <div class="box-checkbox">
+            <div>嗅探音频</div>
+            <input id="ckbSpyAudio" type="checkbox"/>
+        </div>
+        <div class="box-checkbox">
+            <div>嗅探图片</div>
+            <input id="ckbSpyPicture" type="checkbox"/>
+        </div>
+        <div class="box-checkbox">
+            <div>嗅探文档</div>
+            <input id="ckbSpyDoc" type="checkbox"/>
+        </div>
+    </div>
+</div>
 
-</div>
-<div class="card">
-    <div class="box-checkbox">
-        <div>请求匹配器</div>
-        <input id="ckbMatcher" type="checkbox"/>
-    </div>
-    <span class="card box-checkbox">
-        属性：
-        <span class="card" id="matcherPropertyCount"></span>
-        <span class="btn-common" id="matcherPropertyDownload">下载</span>
-    </span>
-    <span class="card box-checkbox">
-        视频：
-        <span class="card" id="matcherVideoCount"></span>
-        <span class="btn-common" id="matcherVideoDownload">下载</span>
-    </span>
-    <span class="card box-checkbox">
-        直播：
-        <span class="card" id="matcherLiveCount"></span>
-        <span class="btn-common" id="matcherLiveDownload">下载</span>
-    </span>
-    <span class="card box-checkbox">
-        音频：
-        <span class="card" id="matcherAudioCount"></span>
-        <span class="btn-common" id="matcherAudioDownload">下载</span>
-    </span>
-    <span class="card box-checkbox">
-        图片：
-        <span class="card" id="matcherImageCount"></span>
-        <span class="btn-common" id="matcherImageDownload">下载</span>
-    </span>
-    <span class="card box-checkbox">
-        文档：
-        <span class="card" id="matcherDocumentCount"></span>
-        <span class="btn-common" id="matcherDocumentDownload">下载</span>
-    </span>
-    <span class="card box-checkbox">
-        <span class="btn-common" id="matcherClean">清空</span>
-    </span>
-</div>
-<div class="card">
-    <!-- 抖音 -->
-    <div class="box-checkbox btn-tiktok-web">
-        <div>抖音</div>
-    </div>
-    <div class="box-checkbox">
-        <div>喜欢列表</div>
-        <input id="ckbTiktokFavorite" type="checkbox"/>
-    </div>
-    <div class="box-checkbox">
-        <div>收藏列表</div>
-        <input id="ckbTiktokCollection" type="checkbox"/>
-    </div>
-    <div class="box-checkbox">
-        <div>个人作品</div>
-        <input id="ckbTiktokPost" type="checkbox"/>
-    </div>
-    <div class="box-checkbox">
-        <div>相关推荐</div>
-        <input id="ckbTiktokRelated" type="checkbox"/>
-    </div>
-    <div class="box-checkbox">
-        <div>观看历史</div>
-        <input id="ckbTiktokHistory" type="checkbox"/>
-    </div>
-</div>
-<div class="card">
-    <!-- 头条 -->
-    <div class="box-checkbox btn-toutiao-web">
-        <div>头条</div>
-    </div>
-    <div class="box-checkbox">
-        <div>小视频</div>
-        <input id="ckbToutiaoUserShortVideo" type="checkbox"/>
-    </div>
-    <div class="box-checkbox">
-        <div>微头条</div>
-        <input id="ckbToutiaoUserUgc" type="checkbox"/>
-    </div>
-    <div class="box-checkbox">
-        <div>视频</div>
-        <input id="ckbToutiaoUserVideo" type="checkbox"/>
-    </div>
-</div>
-<div class="card">
-    <!-- 微博 -->
-    <div class="box-checkbox btn-weibo-web">
-        <div>微博</div>
-    </div>
-    <div class="box-checkbox">
-        <div>个人微博</div>
-        <input id="ckbWeiboUserHome" type="checkbox"/>
-    </div>
-    <div class="box-checkbox">
-        <div>个人视频</div>
-        <input id="ckbWeiboUserVideo" type="checkbox"/>
-    </div>
-</div>
-<div class="card">
-    <div class="box-checkbox">
-        <div>后缀嗅探</div>
-        <input id="ckbSpySuffixType" type="checkbox"/>
-    </div>
-    <div class="box-checkbox">
-        <div>嗅探视频</div>
-        <input id="ckbSpyVideo" type="checkbox"/>
-    </div>
-    <div class="box-checkbox">
-        <div>嗅探音频</div>
-        <input id="ckbSpyAudio" type="checkbox"/>
-    </div>
-    <div class="box-checkbox">
-        <div>嗅探图片</div>
-        <input id="ckbSpyPicture" type="checkbox"/>
-    </div>
-    <div class="box-checkbox">
-        <div>嗅探文档</div>
-        <input id="ckbSpyDoc" type="checkbox"/>
-    </div>
-</div>
 <div id="content">
     <!--
     <div class="card box-container">
@@ -283,19 +301,19 @@
     }
 
     .btn-foo-circle {
-        width: 48px;
-        height: 48px;
-        line-height: 48px;
+        width: 38px;
+        height: 38px;
+        line-height: 38px;
         text-align: center;
-        font-size: 32px;
+        font-size: 24px;
         font-weight: bolder;
         background-color: rgba(255, 255, 255, 0.8);
-        border-radius: 24px;
+        border-radius: 18px;
         border: solid 1px #eee;
         box-shadow: 3px 3px 3px 3px #ddd;
         position: fixed;
-        right: 5px;
-        bottom: 5px;
+        right: 3px;
+        bottom: 3px;
         text-decoration: none;
         z-index: 2000;
     }
@@ -314,27 +332,27 @@
 
     .btn-download-all {
         right: 5px;
-        bottom: 72px;
+        bottom: calc(56px * 1);
         color: lightgreen;
     }
 
     .btn-catch-count {
         right: 5px;
-        bottom: 142px;
+        bottom: calc(56px * 2);
         font-size: 22px;
         color: aquamarine;
     }
 
     .btn-copy-clipboard {
         right: 5px;
-        bottom: 210px;
+        bottom: calc(56px * 3);;
         font-size: 22px;
         color: orange;
     }
 
     .btn-tiktok-web {
         right: 5px;
-        bottom: 275px;
+        bottom: calc(56px * 4);
         font-size: 22px;
         color: purple !important;
     }
@@ -345,7 +363,7 @@
 
     .btn-toutiao-web {
         right: 5px;
-        bottom: 335px;
+        bottom: calc(56px * 5);
         font-size: 22px;
         color: orangered !important;
     }
@@ -356,7 +374,7 @@
 
     .btn-weibo-web {
         right: 5px;
-        bottom: 395px;
+        bottom: calc(56px * 6);
         font-size: 22px;
         color: #dd3344 !important;
     }
@@ -365,9 +383,20 @@
         color: #dd3344 !important;
     }
 
+    .btn-kuaishou-web {
+        right: 5px;
+        bottom: calc(56px * 7);
+        font-size: 22px;
+        color: #fca926 !important;
+    }
+
+    .btn-kuaishou-web a {
+        color: #fca926 !important;
+    }
+
     .btn-foo-circle:hover {
         color: orangered;
-        font-size: 36px;
+        font-size: 26px;
     }
 
     .box-checkbox {

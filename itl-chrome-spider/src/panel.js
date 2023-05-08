@@ -148,9 +148,18 @@ $("#copy2bord").click(function () {
 
 refreshCount();
 
+$("#ckbExtendsControlPanel").change(function () {
+    if ($("#ckbExtendsControlPanel").prop('checked')) {
+        $("#controlPanel").css('display', 'block');
+    } else {
+        $("#controlPanel").css('display', 'none');
+    }
+});
+
 $("#ckbFilter").prop('checked', true);
 $("#ckbFavorite").prop('checked', true);
 $("#ckbFilterRepeat").prop('checked', true);
+$("#ckbExtendsControlPanel").prop('checked', true);
 
 function safeFileName(filename) {
     filename = filename.replaceAll('/', ' ');
@@ -276,6 +285,9 @@ function stringContaintsAny(str, arr = []) {
 function objectRecursiveMatcher(url, route, obj) {
     Object.keys(obj).sort().forEach(function (key) {
         let val = obj[key]
+        if (!val || val == '') {
+            return
+        }
         let lkey = key.toLowerCase();
         let nextRoute = route + "." + key;
         if (lkey.indexOf('url') >= 0) {
@@ -378,6 +390,97 @@ function responseBodyMatcher(url, headers, res) {
     }
     objectRecursiveMatcher(url, "", res)
     updateMatcherCount()
+}
+
+
+// 解析快手视频
+function parseKuaishouVideo(url, headers, res) {
+    let ret = [];
+
+    // 快手视频
+    // 个人主页相关列表
+    const catchUrl = '/graphql';
+    if (url.indexOf(catchUrl) < 0) {
+        return ret;
+    }
+
+    if (!$("#ckbKuaishouUserHome").prop('checked')) {
+        return ret;
+    }
+
+    if (!res.data) {
+        return ret;
+    }
+
+
+    if (!res.data.visionProfilePhotoList) {
+        return ret;
+    }
+
+    let feeds = res.data.visionProfilePhotoList.feeds
+
+    if (!feeds || feeds.length == 0) {
+        return
+    }
+
+    for (let i = 0; i < feeds.length; i++) {
+        let doc = {
+            type: 'video',
+            url: null,
+            title: null,
+            img: null,
+            authorName: null,
+            authorAvatar: null,
+            authorId: null,
+            authorHome: null,
+        };
+        let item = feeds[i];
+        if (!item) {
+            continue;
+        }
+        if (!item.photo) {
+            continue;
+        }
+        if (!item.photo.videoResource) {
+            continue;
+        }
+        if (!item.photo.videoResource.h264) {
+            continue;
+        }
+        if (!item.photo.videoResource.h264.adaptationSet) {
+            continue;
+        }
+        if (item.photo.videoResource.h264.adaptationSet.length == 0) {
+            continue;
+        }
+        let representation = item.photo.videoResource.h264.adaptationSet[0].representation
+        if (!representation || representation.length == 0) {
+            continue;
+        }
+        let curr = representation[0]
+        if (!curr.url || curr.url == '') {
+            continue
+        }
+
+        doc.url = curr.url;
+        doc.title = item.photo.caption;
+        if (doc.filename && doc.filename != "") {
+            doc.filename = safeFileName(doc.title) + '.mp4';
+        } else {
+            doc.filename = 'download.mp4';
+        }
+        doc.img = item.photo.coverUrl;
+        if (item.author) {
+            doc.authorName = item.author.name;
+            doc.authorAvatar = item.author.headerUrl;
+            doc.authorId = item.author.id;
+            doc.authorHome = 'https://www.kuaishou.com/profile/' + doc.authorId;
+        }
+
+        ret.push(doc);
+    }
+
+    return ret;
 }
 
 // 解析头条视频
@@ -977,6 +1080,9 @@ chrome.devtools.network.onRequestFinished.addListener(async (...args) => {
 
         let weiboList = parseWeiboVideo(url, responseHeader, respObj);
         mergeIntoList(weiboList, contentList);
+
+        let kuaisouList = parseKuaishouVideo(url, responseHeader, respObj);
+        mergeIntoList(kuaisouList, contentList)
 
         renderVideos(contentList);
 
