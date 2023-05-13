@@ -148,6 +148,11 @@ public class GeneratorDriver {
     }
 
 
+    public static String apis(List<ApiMethod> apis) throws IOException {
+        String tpl = ResourceUtil.getClasspathResourceAsString("/tpl/design/api-doc.html.vm", "UTF-8");
+        return apis(apis, tpl);
+    }
+
     public static String apis(List<ApiMethod> apis, String template) throws IOException {
         Map<String, Object> map = new HashMap<>();
         for (ApiMethod item : apis) {
@@ -379,5 +384,19 @@ public class GeneratorDriver {
         }
 
         return modulesMvc(modules, template);
+    }
+
+    public static String tableDoc(List<TableMeta> tables) throws IOException {
+        String tpl = ResourceUtil.getClasspathResourceAsString("/tpl/design/table-doc.html.vm.vm", "UTF-8");
+        return tablesDoc(tables, tpl);
+    }
+
+    public static String tablesDoc(List<TableMeta> tables, String template) throws IOException {
+        for (TableMeta table : tables) {
+            table.inflateIndexes();
+        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("tables", tables);
+        return VelocityGenerator.render(template, params);
     }
 }

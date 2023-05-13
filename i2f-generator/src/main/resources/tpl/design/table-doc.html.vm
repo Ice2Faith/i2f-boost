@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>表设计文档</title>
+    <style>
+        * {
+            font-family: '新宋体';
+            font-size: 12pt;
+        }
+
+        table tr td {
+            padding: 5px 8px;
+            border: solid 1px black;
+        }
+
+        .api-desc-table {
+            width: 100%;
+        }
+
+        .api-desc-key {
+            width: 25%;
+            background-color: #e86fb2;
+        }
+
+        .api-desc-value {
+            width: 75%;
+        }
+
+        .table-column-list {
+            width: 100%;
+        }
+
+        .table-column-head {
+            text-align: center;
+            font-weight: normal;
+            background-color: #aaaaaa;
+        }
+    </style>
+</head>
+<body>
+    #foreach(${table} in ${tables})
+    <h3>1.1.${velocityCount} 表 ${_vm.ifnull(${table.remark},${table.table})}</h3>
+
+    表 ${_vm.ifnull(${table.table},"")} 的列清单<br/>
+    <table class="table-column-list" border="1" cellspacing="0">
+        <tr>
+            <th class="table-column-head" style="width: 5%">
+                序号
+            </th>
+            <th class="table-column-head" style="width: 25%">
+                名称
+            </th>
+            <th class="table-column-head" style="width: 25%">
+                数据类型
+            </th>
+            <th class="table-column-head" style="width: 15%">
+                非空
+            </th>
+            <th class="table-column-head" style="width: 30%">
+                注释
+            </th>
+        </tr>
+        #foreach(${line} in ${table.columns})
+            <tr>
+                <td class="table-column-body">
+                    $velocityCount
+                </td>
+                <td class="table-column-body">
+                    ${_vm.ifnull(${line.name},"")}
+                </td>
+                <td class="table-column-body">
+                    ${column.typeName}
+                    #if(${column.precision}>0)
+                        (
+                        ${column.precision}
+                        #if(${column.scale}>0)
+                            ,${column.scale}
+                        #end
+                        )
+                    #end
+                </td>
+                <td class="table-column-body">
+                    ${_vm.ifnull(${line.isNullable},"")}
+                </td>
+                <td class="table-column-body">
+                    ${_vm.ifnull(${line.remark},"")}
+                </td>
+            </tr>
+        #end
+    </table>
+
+    <br/>
+    <br/>
+
+    表 ${_vm.ifnull(${table.table},"")} 的键清单<br/>
+    <table class="table-column-list" border="1" cellspacing="0">
+        <tr>
+            <th class="table-column-head" style="width: 5%">
+                序号
+            </th>
+            <th class="table-column-head" style="width: 35%">
+                限制名称
+            </th>
+            <th class="table-column-head" style="width: 35%">
+                字段
+            </th>
+            <th class="table-column-head" style="width: 25%">
+                注释
+            </th>
+        </tr>
+        #foreach(${line} in ${api.indexes})
+            <tr>
+                <td class="table-column-body">
+                    $velocityCount
+                </td>
+                <td class="table-column-body">
+                    ${_vm.ifnull(${line.name},"")}
+                </td>
+                <td class="table-column-body">
+                    #foreach(${item} in ${line.columns})
+                        ${item} &emsp;
+                    #end
+                </td>
+                <td class="table-column-body">
+                    ${_vm.ifnull(${line.type},"")}
+                </td>
+            </tr>
+        #end
+    </table>
+    #end
+<br/>
+<br/>
+
+</body>
+
+</html>
