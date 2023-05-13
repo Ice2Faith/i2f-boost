@@ -57,6 +57,8 @@
                         <include>**/*.json</include>
                         <include>**/*.md</include>
                         <include>**/*.txt</include>
+                        <include>**/*.vm</include>
+                        <include>**/*.db</include>
                     </includes>
                 </configuration>
             </plugin>

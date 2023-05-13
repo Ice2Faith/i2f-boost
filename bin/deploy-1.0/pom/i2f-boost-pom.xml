@@ -16,13 +16,11 @@
     <modules>
         <module>i2f-base</module>
 
-        <module>itl-ddiff</module>
-
-        <module>itl-crypt</module>
-
 
         <!-- 仅依赖jdk1.8,javase -->
         <module>i2f-core</module>
+
+        <module>i2f-streaming</module>
 
         <!-- 仅依赖jdk1.5,javax,javaee -->
         <module>i2f-core-j2ee</module>
@@ -41,12 +39,21 @@
         <module>i2f-springcloud</module>
 
         <module>i2f-test</module>
+
         <module>i2f-agent</module>
 
         <module>i2f-generator</module>
+
         <module>itl-chrome-spider</module>
 
         <module>itl-nginx-rtmp-auth-server</module>
+
+        <module>itl-ddiff</module>
+
+        <module>itl-crypt</module>
+
+
+        <module>i2f-translate</module>
         <!-- springcloud netflix -->
 
 
