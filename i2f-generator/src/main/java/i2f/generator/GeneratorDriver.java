@@ -105,13 +105,16 @@ public class GeneratorDriver {
 
     public static String drawioEr(List<TableMeta> tables, String template) throws IOException {
         Map<String, Object> map = new HashMap<>();
+        for (TableMeta item : tables) {
+            item.sortColumns();
+        }
         List<DrawioErElem> elems = DrawioAdapter.parseEr(tables);
         map.put("elems", elems);
         return VelocityGenerator.render(template, map);
     }
 
     public static String drawioEr(List<TableMeta> tables) throws IOException {
-        String tpl = ResourceUtil.getResourceAsString("tpl/drawio/er/er.xml.drawio.vm", "UTF-8");
+        String tpl = ResourceUtil.getClasspathResourceAsString("tpl/drawio/er/er.xml.drawio.vm", "UTF-8");
         return drawioEr(tables, tpl);
     }
 
