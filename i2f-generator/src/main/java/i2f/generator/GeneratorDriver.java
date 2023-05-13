@@ -3,6 +3,7 @@ package i2f.generator;
 import i2f.core.db.core.DbBeanResolver;
 import i2f.core.db.core.DbResolver;
 import i2f.core.db.data.TableMeta;
+import i2f.core.reflect.Reflects;
 import i2f.core.reflect.core.ReflectResolver;
 import i2f.core.xml.Xml2;
 import i2f.extension.template.velocity.VelocityGenerator;
@@ -158,7 +159,13 @@ public class GeneratorDriver {
         return apis(apis,template);
     }
 
-    public static Set<Method> getMvcMethos(Class clazz){
+    public static Set<Method> getMvcMethos(Class clazz) {
+        String clazzName = clazz.getName();
+        int idx = clazzName.indexOf("$$EnhancerBySpring");
+        if (idx >= 0) {
+            clazzName = clazzName.substring(0, idx);
+            clazz = Reflects.findClass(clazzName);
+        }
         Set<Method> set = ReflectResolver.getMethodsWithAnnotations(clazz, false,
                 RequestMapping.class,
                 GetMapping.class, PostMapping.class, PutMapping.class, DeleteMapping.class,

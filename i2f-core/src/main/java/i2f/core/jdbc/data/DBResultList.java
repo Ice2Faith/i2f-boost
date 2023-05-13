@@ -125,7 +125,7 @@ public class DBResultList extends LinkedList<Map<String, Object>> {
             ret.headers = new String[colCount];
             for (int i = 1; i <= colCount; i++) {
                 String colName = meta.getColumnName(i);
-                ret.headers[i] = colName;
+                ret.headers[i - 1] = colName;
             }
             while (rs.next()) {
                 Map<String, Object> row = new HashMap<>();

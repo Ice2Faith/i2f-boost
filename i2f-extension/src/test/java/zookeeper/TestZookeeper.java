@@ -1,12 +1,13 @@
 package zookeeper;
 
-import i2f.extension.json.gson.GsonJsonProcessor;
-import i2f.extension.zookeeper.ZookeeperUtil;
+import i2f.extension.zookeeper.ZookeeperConfig;
+import i2f.extension.zookeeper.ZookeeperManager;
 import i2f.extension.zookeeper.cache.ZookeeperCache;
 import i2f.extension.zookeeper.watcher.IWatchProcessor;
 import i2f.extension.zookeeper.watcher.LoopWatcherAdapter;
 import model.TestBean;
-import org.apache.zookeeper.*;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.WatchedEvent;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -18,23 +19,21 @@ import java.util.concurrent.TimeUnit;
  */
 public class TestZookeeper {
     public static void main(String[] args) throws IOException, InterruptedException, KeeperException {
-        ZooKeeper zooKeeper= ZookeeperUtil.getConnectedZookeeper("127.0.0.1:2181", Integer.MAX_VALUE, new Watcher() {
-            @Override
-            public void process(WatchedEvent event) {
-                System.out.println(">>>>>>>>>>event:"+event.getPath()+":"+event.getType().name());
-            }
-        });
-        zooKeeper.addWatch("/",new LoopWatcherAdapter(zooKeeper, "/", new IWatchProcessor() {
+        ZookeeperConfig config = new ZookeeperConfig();
+        config.setConnectString("127.0.0.1:2181");
+        config.setSessionTimeout(Integer.MAX_VALUE);
+        ZookeeperManager manager = new ZookeeperManager(config);
+        manager.watch("/", new LoopWatcherAdapter(manager, "/", new IWatchProcessor() {
             @Override
             public boolean process(WatchedEvent event, LoopWatcherAdapter adapter) {
-                System.out.println(">>>>>>>>>lp:event:"+event.getPath()+":"+event.getType().name());
+                System.out.println(">>>>>>>>>lp:event:" + event.getPath() + ":" + event.getType().name());
                 return true;
             }
-        }), AddWatchMode.PERSISTENT_RECURSIVE);
+        }), true);
 
-        ZookeeperCache cache=new ZookeeperCache(zooKeeper,new GsonJsonProcessor());
+        ZookeeperCache cache = new ZookeeperCache("/cache", manager);
 
-        TestBean tb=new TestBean();
+        TestBean tb = new TestBean();
         tb.setName("zhangsan");
         tb.setAge(23);
         tb.setWeight(61.2);
@@ -53,6 +52,6 @@ public class TestZookeeper {
 
         cache.remove("token_zhangsan");
 
-        zooKeeper.close();
+        manager.zk().close();
     }
 }

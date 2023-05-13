@@ -1,11 +1,16 @@
 package i2f.generator.api;
 
+import i2f.core.reflect.Reflects;
 import i2f.core.reflect.core.ReflectResolver;
 import io.swagger.annotations.*;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.*;
+import java.security.SecureRandom;
+import java.time.temporal.Temporal;
 import java.util.*;
 
 /**
@@ -14,15 +19,52 @@ import java.util.*;
  * @desc
  */
 public class ApiMethodResolver {
+    public static Class<?>[] includeParseClassArray = {
+            Collection.class,
+            Map.class
+    };
+    public static Class<?>[] excludeParseClassArray = {
+            Date.class,
+            Calendar.class,
+            Temporal.class,
+            Random.class,
+            SecureRandom.class,
+            InputStream.class,
+            OutputStream.class,
+            Throwable.class,
+    };
+
+    public static String[] includeParseTypeNamePrefixArray = {
+
+    };
+
+    public static String[] excludeParseTypeNamePrefixArray = {
+            "java.",
+            "javax.",
+            "javafx.",
+            "jdk.",
+            "sun.",
+            "com.sun.",
+            "netscape.",
+            "org.xml.sax.",
+            "org.w3c.dom.",
+            "org.omg.",
+            "org.jcp.xml.",
+            "com.oracle.xmlns.internal.",
+            "com.oracle.jrckit.",
+            "com.oracle.webservices.internal.",
+            "com.oracle.deploy.",
+            "org.relaxng.datatype.",
+    };
 
     protected Method method;
     protected ApiMethod api;
 
-    public static ApiMethod parseMethod(Method method){
+    public static ApiMethod parseMethod(Method method) {
         return new ApiMethodResolver(method).parse();
     }
 
-    public ApiMethodResolver(Method method){
+    public ApiMethodResolver(Method method) {
         init(method);
     }
 
@@ -234,30 +276,66 @@ public class ApiMethodResolver {
             line.setType(genericType);
         }
 
-        if(swaggerSupport()){
-            ApiModel annModel= ReflectResolver.findAnnotation(type,ApiModel.class,false);
-            if(annModel!=null){
-                line.setComment(annModel.value()+" "+annModel.description());
+        if (swaggerSupport()) {
+            ApiModel annModel = ReflectResolver.findAnnotation(type, ApiModel.class, false);
+            if (annModel != null) {
+                line.setComment(annModel.value() + " " + annModel.description());
             }
         }
 
         line.setRoute(line.getName());
         lines.add(line);
-        if(!type.getName().startsWith("java.lang.")) {
-            lines.addAll(genLines(type, genericType, line.getName(),line.getOrder(),line.getRoute()));
+        if (!checkNotRecursiveType(type)) {
+            lines.addAll(genLines(null, type, genericType, line.getName(), line.getOrder(), line.getRoute()));
         }
         api.setReturns(lines);
     }
 
-    public static String[] getParameterNames(Method method){
-        if(springCoreSupport()){
+    public static boolean checkNotRecursiveType(Type type) {
+        if (type instanceof Class) {
+            Class<?> clazz = (Class<?>) type;
+            return checkNotRecursiveType(clazz);
+        }
+        return checkNotRecursiveType(type.getTypeName());
+    }
+
+    public static boolean checkNotRecursiveType(Class<?> clazz) {
+        for (Class<?> item : includeParseClassArray) {
+            if (Reflects.isTypeOf(clazz, item)) {
+                return false;
+            }
+        }
+        for (Class<?> item : excludeParseClassArray) {
+            if (Reflects.isTypeOf(clazz, item)) {
+                return true;
+            }
+        }
+        return checkNotRecursiveType(clazz.getName());
+    }
+
+    public static boolean checkNotRecursiveType(String name) {
+        for (String item : includeParseTypeNamePrefixArray) {
+            if (name.startsWith(item)) {
+                return false;
+            }
+        }
+        for (String item : excludeParseTypeNamePrefixArray) {
+            if (name.startsWith(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String[] getParameterNames(Method method) {
+        if (springCoreSupport()) {
             String[] names = new LocalVariableTableParameterNameDiscoverer().getParameterNames(method);
             if (names != null) {
                 return names;
             }
         }
         Parameter[] parameters = method.getParameters();
-        String[] names=new String[parameters.length];
+        String[] names = new String[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
             names[i]=parameters[i].getName();
         }
@@ -333,7 +411,7 @@ public class ApiMethodResolver {
                     if(!"".equals(annPathVar.name())){
                         line.setName(annPathVar.name());
                     }
-                    if(annPathVar.required()){
+                    if (annPathVar.required()) {
                         line.setRestrict("require");
                     }
                     line.setRemark(PathVariable.class.getSimpleName());
@@ -342,26 +420,39 @@ public class ApiMethodResolver {
 
             line.setRoute(line.getName());
             lines.add(line);
-            if(!type.getName().startsWith("java.lang.")) {
-                lines.addAll(genLines(type, genericType, line.getName(),line.getOrder(),line.getRoute()));
+            if (!checkNotRecursiveType(type)) {
+                lines.addAll(genLines(null, type, genericType, line.getName(), line.getOrder(), line.getRoute()));
             }
         }
 
         api.setArgs(lines);
     }
 
-    public static List<ApiLine> genLines(Class type, Type genericType, String parent, String order, String route){
-        List<ApiLine> ret=new ArrayList<>();
-        Map<Field,Class> fieldsMap=forceAllFields(type);
-        for(Map.Entry<Field,Class> entry : fieldsMap.entrySet()){
+    public static List<ApiLine> genLines(Set<Type> visitedTypeSet, Class type, Type genericType, String parent, String order, String route) {
+        if (visitedTypeSet == null) {
+            visitedTypeSet = new LinkedHashSet<>();
+        }
+//        visitedTypeSet.add(type);
+        if (!(genericType instanceof Class)) {
+            visitedTypeSet.add(genericType);
+        }
+        List<ApiLine> ret = new ArrayList<>();
+        if (Reflects.isTypeOf(type, Iterable.class)
+                || Reflects.isTypeOf(type, Map.class)) {
+            if (genericType instanceof ParameterizedType) {
+                return resolveParameterizedType(visitedTypeSet, (ParameterizedType) genericType, parent, order + "1", route);
+            }
+        }
+        Map<Field, Class> fieldsMap = forceAllFields(type);
+        for (Map.Entry<Field, Class> entry : fieldsMap.entrySet()) {
             Field field = entry.getKey();
-            if(Modifier.isStatic(field.getModifiers())){
+            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
             Class clazz = entry.getValue();
-            Class fieldType=field.getType();
-            Type fieldGenericType=field.getGenericType();
-            ApiLine line=new ApiLine();
+            Class fieldType = field.getType();
+            Type fieldGenericType = field.getGenericType();
+            ApiLine line = new ApiLine();
             line.setName(field.getName());
             line.setParent(parent);
             line.setType(fieldType);
@@ -378,45 +469,45 @@ public class ApiMethodResolver {
                     }
                 }
             }
-            if(swaggerSupport()){
-                ApiModelProperty annProp= ReflectResolver.findAnnotation(field,ApiModelProperty.class,false);
-                if(annProp!=null){
+            if (swaggerSupport()) {
+                ApiModelProperty annProp = ReflectResolver.findAnnotation(field, ApiModelProperty.class, false);
+                if (annProp != null) {
                     line.setComment(annProp.value());
                     line.setRemark(annProp.example());
-                    line.setRestrict(annProp.required()?"require":"");
+                    line.setRestrict(annProp.required() ? "require" : "");
                 }
             }
-            line.setRoute(route+"."+line.getName());
+            line.setRoute(route + "." + line.getName());
             ret.add(line);
-            if(!fieldType.getName().startsWith("java.lang.")) {
-                if(!type.equals(fieldType)){
-                    List<ApiLine> nexts = genLines(fieldType, fieldGenericType, line.getName(),line.getOrder(),line.getRoute());
+            if (!checkNotRecursiveType(fieldType)) {
+                if (!visitedTypeSet.contains(fieldType) && !visitedTypeSet.contains(fieldGenericType)) {
+                    List<ApiLine> nexts = genLines(visitedTypeSet, fieldType, fieldGenericType, line.getName(), line.getOrder(), line.getRoute());
                     ret.addAll(nexts);
                 }
             }
-            if(!fieldType.equals(fieldGenericType)){
-                if(fieldGenericType instanceof TypeVariable){
-                    TypeVariable typeVariable=(TypeVariable)fieldGenericType;
+            if (!fieldType.equals(fieldGenericType)) {
+                if (fieldGenericType instanceof TypeVariable) {
+                    TypeVariable typeVariable = (TypeVariable) fieldGenericType;
                     GenericDeclaration genericDeclaration = typeVariable.getGenericDeclaration();
                     TypeVariable<?>[] typeParameters = genericDeclaration.getTypeParameters();
-                    if(genericType instanceof ParameterizedType){
-                        ParameterizedType ptype=(ParameterizedType)genericType;
+                    if (genericType instanceof ParameterizedType) {
+                        ParameterizedType ptype = (ParameterizedType) genericType;
                         Type rawType = ptype.getRawType();
                         Type[] typeArgs = ptype.getActualTypeArguments();
                         if(typeArgs.length==1){
                             try{
                                 Type typeArg = typeArgs[0];
                                 if(typeArg instanceof Class) {
-                                    Class nextClazz = (Class)typeArg;
+                                    Class nextClazz = (Class) typeArg;
                                     Type nextGenericType = nextClazz.getGenericSuperclass();
-                                    if(!type.equals(nextClazz)){
-                                        List<ApiLine> nexts = genLines(nextClazz, nextGenericType, line.getName(), line.getOrder(),line.getRoute());
+                                    if (!visitedTypeSet.contains(nextClazz) && !visitedTypeSet.contains(nextGenericType)) {
+                                        List<ApiLine> nexts = genLines(visitedTypeSet, nextClazz, nextGenericType, line.getName(), line.getOrder(), line.getRoute());
                                         ret.addAll(nexts);
                                     }
-                                }else if(typeArg instanceof ParameterizedType){
-                                    ParameterizedType nextPtype = (ParameterizedType)typeArg;
-                                    if(!existsRecursiveParameterizedType(type,nextPtype)) {
-                                        List<ApiLine> nexts = resolveParameterizedType(nextPtype, line.getName(), line.getOrder(), line.getRoute());
+                                }else if(typeArg instanceof ParameterizedType) {
+                                    ParameterizedType nextPtype = (ParameterizedType) typeArg;
+                                    if (!visitedTypeSet.contains(type) && !visitedTypeSet.contains(nextPtype)) {
+                                        List<ApiLine> nexts = resolveParameterizedType(visitedTypeSet, nextPtype, line.getName(), line.getOrder(), line.getRoute());
                                         ret.addAll(nexts);
                                     }
                                 }
@@ -425,10 +516,10 @@ public class ApiMethodResolver {
                             }
                         }
                     }
-                }else if(fieldGenericType instanceof ParameterizedType){
-                    ParameterizedType nextPramType = (ParameterizedType)fieldGenericType;
-                    if(!existsRecursiveParameterizedType(type,nextPramType)){
-                        List<ApiLine> nexts=resolveParameterizedType(nextPramType,line.getName(),line.getOrder(),line.getRoute());
+                }else if(fieldGenericType instanceof ParameterizedType) {
+                    ParameterizedType nextPramType = (ParameterizedType) fieldGenericType;
+                    if (!visitedTypeSet.contains(type) && !visitedTypeSet.contains(nextPramType)) {
+                        List<ApiLine> nexts = resolveParameterizedType(visitedTypeSet, nextPramType, line.getName(), line.getOrder(), line.getRoute());
                         ret.addAll(nexts);
                     }
 
@@ -439,43 +530,39 @@ public class ApiMethodResolver {
         return ret;
     }
 
-    public static boolean existsRecursiveParameterizedType(Type classType,ParameterizedType nextPramType){
-        boolean isRecursive=false;
-        Type[] nextArgs = nextPramType.getActualTypeArguments();
-        for (int i = 0; i < nextArgs.length; i++) {
-            if(nextArgs[i].equals(classType)){
-                isRecursive=true;
-                break;
-            }
+    public static List<ApiLine> resolveParameterizedType(Set<Type> visitedTypeSet, ParameterizedType nextPramType, String parent, String order, String route) {
+        if (visitedTypeSet == null) {
+            visitedTypeSet = new LinkedHashSet<>();
         }
-        return isRecursive;
-    }
-
-    public static List<ApiLine> resolveParameterizedType(ParameterizedType nextPramType, String parent, String order, String route) {
+        visitedTypeSet.add(nextPramType);
         List<ApiLine> ret = new ArrayList<>();
         Class nextParamRawType = (Class) nextPramType.getRawType();
-        if(Iterable.class.isAssignableFrom(nextParamRawType) || Enumeration.class.isAssignableFrom(nextParamRawType)){ // 处理collection中的泛型
-            String nextName=parent+"$elem";
+        if (Iterable.class.isAssignableFrom(nextParamRawType) || Enumeration.class.isAssignableFrom(nextParamRawType)) { // 处理collection中的泛型
+            String nextName = parent + "$elem";
             Type[] nextArgs = nextPramType.getActualTypeArguments();
-            Type typeArg=nextArgs[0];
-            ApiLine nextLine=new ApiLine();
+            Type typeArg = nextArgs[0];
+            ApiLine nextLine = new ApiLine();
             nextLine.setName(nextName);
             nextLine.setParent(parent);
             nextLine.setType(typeArg);
             nextLine.setOrder(order+"1");
             nextLine.setRoute(route+"."+nextLine.getName());
             ret.add(nextLine);
-            if(!typeArg.getTypeName().startsWith("java.lang.")){
-                if(typeArg instanceof Class) {
-                    Class nextClazz = (Class)typeArg;
+            if (!checkNotRecursiveType(typeArg)) {
+                if (typeArg instanceof Class) {
+                    Class nextClazz = (Class) typeArg;
                     Type nextGenericType = nextClazz.getGenericSuperclass();
-                    List<ApiLine> nexts = genLines(nextClazz, nextGenericType, nextName, nextLine.getOrder(),nextLine.getRoute());
-                    ret.addAll(nexts);
-                }else if(typeArg instanceof ParameterizedType){
-                    ParameterizedType nextPtype = (ParameterizedType)typeArg;
-                    Class nextRawType = (Class)nextPtype.getRawType();
-                    List<ApiLine> nexts = genLines(nextRawType, nextPtype, nextName, nextLine.getOrder(),nextLine.getRoute());
-                    ret.addAll(nexts);
+                    if (!visitedTypeSet.contains(nextClazz) && !visitedTypeSet.contains(nextGenericType)) {
+                        List<ApiLine> nexts = genLines(visitedTypeSet, nextClazz, nextGenericType, nextName, nextLine.getOrder(), nextLine.getRoute());
+                        ret.addAll(nexts);
+                    }
+                } else if (typeArg instanceof ParameterizedType) {
+                    ParameterizedType nextPtype = (ParameterizedType) typeArg;
+                    Class nextRawType = (Class) nextPtype.getRawType();
+                    if (!visitedTypeSet.contains(nextRawType) && !visitedTypeSet.contains(nextPtype)) {
+                        List<ApiLine> nexts = genLines(visitedTypeSet, nextRawType, nextPtype, nextName, nextLine.getOrder(), nextLine.getRoute());
+                        ret.addAll(nexts);
+                    }
                 }
             }
 
@@ -487,20 +574,24 @@ public class ApiMethodResolver {
             nextLine.setName(nextKeyName);
             nextLine.setParent(parent);
             nextLine.setType(typeArg);
-            nextLine.setOrder(order+"1");
-            nextLine.setRoute(route+"."+nextLine.getName());
+            nextLine.setOrder(order + "1");
+            nextLine.setRoute(route + "$key");
             ret.add(nextLine);
-            if(!typeArg.getTypeName().startsWith("java.lang.")){
-                if(typeArg instanceof Class) {
-                    Class nextClazz = (Class)typeArg;
+            if (!checkNotRecursiveType(typeArg)) {
+                if (typeArg instanceof Class) {
+                    Class nextClazz = (Class) typeArg;
                     Type nextGenericType = nextClazz.getGenericSuperclass();
-                    List<ApiLine> nexts = genLines(nextClazz, nextGenericType, nextKeyName, nextLine.getOrder(),nextLine.getRoute());
-                    ret.addAll(nexts);
-                }else if(typeArg instanceof ParameterizedType){
-                    ParameterizedType nextPtype = (ParameterizedType)typeArg;
-                    Class nextRawType = (Class)nextPtype.getRawType();
-                    List<ApiLine> nexts = genLines(nextRawType, nextPtype, nextKeyName, nextLine.getOrder(),nextLine.getRoute());
-                    ret.addAll(nexts);
+                    if (!visitedTypeSet.contains(nextClazz) && !visitedTypeSet.contains(nextGenericType)) {
+                        List<ApiLine> nexts = genLines(visitedTypeSet, nextClazz, nextGenericType, nextKeyName, nextLine.getOrder(), nextLine.getRoute());
+                        ret.addAll(nexts);
+                    }
+                } else if (typeArg instanceof ParameterizedType) {
+                    ParameterizedType nextPtype = (ParameterizedType) typeArg;
+                    Class nextRawType = (Class) nextPtype.getRawType();
+                    if (!visitedTypeSet.contains(nextRawType) && !visitedTypeSet.contains(nextPtype)) {
+                        List<ApiLine> nexts = genLines(visitedTypeSet, nextRawType, nextPtype, nextKeyName, nextLine.getOrder(), nextLine.getRoute());
+                        ret.addAll(nexts);
+                    }
                 }
             }
             String nextValueName=parent+"$value";
@@ -509,25 +600,31 @@ public class ApiMethodResolver {
             nextLine.setName(nextValueName);
             nextLine.setParent(parent);
             nextLine.setType(typeArg);
-            nextLine.setOrder(order+"1");
-            nextLine.setRoute(route+"."+nextLine.getName());
+            nextLine.setOrder(order + "1");
+            nextLine.setRoute(route + "$value");
             ret.add(nextLine);
-            if(!typeArg.getTypeName().startsWith("java.lang.")){
-                if(typeArg instanceof Class) {
-                    Class nextClazz = (Class)typeArg;
+            if (!checkNotRecursiveType(typeArg)) {
+                if (typeArg instanceof Class) {
+                    Class nextClazz = (Class) typeArg;
                     Type nextGenericType = nextClazz.getGenericSuperclass();
-                    List<ApiLine> nexts = genLines(nextClazz, nextGenericType, nextValueName, nextLine.getOrder(),nextLine.getRoute());
-                    ret.addAll(nexts);
-                }else if(typeArg instanceof ParameterizedType){
-                    ParameterizedType nextPtype = (ParameterizedType)typeArg;
-                    Class nextRawType = (Class)nextPtype.getRawType();
-                    List<ApiLine> nexts = genLines(nextRawType, nextPtype, nextValueName, nextLine.getOrder(),nextLine.getRoute());
-                    ret.addAll(nexts);
+                    if (!visitedTypeSet.contains(nextClazz) && !visitedTypeSet.contains(nextGenericType)) {
+                        List<ApiLine> nexts = genLines(visitedTypeSet, nextClazz, nextGenericType, nextValueName, nextLine.getOrder(), nextLine.getRoute());
+                        ret.addAll(nexts);
+                    }
+                } else if (typeArg instanceof ParameterizedType) {
+                    ParameterizedType nextPtype = (ParameterizedType) typeArg;
+                    Class nextRawType = (Class) nextPtype.getRawType();
+                    if (!visitedTypeSet.contains(nextRawType) && !visitedTypeSet.contains(nextPtype)) {
+                        List<ApiLine> nexts = genLines(visitedTypeSet, nextRawType, nextPtype, nextValueName, nextLine.getOrder(), nextLine.getRoute());
+                        ret.addAll(nexts);
+                    }
                 }
             }
         }else {
-            List<ApiLine> nexts = genLines(nextParamRawType, nextPramType, parent, order,route);
-            ret.addAll(nexts);
+            if (!visitedTypeSet.contains(nextParamRawType) && !visitedTypeSet.contains(nextPramType)) {
+                List<ApiLine> nexts = genLines(visitedTypeSet, nextParamRawType, nextPramType, parent, order, route);
+                ret.addAll(nexts);
+            }
         }
 
         return ret;

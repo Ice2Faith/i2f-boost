@@ -8,7 +8,7 @@ import java.util.function.Function;
  * @date 2023/5/1 14:52
  * @desc
  */
-public class BeanPropertyComparator<T, R extends Comparable<R>> implements Comparator<T> {
+public class BeanPropertyComparator<T, R> implements Comparator<T> {
     private Function<T, R> getter;
 
     public BeanPropertyComparator(Function<T, R> getter) {
@@ -37,6 +37,12 @@ public class BeanPropertyComparator<T, R extends Comparable<R>> implements Compa
         if (r2 == null) {
             return 1;
         }
-        return r1.compareTo(r2);
+        if (r1 instanceof Comparable) {
+            return ((Comparable) r1).compareTo(r2);
+        }
+        if (r2 instanceof Comparable) {
+            return ((Comparable) r2).compareTo(r1);
+        }
+        return Integer.compare(r1.hashCode(), r2.hashCode());
     }
 }

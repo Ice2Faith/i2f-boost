@@ -1,8 +1,8 @@
 package i2f.core.reflect;
 
 import i2f.core.collection.Collections;
-import i2f.core.map.Maps;
 import i2f.core.functional.jvf.Predicate;
+import i2f.core.map.Maps;
 import i2f.core.str.Strings;
 
 import java.io.File;
@@ -61,10 +61,17 @@ public class Reflects {
     public static Class findClass(String className) {
         try {
             Class<?> clazz = Class.forName(className);
-            if (clazz == null) {
-                clazz = contextClassLoader().loadClass(className);
+            if (clazz != null) {
+                return clazz;
             }
-            return clazz;
+        } catch (Exception e) {
+
+        }
+        try {
+            Class<?> clazz = contextClassLoader().loadClass(className);
+            if (clazz != null) {
+                return clazz;
+            }
         } catch (Exception e) {
 
         }
