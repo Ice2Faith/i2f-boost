@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>模块文档</title>
+    <style>
+        * {
+            font-family: '新宋体';
+            font-size: 12pt;
+        }
+
+        table tr td {
+            padding: 5px 8px;
+            border: solid 1px black;
+        }
+
+        .module-desc-table {
+            width: 100%;
+        }
+
+        .module-desc-key {
+            width: 25%;
+            text-align: center;
+            line-height: 100%;
+            font-weight: bold;
+            background-color: #bababa;
+        }
+
+        .module-desc-value {
+            width: 75%;
+        }
+
+        .module-data-list {
+            width: 100%;
+        }
+
+        .module-data-head {
+            text-align: center;
+            font-weight: normal;
+            background-color: #aaaaaa;
+        }
+    </style>
+</head>
+<body>
+    #foreach(${module} in ${modules})
+    <h3>1.1.${velocityCount} ${_vm.ifnull(${module.comment},"")}</h3>
+
+    功能涉及：<br/>
+
+    <table class="module-desc-table" border="1" cellspacing="0">
+        <tr>
+            <td class="module-desc-key">功能描述</td>
+            <td class="module-desc-value">${_vm.ifnull(${module.comment},"")}</td>
+        </tr>
+        <tr>
+            <td class="module-desc-key">输入参数</td>
+            <td class="module-desc-value">Object</td>
+        </tr>
+        <tr>
+            <td class="module-desc-key">处理描述</td>
+            <td class="module-desc-value">数据封装传输对象</td>
+        </tr>
+        <tr>
+            <td class="module-desc-key">输出参数</td>
+            <td class="module-desc-value">Object</td>
+        </tr>
+        <tr>
+            <td class="module-desc-key">返回值</td>
+            <td class="module-desc-value">Object</td>
+        </tr>
+        <tr>
+            <td class="module-desc-key">数据结构与算法</td>
+            <td class="module-desc-value"></td>
+        </tr>
+    </table>
+    <br/>
+    <br/>
+
+    原型界面：
+    <br/>
+    <br/>
+    <div>
+        图 1.1.${velocityCount} 原型展示
+    </div>
+    <br/>
+
+    功能详细说明：<br/>
+    &emsp;类设计：<br/>
+    &emsp;1、类图<br/>
+    <br/>
+    <br/>
+    &emsp;2、类属性/方法说明<br/>
+    &emsp;${_vm.ifnull(${module.comment},"")}类：<br/>
+
+    请求报文体<br/>
+    <table class="module-data-list" border="1" cellspacing="0">
+        <tr>
+            <th class="module-data-head" style="width: 5%">
+                序号
+            </th>
+            <th class="module-data-head" style="width: 25%">
+                方法名
+            </th>
+            <th class="module-data-head" style="width: 25%">
+                调用参数
+            </th>
+            <th class="module-data-head" style="width: 10%">
+                返回值
+            </th>
+            <th class="module-data-head" style="width: 35%">
+                说明
+            </th>
+        </tr>
+        #foreach(${method} in ${module.methods})
+            <tr>
+                <td class="module-data-body">
+                    $velocityCount
+                </td>
+                <td class="module-data-body">
+                    ${_vm.ifnull(${method.srcMethodName},"")}
+                </td>
+                <td class="module-data-body">
+                    #foreach(${line} in ${method.args})
+                        ${line.name}<br/>
+                    #end
+                </td>
+                <td class="module-data-body">
+                    #foreach(${line} in ${method.returns})
+                        ${line.name}<br/>
+                    #end
+                </td>
+                <td class="module-data-body">
+                    ${_vm.ifnull(${method.comment},"")}
+                </td>
+            </tr>
+        #end
+    </table>
+    &emsp;3、调用逻辑<br/>
+    &emsp;暂无<br/>
+    &emsp;存储设计：<br/>
+    &emsp;暂无<br/>
+
+    #end
+<br/>
+<br/>
+
+</body>
+
+</html>

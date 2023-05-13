@@ -61,7 +61,8 @@ public class ApiMethodResolver {
         FULL,
         MOST,
         MORE,
-        BASIC;
+        BASIC,
+        NONE;
     }
 
     protected TraceLevel traceLevel = TraceLevel.BASIC;
@@ -107,6 +108,7 @@ public class ApiMethodResolver {
         Class clazz = method.getDeclaringClass();
         String methodName = clazz.getName() + "." + method.getName();
         api.setSrcMethod(method);
+        api.setSrcMethodName(method.getName());
         api.setJavaMethod(methodName);
         api.setJavaGenericMethod(method.toGenericString());
     }
@@ -306,8 +308,10 @@ public class ApiMethodResolver {
 
         line.setRoute(line.getName());
         lines.add(line);
-        if (!checkNotRecursiveType(type)) {
-            lines.addAll(genLines(null, type, genericType, line.getName(), line.getOrder(), line.getRoute()));
+        if (traceLevel != TraceLevel.NONE) {
+            if (!checkNotRecursiveType(type)) {
+                lines.addAll(genLines(null, type, genericType, line.getName(), line.getOrder(), line.getRoute()));
+            }
         }
         api.setReturns(lines);
     }
@@ -441,8 +445,10 @@ public class ApiMethodResolver {
 
             line.setRoute(line.getName());
             lines.add(line);
-            if (!checkNotRecursiveType(type)) {
-                lines.addAll(genLines(null, type, genericType, line.getName(), line.getOrder(), line.getRoute()));
+            if (traceLevel != TraceLevel.NONE) {
+                if (!checkNotRecursiveType(type)) {
+                    lines.addAll(genLines(null, type, genericType, line.getName(), line.getOrder(), line.getRoute()));
+                }
             }
         }
 

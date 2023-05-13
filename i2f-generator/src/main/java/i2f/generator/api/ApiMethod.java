@@ -17,6 +17,7 @@ public class ApiMethod {
     private List<String> urls;
     private List<String> methods;
     private Method srcMethod;
+    private String srcMethodName;
     private String javaMethod;
     private String javaGenericMethod;
     private String comment;

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>接口文档</title>
+    <style>
+        * {
+            font-family: '新宋体';
+            font-size: 12pt;
+        }
+
+        table tr td {
+            padding: 5px 8px;
+            border: solid 1px black;
+        }
+
+        .api-desc-table {
+            width: 100%;
+        }
+
+        .api-desc-key {
+            width: 25%;
+            background-color: #e86fb2;
+        }
+
+        .api-desc-value {
+            width: 75%;
+        }
+
+        .api-data-list {
+            width: 100%;
+        }
+
+        .api-data-head {
+            text-align: center;
+            font-weight: normal;
+            background-color: #aaaaaa;
+        }
+    </style>
+</head>
+<body>
+    #foreach(${api} in ${apis})
+    <h3>1.1.${velocityCount} ${_vm.ifnull(${api.comment},"")}</h3>
+
+    接口说明：<br/>
+
+    <table class="api-desc-table" border="1" cellspacing="0">
+        <tr>
+            <td class="api-desc-key">名称</td>
+            <td class="api-desc-value">${_vm.ifnull(${api.comment},"")}</td>
+        </tr>
+        <tr>
+            <td class="api-desc-key">接口内容</td>
+            <td class="api-desc-value"></td>
+        </tr>
+        <tr>
+            <td class="api-desc-key">服务名</td>
+            <td class="api-desc-value">${_vm.ifnull(${api.urls[0]},"")}</td>
+        </tr>
+        <tr>
+            <td class="api-desc-key">请求地址</td>
+            <td class="api-desc-value"></td>
+        </tr>
+        <tr>
+            <td class="api-desc-key">接口协议</td>
+            <td class="api-desc-value">HTTP ${_vm.ifnull(${api.methods[0]},"")}</td>
+        </tr>
+        <tr>
+            <td class="api-desc-key">字节编码</td>
+            <td class="api-desc-value">UTF-8</td>
+        </tr>
+        <tr>
+            <td class="api-desc-key">数据格式</td>
+            <td class="api-desc-value">JSON</td>
+        </tr>
+        <tr>
+            <td class="api-desc-key">发起方</td>
+            <td class="api-desc-value">业务接入平台</td>
+        </tr>
+        <tr>
+            <td class="api-desc-key">接收方</td>
+            <td class="api-desc-value">后台接口服务</td>
+        </tr>
+        <tr>
+            <td class="api-desc-key">备注</td>
+            <td class="api-desc-value"></td>
+        </tr>
+    </table>
+    <br/>
+    <br/>
+
+    请求报文体<br/>
+    <table class="api-data-list" border="1" cellspacing="0">
+        <tr>
+            <th class="api-data-head" style="width: 5%">
+                序号
+            </th>
+            <th class="api-data-head" style="width: 15%">
+                父元素
+            </th>
+            <th class="api-data-head" style="width: 15%">
+                元素名
+            </th>
+            <th class="api-data-head" style="width: 10%">
+                约束
+            </th>
+            <th class="api-data-head" style="width: 10%">
+                类型
+            </th>
+            <th class="api-data-head" style="width: 5%">
+                宽度
+            </th>
+            <th class="api-data-head" style="width: 20%">
+                描述
+            </th>
+            <th class="api-data-head" style="width: 10%">
+                取值说明
+            </th>
+        </tr>
+        #foreach(${line} in ${api.args})
+            <tr>
+                <td class="api-data-body">
+                    $velocityCount
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.parent},"")}
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.name},"")}
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.restrict},"")}
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.typeName},"")}
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.width},"")}
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.comment},"")}
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.remark},"")}
+                </td>
+            </tr>
+        #end
+    </table>
+
+    <br/>
+    <br/>
+
+    响应报文体<br/>
+    <table class="api-data-list" border="1" cellspacing="0">
+        <tr>
+            <th class="api-data-head" style="width: 5%">
+                序号
+            </th>
+            <th class="api-data-head" style="width: 15%">
+                父元素
+            </th>
+            <th class="api-data-head" style="width: 15%">
+                元素名
+            </th>
+            <th class="api-data-head" style="width: 10%">
+                约束
+            </th>
+            <th class="api-data-head" style="width: 10%">
+                类型
+            </th>
+            <th class="api-data-head" style="width: 5%">
+                宽度
+            </th>
+            <th class="api-data-head" style="width: 20%">
+                描述
+            </th>
+            <th class="api-data-head" style="width: 10%">
+                取值说明
+            </th>
+        </tr>
+        #foreach(${line} in ${api.returns})
+            <tr>
+                <td class="api-data-body">
+                    $velocityCount
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.parent},"")}
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.name},"")}
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.restrict},"")}
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.typeName},"")}
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.width},"")}
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.comment},"")}
+                </td>
+                <td class="api-data-body">
+                    ${_vm.ifnull(${line.remark},"")}
+                </td>
+            </tr>
+        #end
+    </table>
+    #end
+<br/>
+<br/>
+
+</body>
+
+</html>

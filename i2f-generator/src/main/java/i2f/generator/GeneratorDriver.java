@@ -16,6 +16,8 @@ import i2f.generator.data.TableContext;
 import i2f.generator.drawio.er.DrawioAdapter;
 import i2f.generator.drawio.er.DrawioErElem;
 import i2f.generator.er.ErContext;
+import i2f.generator.module.ModuleController;
+import i2f.generator.module.ModuleResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -341,4 +343,41 @@ public class GeneratorDriver {
     }
 
 
+    public static String modulesMvc(List<ModuleController> modules) throws IOException {
+        String tpl = ResourceUtil.getClasspathResourceAsString("/tpl/design/module-doc.html.vm", "UTF-8");
+        return modulesMvc(modules, tpl);
+    }
+
+    public static String modulesMvc(List<ModuleController> modules, String template) throws IOException {
+        Map<String, Object> params = new HashMap<>();
+        params.put("modules", modules);
+        return VelocityGenerator.render(template, params);
+    }
+
+    public static String modulesMvc(String template, Class<?> controller, Class<?>... controllers) throws IOException {
+        List<ModuleController> modules = new LinkedList<>();
+        modules.add(ModuleResolver.parse(controller));
+        for (Class<?> item : controllers) {
+            modules.add(ModuleResolver.parse(item));
+        }
+        return modulesMvc(modules, template);
+    }
+
+    public static String modulesMvcControllers(ApplicationContext context, Predicate<Class<?>> filter, Consumer<List<ModuleController>> preProcessor, String template) throws IOException {
+        Set<Class<?>> controllers = getSpringMvcControllers(context);
+        List<ModuleController> modules = new LinkedList<>();
+        if (filter != null) {
+            for (Class<?> controller : controllers) {
+                if (filter.test(controller)) {
+                    modules.add(ModuleResolver.parse(controller));
+                }
+            }
+        }
+
+        if (preProcessor != null) {
+            preProcessor.accept(modules);
+        }
+
+        return modulesMvc(modules, template);
+    }
 }
