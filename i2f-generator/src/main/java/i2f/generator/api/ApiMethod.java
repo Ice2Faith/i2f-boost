@@ -2,6 +2,7 @@ package i2f.generator.api;
 
 import lombok.Data;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 public class ApiMethod {
     private List<String> urls;
     private List<String> methods;
+    private Method srcMethod;
     private String javaMethod;
     private String javaGenericMethod;
     private String comment;

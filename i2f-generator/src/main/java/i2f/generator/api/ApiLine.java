@@ -2,6 +2,7 @@ package i2f.generator.api;
 
 import lombok.Data;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 /**
@@ -15,6 +16,7 @@ public class ApiLine {
     private String name;
     private String restrict;
     private Type type;
+    private Field field;
     private String width;
     private String comment;
     private String remark;
