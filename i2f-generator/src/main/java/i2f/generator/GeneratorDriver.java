@@ -386,7 +386,7 @@ public class GeneratorDriver {
         return modulesMvc(modules, template);
     }
 
-    public static String tableDoc(List<TableMeta> tables) throws IOException {
+    public static String tablesDoc(List<TableMeta> tables) throws IOException {
         String tpl = ResourceUtil.getClasspathResourceAsString("/tpl/design/table-doc.html.vm", "UTF-8");
         return tablesDoc(tables, tpl);
     }

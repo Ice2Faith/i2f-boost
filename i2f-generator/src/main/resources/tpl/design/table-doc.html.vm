@@ -113,7 +113,7 @@
                 注释
             </th>
         </tr>
-        #foreach(${line} in ${api.indexes})
+        #foreach(${line} in ${table.indexes})
             <tr>
                 <td class="table-column-body">
                     $velocityCount

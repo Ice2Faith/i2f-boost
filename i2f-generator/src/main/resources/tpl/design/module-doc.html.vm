@@ -90,7 +90,7 @@
     <br/>
     <br/>
     &emsp;2、类属性/方法说明<br/>
-    &emsp;${_vm.ifnull(${module.comment},"")}类：<br/>
+    &emsp;${_vm.ifnull(${module.className},"")}类：<br/>
 
     请求报文体<br/>
     <table class="module-data-list" border="1" cellspacing="0">
@@ -126,7 +126,7 @@
                 </td>
                 <td class="module-data-body">
                     #foreach(${line} in ${method.returns})
-                        ${line.name}<br/>
+                        ${line.typeName}<br/>
                     #end
                 </td>
                 <td class="module-data-body">
