@@ -5,6 +5,7 @@ import i2f.core.db.core.DbResolver;
 import i2f.core.db.data.TableMeta;
 import i2f.core.reflect.Reflects;
 import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.resource.ResourceUtil;
 import i2f.core.xml.Xml2;
 import i2f.extension.template.velocity.VelocityGenerator;
 import i2f.generator.api.ApiLine;
@@ -12,6 +13,8 @@ import i2f.generator.api.ApiMethod;
 import i2f.generator.api.ApiMethodResolver;
 import i2f.generator.data.JavaCodeContext;
 import i2f.generator.data.TableContext;
+import i2f.generator.drawio.er.DrawioAdapter;
+import i2f.generator.drawio.er.DrawioErElem;
 import i2f.generator.er.ErContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -100,6 +103,17 @@ public class GeneratorDriver {
         return er(list, template);
     }
 
+    public static String drawioEr(List<TableMeta> tables, String template) throws IOException {
+        Map<String, Object> map = new HashMap<>();
+        List<DrawioErElem> elems = DrawioAdapter.parseEr(tables);
+        map.put("elems", elems);
+        return VelocityGenerator.render(template, map);
+    }
+
+    public static String drawioEr(List<TableMeta> tables) throws IOException {
+        String tpl = ResourceUtil.getResourceAsString("tpl/drawio/er/er.xml.drawio.vm", "UTF-8");
+        return drawioEr(tables, tpl);
+    }
 
     public static String doc(List<TableMeta> tables, String template) throws Exception {
         Map<String, Object> map = new HashMap<>();

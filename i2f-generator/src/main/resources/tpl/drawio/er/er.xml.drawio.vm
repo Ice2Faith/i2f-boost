@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio-plugin" modified="2023-05-11T08:42:47.550Z"
+        agent="5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36"
+        etag="b4rvB9Hyk6hXLVEPJBp4" version="13.7.9" type="embed">
+    <diagram id="lNPZZ_e-28soofFFy49H" name="Page-1">
+        <mxGraphModel dx="385" dy="528" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1"
+                      page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+
+#foreach( ${item} in ${elems})
+    #if(${item.type}=="entity")
+        <!-- 实体 -->
+        <mxCell id="${item.id}" value="${item.text}" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+            <mxGeometry x="${item.x}" y="${item.y}" width="${item.width}" height="${item.height}" as="geometry"/>
+        </mxCell>
+    #end
+
+    #if(${item.type}=="attribute")
+        <!-- 属性 -->
+        <mxCell id="${item.id}" value="${item.text}" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+            <mxGeometry x="${item.x}" y="${item.y}" width="${item.width}" height="${item.height}" as="geometry"/>
+        </mxCell>
+    #end
+
+    #if(${item.type}=="link")
+        <!-- 连线 -->
+        <mxCell id="${item.id}" value="${item.text}" style="endArrow=none;html=1;" parent="1" source="${item.startId}" target="${item.endId}" edge="1">
+            <mxGeometry width="${item.width}" height="${item.height}" relative="1" as="geometry">
+                <mxPoint as="sourcePoint"/>
+                <mxPoint as="targetPoint"/>
+            </mxGeometry>
+        </mxCell>
+    #end
+#end
+
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
+
