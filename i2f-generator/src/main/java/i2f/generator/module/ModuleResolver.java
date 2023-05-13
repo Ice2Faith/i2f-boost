@@ -44,9 +44,23 @@ public class ModuleResolver {
     public void parseClassBasic() {
         module.setMethods(new ArrayList<>());
         module.setClazz(clazz);
-        module.setFullClassName(clazz.getName());
-        module.setClassName(clazz.getSimpleName());
-        String trimName = clazz.getSimpleName();
+        String clazzName = clazz.getName();
+        if (clazzName != null) {
+            int idx = clazzName.indexOf("$$Enhancer");
+            if (idx >= 0) {
+                clazzName = clazzName.substring(0, idx);
+            }
+        }
+        module.setFullClassName(clazzName);
+        String simpleName = clazzName;
+        if (simpleName != null) {
+            int idx = simpleName.lastIndexOf(".");
+            if (idx >= 0) {
+                simpleName = simpleName.substring(0, idx);
+            }
+        }
+        module.setClassName(simpleName);
+        String trimName = simpleName;
         int idx = trimName.indexOf("Controller");
         if (idx >= 0) {
             trimName = trimName.substring(0, idx);

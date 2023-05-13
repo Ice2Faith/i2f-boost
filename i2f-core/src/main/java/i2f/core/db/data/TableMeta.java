@@ -77,7 +77,12 @@ public class TableMeta {
                 indexesMap.get(name).add(column.getName());
             }
         }
+        Set<String> set = new HashSet<>();
         for (Map.Entry<String, List<String>> entry : primaryMap.entrySet()) {
+            if (set.contains(entry.getKey())) {
+                continue;
+            }
+            set.add(entry.getKey());
             TableIndexMeta item = new TableIndexMeta();
             item.setType("primary");
             item.setName(entry.getKey());
@@ -85,6 +90,10 @@ public class TableMeta {
             indexes.add(item);
         }
         for (Map.Entry<String, List<String>> entry : uniqueMap.entrySet()) {
+            if (set.contains(entry.getKey())) {
+                continue;
+            }
+            set.add(entry.getKey());
             TableIndexMeta item = new TableIndexMeta();
             item.setType("unique");
             item.setName(entry.getKey());
@@ -92,6 +101,10 @@ public class TableMeta {
             indexes.add(item);
         }
         for (Map.Entry<String, List<String>> entry : indexesMap.entrySet()) {
+            if (set.contains(entry.getKey())) {
+                continue;
+            }
+            set.add(entry.getKey());
             TableIndexMeta item = new TableIndexMeta();
             item.setType("index");
             item.setName(entry.getKey());

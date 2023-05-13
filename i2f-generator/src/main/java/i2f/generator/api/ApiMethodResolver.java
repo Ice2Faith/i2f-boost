@@ -482,12 +482,17 @@ public class ApiMethodResolver {
             }
         }
         Map<Field, Class> fieldsMap = forceAllFields(type);
-        for (Map.Entry<Field, Class> entry : fieldsMap.entrySet()) {
-            Field field = entry.getKey();
+        List<Field> fieldsList = new ArrayList<>(fieldsMap.keySet());
+        fieldsList.sort(new Comparator<Field>() {
+            @Override
+            public int compare(Field o1, Field o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+        for (Field field : fieldsList) {
             if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
-            Class clazz = entry.getValue();
             Class fieldType = field.getType();
             Type fieldGenericType = field.getGenericType();
             ApiLine line = new ApiLine();

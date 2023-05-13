@@ -355,6 +355,19 @@ public class GeneratorDriver {
 
     public static String modulesMvc(List<ModuleController> modules, String template) throws IOException {
         Map<String, Object> params = new HashMap<>();
+        for (ModuleController item : modules) {
+            List<ApiMethod> methods = item.getMethods();
+            for (ApiMethod method : methods) {
+                List<ApiLine> args = method.getArgs();
+                for (ApiLine arg : args) {
+                    arg.refresh(false, false);
+                }
+                List<ApiLine> returns = method.getReturns();
+                for (ApiLine line : returns) {
+                    line.refresh(false, false);
+                }
+            }
+        }
         params.put("modules", modules);
         return VelocityGenerator.render(template, params);
     }
@@ -395,6 +408,7 @@ public class GeneratorDriver {
         for (TableMeta table : tables) {
             table.inflateIndexes();
         }
+
         Map<String, Object> params = new HashMap<>();
         params.put("tables", tables);
         return VelocityGenerator.render(template, params);
