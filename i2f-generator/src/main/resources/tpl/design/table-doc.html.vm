@@ -70,18 +70,22 @@
                     ${_vm.ifnull(${line.name},"")}
                 </td>
                 <td class="table-column-body">
-                    ${column.typeName}
-                    #if(${column.precision}>0)
+                    ${line.typeName}
+                    #if(${line.precision}>0)
                         (
-                        ${column.precision}
-                        #if(${column.scale}>0)
-                            ,${column.scale}
+                        ${line.precision}
+                        #if(${line.scale}>0)
+                            ,${line.scale}
                         #end
                         )
                     #end
                 </td>
                 <td class="table-column-body">
-                    ${_vm.ifnull(${line.isNullable},"")}
+                    #if(${_vm.ifnull(${line.isNullable},"")}=="YES")
+                        NO
+                    #else
+                        YES
+                    #end
                 </td>
                 <td class="table-column-body">
                     ${_vm.ifnull(${line.remark},"")}
@@ -119,7 +123,10 @@
                 </td>
                 <td class="table-column-body">
                     #foreach(${item} in ${line.columns})
-                        ${item} &emsp;
+                        ${item}
+                        #if($velocityCount < $line.columns.size())
+                            、
+                        #end
                     #end
                 </td>
                 <td class="table-column-body">

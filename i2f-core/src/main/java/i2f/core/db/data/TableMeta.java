@@ -82,18 +82,21 @@ public class TableMeta {
             item.setType("primary");
             item.setName(entry.getKey());
             item.setColumns(entry.getValue());
+            indexes.add(item);
         }
         for (Map.Entry<String, List<String>> entry : uniqueMap.entrySet()) {
             TableIndexMeta item = new TableIndexMeta();
             item.setType("unique");
             item.setName(entry.getKey());
             item.setColumns(entry.getValue());
+            indexes.add(item);
         }
         for (Map.Entry<String, List<String>> entry : indexesMap.entrySet()) {
             TableIndexMeta item = new TableIndexMeta();
             item.setType("index");
             item.setName(entry.getKey());
             item.setColumns(entry.getValue());
+            indexes.add(item);
         }
         return this;
     }

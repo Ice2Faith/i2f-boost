@@ -71,7 +71,11 @@ public class ModuleResolver {
                 classUrl = classRequestMapping.value();
             }
         }
-        module.setBaseUrl(classUrl[0]);
+        if (classUrl.length > 0) {
+            module.setBaseUrl(classUrl[0]);
+        } else {
+            module.setBaseUrl("");
+        }
 
         String remark = "";
         if (classResponseBody != null || classRestController != null) {
