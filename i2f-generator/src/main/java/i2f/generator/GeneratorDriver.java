@@ -387,7 +387,7 @@ public class GeneratorDriver {
     }
 
     public static String tableDoc(List<TableMeta> tables) throws IOException {
-        String tpl = ResourceUtil.getClasspathResourceAsString("/tpl/design/table-doc.html.vm.vm", "UTF-8");
+        String tpl = ResourceUtil.getClasspathResourceAsString("/tpl/design/table-doc.html.vm", "UTF-8");
         return tablesDoc(tables, tpl);
     }
 
