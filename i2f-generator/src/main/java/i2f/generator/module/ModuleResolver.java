@@ -56,7 +56,7 @@ public class ModuleResolver {
         if (simpleName != null) {
             int idx = simpleName.lastIndexOf(".");
             if (idx >= 0) {
-                simpleName = simpleName.substring(0, idx);
+                simpleName = simpleName.substring(idx + 1);
             }
         }
         module.setClassName(simpleName);

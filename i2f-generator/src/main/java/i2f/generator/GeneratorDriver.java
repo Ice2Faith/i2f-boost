@@ -361,10 +361,14 @@ public class GeneratorDriver {
                 List<ApiLine> args = method.getArgs();
                 for (ApiLine arg : args) {
                     arg.refresh(false, false);
+                    arg.setTypeName(Xml2.toXmlString(arg.getTypeName()));
+                    arg.setComment(Xml2.toXmlString(arg.getComment()));
                 }
                 List<ApiLine> returns = method.getReturns();
                 for (ApiLine line : returns) {
                     line.refresh(false, false);
+                    line.setTypeName(Xml2.toXmlString(line.getTypeName()));
+                    line.setComment(Xml2.toXmlString(line.getComment()));
                 }
             }
         }
