@@ -1,0 +1,32 @@
+# 调用跟踪
+invoke:
+  trace:
+    # 是否开启
+    enable: true
+    # 慢调用毫秒
+    slowMs: 300
+    # 异常时是否打印堆栈
+    showStackTrace: true
+    # 是否显示调用参数
+    showArgs: false
+    # 是否显示返回值
+    showReturn: false
+    # 是否只显示参数/返回值类型
+    typeOnly: false
+    # 参数或返回值是否适用JSON序列化打印
+    jsonPrint: true
+    # JSON序列化打印时，是否需要格式化JSON
+    jsonFormat: true
+    # 是否开启堆栈跟踪
+    stackTraceEnable: true
+    # 是否开启AOP调用监控
+    aop:
+      enable: true
+    # 是否开启过滤器调用监控
+    filter:
+      enable: true
+    # 是否开启cglib代理bean
+    cglib:
+      enable: true
+      includeClassPattens:
+        - org.jeecg.**
