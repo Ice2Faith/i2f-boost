@@ -521,6 +521,28 @@
             <version>9.1.5</version>
         </dependency>
 
+        <!-- word转pdf/png -->
+        <dependency>
+            <groupId>com.aspose.words</groupId>
+            <artifactId>aspose-words</artifactId>
+            <version>15.8.0-jdk16</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/aspose-words-15.8.0-jdk16.jar</systemPath>
+        </dependency>
+
+        <!-- word转pdf,需要使用com组件，只能在windows使用，或必须使用windows远程主机转换 -->
+        <dependency>
+            <groupId>com.documents4j</groupId>
+            <artifactId>documents4j-local</artifactId>
+            <version>1.1.10</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.documents4j/documents4j-transformer-msoffice-word -->
+        <dependency>
+            <groupId>com.documents4j</groupId>
+            <artifactId>documents4j-transformer-msoffice-word</artifactId>
+            <version>1.1.10</version>
+        </dependency>
+
     </dependencies>
 
 
