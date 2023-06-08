@@ -84,6 +84,15 @@ public class Uid {
     public static Uid UID = getByMac();
 
     /**
+     * 获取一个ID
+     *
+     * @return
+     */
+    public static long getId() {
+        return UID.nextId();
+    }
+
+    /**
      * 根据MAC地址序列校验和获取实例
      *
      * @return
