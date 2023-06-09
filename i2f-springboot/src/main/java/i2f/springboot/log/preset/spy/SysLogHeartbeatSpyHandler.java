@@ -1,12 +1,13 @@
 package i2f.springboot.log.preset.spy;
 
+import i2f.core.perf.PerfUtil;
+import i2f.core.perf.data.LinuxFreeDto;
+import i2f.core.perf.data.LinuxTop5Dto;
 import i2f.springboot.log.SysLogger;
 import i2f.springboot.log.SysLoggerFactory;
 import i2f.springboot.log.annotations.SysLog;
 import i2f.springboot.log.consts.LogKeys;
 import i2f.springboot.log.consts.LogType;
-import i2f.springboot.log.data.LinuxFreeDto;
-import i2f.springboot.log.data.LinuxTop5Dto;
 import i2f.springboot.log.preset.JvmUtil;
 import i2f.springboot.log.preset.lifecycle.SysLogApplicationRunnerListener;
 import i2f.springboot.log.util.SysLogUtil;
@@ -323,7 +324,7 @@ public class SysLogHeartbeatSpyHandler implements InitializingBean {
 
 
     private void logSysFree(String traceId, long runTime) {
-        LinuxFreeDto free = SysLogUtil.getLinuxFree();
+        LinuxFreeDto free = PerfUtil.getLinuxFree();
         if (free == null) {
             return;
         }
@@ -411,7 +412,7 @@ public class SysLogHeartbeatSpyHandler implements InitializingBean {
     }
 
     private void logSysTop(String traceId, long runTime) {
-        LinuxTop5Dto top5 = SysLogUtil.getLinuxTop5();
+        LinuxTop5Dto top5 = PerfUtil.getLinuxTop5();
         if (top5 == null) {
             return;
         }

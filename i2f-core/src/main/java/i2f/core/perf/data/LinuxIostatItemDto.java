@@ -1,4 +1,4 @@
-package i2f.springboot.log.data;
+package i2f.core.perf.data;
 
 /**
  * @author Ice2Faith
