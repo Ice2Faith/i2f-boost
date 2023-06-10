@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="i2f.liteflow.mapper.LiteFlowProcessMapper">
+    <!--
+    * @author Ice2Faith
+    * @date 2023-06-07 14:21:53
+    * @desc lite_flow_process 流程表
+    -->
+
+    <resultMap id="mapDoResultMap" type="i2f.liteflow.data.dom.LiteFlowProcessDo">
+        <id property="id" column="id"/>
+        <result property="pkey" column="pkey"/>
+        <result property="version" column="version"/>
+        <result property="active" column="active"/>
+        <result property="folder" column="folder"/>
+        <result property="name" column="name"/>
+        <result property="remark" column="remark"/>
+        <result property="graphImg" column="graph_img"/>
+        <result property="graphFile" column="graph_file"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+    </resultMap>
+
+    <resultMap id="mapVoResultMap" type="i2f.liteflow.data.vo.LiteFlowProcessVo"
+               extends="mapDoResultMap">
+        <result property="versionDesc" column="version_desc"/>
+        <result property="activeDesc" column="active_desc"/>
+    </resultMap>
+
+    <sql id="columnsAsCamel">
+          a.id
+         ,a.pkey
+         ,a.version
+         ,a.active
+         ,a.folder
+         ,a.name
+         ,a.remark
+         ,a.graph_img as graphImg
+         ,a.graph_file as graphFile
+         ,a.create_time as createTime
+         ,a.create_by as createBy
+         ,a.update_time as updateTime
+         ,a.update_by as updateBy
+    </sql>
+
+    <sql id="columnDescAsCamel">
+          a.version_desc as versionDesc
+         ,a.active_desc as activeDesc
+    </sql>
+
+    <sql id="baseQueryBody">
+        select
+              a.id
+              ,a.pkey
+              ,a.version
+              ,a.active
+              ,a.folder
+              ,a.name
+              ,a.remark
+              ,a.graph_img
+              ,a.graph_file
+              ,a.create_time
+              ,a.create_by
+              ,a.update_time
+              ,a.update_by
+        from lite_flow_process a
+    </sql>
+
+    <sql id="baseQuery">
+        <include refid="baseQueryBody"></include>
+        <where>
+            <if test="post.id!=null">
+                and a.id = #{post.id}
+            </if>
+            <if test="post.pkey!=null and post.pkey!=''">
+                and instr(a.pkey,#{post.pkey}) &gt; 0
+            </if>
+            <if test="post.version!=null">
+                and a.version = #{post.version}
+            </if>
+            <if test="post.active!=null">
+                and a.active = #{post.active}
+            </if>
+            <if test="post.folder!=null and post.folder!=''">
+                and instr(a.folder,#{post.folder}) &gt; 0
+            </if>
+            <if test="post.name!=null and post.name!=''">
+                and instr(a.name,#{post.name}) &gt; 0
+            </if>
+            <if test="post.remark!=null and post.remark!=''">
+                and instr(a.remark,#{post.remark}) &gt; 0
+            </if>
+            <if test="post.graphImg!=null and post.graphImg!=''">
+                and instr(a.graph_img,#{post.graphImg}) &gt; 0
+            </if>
+            <if test="post.graphFile!=null and post.graphFile!=''">
+                and instr(a.graph_file,#{post.graphFile}) &gt; 0
+            </if>
+            <if test="post.createTime!=null">
+                and a.create_time = #{post.createTime}
+            </if>
+            <if test="post.createBy!=null and post.createBy!=''">
+                and instr(a.create_by,#{post.createBy}) &gt; 0
+            </if>
+            <if test="post.updateTime!=null">
+                and a.update_time = #{post.updateTime}
+            </if>
+            <if test="post.updateBy!=null and post.updateBy!=''">
+                and instr(a.update_by,#{post.updateBy}) &gt; 0
+            </if>
+        </where>
+    </sql>
+
+    <select id="list" resultMap="mapVoResultMap">
+        <include refid="baseQuery"></include>
+    </select>
+
+    <select id="findByPk" resultMap="mapVoResultMap">
+        <include refid="baseQueryBody"></include>
+        where a.id = #{id}
+    </select>
+
+    <insert id="insertSelective">
+        insert into lite_flow_process
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.id!=null">
+                id,
+            </if>
+            <if test="post.pkey!=null and post.pkey!=''">
+                pkey,
+            </if>
+            <if test="post.version!=null">
+                version,
+            </if>
+            <if test="post.active!=null">
+                active,
+            </if>
+            <if test="post.folder!=null and post.folder!=''">
+                folder,
+            </if>
+            <if test="post.name!=null and post.name!=''">
+                name,
+            </if>
+            <if test="post.remark!=null and post.remark!=''">
+                remark,
+            </if>
+            <if test="post.graphImg!=null and post.graphImg!=''">
+                graph_img,
+            </if>
+            <if test="post.graphFile!=null and post.graphFile!=''">
+                graph_file,
+            </if>
+            <if test="post.createTime!=null">
+                create_time,
+            </if>
+            <if test="post.createBy!=null and post.createBy!=''">
+                create_by,
+            </if>
+            <if test="post.updateTime!=null">
+                update_time,
+            </if>
+            <if test="post.updateBy!=null and post.updateBy!=''">
+                update_by,
+            </if>
+        </trim>
+        )
+        values
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.id!=null">
+                #{post.id},
+            </if>
+            <if test="post.pkey!=null and post.pkey!=''">
+                #{post.pkey},
+            </if>
+            <if test="post.version!=null">
+                #{post.version},
+            </if>
+            <if test="post.active!=null">
+                #{post.active},
+            </if>
+            <if test="post.folder!=null and post.folder!=''">
+                #{post.folder},
+            </if>
+            <if test="post.name!=null and post.name!=''">
+                #{post.name},
+            </if>
+            <if test="post.remark!=null and post.remark!=''">
+                #{post.remark},
+            </if>
+            <if test="post.graphImg!=null and post.graphImg!=''">
+                #{post.graphImg},
+            </if>
+            <if test="post.graphFile!=null and post.graphFile!=''">
+                #{post.graphFile},
+            </if>
+            <if test="post.createTime!=null">
+                #{post.createTime},
+            </if>
+            <if test="post.createBy!=null and post.createBy!=''">
+                #{post.createBy},
+            </if>
+            <if test="post.updateTime!=null">
+                #{post.updateTime},
+            </if>
+            <if test="post.updateBy!=null and post.updateBy!=''">
+                #{post.updateBy},
+            </if>
+        </trim>
+        )
+    </insert>
+
+    <update id="updateSelectiveByPk">
+        update lite_flow_process
+        <set>
+            <if test="post.id!=null">
+                id = #{post.id},
+            </if>
+            <if test="post.pkey!=null and post.pkey!=''">
+                pkey = #{post.pkey},
+            </if>
+            <if test="post.version!=null">
+                version = #{post.version},
+            </if>
+            <if test="post.active!=null">
+                active = #{post.active},
+            </if>
+            <if test="post.folder!=null and post.folder!=''">
+                folder = #{post.folder},
+            </if>
+            <if test="post.name!=null and post.name!=''">
+                name = #{post.name},
+            </if>
+            <if test="post.remark!=null and post.remark!=''">
+                remark = #{post.remark},
+            </if>
+            <if test="post.graphImg!=null and post.graphImg!=''">
+                graph_img = #{post.graphImg},
+            </if>
+            <if test="post.graphFile!=null and post.graphFile!=''">
+                graph_file = #{post.graphFile},
+            </if>
+            <if test="post.createTime!=null">
+                create_time = #{post.createTime},
+            </if>
+            <if test="post.createBy!=null and post.createBy!=''">
+                create_by = #{post.createBy},
+            </if>
+            <if test="post.updateTime!=null">
+                update_time = #{post.updateTime},
+            </if>
+            <if test="post.updateBy!=null and post.updateBy!=''">
+                update_by = #{post.updateBy},
+            </if>
+        </set>
+        where id = #{post.id}
+    </update>
+
+    <delete id="deleteByPk">
+        delete from lite_flow_process
+        where id = #{id}
+    </delete>
+
+    <insert id="insert">
+        insert into lite_flow_process
+        (
+             id
+             ,pkey
+             ,version
+             ,active
+             ,folder
+             ,name
+             ,remark
+             ,graph_img
+             ,graph_file
+             ,create_time
+             ,create_by
+             ,update_time
+             ,update_by
+        )
+        values
+        (
+             #{post.id}
+             ,#{post.pkey}
+             ,#{post.version}
+             ,#{post.active}
+             ,#{post.folder}
+             ,#{post.name}
+             ,#{post.remark}
+             ,#{post.graphImg}
+             ,#{post.graphFile}
+             ,#{post.createTime}
+             ,#{post.createBy}
+             ,#{post.updateTime}
+             ,#{post.updateBy}
+        )
+    </insert>
+
+    <update id="updateByPk">
+        update lite_flow_process
+        <set>
+            id = #{post.id},
+            pkey = #{post.pkey},
+            version = #{post.version},
+            active = #{post.active},
+            folder = #{post.folder},
+            name = #{post.name},
+            remark = #{post.remark},
+            graph_img = #{post.graphImg},
+            graph_file = #{post.graphFile},
+            create_time = #{post.createTime},
+            create_by = #{post.createBy},
+            update_time = #{post.updateTime},
+            update_by = #{post.updateBy},
+        </set>
+        where id = #{post.id}
+    </update>
+
+    <delete id="deleteSelective">
+        delete from lite_flow_process
+        where
+        <trim suffixOverrides="and|or" prefixOverrides="and|or">
+            <if test="post.id!=null">
+                and id = #{post.id}
+            </if>
+            <if test="post.pkey!=null and post.pkey!=''">
+                and instr(pkey,#{post.pkey}) &gt; 0
+            </if>
+            <if test="post.version!=null">
+                and version = #{post.version}
+            </if>
+            <if test="post.active!=null">
+                and active = #{post.active}
+            </if>
+            <if test="post.folder!=null and post.folder!=''">
+                and instr(folder,#{post.folder}) &gt; 0
+            </if>
+            <if test="post.name!=null and post.name!=''">
+                and instr(name,#{post.name}) &gt; 0
+            </if>
+            <if test="post.remark!=null and post.remark!=''">
+                and instr(remark,#{post.remark}) &gt; 0
+            </if>
+            <if test="post.graphImg!=null and post.graphImg!=''">
+                and instr(graph_img,#{post.graphImg}) &gt; 0
+            </if>
+            <if test="post.graphFile!=null and post.graphFile!=''">
+                and instr(graph_file,#{post.graphFile}) &gt; 0
+            </if>
+            <if test="post.createTime!=null">
+                and create_time = #{post.createTime}
+            </if>
+            <if test="post.createBy!=null and post.createBy!=''">
+                and instr(create_by,#{post.createBy}) &gt; 0
+            </if>
+            <if test="post.updateTime!=null">
+                and update_time = #{post.updateTime}
+            </if>
+            <if test="post.updateBy!=null and post.updateBy!=''">
+                and instr(update_by,#{post.updateBy}) &gt; 0
+            </if>
+        </trim>
+    </delete>
+
+    <insert id="insertBatch">
+        insert into lite_flow_process
+        (
+        id
+        ,pkey
+        ,version
+        ,active
+        ,folder
+        ,name
+        ,remark
+        ,graph_img
+        ,graph_file
+        ,create_time
+        ,create_by
+        ,update_time
+        ,update_by
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id}
+            ,#{item.pkey}
+            ,#{item.version}
+            ,#{item.active}
+            ,#{item.folder}
+            ,#{item.name}
+            ,#{item.remark}
+            ,#{item.graphImg}
+            ,#{item.graphFile}
+            ,#{item.createTime}
+            ,#{item.createBy}
+            ,#{item.updateTime}
+            ,#{item.updateBy}
+            )
+        </foreach>
+
+    </insert>
+    <update id="updateAsDeactiveByPKey">
+        update lite_flow_process
+        set active=0
+        where pkey=#{pkey}
+    </update>
+    <select id="countByPKey" resultType="java.lang.Integer">
+        select count(*) cnt
+        from lite_flow_process
+        where pkey=#{pkey}
+    </select>
+    <select id="processIdByPkey" resultType="java.lang.Long">
+        select id
+        from  lite_flow_process
+        where pkey=#{pkey}
+        and active=1
+        order by version desc
+        limit 1
+    </select>
+    <select id="getMaxVersion" resultType="java.lang.Integer">
+        select max(version) ver
+        from lite_flow_process
+        where pkey=#{pkey}
+    </select>
+    <delete id="deleteHistoryVersions">
+        delete from lite_flow_process
+        where  active=0
+        and pkey=#{pkey}
+    </delete>
+</mapper>

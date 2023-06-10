@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="i2f.liteflow.mapper.LiteFlowParamsMapper">
+    <!--
+    * @author Ice2Faith
+    * @date 2023-06-07 14:27:04
+    * @desc lite_flow_params 流程参数表
+    -->
+
+    <resultMap id="mapDoResultMap" type="i2f.liteflow.data.dom.LiteFlowParamsDo">
+        <id property="id" column="id"/>
+        <result property="instanceId" column="instance_id"/>
+        <result property="entryKey" column="entry_key"/>
+        <result property="entryType" column="entry_type"/>
+        <result property="entryValue" column="entry_value"/>
+    </resultMap>
+
+    <resultMap id="mapVoResultMap" type="i2f.liteflow.data.vo.LiteFlowParamsVo"
+               extends="mapDoResultMap">
+    </resultMap>
+
+    <sql id="columnsAsCamel">
+         a.id
+         ,a.instance_id as instanceId
+         ,a.entry_key as entryKey
+         ,a.entry_type as entryType
+         ,a.entry_value as entryValue
+    </sql>
+
+    <sql id="columnDescAsCamel">
+    </sql>
+
+    <sql id="baseQueryBody">
+        select
+              a.id
+              ,a.instance_id
+              ,a.entry_key
+              ,a.entry_type
+              ,a.entry_value
+        from lite_flow_params a
+    </sql>
+
+    <sql id="baseQuery">
+        <include refid="baseQueryBody"></include>
+        <where>
+            <if test="post.id!=null">
+                and a.id = #{post.id}
+            </if>
+            <if test="post.instanceId!=null">
+                and a.instance_id = #{post.instanceId}
+            </if>
+            <if test="post.entryKey!=null and post.entryKey!=''">
+                and instr(a.entry_key,#{post.entryKey}) &gt; 0
+            </if>
+            <if test="post.entryType!=null and post.entryType!=''">
+                and instr(a.entry_type,#{post.entryType}) &gt; 0
+            </if>
+            <if test="post.entryValue!=null and post.entryValue!=''">
+                and instr(a.entry_value,#{post.entryValue}) &gt; 0
+            </if>
+        </where>
+    </sql>
+
+    <select id="list" resultMap="mapVoResultMap">
+        <include refid="baseQuery"></include>
+    </select>
+
+    <select id="findByPk" resultMap="mapVoResultMap">
+        <include refid="baseQueryBody"></include>
+        where a.id = #{id}
+    </select>
+
+    <insert id="insertSelective">
+        insert into lite_flow_params
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.id!=null">
+                id,
+            </if>
+            <if test="post.instanceId!=null">
+                instance_id,
+            </if>
+            <if test="post.entryKey!=null and post.entryKey!=''">
+                entry_key,
+            </if>
+            <if test="post.entryType!=null and post.entryType!=''">
+                entry_type,
+            </if>
+            <if test="post.entryValue!=null and post.entryValue!=''">
+                entry_value,
+            </if>
+        </trim>
+        )
+        values
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.id!=null">
+                #{post.id},
+            </if>
+            <if test="post.instanceId!=null">
+                #{post.instanceId},
+            </if>
+            <if test="post.entryKey!=null and post.entryKey!=''">
+                #{post.entryKey},
+            </if>
+            <if test="post.entryType!=null and post.entryType!=''">
+                #{post.entryType},
+            </if>
+            <if test="post.entryValue!=null and post.entryValue!=''">
+                #{post.entryValue},
+            </if>
+        </trim>
+        )
+    </insert>
+
+    <update id="updateSelectiveByPk">
+        update lite_flow_params
+        <set>
+            <if test="post.id!=null">
+                id = #{post.id},
+            </if>
+            <if test="post.instanceId!=null">
+                instance_id = #{post.instanceId},
+            </if>
+            <if test="post.entryKey!=null and post.entryKey!=''">
+                entry_key = #{post.entryKey},
+            </if>
+            <if test="post.entryType!=null and post.entryType!=''">
+                entry_type = #{post.entryType},
+            </if>
+            <if test="post.entryValue!=null and post.entryValue!=''">
+                entry_value = #{post.entryValue},
+            </if>
+        </set>
+        where id = #{post.id}
+    </update>
+
+    <delete id="deleteByPk">
+        delete from lite_flow_params
+        where id = #{id}
+    </delete>
+
+    <insert id="insert">
+        insert into lite_flow_params
+        (
+             id
+             ,instance_id
+             ,entry_key
+             ,entry_type
+             ,entry_value
+        )
+        values
+        (
+             #{post.id}
+             ,#{post.instanceId}
+             ,#{post.entryKey}
+             ,#{post.entryType}
+             ,#{post.entryValue}
+        )
+    </insert>
+
+    <update id="updateByPk">
+        update lite_flow_params
+        <set>
+            id = #{post.id},
+            instance_id = #{post.instanceId},
+            entry_key = #{post.entryKey},
+            entry_type = #{post.entryType},
+            entry_value = #{post.entryValue},
+        </set>
+        where id = #{post.id}
+    </update>
+
+    <delete id="deleteSelective">
+        delete from lite_flow_params
+        where
+        <trim suffixOverrides="and|or" prefixOverrides="and|or">
+            <if test="post.id!=null">
+                and id = #{post.id}
+            </if>
+            <if test="post.instanceId!=null">
+                and instance_id = #{post.instanceId}
+            </if>
+            <if test="post.entryKey!=null and post.entryKey!=''">
+                and instr(entry_key,#{post.entryKey}) &gt; 0
+            </if>
+            <if test="post.entryType!=null and post.entryType!=''">
+                and instr(entry_type,#{post.entryType}) &gt; 0
+            </if>
+            <if test="post.entryValue!=null and post.entryValue!=''">
+                and instr(entry_value,#{post.entryValue}) &gt; 0
+            </if>
+        </trim>
+    </delete>
+
+    <insert id="insertBatch">
+        insert into lite_flow_params
+        (
+        id
+        ,instance_id
+        ,entry_key
+        ,entry_type
+        ,entry_value
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id}
+            ,#{item.instanceId}
+            ,#{item.entryKey}
+            ,#{item.entryType}
+            ,#{item.entryValue}
+            )
+        </foreach>
+
+    </insert>
+    <select id="getParamsByInstanceId" resultMap="mapVoResultMap">
+        <include refid="baseQueryBody"></include>
+        where a.instance_id = #{instanceId}
+    </select>
+    <delete id="deleteByInstanceId">
+        delete from lite_flow_params
+        where instance_id=#{instanceId}
+    </delete>
+</mapper>

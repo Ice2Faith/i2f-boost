@@ -1,0 +1,88 @@
+{
+    "id" : 454335988593381377,
+    "pkey" : "leave",
+    "version" : 2,
+    "active" : 1,
+    "folder" : "hr",
+    "name" : "请假流程",
+    "remark" : "请假流程",
+    "graphImg" : null,
+    "graphFile" : null,
+    "createTime" : 1686130141000,
+    "createBy" : "root",
+    "updateTime" : null,
+    "updateBy" : null,
+    "versionDesc" : null,
+    "activeDesc" : null,
+    "nodes" : [ {
+        "pkey" : "begin",
+        "processId" : 454335988593381377,
+        "name" : "开始",
+        "nodeType" : 0,
+        "handleType" : 0,
+        "handleBy" : "-",
+        "nodeTypeDesc" : null,
+        "handleTypeDesc" : null
+    }, {
+        "pkey" : "fn",
+        "processId" : 454335988593381377,
+        "name" : "财务归档",
+        "nodeType" : 1,
+        "handleType" : 0,
+        "handleBy" : "fn",
+        "nodeTypeDesc" : null,
+        "handleTypeDesc" : null
+    }, {
+        "pkey" : "hr",
+        "processId" : 454335988593381377,
+        "name" : "人事归档",
+        "nodeType" : 2,
+        "handleType" : 1,
+        "handleBy" : "hr",
+        "nodeTypeDesc" : null,
+        "handleTypeDesc" : null
+    }, {
+        "pkey" : "mgt",
+        "processId" : 454335988593381377,
+        "name" : "经理审批",
+        "nodeType" : 2,
+        "handleType" : 0,
+        "handleBy" : "mgt",
+        "nodeTypeDesc" : null,
+        "handleTypeDesc" : null
+    }, {
+        "pkey" : "mgt2",
+        "processId" : 454335988593381377,
+        "name" : "二级主管审批",
+        "nodeType" : 2,
+        "handleType" : 0,
+        "handleBy" : "mgt2",
+        "nodeTypeDesc" : null,
+        "handleTypeDesc" : null
+    } ],
+    "dags" : [ {
+        "id" : 454335990342406144,
+        "processId" : 454335988593381377,
+        "beginNodePkey" : "begin",
+        "endNodePkey" : "mgt2",
+        "flowCondition" : "true"
+    }, {
+        "id" : 454335990342406145,
+        "processId" : 454335988593381377,
+        "beginNodePkey" : "mgt2",
+        "endNodePkey" : "mgt",
+        "flowCondition" : "true"
+    }, {
+        "id" : 454335990342406146,
+        "processId" : 454335988593381377,
+        "beginNodePkey" : "mgt",
+        "endNodePkey" : "hr",
+        "flowCondition" : "true"
+    }, {
+        "id" : 454335990342406147,
+        "processId" : 454335988593381377,
+        "beginNodePkey" : "hr",
+        "endNodePkey" : "fn",
+        "flowCondition" : "true"
+    } ]
+}

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="i2f.liteflow.mapper.LiteFlowActiveMapper">
+    <!--
+    * @author Ice2Faith
+    * @date 2023-06-10 16:22:38
+    * @desc lite_flow_active 流程激活表
+    -->
+
+    <resultMap id="mapDoResultMap" type="i2f.liteflow.data.dom.LiteFlowActiveDo">
+        <id property="id" column="id"/>
+        <result property="instanceId" column="instance_id"/>
+        <result property="beginNodePkey" column="begin_node_pkey"/>
+        <result property="endNodePkey" column="end_node_pkey"/>
+    </resultMap>
+
+    <resultMap id="mapVoResultMap" type="i2f.liteflow.data.vo.LiteFlowActiveVo"
+               extends="mapDoResultMap">
+    </resultMap>
+
+    <sql id="columnsAsCamel">
+         a.id
+         ,a.instance_id as instanceId
+         ,a.begin_node_pkey as beginNodePkey
+         ,a.end_node_pkey as endNodePkey
+    </sql>
+
+    <sql id="columnDescAsCamel">
+    </sql>
+
+    <sql id="baseQueryBody">
+        select
+              a.id
+              ,a.instance_id
+              ,a.begin_node_pkey
+              ,a.end_node_pkey
+        from lite_flow_active a
+    </sql>
+
+    <sql id="baseQuery">
+        <include refid="baseQueryBody"></include>
+        <where>
+            <if test="post.id!=null">
+                and a.id = #{post.id}
+            </if>
+            <if test="post.instanceId!=null">
+                and a.instance_id = #{post.instanceId}
+            </if>
+            <if test="post.beginNodePkey!=null and post.beginNodePkey!=''">
+                and instr(a.begin_node_pkey,#{post.beginNodePkey}) &gt; 0
+            </if>
+            <if test="post.endNodePkey!=null and post.endNodePkey!=''">
+                and instr(a.end_node_pkey,#{post.endNodePkey}) &gt; 0
+            </if>
+        </where>
+    </sql>
+
+    <select id="list" resultMap="mapVoResultMap">
+        <include refid="baseQuery"></include>
+    </select>
+
+    <select id="findByPk" resultMap="mapVoResultMap">
+        <include refid="baseQueryBody"></include>
+        where a.id = #{id}
+    </select>
+
+    <insert id="insertSelective">
+        insert into lite_flow_active
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.id!=null">
+                id,
+            </if>
+            <if test="post.instanceId!=null">
+                instance_id,
+            </if>
+            <if test="post.beginNodePkey!=null and post.beginNodePkey!=''">
+                begin_node_pkey,
+            </if>
+            <if test="post.endNodePkey!=null and post.endNodePkey!=''">
+                end_node_pkey,
+            </if>
+        </trim>
+        )
+        values
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.id!=null">
+                #{post.id},
+            </if>
+            <if test="post.instanceId!=null">
+                #{post.instanceId},
+            </if>
+            <if test="post.beginNodePkey!=null and post.beginNodePkey!=''">
+                #{post.beginNodePkey},
+            </if>
+            <if test="post.endNodePkey!=null and post.endNodePkey!=''">
+                #{post.endNodePkey},
+            </if>
+        </trim>
+        )
+    </insert>
+
+    <update id="updateSelectiveByPk">
+        update lite_flow_active
+        <set>
+            <if test="post.id!=null">
+                id = #{post.id},
+            </if>
+            <if test="post.instanceId!=null">
+                instance_id = #{post.instanceId},
+            </if>
+            <if test="post.beginNodePkey!=null and post.beginNodePkey!=''">
+                begin_node_pkey = #{post.beginNodePkey},
+            </if>
+            <if test="post.endNodePkey!=null and post.endNodePkey!=''">
+                end_node_pkey = #{post.endNodePkey},
+            </if>
+        </set>
+        where id = #{post.id}
+    </update>
+
+    <delete id="deleteByPk">
+        delete from lite_flow_active
+        where id = #{id}
+    </delete>
+
+    <insert id="insert">
+        insert into lite_flow_active
+        (
+             id
+             ,instance_id
+             ,begin_node_pkey
+             ,end_node_pkey
+        )
+        values
+        (
+             #{post.id}
+             ,#{post.instanceId}
+             ,#{post.beginNodePkey}
+             ,#{post.endNodePkey}
+        )
+    </insert>
+
+    <update id="updateByPk">
+        update lite_flow_active
+        <set>
+            id = #{post.id},
+            instance_id = #{post.instanceId},
+            begin_node_pkey = #{post.beginNodePkey},
+            end_node_pkey = #{post.endNodePkey},
+        </set>
+        where id = #{post.id}
+    </update>
+
+    <delete id="deleteSelective">
+        delete from lite_flow_active
+        where
+        <trim suffixOverrides="and|or" prefixOverrides="and|or">
+            <if test="post.id!=null">
+                and id = #{post.id}
+            </if>
+            <if test="post.instanceId!=null">
+                and instance_id = #{post.instanceId}
+            </if>
+            <if test="post.beginNodePkey!=null and post.beginNodePkey!=''">
+                and instr(begin_node_pkey,#{post.beginNodePkey}) &gt; 0
+            </if>
+            <if test="post.endNodePkey!=null and post.endNodePkey!=''">
+                and instr(end_node_pkey,#{post.endNodePkey}) &gt; 0
+            </if>
+        </trim>
+    </delete>
+
+    <insert id="insertBatch">
+        insert into lite_flow_active
+        (
+        id
+        ,instance_id
+        ,begin_node_pkey
+        ,end_node_pkey
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id}
+            ,#{item.instanceId}
+            ,#{item.beginNodePkey}
+            ,#{item.endNodePkey}
+            )
+        </foreach>
+
+    </insert>
+    <delete id="deleteBeginKeys">
+        delete from lite_flow_active
+        where instance_id=#{instanceId}
+        and begin_node_pkey=#{beginKey}
+    </delete>
+    <select id="getEndKeys" resultMap="mapVoResultMap">
+        <include refid="baseQueryBody"></include>
+        where a.instance_id=#{instanceId}
+        and a.end_node_pkey=#{nextKey}
+    </select>
+    <delete id="deleteByInstanceId">
+        delete from lite_flow_active
+        where instance_id=#{instanceId}
+    </delete>
+</mapper>

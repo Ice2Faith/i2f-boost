@@ -56,8 +56,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class I2fTestApplication extends WarBootApplication {
 
 	public static void main(String[] args) {
-		String log= startup(I2fTestApplication.class, args);
-		System.out.println(log);
+		startup(I2fTestApplication.class, args);
 	}
 
 }

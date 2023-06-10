@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="i2f.liteflow.mapper.LiteFlowNodeMapper">
+    <!--
+    * @author Ice2Faith
+    * @date 2023-06-07 14:23:03
+    * @desc lite_flow_node 流程节点表
+    -->
+
+    <resultMap id="mapDoResultMap" type="i2f.liteflow.data.dom.LiteFlowNodeDo">
+        <id property="pkey" column="pkey"/>
+        <result property="processId" column="process_id"/>
+        <result property="name" column="name"/>
+        <result property="nodeType" column="node_type"/>
+        <result property="handleType" column="handle_type"/>
+        <result property="handleBy" column="handle_by"/>
+    </resultMap>
+
+    <resultMap id="mapVoResultMap" type="i2f.liteflow.data.vo.LiteFlowNodeVo"
+               extends="mapDoResultMap">
+        <result property="nodeTypeDesc" column="node_type_desc"/>
+        <result property="handleTypeDesc" column="handle_type_desc"/>
+    </resultMap>
+
+    <sql id="columnsAsCamel">
+           a.pkey
+          ,a.process_id as processId
+          ,a.name
+          ,a.node_type as nodeType
+          ,a.handle_type as handleType
+          ,a.handle_by as handleBy
+    </sql>
+
+    <sql id="columnDescAsCamel">
+          a.node_type_desc as nodeTypeDesc
+         ,a.handle_type_desc as handleTypeDesc
+    </sql>
+
+    <sql id="baseQueryBody">
+        select
+              a.pkey
+              ,a.process_id
+              ,a.name
+              ,a.node_type
+              ,a.handle_type
+              ,a.handle_by
+        from lite_flow_node a
+    </sql>
+
+    <sql id="baseQuery">
+        <include refid="baseQueryBody"></include>
+        <where>
+            <if test="post.pkey!=null and post.pkey!=''">
+                and instr(a.pkey,#{post.pkey}) &gt; 0
+            </if>
+            <if test="post.processId!=null">
+                and a.process_id = #{post.processId}
+            </if>
+            <if test="post.name!=null and post.name!=''">
+                and instr(a.name,#{post.name}) &gt; 0
+            </if>
+            <if test="post.nodeType!=null">
+                and a.node_type = #{post.nodeType}
+            </if>
+            <if test="post.handleType!=null">
+                and a.handle_type = #{post.handleType}
+            </if>
+            <if test="post.handleBy!=null and post.handleBy!=''">
+                and instr(a.handle_by,#{post.handleBy}) &gt; 0
+            </if>
+        </where>
+    </sql>
+
+    <select id="list" resultMap="mapVoResultMap">
+        <include refid="baseQuery"></include>
+    </select>
+
+    <select id="findByPk" resultMap="mapVoResultMap">
+        <include refid="baseQueryBody"></include>
+        where a.pkey = #{pkey}
+    </select>
+
+    <select id="findByProcessId"  resultMap="mapVoResultMap">
+        <include refid="baseQueryBody"></include>
+        where a.process_id = #{processId}
+    </select>
+
+    <insert id="insertSelective">
+        insert into lite_flow_node
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.pkey!=null and post.pkey!=''">
+                pkey,
+            </if>
+            <if test="post.processId!=null">
+                process_id,
+            </if>
+            <if test="post.name!=null and post.name!=''">
+                name,
+            </if>
+            <if test="post.nodeType!=null">
+                node_type,
+            </if>
+            <if test="post.handleType!=null">
+                handle_type,
+            </if>
+            <if test="post.handleBy!=null and post.handleBy!=''">
+                handle_by,
+            </if>
+        </trim>
+        )
+        values
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.pkey!=null and post.pkey!=''">
+                #{post.pkey},
+            </if>
+            <if test="post.processId!=null">
+                #{post.processId},
+            </if>
+            <if test="post.name!=null and post.name!=''">
+                #{post.name},
+            </if>
+            <if test="post.nodeType!=null">
+                #{post.nodeType},
+            </if>
+            <if test="post.handleType!=null">
+                #{post.handleType},
+            </if>
+            <if test="post.handleBy!=null and post.handleBy!=''">
+                #{post.handleBy},
+            </if>
+        </trim>
+        )
+    </insert>
+
+    <update id="updateSelectiveByPk">
+        update lite_flow_node
+        <set>
+            <if test="post.pkey!=null and post.pkey!=''">
+                pkey = #{post.pkey},
+            </if>
+            <if test="post.processId!=null">
+                process_id = #{post.processId},
+            </if>
+            <if test="post.name!=null and post.name!=''">
+                name = #{post.name},
+            </if>
+            <if test="post.nodeType!=null">
+                node_type = #{post.nodeType},
+            </if>
+            <if test="post.handleType!=null">
+                handle_type = #{post.handleType},
+            </if>
+            <if test="post.handleBy!=null and post.handleBy!=''">
+                handle_by = #{post.handleBy},
+            </if>
+        </set>
+        where pkey = #{post.pkey}
+    </update>
+
+    <delete id="deleteByPk">
+        delete from lite_flow_node
+        where pkey = #{pkey}
+    </delete>
+
+    <insert id="insert">
+        insert into lite_flow_node
+        (
+              pkey
+             ,process_id
+             ,name
+             ,node_type
+             ,handle_type
+             ,handle_by
+        )
+        values
+        (
+             #{post.pkey}
+             ,#{post.processId}
+             ,#{post.name}
+             ,#{post.nodeType}
+             ,#{post.handleType}
+             ,#{post.handleBy}
+        )
+    </insert>
+
+    <update id="updateByPk">
+        update lite_flow_node
+        <set>
+            pkey = #{post.pkey},
+            process_id = #{post.processId},
+            name = #{post.name},
+            node_type = #{post.nodeType},
+            handle_type = #{post.handleType},
+            handle_by = #{post.handleBy},
+        </set>
+        where pkey = #{post.pkey}
+    </update>
+
+    <delete id="deleteSelective">
+        delete from lite_flow_node
+        where
+        <trim suffixOverrides="and|or" prefixOverrides="and|or">
+            <if test="post.pkey!=null and post.pkey!=''">
+                and instr(pkey,#{post.pkey}) &gt; 0
+            </if>
+            <if test="post.processId!=null">
+                and process_id = #{post.processId}
+            </if>
+            <if test="post.name!=null and post.name!=''">
+                and instr(name,#{post.name}) &gt; 0
+            </if>
+            <if test="post.nodeType!=null">
+                and node_type = #{post.nodeType}
+            </if>
+            <if test="post.handleType!=null">
+                and handle_type = #{post.handleType}
+            </if>
+            <if test="post.handleBy!=null and post.handleBy!=''">
+                and instr(handle_by,#{post.handleBy}) &gt; 0
+            </if>
+        </trim>
+    </delete>
+
+    <insert id="insertBatch">
+        insert into lite_flow_node
+        (
+        pkey
+        ,process_id
+        ,name
+        ,node_type
+        ,handle_type
+        ,handle_by
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.pkey}
+            ,#{item.processId}
+            ,#{item.name}
+            ,#{item.nodeType}
+            ,#{item.handleType}
+            ,#{item.handleBy}
+            )
+        </foreach>
+
+    </insert>
+    <delete id="deleteHistoryVersions">
+        delete from lite_flow_node
+        where process_id in (
+            select id
+            from lite_flow_process
+            where active=0
+            and pkey=#{pkey}
+        )
+    </delete>
+</mapper>

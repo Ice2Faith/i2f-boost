@@ -40,8 +40,47 @@ public class JvmUtil {
         return false;
     }
 
+
+    public static boolean isAgent(){
+        List<String> args = ManagementFactory.getRuntimeMXBean().getInputArguments();
+        for (String arg : args) {
+            if (arg.startsWith("-javaagent:")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isNoVerify(){
+        List<String> args = ManagementFactory.getRuntimeMXBean().getInputArguments();
+        for (String arg : args) {
+            if ("-noverify".equals(arg) || "-Xverify:none".equals(arg)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static RuntimeMXBean getRuntimeMXBean() {
         return ManagementFactory.getRuntimeMXBean();
+    }
+
+    public static String getPid(){
+        String name = getRuntimeMXBean().getName();
+        String[] arr = name.split("@",2);
+        if(arr.length==2){
+            return arr[0];
+        }
+        return "-1";
+    }
+
+    public static String getStartUser(){
+        String name = getRuntimeMXBean().getName();
+        String[] arr = name.split("@",2);
+        if(arr.length==2){
+            return arr[1];
+        }
+        return "";
     }
 
     public static String getVmName() {

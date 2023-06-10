@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="i2f.liteflow.mapper.LiteFlowLogMapper">
+    <!--
+    * @author Ice2Faith
+    * @date 2023-06-07 14:25:56
+    * @desc lite_flow_log 流程日志表
+    -->
+
+    <resultMap id="mapDoResultMap" type="i2f.liteflow.data.dom.LiteFlowLogDo">
+        <id property="id" column="id"/>
+        <result property="instanceId" column="instance_id"/>
+        <result property="nodeKey" column="node_key"/>
+        <result property="prevId" column="prev_id"/>
+        <result property="prepared" column="prepared"/>
+        <result property="newest" column="newest"/>
+        <result property="handleTime" column="handle_time"/>
+        <result property="handleMsg" column="handle_msg"/>
+        <result property="handleBy" column="handle_by"/>
+        <result property="param1" column="param1"/>
+        <result property="param2" column="param2"/>
+        <result property="param3" column="param3"/>
+        <result property="param4" column="param4"/>
+        <result property="param5" column="param5"/>
+    </resultMap>
+
+    <resultMap id="mapVoResultMap" type="i2f.liteflow.data.vo.LiteFlowLogVo"
+               extends="mapDoResultMap">
+        <result property="preparedDesc" column="prepared_desc"/>
+        <result property="newestDesc" column="newest_desc"/>
+    </resultMap>
+
+    <sql id="columnsAsCamel">
+         a.id
+         ,a.instance_id as instanceId
+         ,a.node_key as nodeKey
+         ,a.prev_id as prevId
+         ,a.prepared
+         ,a.newest
+         ,a.handle_time as handleTime
+         ,a.handle_msg as handleMsg
+         ,a.handle_by as handleBy
+         ,a.param1
+         ,a.param2
+         ,a.param3
+         ,a.param4
+         ,a.param5
+    </sql>
+
+    <sql id="columnDescAsCamel">
+           a.prepared_desc as preparedDesc
+          ,a.newest_desc as newestDesc
+    </sql>
+
+    <sql id="baseQueryBody">
+        select
+               a.id
+              ,a.instance_id
+              ,a.node_key
+              ,a.prev_id
+              ,a.prepared
+              ,a.newest
+              ,a.handle_time
+              ,a.handle_msg
+              ,a.handle_by
+              ,a.param1
+              ,a.param2
+              ,a.param3
+              ,a.param4
+              ,a.param5
+              ,b.process_id
+              ,c.handle_type
+              ,c.handle_by as process_handle_by
+        from lite_flow_log a
+        left join lite_flow_instance b on a.instance_id =b.id
+        left join lite_flow_node c on c.process_id =b.process_id and c.pkey =a.node_key
+    </sql>
+
+    <sql id="baseQuery">
+        <include refid="baseQueryBody"></include>
+        <where>
+            <if test="post.id!=null">
+                and a.id = #{post.id}
+            </if>
+            <if test="post.instanceId!=null">
+                and a.instance_id = #{post.instanceId}
+            </if>
+            <if test="post.nodeKey!=null and post.nodeKey!=''">
+                and instr(a.node_key,#{post.nodeKey}) &gt; 0
+            </if>
+            <if test="post.prevId!=null">
+                and a.prev_id = #{post.prevId}
+            </if>
+            <if test="post.prepared!=null">
+                and a.prepared = #{post.prepared}
+            </if>
+            <if test="post.newest!=null">
+                and a.newest = #{post.newest}
+            </if>
+            <if test="post.handleTime!=null">
+                and a.handle_time = #{post.handleTime}
+            </if>
+            <if test="post.handleMsg!=null and post.handleMsg!=''">
+                and instr(a.handle_msg,#{post.handleMsg}) &gt; 0
+            </if>
+            <if test="post.handleBy!=null and post.handleBy!=''">
+                and instr(a.handle_by,#{post.handleBy}) &gt; 0
+            </if>
+            <if test="post.param1!=null and post.param1!=''">
+                and instr(a.param1,#{post.param1}) &gt; 0
+            </if>
+            <if test="post.param2!=null and post.param2!=''">
+                and instr(a.param2,#{post.param2}) &gt; 0
+            </if>
+            <if test="post.param3!=null and post.param3!=''">
+                and instr(a.param3,#{post.param3}) &gt; 0
+            </if>
+            <if test="post.param4!=null and post.param4!=''">
+                and instr(a.param4,#{post.param4}) &gt; 0
+            </if>
+            <if test="post.param5!=null and post.param5!=''">
+                and instr(a.param5,#{post.param5}) &gt; 0
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="list" resultMap="mapVoResultMap">
+        <include refid="baseQuery"></include>
+    </select>
+
+    <select id="findByPk" resultMap="mapVoResultMap">
+        <include refid="baseQueryBody"></include>
+        where a.id = #{id}
+    </select>
+
+    <insert id="insertSelective">
+        insert into lite_flow_log
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.id!=null">
+                id,
+            </if>
+            <if test="post.instanceId!=null">
+                instance_id,
+            </if>
+            <if test="post.nodeKey!=null and post.nodeKey!=''">
+                node_key,
+            </if>
+            <if test="post.prevId!=null">
+                prev_id,
+            </if>
+            <if test="post.prepared!=null">
+                prepared,
+            </if>
+            <if test="post.newest!=null">
+                newest,
+            </if>
+            <if test="post.handleTime!=null">
+                handle_time,
+            </if>
+            <if test="post.handleMsg!=null and post.handleMsg!=''">
+                handle_msg,
+            </if>
+            <if test="post.handleBy!=null and post.handleBy!=''">
+                handle_by,
+            </if>
+            <if test="post.param1!=null and post.param1!=''">
+                param1,
+            </if>
+            <if test="post.param2!=null and post.param2!=''">
+                param2,
+            </if>
+            <if test="post.param3!=null and post.param3!=''">
+                param3,
+            </if>
+            <if test="post.param4!=null and post.param4!=''">
+                param4,
+            </if>
+            <if test="post.param5!=null and post.param5!=''">
+                param5,
+            </if>
+        </trim>
+        )
+        values
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.id!=null">
+                #{post.id},
+            </if>
+            <if test="post.instanceId!=null">
+                #{post.instanceId},
+            </if>
+            <if test="post.nodeKey!=null and post.nodeKey!=''">
+                #{post.nodeKey},
+            </if>
+            <if test="post.prevId!=null">
+                #{post.prevId},
+            </if>
+            <if test="post.prepared!=null">
+                #{post.prepared},
+            </if>
+            <if test="post.newest!=null">
+                #{post.newest},
+            </if>
+            <if test="post.handleTime!=null">
+                #{post.handleTime},
+            </if>
+            <if test="post.handleMsg!=null and post.handleMsg!=''">
+                #{post.handleMsg},
+            </if>
+            <if test="post.handleBy!=null and post.handleBy!=''">
+                #{post.handleBy},
+            </if>
+            <if test="post.param1!=null and post.param1!=''">
+                #{post.param1},
+            </if>
+            <if test="post.param2!=null and post.param2!=''">
+                #{post.param2},
+            </if>
+            <if test="post.param3!=null and post.param3!=''">
+                #{post.param3},
+            </if>
+            <if test="post.param4!=null and post.param4!=''">
+                #{post.param4},
+            </if>
+            <if test="post.param5!=null and post.param5!=''">
+                #{post.param5},
+            </if>
+        </trim>
+        )
+    </insert>
+
+    <update id="updateSelectiveByPk">
+        update lite_flow_log
+        <set>
+            <if test="post.id!=null">
+                id = #{post.id},
+            </if>
+            <if test="post.instanceId!=null">
+                instance_id = #{post.instanceId},
+            </if>
+            <if test="post.nodeKey!=null and post.nodeKey!=''">
+                node_key = #{post.nodeKey},
+            </if>
+            <if test="post.prevId!=null">
+                prev_id = #{post.prevId},
+            </if>
+            <if test="post.prepared!=null">
+                prepared = #{post.prepared},
+            </if>
+            <if test="post.newest!=null">
+                newest = #{post.newest},
+            </if>
+            <if test="post.handleTime!=null">
+                handle_time = #{post.handleTime},
+            </if>
+            <if test="post.handleMsg!=null and post.handleMsg!=''">
+                handle_msg = #{post.handleMsg},
+            </if>
+            <if test="post.handleBy!=null and post.handleBy!=''">
+                handle_by = #{post.handleBy},
+            </if>
+            <if test="post.param1!=null and post.param1!=''">
+                param1 = #{post.param1},
+            </if>
+            <if test="post.param2!=null and post.param2!=''">
+                param2 = #{post.param2},
+            </if>
+            <if test="post.param3!=null and post.param3!=''">
+                param3 = #{post.param3},
+            </if>
+            <if test="post.param4!=null and post.param4!=''">
+                param4 = #{post.param4},
+            </if>
+            <if test="post.param5!=null and post.param5!=''">
+                param5 = #{post.param5},
+            </if>
+        </set>
+        where id = #{post.id}
+    </update>
+
+    <delete id="deleteByPk">
+        delete from lite_flow_log
+        where id = #{id}
+    </delete>
+
+    <insert id="insert">
+        insert into lite_flow_log
+        (
+             id
+             ,instance_id
+             ,node_key
+             ,prev_id
+             ,prepared
+             ,newest
+             ,handle_time
+             ,handle_msg
+             ,handle_by
+             ,param1
+             ,param2
+             ,param3
+             ,param4
+             ,param5
+        )
+        values
+        (
+              #{post.id}
+             ,#{post.instanceId}
+             ,#{post.nodeKey}
+             ,#{post.prevId}
+             ,#{post.prepared}
+             ,#{post.newest}
+             ,#{post.handleTime}
+             ,#{post.handleMsg}
+             ,#{post.handleBy}
+             ,#{post.param1}
+             ,#{post.param2}
+             ,#{post.param3}
+             ,#{post.param4}
+             ,#{post.param5}
+        )
+    </insert>
+
+    <update id="updateByPk">
+        update lite_flow_log
+        <set>
+            id = #{post.id},
+            instance_id = #{post.instanceId},
+            node_key = #{post.nodeKey},
+            prev_id = #{post.prevId},
+            prepared = #{post.prepared},
+            newest = #{post.newest},
+            handle_time = #{post.handleTime},
+            handle_msg = #{post.handleMsg},
+            handle_by = #{post.handleBy},
+            param1 = #{post.param1},
+            param2 = #{post.param2},
+            param3 = #{post.param3},
+            param4 = #{post.param4},
+            param5 = #{post.param5},
+        </set>
+        where id = #{post.id}
+    </update>
+
+    <delete id="deleteSelective">
+        delete from lite_flow_log
+        where
+        <trim suffixOverrides="and|or" prefixOverrides="and|or">
+            <if test="post.id!=null">
+                and id = #{post.id}
+            </if>
+            <if test="post.instanceId!=null">
+                and instance_id = #{post.instanceId}
+            </if>
+            <if test="post.nodeKey!=null and post.nodeKey!=''">
+                and instr(node_key,#{post.nodeKey}) &gt; 0
+            </if>
+            <if test="post.prevId!=null">
+                and prev_id = #{post.prevId}
+            </if>
+            <if test="post.prepared!=null">
+                and prepared = #{post.prepared}
+            </if>
+            <if test="post.newest!=null">
+                and newest = #{post.newest}
+            </if>
+            <if test="post.handleTime!=null">
+                and handle_time = #{post.handleTime}
+            </if>
+            <if test="post.handleMsg!=null and post.handleMsg!=''">
+                and instr(handle_msg,#{post.handleMsg}) &gt; 0
+            </if>
+            <if test="post.handleBy!=null and post.handleBy!=''">
+                and instr(handle_by,#{post.handleBy}) &gt; 0
+            </if>
+            <if test="post.param1!=null and post.param1!=''">
+                and instr(param1,#{post.param1}) &gt; 0
+            </if>
+            <if test="post.param2!=null and post.param2!=''">
+                and instr(param2,#{post.param2}) &gt; 0
+            </if>
+            <if test="post.param3!=null and post.param3!=''">
+                and instr(param3,#{post.param3}) &gt; 0
+            </if>
+            <if test="post.param4!=null and post.param4!=''">
+                and instr(param4,#{post.param4}) &gt; 0
+            </if>
+            <if test="post.param5!=null and post.param5!=''">
+                and instr(param5,#{post.param5}) &gt; 0
+            </if>
+        </trim>
+    </delete>
+
+    <insert id="insertBatch">
+        insert into lite_flow_log
+        (
+        id
+        ,instance_id
+        ,node_key
+        ,prev_id
+        ,prepared
+        ,newest
+        ,handle_time
+        ,handle_msg
+        ,handle_by
+        ,param1
+        ,param2
+        ,param3
+        ,param4
+        ,param5
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id}
+            ,#{item.instanceId}
+            ,#{item.nodeKey}
+            ,#{item.prevId}
+            ,#{item.prepared}
+            ,#{item.newest}
+            ,#{item.handleTime}
+            ,#{item.handleMsg}
+            ,#{item.handleBy}
+            ,#{item.param1}
+            ,#{item.param2}
+            ,#{item.param3}
+            ,#{item.param4}
+            ,#{item.param5}
+            )
+        </foreach>
+
+    </insert>
+    <select id="getTasks" resultMap="mapVoResultMap">
+        <include refid="baseQueryBody"></include>
+        where a.newest = 1
+        and a.prepared = 1
+        and b.status != 2
+        and (
+            a.handle_by = #{oper}
+            or (
+                a.handle_by is null
+                and c.handle_type =1
+                <if test="organs!=null and organs.size>0">
+                    and c.handle_by in
+                    <foreach collection="organs" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+            )
+        )
+    </select>
+    <select id="getNewestTask" resultMap="mapVoResultMap">
+        <include refid="baseQueryBody"></include>
+        where a.newest = 1
+        and a.instance_id=#{instanceId}
+    </select>
+    <select id="getInstanceLogs" resultMap="mapVoResultMap">
+        <include refid="baseQueryBody"></include>
+        where a.instance_id=#{instanceId}
+        order by handle_time desc
+    </select>
+    <select id="getNewestTaskCount" resultType="java.lang.Integer">
+        select count(*) cnt
+        from lite_flow_log a
+        where a.instance_id=#{instanceId}
+        and a.node_key=#{nodeKey}
+        and a.newest = 1
+    </select>
+    <update id="updateAsPrepared">
+        update lite_flow_log
+        set prepared=1
+        where instance_id=#{instanceId}
+        and node_key=#{nextKey}
+        and newest = 1
+    </update>
+    <update id="updateHandleBy">
+        update lite_flow_log
+        set handle_by=#{handleBy}
+        where id=#{logId}
+    </update>
+    <delete id="deleteByInstanceId">
+        delete from lite_flow_log
+        where instance_id=#{instanceId}
+    </delete>
+</mapper>

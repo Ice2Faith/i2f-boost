@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="i2f.liteflow.mapper.LiteFlowInstanceMapper">
+    <!--
+    * @author Ice2Faith
+    * @date 2023-06-07 14:24:49
+    * @desc lite_flow_instance 流程实例表
+    -->
+
+    <resultMap id="mapDoResultMap" type="i2f.liteflow.data.dom.LiteFlowInstanceDo">
+        <id property="id" column="id"/>
+        <result property="processId" column="process_id"/>
+        <result property="businessKey" column="business_key"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+    </resultMap>
+
+    <resultMap id="mapVoResultMap" type="i2f.liteflow.data.vo.LiteFlowInstanceVo"
+               extends="mapDoResultMap">
+        <result property="statusDesc" column="status_desc"/>
+    </resultMap>
+
+    <sql id="columnsAsCamel">
+          a.id
+         ,a.process_id as processId
+         ,a.business_key as businessKey
+         ,a.status
+         ,a.create_time as createTime
+         ,a.create_by as createBy
+    </sql>
+
+    <sql id="columnDescAsCamel">
+         a.status_desc as statusDesc
+    </sql>
+
+    <sql id="baseQueryBody">
+        select
+              a.id
+              ,a.process_id
+              ,a.business_key
+              ,a.status
+              ,a.create_time
+              ,a.create_by
+        from lite_flow_instance a
+    </sql>
+
+    <sql id="baseQuery">
+        <include refid="baseQueryBody"></include>
+        <where>
+            <if test="post.id!=null">
+                and a.id = #{post.id}
+            </if>
+            <if test="post.processId!=null">
+                and a.process_id = #{post.processId}
+            </if>
+            <if test="post.businessKey!=null and post.businessKey!=''">
+                and instr(a.business_key,#{post.businessKey}) &gt; 0
+            </if>
+            <if test="post.status!=null">
+                and a.status = #{post.status}
+            </if>
+            <if test="post.createTime!=null">
+                and a.create_time = #{post.createTime}
+            </if>
+            <if test="post.createBy!=null and post.createBy!=''">
+                and instr(a.create_by,#{post.createBy}) &gt; 0
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="list" resultMap="mapVoResultMap">
+        <include refid="baseQuery"></include>
+    </select>
+
+    <select id="findByPk" resultMap="mapVoResultMap">
+        <include refid="baseQueryBody"></include>
+        where a.id = #{id}
+    </select>
+
+    <insert id="insertSelective">
+        insert into lite_flow_instance
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.id!=null">
+                id,
+            </if>
+            <if test="post.processId!=null">
+                process_id,
+            </if>
+            <if test="post.businessKey!=null and post.businessKey!=''">
+                business_key,
+            </if>
+            <if test="post.status!=null">
+                status,
+            </if>
+            <if test="post.createTime!=null">
+                create_time,
+            </if>
+            <if test="post.createBy!=null and post.createBy!=''">
+                create_by,
+            </if>
+        </trim>
+        )
+        values
+        (
+        <trim suffixOverrides="," prefixOverrides=",">
+            <if test="post.id!=null">
+                #{post.id},
+            </if>
+            <if test="post.processId!=null">
+                #{post.processId},
+            </if>
+            <if test="post.businessKey!=null and post.businessKey!=''">
+                #{post.businessKey},
+            </if>
+            <if test="post.status!=null">
+                #{post.status},
+            </if>
+            <if test="post.createTime!=null">
+                #{post.createTime},
+            </if>
+            <if test="post.createBy!=null and post.createBy!=''">
+                #{post.createBy},
+            </if>
+        </trim>
+        )
+    </insert>
+
+    <update id="updateSelectiveByPk">
+        update lite_flow_instance
+        <set>
+            <if test="post.id!=null">
+                id = #{post.id},
+            </if>
+            <if test="post.processId!=null">
+                process_id = #{post.processId},
+            </if>
+            <if test="post.businessKey!=null and post.businessKey!=''">
+                business_key = #{post.businessKey},
+            </if>
+            <if test="post.status!=null">
+                status = #{post.status},
+            </if>
+            <if test="post.createTime!=null">
+                create_time = #{post.createTime},
+            </if>
+            <if test="post.createBy!=null and post.createBy!=''">
+                create_by = #{post.createBy},
+            </if>
+        </set>
+        where id = #{post.id}
+    </update>
+
+    <delete id="deleteByPk">
+        delete from lite_flow_instance
+        where id = #{id}
+    </delete>
+
+    <insert id="insert">
+        insert into lite_flow_instance
+        (
+             id
+             ,process_id
+             ,business_key
+             ,status
+             ,create_time
+             ,create_by
+        )
+        values
+        (
+             #{post.id}
+             ,#{post.processId}
+             ,#{post.businessKey}
+             ,#{post.status}
+             ,#{post.createTime}
+             ,#{post.createBy}
+        )
+    </insert>
+
+    <update id="updateByPk">
+        update lite_flow_instance
+        <set>
+            id = #{post.id},
+            process_id = #{post.processId},
+            business_key = #{post.businessKey},
+            status = #{post.status},
+            create_time = #{post.createTime},
+            create_by = #{post.createBy},
+        </set>
+        where id = #{post.id}
+    </update>
+
+    <delete id="deleteSelective">
+        delete from lite_flow_instance
+        where
+        <trim suffixOverrides="and|or" prefixOverrides="and|or">
+            <if test="post.id!=null">
+                and id = #{post.id}
+            </if>
+            <if test="post.processId!=null">
+                and process_id = #{post.processId}
+            </if>
+            <if test="post.businessKey!=null and post.businessKey!=''">
+                and instr(business_key,#{post.businessKey}) &gt; 0
+            </if>
+            <if test="post.status!=null">
+                and status = #{post.status}
+            </if>
+            <if test="post.createTime!=null">
+                and create_time = #{post.createTime}
+            </if>
+            <if test="post.createBy!=null and post.createBy!=''">
+                and instr(create_by,#{post.createBy}) &gt; 0
+            </if>
+        </trim>
+    </delete>
+
+    <insert id="insertBatch">
+        insert into lite_flow_instance
+        (
+        id
+        ,process_id
+        ,business_key
+        ,status
+        ,create_time
+        ,create_by
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id}
+            ,#{item.processId}
+            ,#{item.businessKey}
+            ,#{item.status}
+            ,#{item.createTime}
+            ,#{item.createBy}
+            )
+        </foreach>
+
+    </insert>
+</mapper>

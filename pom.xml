@@ -59,6 +59,7 @@
 
         <!--        <module>i2f-backup</module>-->
 
+        <module>i2f-liteflow</module>
     </modules>
 
     <properties>
