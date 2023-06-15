@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: i2f-liteflow
+  profiles:
+    active: dev

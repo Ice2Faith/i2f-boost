@@ -1,0 +1,20 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /app
+
+logging:
+  level:
+    root: info
+    i2f.secure.**.mapper: debug
+
+
+spring:
+  mvc:
+    servlet:
+      filter:
+        chain:
+          patterns: /**
+          filters: secureTransferFilter
+
+

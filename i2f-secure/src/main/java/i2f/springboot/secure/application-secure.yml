@@ -1,0 +1,66 @@
+# secure 配置
+i2f:
+  springboot:
+    config:
+      secure:
+        # 是否开启
+        enable: true
+        # rsa秘钥的存储路径，默认../
+        rsa-store-path: ../
+        # 响应字符集，默认UTF-8
+        responseCharset: 'UTF-8'
+        # RSA秘钥长度，默认1024
+        rsaKeySize: 1024
+        # 随机秘钥生成的随机数的最大值，默认8192
+        randomKeyBound: 8192
+        # 一次性消息的保持时间秒数，默认6*60
+        # 这段时间内重复出现的nonce将会被认为是重放请求被拦截
+        nonceTimeoutSeconds: 360
+        # 是否启动动态RSA更新秘钥，默认true
+        enableDynamicRsaKey: true
+        # 每次更新秘钥的时长秒数，默认6*60
+        dynamicRefreshDelaySeconds: 360
+        # 最多保留多少历史秘钥，默认5
+        dynamicMaxHistoriesCount: 5
+        # 用于存储安全头的请求头名称，默认sswh
+        headerName: sswh
+        # 安全头格式的分隔符，默认;
+        headerSeparator: ;
+        # 动态刷新RSA秘钥的响应头，默认skey
+        dynamicKeyHeaderName: skey
+        # 默认的安全控制策略，也就是当注解和白名单都未配置时的策略模式，默认关闭
+        defaultControl:
+          # 入站是否安全
+          in: false
+          # 出站是否安全
+          out: false
+        # 白名单配置列表项，符合ant-match模式
+        whiteList:
+          # 进出站都忽略的列表清单
+          bothPattens:
+            - /file/**
+          # 进站忽略的列表清单
+          inPattens:
+            - /common/upload/**
+          # 出站忽略的列表清单
+          outPattens:
+            - /common/download/**
+        # AOP功能
+        aop:
+          # 是否启用AOP功能，默认true
+          # 改功能包含抛出核心filter的异常，使得能够通过ExceptionHandler进行捕获异常
+          # 包含支持解密String类型的RequestParam请求参数
+          # 包含controller为String类型返回值时的特殊处理
+          # 因此不建议关闭此功能，关闭之后也需要自己进行覆盖实现
+          enable: true
+        # 内置的API接口
+        api:
+          # 是否开启默认的API响应RSA秘钥获取请求，默认true
+          # 请求路径：/secure/key
+          enable: true
+        # 内置的URL请求路径转发接口
+        enc-url-forward:
+          # 是否开启enc的url解密请求转发，默认true
+          # 请求路径: /enc/**
+          enable: true
+
