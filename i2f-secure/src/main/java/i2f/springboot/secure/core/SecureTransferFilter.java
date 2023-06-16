@@ -11,6 +11,7 @@ import i2f.springboot.secure.consts.SecureErrorCode;
 import i2f.springboot.secure.data.SecureCtrl;
 import i2f.springboot.secure.data.SecureHeader;
 import i2f.springboot.secure.exception.SecureException;
+import i2f.springboot.secure.util.RequestUtils;
 import i2f.springboot.secure.util.SecureUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -154,12 +155,16 @@ public class SecureTransferFilter implements Filter, InitializingBean {
                 // 正常的请求是客户端发起的，每一次一次性头都是不同的
                 // 然而，非正常的请求，可以进行重放请求达到目的
                 // 这样的请求，就会出现一次性头重复，存在相同的签名
-                String nonce = requestHeader.nonce;
-                if (nonceCache.containsKey(nonce)) {
+                String clientIp = RequestUtils.getIp(request);
+                // 对于服务端而言，nonce从客户端发送过来，很难避免不同的客户端发送过来的nonce重复的问题
+                // 如果不进行客户端隔离，就会导致不少正常的请求被拦截为重放
+                // 因此需要结合客户端IP判定nonce
+                String cacheNonce = clientIp + ":" + requestHeader.nonce;
+                if (nonceCache.containsKey(cacheNonce)) {
                     throw new SecureException(SecureErrorCode.BAD_NONCE, "不允许重放请求");
                 }
 
-                nonceCache.put(nonce, 1L);
+                nonceCache.put(cacheNonce, 1L);
 
                 // 这里定时消除一个时间窗口内的重放请求
                 // 更好的实现方式时使用redis，避免一个时间窗口内出现大量请求
@@ -167,7 +172,7 @@ public class SecureTransferFilter implements Filter, InitializingBean {
                 pool.schedule(new Runnable() {
                     @Override
                     public void run() {
-                        nonceCache.remove(nonce);
+                        nonceCache.remove(cacheNonce);
                     }
                 }, secureConfig.getNonceTimeoutSeconds(), TimeUnit.SECONDS);
 

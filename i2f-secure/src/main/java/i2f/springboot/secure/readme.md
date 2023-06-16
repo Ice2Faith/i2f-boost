@@ -5,6 +5,19 @@
     - 采用RSA+AES组合形式完成前后端交互的加解密过程
     - 同时进行nonce防重放攻击防御
     - 同时支持动态刷新RSA秘钥
+- 优势
+    - 采用Filter+Aop+Forward实现无侵入式接入
+    - 对于程序员来说是透明的
+    - 支持请求体（body）/请求参数（queryString）的加密传输
+    - 支持响应体（body）的加传输
+    - 支持请求URL的加密传输
+    - 实现请求过程的全参数加密
+- 缺点
+    - 可能某些特殊接口会发生错误
+    - 可以使用白名单或者注解进行排除处理
+    - 前端只提供了基于axios拦截器的过滤器实现
+    - 因为这能够实现程序员无感化
+    - 其他请求方式，因为不支持拦截器或者无感化
 - 总体流程
     - 客户端
         - 登录后获取RSA公钥
@@ -106,6 +119,46 @@ this.$axios({
   }).then(({data})=>{
     this.$secureTransfer.saveRsaPubKey(data);
   })
+```
+- 此获取RSA公钥的代码
+- 如果是使用Vue等虚拟DOM主体时
+- 建议在Vue等主体的初始化时进行调用
+- 下面以Vue为例
+    - 在Vue主体实例创建时调用获取RSA公钥
+    - 如果后端配置了动态刷新RSA，则建议使用定时器进行定时刷新
+    - 否则可能出现请求失败，后端无法解密情况
+```bash
+App.vue
+```
+```js
+import SecureTransfer from "@/secure/core/secure-transfer";
+
+export default {
+  name: 'App',
+  components: {
+    
+  },
+  created() {
+    this.initRsaContent()
+    let _this=this
+    window.rsaTimer=setInterval(function(){
+        _this.initRsaContent()
+    },5*60*1000)
+  },
+  destroyed() {
+    clearInterval(window.rsaTimer)
+  },
+  methods:{
+    initRsaContent(){
+      this.$axios({
+        url: 'secure/key',
+        method: 'post'
+      }).then(({data})=>{
+        SecureTransfer.saveRsaPubKey(data)
+      })
+    },
+  }
+}
 ```
 
 ---
