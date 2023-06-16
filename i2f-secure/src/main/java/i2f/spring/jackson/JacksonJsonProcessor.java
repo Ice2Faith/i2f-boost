@@ -8,16 +8,19 @@ import java.util.Locale;
 import java.util.Map;
 
 @Component
-public class JacksonJsonProcessor  {
+public class JacksonJsonProcessor {
     protected volatile ObjectMapper mapper;
-    public JacksonJsonProcessor(){
-        mapper=new ObjectMapper();
+
+    public JacksonJsonProcessor() {
+        mapper = new ObjectMapper();
         mapper.setLocale(Locale.getDefault());
     }
-    public JacksonJsonProcessor(ObjectMapper mapper){
-        this.mapper=mapper;
+
+    public JacksonJsonProcessor(ObjectMapper mapper) {
+        this.mapper = mapper;
     }
-    public ObjectMapper getMapper(){
+
+    public ObjectMapper getMapper() {
         return mapper;
     }
 
@@ -62,14 +65,14 @@ public class JacksonJsonProcessor  {
         }
     }
 
-    public Map<String,Object> bean2Map(Object bean) {
+    public Map<String, Object> bean2Map(Object bean) {
         String json = serialize(bean);
         Map<String, Object> map = deserialize(json, new TypeReference<Map<String, Object>>() {
         });
         return map;
     }
 
-    public<T> T map2Bean(Map<String,Object> map, Class<T> clazz) {
+    public <T> T map2Bean(Map<String, Object> map, Class<T> clazz) {
         String json = serialize(map);
         T bean = deserialize(json, clazz);
         return bean;

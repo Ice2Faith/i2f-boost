@@ -11,7 +11,8 @@ import java.io.IOException;
  * @desc
  */
 public class ByteArrayServletInputStream extends ServletInputStream {
-    protected ByteArrayInputStream bis ;
+    protected ByteArrayInputStream bis;
+
     public ByteArrayServletInputStream(ByteArrayInputStream bis) {
         this.bis = bis;
     }

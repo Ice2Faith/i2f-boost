@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -22,38 +21,39 @@ import java.util.Set;
 @Configuration
 @ConfigurationProperties(prefix = "i2f.springboot.config.secure")
 public class SecureConfig {
-    private String rsaStorePath="../";
+    private String rsaStorePath = "../";
 
-    private String responseCharset="UTF-8";
+    private String responseCharset = "UTF-8";
 
-    private int rsaKeySize=1024;
+    private int rsaKeySize = 1024;
 
-    private int randomKeyBound=8192;
+    private int randomKeyBound = 8192;
 
-    private int nonceTimeoutSeconds=6*60;
+    private int nonceTimeoutSeconds = 6 * 60;
 
-    private boolean enableDynamicRsaKey=true;
+    private boolean enableDynamicRsaKey = true;
 
-    private long dynamicRefreshDelaySeconds=6*60;
+    private long dynamicRefreshDelaySeconds = 6 * 60;
 
-    private int dynamicMaxHistoriesCount=5;
+    private int dynamicMaxHistoriesCount = 5;
 
-    private String headerName= SecureConsts.DEFAULT_SECURE_HEADER_NAME;
+    private String headerName = SecureConsts.DEFAULT_SECURE_HEADER_NAME;
 
-    private String headerSeparator=SecureConsts.DEFAULT_HEADER_SEPARATOR;
+    private String headerSeparator = SecureConsts.DEFAULT_HEADER_SEPARATOR;
 
-    private String dynamicKeyHeaderName=SecureConsts.SECURE_DYNAMIC_KEY_HEADER;
+    private String dynamicKeyHeaderName = SecureConsts.SECURE_DYNAMIC_KEY_HEADER;
 
-    private String encUrlPath=SecureConsts.DEFAULT_ENC_URL_PATH;
+    private String encUrlPath = SecureConsts.DEFAULT_ENC_URL_PATH;
 
-    private SecureCtrl defaultControl=new SecureCtrl(true,true);
+    private String parameterName=SecureConsts.DEFAULT_SECURE_PARAMETER_NAME;
+
+    private SecureCtrl defaultControl = new SecureCtrl(true, true);
 
     private SecureWhiteListConfig whiteList;
 
-
     @Data
     @NoArgsConstructor
-    public static class SecureWhiteListConfig{
+    public static class SecureWhiteListConfig {
         private Set<String> bothPattens;
         private Set<String> inPattens;
         private Set<String> outPattens;

@@ -5,7 +5,7 @@ package i2f.springboot.secure.consts;
  * @date 2023/6/13 10:19
  * @desc
  */
-public enum  SecureErrorCode {
+public enum SecureErrorCode {
     SECURE_HEADER_EMPTY(101),
     SECURE_HEADER_STRUCTURE(102),
     SECURE_HEADER_SIGN_EMPTY(103),
@@ -17,15 +17,15 @@ public enum  SecureErrorCode {
     BAD_RANDOM_KEY(202),
     BAD_NONCE(203),
 
-    BAD_SECURE_REQUEST(301)
-    ;
+    BAD_SECURE_REQUEST(301);
 
     private int code;
 
     SecureErrorCode(int code) {
         this.code = code;
     }
-    public int code(){
+
+    public int code() {
         return this.code;
     }
 }

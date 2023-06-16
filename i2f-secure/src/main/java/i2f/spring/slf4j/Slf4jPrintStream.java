@@ -16,9 +16,10 @@ import java.util.Locale;
  * @desc 控制台输出，重定向到SLF4J，以便在logback中能够显示控制台输出
  */
 public class Slf4jPrintStream extends PrintStream {
-    public enum Slf4jLevel{
-        TRACE,DEBUG,INFO,WARN,ERROR;
+    public enum Slf4jLevel {
+        TRACE, DEBUG, INFO, WARN, ERROR;
     }
+
     // logback配置项名称
     public static final String LOGBACK_CONFIG_PROPERTY_NAME = "logging.config";
     // 初始化时自动获取本类类名
@@ -43,21 +44,21 @@ public class Slf4jPrintStream extends PrintStream {
 
     public Slf4jPrintStream(Slf4jLevel level, PrintStream target, String targetName, boolean keepConsole, boolean useTrace) {
         super((OutputStream) new ByteArrayOutputStream());
-        selfClassName=getClass().getName();
-        selfSimpleName=getClass().getSimpleName();
-        this.targetName=targetName;
-        this.level=level;
-        this.target=target;
-        this.keepConsole=keepConsole;
-        this.useTrace=useTrace;
-        this.log=LoggerFactory.getLogger(getClass().getSimpleName()+"."+targetName);
+        selfClassName = getClass().getName();
+        selfSimpleName = getClass().getSimpleName();
+        this.targetName = targetName;
+        this.level = level;
+        this.target = target;
+        this.keepConsole = keepConsole;
+        this.useTrace = useTrace;
+        this.log = LoggerFactory.getLogger(getClass().getSimpleName() + "." + targetName);
         // 检测是否启用了logback
         String logback = System.getProperty(LOGBACK_CONFIG_PROPERTY_NAME);
-        if(logback!=null){
-            logback=logback.trim();
+        if (logback != null) {
+            logback = logback.trim();
         }
-        if(logback!=null && !"".equals(logback)){
-            logbackEnv=true;
+        if (logback != null && !"".equals(logback)) {
+            logbackEnv = true;
         }
     }
 
@@ -65,8 +66,8 @@ public class Slf4jPrintStream extends PrintStream {
     public void write(byte[] b) throws IOException {
         // 如果没有启用logback，需要降拦截的日志重新输出回控制台显示
         // 如果启用了控制台，则直接定向到logback日志中，不再进行回显到控制台
-        if(!logbackEnv){
-            if(target!=null){
+        if (!logbackEnv) {
+            if (target != null) {
                 target.write(b);
             }
         }
@@ -75,24 +76,25 @@ public class Slf4jPrintStream extends PrintStream {
     /**
      * 静态方法，进行控制台的标准输出和错误输出使用slf4j处理
      * 标准输出映射为INFO级别，错误输出映射为ERROR级别
+     *
      * @param keepConsole
      * @param useTrace
      */
-    public static void redirectSysoutSyserr(boolean keepConsole,boolean useTrace){
-        synchronized (System.class){
-            if(!(System.out instanceof Slf4jPrintStream)){
-                PrintStream out= System.out;
-                System.setOut(new Slf4jPrintStream(Slf4jLevel.INFO,out,"sys.out",keepConsole,useTrace));
+    public static void redirectSysoutSyserr(boolean keepConsole, boolean useTrace) {
+        synchronized (System.class) {
+            if (!(System.out instanceof Slf4jPrintStream)) {
+                PrintStream out = System.out;
+                System.setOut(new Slf4jPrintStream(Slf4jLevel.INFO, out, "sys.out", keepConsole, useTrace));
             }
-            if(!(System.err instanceof Slf4jPrintStream)){
-                PrintStream err=System.err;
-                System.setErr(new Slf4jPrintStream(Slf4jLevel.ERROR,err,"sys.err",keepConsole,useTrace));
+            if (!(System.err instanceof Slf4jPrintStream)) {
+                PrintStream err = System.err;
+                System.setErr(new Slf4jPrintStream(Slf4jLevel.ERROR, err, "sys.err", keepConsole, useTrace));
             }
         }
     }
 
-    public static void redirectSysoutSyserr(){
-        redirectSysoutSyserr(false,true);
+    public static void redirectSysoutSyserr() {
+        redirectSysoutSyserr(false, true);
     }
 
     // 针对特殊数据做转换
@@ -114,21 +116,21 @@ public class Slf4jPrintStream extends PrintStream {
             } catch (Exception e) {
 
             }
-            try{
-                String str=new String(data,"GBK");
+            try {
+                String str = new String(data, "GBK");
                 return str;
-            }catch(Exception e){
+            } catch (Exception e) {
 
             }
         }
         return val;
     }
 
-    protected void proxy(Object ... vals){
-        if(vals.length<=0){
+    protected void proxy(Object... vals) {
+        if (vals.length <= 0) {
             return;
         }
-        if(useTrace) {
+        if (useTrace) {
             StackTraceElement[] stacks = Thread.currentThread().getStackTrace();
             int idx = 0;
             for (int i = stacks.length - 1; i >= 0; i--) {
@@ -183,14 +185,14 @@ public class Slf4jPrintStream extends PrintStream {
 
     @Override
     public void close() {
-        if(target!=null){
+        if (target != null) {
             target.close();
         }
     }
 
     @Override
     public boolean checkError() {
-        if(target!=null){
+        if (target != null) {
             target.checkError();
         }
         return false;
@@ -209,29 +211,28 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void write(int b) {
         proxy(b);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.write(b);
         }
     }
 
     @Override
     public void write(byte[] buf, int off, int len) {
-        byte[] data=new byte[len];
-        for(int i=0;i<len;i++){
-            data[i]=buf[off+i];
+        byte[] data = new byte[len];
+        for (int i = 0; i < len; i++) {
+            data[i] = buf[off + i];
         }
         proxy(data);
-        if(target!=null && keepConsole){
-            target.write(buf,off,len);
+        if (target != null && keepConsole) {
+            target.write(buf, off, len);
         }
     }
-
 
 
     @Override
     public void print(boolean b) {
         proxy(b);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.print(b);
         }
     }
@@ -239,7 +240,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void print(char c) {
         proxy(c);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.print(c);
         }
     }
@@ -247,15 +248,15 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void print(int i) {
         proxy(i);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.print(i);
         }
     }
 
     @Override
     public void print(long l) {
-       proxy(l);
-        if(target!=null && keepConsole){
+        proxy(l);
+        if (target != null && keepConsole) {
             target.print(l);
         }
     }
@@ -263,7 +264,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void print(float f) {
         proxy(f);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.print(f);
         }
     }
@@ -271,7 +272,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void print(double d) {
         proxy(d);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.print(d);
         }
     }
@@ -279,7 +280,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void print(char[] s) {
         proxy(s);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.print(s);
         }
     }
@@ -287,7 +288,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void print(String s) {
         proxy(s);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.print(s);
         }
     }
@@ -295,7 +296,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void print(Object obj) {
         proxy(obj);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.print(obj);
         }
     }
@@ -303,7 +304,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void println() {
         proxy("\n");
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.println();
         }
     }
@@ -311,7 +312,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void println(boolean x) {
         proxy(x);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.println(x);
         }
     }
@@ -319,7 +320,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void println(char x) {
         proxy(x);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.println(x);
         }
     }
@@ -327,7 +328,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void println(int x) {
         proxy(x);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.println(x);
         }
     }
@@ -335,7 +336,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void println(long x) {
         proxy(x);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.println(x);
         }
     }
@@ -343,7 +344,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void println(float x) {
         proxy(x);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.println(x);
         }
     }
@@ -351,7 +352,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void println(double x) {
         proxy(x);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.println(x);
         }
     }
@@ -359,7 +360,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void println(char[] x) {
         proxy(x);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.println(x);
         }
     }
@@ -367,7 +368,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void println(String x) {
         proxy(x);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.println(x);
         }
     }
@@ -375,55 +376,55 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public void println(Object x) {
         proxy(x);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.println(x);
         }
     }
 
     @Override
     public PrintStream printf(String format, Object... args) {
-        StringBuilder builder=new StringBuilder();
-        Formatter  formatter = new Formatter((Appendable) builder);
+        StringBuilder builder = new StringBuilder();
+        Formatter formatter = new Formatter((Appendable) builder);
         formatter.format(Locale.getDefault(), format, args);
         proxy(builder.toString());
-        if(target!=null && keepConsole){
-            target.printf(format,args);
+        if (target != null && keepConsole) {
+            target.printf(format, args);
         }
         return this;
     }
 
     @Override
     public PrintStream printf(Locale l, String format, Object... args) {
-        StringBuilder builder=new StringBuilder();
-        Formatter  formatter = new Formatter((Appendable) builder);
+        StringBuilder builder = new StringBuilder();
+        Formatter formatter = new Formatter((Appendable) builder);
         formatter.format(l, format, args);
         proxy(builder.toString());
-        if(target!=null && keepConsole){
-            target.printf(l,format,args);
+        if (target != null && keepConsole) {
+            target.printf(l, format, args);
         }
         return this;
     }
 
     @Override
     public PrintStream format(String format, Object... args) {
-        StringBuilder builder=new StringBuilder();
-        Formatter  formatter = new Formatter((Appendable) builder);
+        StringBuilder builder = new StringBuilder();
+        Formatter formatter = new Formatter((Appendable) builder);
         formatter.format(Locale.getDefault(), format, args);
         proxy(builder.toString());
-        if(target!=null && keepConsole){
-            target.format(format,args);
+        if (target != null && keepConsole) {
+            target.format(format, args);
         }
         return this;
     }
 
     @Override
     public PrintStream format(Locale l, String format, Object... args) {
-        StringBuilder builder=new StringBuilder();
-        Formatter  formatter = new Formatter((Appendable) builder);
+        StringBuilder builder = new StringBuilder();
+        Formatter formatter = new Formatter((Appendable) builder);
         formatter.format(l, format, args);
         proxy(builder.toString());
-        if(target!=null && keepConsole){
-            target.format(l,format,args);
+        if (target != null && keepConsole) {
+            target.format(l, format, args);
         }
         return this;
     }
@@ -431,7 +432,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public PrintStream append(CharSequence csq) {
         proxy(csq);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.append(csq);
         }
         return this;
@@ -439,11 +440,11 @@ public class Slf4jPrintStream extends PrintStream {
 
     @Override
     public PrintStream append(CharSequence csq, int start, int end) {
-        StringBuilder builder=new StringBuilder();
-        builder.append(csq,start,end);
+        StringBuilder builder = new StringBuilder();
+        builder.append(csq, start, end);
         proxy(builder.toString());
-        if(target!=null && keepConsole){
-            target.append(csq,start,end);
+        if (target != null && keepConsole) {
+            target.append(csq, start, end);
         }
         return this;
     }
@@ -451,7 +452,7 @@ public class Slf4jPrintStream extends PrintStream {
     @Override
     public PrintStream append(char c) {
         proxy(c);
-        if(target!=null && keepConsole){
+        if (target != null && keepConsole) {
             target.append(c);
         }
         return this;

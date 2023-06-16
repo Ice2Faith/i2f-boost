@@ -1,8 +1,6 @@
 <template>
   <div>
 
-
-
     <button @click="invokeInt">int</button>
     <button @click="invokeStr">str</button>
     <button @click="invokeMap">map</button>
@@ -10,6 +8,8 @@
     <button @click="invokeEcho">echo</button>
 
     <button @click="invokeObj">obj</button>
+
+    <button @click="invokeParam">param</button>
   </div>
 </template>
 
@@ -28,17 +28,24 @@ export default {
     }
   },
   created() {
-    this.initRsaContent()
   },
   methods:{
-    initRsaContent(){
+    invokeParam(){
+      let obj={
+        name:"张三",
+        age: 25,
+        time: new Date().getTime(),
+        index: 1,
+        size: 30
+      }
       this.$axios({
-        url: 'secure/key',
-        method: 'post'
+        url: 'test/param',
+        method: 'post',
+        params: obj,
+        data: obj,
+        headers: SecureTransfer.getSecureHeader(true,true)
       }).then(({data})=>{
-        console.log('SECURE_KEY',data)
-        localStorage.setItem('SECURE_KEY',data)
-        SecureTransfer.saveRsaPubKey(data)
+        console.log('echo',data)
       })
     },
     invokeObj(){

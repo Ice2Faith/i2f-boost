@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class SecureCtrl {
-    public boolean in=false;
-    public boolean out=false;
+    public boolean in = false;
+    public boolean out = false;
 
     public SecureCtrl(boolean in, boolean out) {
         this.in = in;

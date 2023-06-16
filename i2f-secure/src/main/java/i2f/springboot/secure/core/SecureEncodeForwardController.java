@@ -1,7 +1,6 @@
 package i2f.springboot.secure.core;
 
 
-import i2f.secure.StackTraceUtils;
 import i2f.springboot.secure.util.SecureUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -24,19 +23,16 @@ import java.io.IOException;
 @Controller
 public class SecureEncodeForwardController implements InitializingBean {
     @RequestMapping("/enc/{encodeUrl}")
-    public void encodeUrlForward(@PathVariable("encodeUrl")String encodeUrl, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String trueUrl= SecureUtils.decodeEncTrueUrl(encodeUrl);
-        if(!trueUrl.startsWith("/")){
-            trueUrl="/"+trueUrl;
+    public void encodeUrlForward(@PathVariable("encodeUrl") String encodeUrl, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String trueUrl = SecureUtils.decodeEncTrueUrl(encodeUrl);
+        if (!trueUrl.startsWith("/")) {
+            trueUrl = "/" + trueUrl;
         }
-        log.info("forward:\n\tsrc:"+encodeUrl+"\n\t"+"dst:"+trueUrl);
-        log.info("trace:\n"+ StackTraceUtils.getCurrentStackTrace());
+        log.info("forward:\n\tsrc:" + encodeUrl + "\n\t" + "dst:" + trueUrl);
 
-        request.getRequestDispatcher(trueUrl).forward(request,response);
+        request.getRequestDispatcher(trueUrl).forward(request, response);
 
-        log.info("forward:\n\tsrc:"+encodeUrl+"\n\t"+"dst:"+trueUrl);
-
-
+        log.info("forward:\n\tsrc:" + encodeUrl + "\n\t" + "dst:" + trueUrl);
     }
 
     @Override

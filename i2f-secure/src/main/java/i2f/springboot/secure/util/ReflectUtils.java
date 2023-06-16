@@ -10,20 +10,21 @@ import java.lang.reflect.Member;
  * @desc
  */
 public class ReflectUtils {
-    public static<T extends Annotation> T getAnnotation(AnnotatedElement elem, Class<T> annClass){
-        T ann=elem.getDeclaredAnnotation(annClass);
-        if(ann==null){
-            ann=elem.getAnnotation(annClass);
+    public static <T extends Annotation> T getAnnotation(AnnotatedElement elem, Class<T> annClass) {
+        T ann = elem.getDeclaredAnnotation(annClass);
+        if (ann == null) {
+            ann = elem.getAnnotation(annClass);
         }
         return ann;
     }
-    public static<T extends Annotation> T getMemberAnnotation(Member member, Class<T> annClass){
+
+    public static <T extends Annotation> T getMemberAnnotation(Member member, Class<T> annClass) {
         T ann = null;
-        if(member instanceof AnnotatedElement){
-            ann=getAnnotation((AnnotatedElement)member,annClass);
+        if (member instanceof AnnotatedElement) {
+            ann = getAnnotation((AnnotatedElement) member, annClass);
         }
-        if(ann==null){
-            ann=getAnnotation(member.getDeclaringClass(),annClass);
+        if (ann == null) {
+            ann = getAnnotation(member.getDeclaringClass(), annClass);
         }
         return ann;
     }

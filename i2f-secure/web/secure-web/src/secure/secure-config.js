@@ -15,10 +15,14 @@ const SecureConfig={
    // 指定在使用编码URL转发时的转发路径
    encUrlPath:SecureConsts.ENC_URL_PATH(),
 
+   parameterName:SecureConsts.DEFAULT_SECURE_PARAMETER_NAME(),
    // 是否开启详细日志
    // 在正式环境中，请禁用
    enableDebugLog: true,
 
+   whileList:['/secure/key','/login'],
+
+   encWhiteList:['/secure/key','/login']
 }
 
 export default SecureConfig

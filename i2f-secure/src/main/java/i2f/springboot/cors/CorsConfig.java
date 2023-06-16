@@ -25,19 +25,18 @@ import java.util.Arrays;
 @ConfigurationProperties(prefix = "i2f.springboot.config.cors")
 @Configuration
 public class CorsConfig {
-    private String urlPatten="/**";
+    private String urlPatten = "/**";
 
-    private String allowOrigins="*";
-    private String allowMethods="*";
-    private String allowHeaders="*";
+    private String allowOrigins = "*";
+    private String allowMethods = "*";
+    private String allowHeaders = "*";
 
-    private boolean allowCredentials=true;
-    private long maxAge=6000L;
+    private boolean allowCredentials = true;
+    private long maxAge = 6000L;
 
 
     @Bean
-    public CorsFilter corsFilter()
-    {
+    public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedMethods(Arrays.asList(allowMethods.split(",")));

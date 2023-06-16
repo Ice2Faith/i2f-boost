@@ -10,15 +10,15 @@ import javax.servlet.http.HttpServletRequest;
  * @desc
  */
 public class RequestUtils {
-    public static String getPossibleValue(String key, HttpServletRequest request){
+    public static String getPossibleValue(String key, HttpServletRequest request) {
         String ret = request.getHeader(key);
-        if(StringUtils.isEmpty(ret)){
+        if (StringUtils.isEmpty(ret)) {
             ret = request.getParameter(key);
         }
-        if(StringUtils.isEmpty(ret)){
-            Object val=request.getAttribute(key);
-            if(val!=null){
-                ret=String.valueOf(val);
+        if (StringUtils.isEmpty(ret)) {
+            Object val = request.getAttribute(key);
+            if (val != null) {
+                ret = String.valueOf(val);
             }
         }
         return ret;

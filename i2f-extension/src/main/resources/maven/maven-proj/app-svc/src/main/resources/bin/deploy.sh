@@ -22,7 +22,7 @@ function upgrade(){
 		_p_now=$(date "+%Y%m%d%H%M%S")
 		_p_bakFile=${_p_name}.tar.gz.${_p_now}
 		echo -e "backup current version to \033[0;34m ../${_p_bakFile} \033[0m ..."
-		tar -czvf ${_p_bakFile} ${_p_name}  --exclude=logs > /dev/null
+		tar -czvf ${_p_bakFile} ${_p_name}  --exclude=logs --exclude=*.log > /dev/null
 		echo -e "release package \033[0;34m ../${_p_pkg} \033[0m ..."
 		tar -xzvf $_p_pkg  > /dev/null
 		echo restart application ...
@@ -49,9 +49,11 @@ function cover(){
 		_p_now=$(date "+%Y%m%d%H%M%S")
 		_p_bakFile=${_p_name}.tar.gz.${_p_now}
 		echo -e "backup current version to \033[0;34m ../${_p_bakFile} \033[0m ..."
-		tar -czvf ${_p_bakFile} ${_p_name}  --exclude=logs > /dev/null
+		tar -czvf ${_p_bakFile} ${_p_name}  --exclude=logs --exclude=*.log > /dev/null
 		echo -e "release package \033[0;34m ../${_p_pkg} \033[0m ..."
+		mv $_p_name/jarctrl.sh ./$_p_name.jarctrl.sh
 		tar -xzvf $_p_pkg  > /dev/null
+		mv -f ./$_p_name.jarctrl.sh $_p_name/jarctrl.sh
 		echo restart application ...
 		cd $_p_name
 		./jarctrl.sh restart
@@ -84,7 +86,7 @@ function pick(){
 		_p_now=$(date "+%Y%m%d%H%M%S")
 		_p_bakFile=${_p_name}.tar.gz.${_p_now}
 		echo -e "backup current version to \033[0;34m ../${_p_bakFile} \033[0m ..."
-		tar -czvf ${_p_bakFile} ${_p_name} --exclude=logs > /dev/null
+		tar -czvf ${_p_bakFile} ${_p_name} --exclude=logs --exclude=*.log > /dev/null
 
 		echo -e "copy pick file \033[0;34m ${_p_usePath} \033[0m to \033[0;34m ../${_p_useNewName} \033[0m ..."
 		cp ${_p_usePath} ${_p_useNewName}

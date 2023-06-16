@@ -17,10 +17,10 @@ import java.util.Map;
 public class ExceptionResolveHandler {
 
     @ExceptionHandler(SecureException.class)
-    public Object handle(SecureException e){
-        Map<String,Object> ret=new HashMap<>();
-        ret.put("code",e.code());
-        ret.put("msg",e.getMessage());
+    public Object handle(SecureException e) {
+        Map<String, Object> ret = new HashMap<>();
+        ret.put("code", e.code());
+        ret.put("msg", e.getMessage());
         e.printStackTrace();
         return ret;
     }

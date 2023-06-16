@@ -27,33 +27,33 @@ import java.util.Set;
  */
 public class SecureUtils {
 
-    public static SecureParams getSecureAnnotation(Member member){
-        return ReflectUtils.getMemberAnnotation(member,SecureParams.class);
+    public static SecureParams getSecureAnnotation(Member member) {
+        return ReflectUtils.getMemberAnnotation(member, SecureParams.class);
     }
 
-    public static String combinePath(String prefix,String suffix,String separator){
-        if(prefix==null){
+    public static String combinePath(String prefix, String suffix, String separator) {
+        if (prefix == null) {
             return suffix;
         }
-        if(suffix==null){
+        if (suffix == null) {
             return prefix;
         }
-        if(prefix.endsWith(separator)){
-            if(suffix.startsWith(separator)){
-                return prefix+suffix.substring(separator.length());
-            }else{
-                return prefix+suffix;
+        if (prefix.endsWith(separator)) {
+            if (suffix.startsWith(separator)) {
+                return prefix + suffix.substring(separator.length());
+            } else {
+                return prefix + suffix;
             }
-        }else{
-            if(suffix.startsWith(separator)){
-                return prefix+suffix;
-            }else{
-                return prefix+separator+suffix;
+        } else {
+            if (suffix.startsWith(separator)) {
+                return prefix + suffix;
+            } else {
+                return prefix + separator + suffix;
             }
         }
     }
 
-    public static SecureCtrl parseSecureCtrl(HttpServletRequest request, SecureConfig secureConfig, MappingUtil mappingUtil){
+    public static SecureCtrl parseSecureCtrl(HttpServletRequest request, SecureConfig secureConfig, MappingUtil mappingUtil) {
         String requestUrl = request.getRequestURI();
         Method method = mappingUtil.getRequestMappingMethod(request);
         SecureCtrl ctrl = null;
@@ -73,34 +73,32 @@ public class SecureUtils {
             SecureUtils.parseUrlWhiteList(ctrl, requestUrl, whiteList);
         }
 
-        String value = RequestUtils.getPossibleValue(secureConfig.getHeaderName(), request);
-        if (!StringUtils.isEmpty(value)) {
-            if (ctrl == null) {
-                ctrl = new SecureCtrl(true, false);
-            } else {
-                ctrl.in = true;
-            }
-        }
-
         if (ctrl == null) {
             ctrl = secureConfig.getDefaultControl();
         }
+
+        String value = RequestUtils.getPossibleValue(secureConfig.getHeaderName(), request);
+        if (!StringUtils.isEmpty(value)) {
+            ctrl.in = true;
+        }
+
+
         return ctrl;
     }
 
-    public static SecureCtrl parseAnnotation(SecureCtrl ctrl, SecureParams ann){
+    public static SecureCtrl parseAnnotation(SecureCtrl ctrl, SecureParams ann) {
         if (ann != null) {
-            if(!ctrl.in){
+            if (!ctrl.in) {
                 ctrl.in = ann.in();
             }
-            if(!ctrl.out){
+            if (!ctrl.out) {
                 ctrl.out = ann.out();
             }
         }
         return ctrl;
     }
 
-    public static SecureCtrl parseUrlWhiteList(SecureCtrl ctrl, String requestUrl, SecureConfig.SecureWhiteListConfig whiteList){
+    public static SecureCtrl parseUrlWhiteList(SecureCtrl ctrl, String requestUrl, SecureConfig.SecureWhiteListConfig whiteList) {
         if (whiteList == null) {
             return ctrl;
         }
@@ -134,42 +132,42 @@ public class SecureUtils {
         return ctrl;
     }
 
-    public static SecureHeader parseSecureHeader(String key,String separator, HttpServletRequest request){
+    public static SecureHeader parseSecureHeader(String key, String separator, HttpServletRequest request) {
         String value = RequestUtils.getPossibleValue(key, request);
-        return decodeSecureHeader(value,separator);
+        return decodeSecureHeader(value, separator);
     }
 
-    public static SecureHeader decodeSecureHeader(String str,String separator){
-        if(StringUtils.isEmpty(str)){
-            throw new SecureException(SecureErrorCode.SECURE_HEADER_EMPTY,"空安全头");
+    public static SecureHeader decodeSecureHeader(String str, String separator) {
+        if (StringUtils.isEmpty(str)) {
+            throw new SecureException(SecureErrorCode.SECURE_HEADER_EMPTY, "空安全头");
         }
-        str=CharsetUtil.ofUtf8(Base64Util.decode(Base64Obfuscator.decode(str)));
+        str = CharsetUtil.ofUtf8(Base64Util.decode(Base64Obfuscator.decode(str)));
         String[] arr = str.split(separator);
-        if(arr.length<4){
-            throw new SecureException(SecureErrorCode.SECURE_HEADER_STRUCTURE,"不正确的安全头结构");
+        if (arr.length < 4) {
+            throw new SecureException(SecureErrorCode.SECURE_HEADER_STRUCTURE, "不正确的安全头结构");
         }
-        SecureHeader ret=new SecureHeader();
-        ret.sign=arr[0];
-        ret.nonce=arr[1];
-        ret.randomKey=arr[2];
-        ret.rsaSign=arr[3];
-        if(StringUtils.isEmpty(ret.sign)){
-            throw new SecureException(SecureErrorCode.SECURE_HEADER_SIGN_EMPTY,"空安全头签名");
+        SecureHeader ret = new SecureHeader();
+        ret.sign = arr[0];
+        ret.nonce = arr[1];
+        ret.randomKey = arr[2];
+        ret.rsaSign = arr[3];
+        if (StringUtils.isEmpty(ret.sign)) {
+            throw new SecureException(SecureErrorCode.SECURE_HEADER_SIGN_EMPTY, "空安全头签名");
         }
-        if(StringUtils.isEmpty(ret.nonce)){
-            throw new SecureException(SecureErrorCode.SECURE_HEADER_NONCE_EMPTY,"空安全头一次性标记");
+        if (StringUtils.isEmpty(ret.nonce)) {
+            throw new SecureException(SecureErrorCode.SECURE_HEADER_NONCE_EMPTY, "空安全头一次性标记");
         }
-        if(StringUtils.isEmpty(ret.randomKey)){
-            throw new SecureException(SecureErrorCode.SECURE_HEADER_RANDOM_KEY_EMPTY,"空安全头随机秘钥");
+        if (StringUtils.isEmpty(ret.randomKey)) {
+            throw new SecureException(SecureErrorCode.SECURE_HEADER_RANDOM_KEY_EMPTY, "空安全头随机秘钥");
         }
-        if(StringUtils.isEmpty(ret.rsaSign)){
-            throw new SecureException(SecureErrorCode.SECURE_HEADER_RSA_SIGN_EMPTY,"空安全头秘钥签名");
+        if (StringUtils.isEmpty(ret.rsaSign)) {
+            throw new SecureException(SecureErrorCode.SECURE_HEADER_RSA_SIGN_EMPTY, "空安全头秘钥签名");
         }
         return ret;
     }
 
-    public static String encodeSecureHeader(SecureHeader header,String separator){
-        StringBuilder builder=new StringBuilder();
+    public static String encodeSecureHeader(SecureHeader header, String separator) {
+        StringBuilder builder = new StringBuilder();
         builder.append(header.sign);
         builder.append(separator);
         builder.append(header.nonce);
@@ -177,54 +175,54 @@ public class SecureUtils {
         builder.append(header.randomKey);
         builder.append(separator);
         builder.append(header.rsaSign);
-        String str= builder.toString();
-        return Base64Obfuscator.encode(Base64Util.encode(CharsetUtil.toUtf8(str)),true);
+        String str = builder.toString();
+        return Base64Obfuscator.encode(Base64Util.encode(CharsetUtil.toUtf8(str)), true);
     }
 
-    public static String makeSecureSign(String body,SecureHeader header){
-        if(body==null){
-            body="";
+    public static String makeSecureSign(String body, SecureHeader header) {
+        if (body == null) {
+            body = "";
         }
-        StringBuilder builder=new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         builder.append(header.nonce);
         builder.append(header.randomKey);
         builder.append(header.rsaSign);
         builder.append(body);
-        String text=builder.toString();
+        String text = builder.toString();
         String sign = StringSignature.sign(text);
         return sign;
     }
 
-    public static boolean verifySecureHeader(String body,SecureHeader header){
-        String sign = makeSecureSign(body,header);
+    public static boolean verifySecureHeader(String body, SecureHeader header) {
+        String sign = makeSecureSign(body, header);
         return sign.equals(header.sign);
     }
 
-    public static String decodeEncTrueUrl(String encodeUrl){
-        String text=Base64Obfuscator.decode(encodeUrl);
+    public static String decodeEncTrueUrl(String encodeUrl) {
+        String text = Base64Obfuscator.decode(encodeUrl);
         String[] arr = text.split(";");
-        if(arr.length!=2){
-            throw new SecureException(SecureErrorCode.BAD_SECURE_REQUEST,"不正确的URL请求");
+        if (arr.length != 2) {
+            throw new SecureException(SecureErrorCode.BAD_SECURE_REQUEST, "不正确的URL请求");
         }
-        String sign=arr[0];
-        String url=arr[1];
+        String sign = arr[0];
+        String url = arr[1];
         String usign = StringSignature.sign(url);
-        if(!usign.equals(sign)){
-            throw new SecureException(SecureErrorCode.BAD_SIGN,"签名验证失败");
+        if (!usign.equals(sign)) {
+            throw new SecureException(SecureErrorCode.BAD_SIGN, "签名验证失败");
         }
-        byte[] data= Base64Util.decodeUrl(Base64Obfuscator.decode(url));
-        String trueUrl= CharsetUtil.ofUtf8(data);
+        byte[] data = Base64Util.decodeUrl(Base64Obfuscator.decode(url));
+        String trueUrl = CharsetUtil.ofUtf8(data);
         return trueUrl;
     }
 
-    public static String encodeEncTrueUrl(String trueUrl){
-        String url = Base64Obfuscator.encode(Base64Util.encode(CharsetUtil.toUtf8(trueUrl)),false);
-        String sign=StringSignature.sign(url);
-        String text=Base64Obfuscator.encode(sign+";"+url,false);
-        try{
-            return URLEncoder.encode(text,"UTF-8");
-        }catch(Exception e){
-            throw new RuntimeException(e.getMessage(),e);
+    public static String encodeEncTrueUrl(String trueUrl) {
+        String url = Base64Obfuscator.encode(Base64Util.encode(CharsetUtil.toUtf8(trueUrl)), false);
+        String sign = StringSignature.sign(url);
+        String text = Base64Obfuscator.encode(sign + ";" + url, false);
+        try {
+            return URLEncoder.encode(text, "UTF-8");
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

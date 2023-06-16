@@ -5,6 +5,8 @@ const SecureConsts={
     // 默认安全头
     DEFAULT_SECURE_HEADER_NAME:()=>"sswh",
 
+    DEFAULT_SECURE_PARAMETER_NAME:()=>"sswp",
+
     // 安全头的分隔符
     DEFAULT_HEADER_SEPARATOR:()=>";",
 

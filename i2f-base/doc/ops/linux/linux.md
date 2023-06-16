@@ -1055,3 +1055,56 @@ perf record -F 99 -a -g -- sleep 60
 perf report -n
 perf report -n --stdio
 ```
+
+## 安装字体
+- 在Linux中，通常只有拉丁字体
+- 没有中文字体和特殊符号字体
+- 因此在Linux中使用GDI进行显示文字
+- 加水印/转换文档为PDF等包含字体的操作时
+- 通常字体转换失败，都是空白格或者乱码
+- 因此，就需要安装字体
+- 这些字体，通常在我们的Windows系统中就有
+- 因此，直接将我们系统中的字体文件拷贝到服务器上
+- 安装字体即可
+- Windows字体路径
+```bash
+C:\Windows\Fonts
+```
+- 可以只复制中文的
+- 也可以全部复制这些文件
+- 复制出来之后压缩为一个压缩包
+```bash
+fonts.zip
+```
+- 大概几百M的样子
+- 上传到服务器
+- 以下操作均需要root权限
+- 进入服务器字体路径
+```shell script
+cd /usr/share/fonts
+```
+- 新建中文字体路径
+```shell script
+mkdir chinese
+```
+- 将字体解压到该目录
+```shell script
+unzip fonts.zip -d chinese
+```
+- 进入目录
+- 此时应该要看到一些以ttf为后缀的文件才对
+```shell script
+cd  chinese
+```
+- 建立字体并立即刷新应用
+```shell script
+mkfontscale
+mkfontdir
+fc-cache -fv
+```
+- 至此，安装已经完毕
+- 查看安装字体列表
+```shell script
+fl-list
+```
+

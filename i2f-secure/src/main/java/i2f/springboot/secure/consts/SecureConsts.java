@@ -7,35 +7,38 @@ package i2f.springboot.secure.consts;
  */
 public interface SecureConsts {
     // secure sign web header
-    String DEFAULT_SECURE_HEADER_NAME="sswh";
+    String DEFAULT_SECURE_HEADER_NAME = "sswh";
 
-    String FILTER_EXCEPTION_ATTR_KEY="SECURE_FILTER_EXCEPTION";
+    // secure sign web parameter
+    String DEFAULT_SECURE_PARAMETER_NAME="sswp";
 
-    String FILTER_DECRYPT_HEADER="SECURE_FILTER_DECRYPT";
+    String FILTER_EXCEPTION_ATTR_KEY = "SECURE_FILTER_EXCEPTION";
 
-    String FILTER_ENCRYPT_HEADER="SECURE_FILTER_ENCRYPT";
+    String FILTER_DECRYPT_HEADER = "SECURE_FILTER_DECRYPT";
 
-    String FLAG_ENABLE ="true";
+    String FILTER_ENCRYPT_HEADER = "SECURE_FILTER_ENCRYPT";
 
-    String FLAG_DISABLE ="false";
+    String FLAG_ENABLE = "true";
 
-    String DEFAULT_HEADER_SEPARATOR=";";
+    String FLAG_DISABLE = "false";
 
-    String SECURE_HEADER_ATTR_KEY="SECURE_HEADER";
+    String DEFAULT_HEADER_SEPARATOR = ";";
+
+    String SECURE_HEADER_ATTR_KEY = "SECURE_HEADER";
 
 
     // 是否是String返回值类型标记
-    String STRING_RETURN_HEADER="SECURE_RETURN_STRING";
-    
-    String ACCESS_CONTROL_EXPOSE_HEADERS="Access-Control-Expose-Headers";
+    String STRING_RETURN_HEADER = "SECURE_RETURN_STRING";
 
-    String RSA_KEY_FILE_NAME="rsa.key";
+    String ACCESS_CONTROL_EXPOSE_HEADERS = "Access-Control-Expose-Headers";
+
+    String RSA_KEY_FILE_NAME = "rsa.key";
 
     // 是否包含动态刷新的RSA公钥签名/公钥头
-    String SECURE_DYNAMIC_KEY_HEADER ="skey";
+    String SECURE_DYNAMIC_KEY_HEADER = "skey";
 
-    String SECURE_REQUIRE_RESPONSE="SECURE_REQUIRE_RESPONSE";
+    String SECURE_REQUIRE_RESPONSE = "SECURE_REQUIRE_RESPONSE";
 
-    String DEFAULT_ENC_URL_PATH="/enc/";
-    
+    String DEFAULT_ENC_URL_PATH = "/enc/";
+
 }

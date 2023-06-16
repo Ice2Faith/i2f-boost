@@ -25,27 +25,27 @@ public class RsaKey {
         this.keyPair = keyPair;
     }
 
-    public RSAPublicKey publicKey(){
-        return (RSAPublicKey)keyPair.getPublic();
+    public RSAPublicKey publicKey() {
+        return (RSAPublicKey) keyPair.getPublic();
     }
 
-    public RSAPrivateKey privateKey(){
-        return (RSAPrivateKey)keyPair.getPrivate();
+    public RSAPrivateKey privateKey() {
+        return (RSAPrivateKey) keyPair.getPrivate();
     }
 
-    public byte[] publicKeyBytes(){
+    public byte[] publicKeyBytes() {
         return publicKey().getEncoded();
     }
 
-    public byte[] privateKeyBytes(){
+    public byte[] privateKeyBytes() {
         return privateKey().getEncoded();
     }
 
-    public String publicKeyBase64(){
+    public String publicKeyBase64() {
         return Base64Util.encode(publicKeyBytes());
     }
 
-    public String privateKeyBase64(){
+    public String privateKeyBase64() {
         return Base64Util.encode(privateKeyBytes());
     }
 
@@ -60,12 +60,12 @@ public class RsaKey {
     }
 
 
-    public static void saveRsaKey(RsaKey rsaKey,OutputStream os) throws IOException {
+    public static void saveRsaKey(RsaKey rsaKey, OutputStream os) throws IOException {
         String pubKey = rsaKey.publicKeyBase64();
-        String priKey=rsaKey.privateKeyBase64();
-        pubKey= Base64Obfuscator.encode(pubKey,true);
-        priKey=Base64Obfuscator.encode(priKey,true);
-        BufferedWriter writer=new BufferedWriter(new OutputStreamWriter(os,"UTF-8"));
+        String priKey = rsaKey.privateKeyBase64();
+        pubKey = Base64Obfuscator.encode(pubKey, true);
+        priKey = Base64Obfuscator.encode(priKey, true);
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
         writer.write(pubKey);
         writer.newLine();
         writer.write(priKey);
@@ -75,29 +75,29 @@ public class RsaKey {
     }
 
     public static RsaKey loadRsaKey(InputStream is) throws IOException, InvalidKeyException {
-        BufferedReader reader=new BufferedReader(new InputStreamReader(is,"UTF-8"));
-        String pubKey= reader.readLine();
-        String priKey= reader.readLine();
-        pubKey=Base64Obfuscator.decode(pubKey);
-        priKey=Base64Obfuscator.decode(priKey);
-        RSAPublicKey publicKey=parsePublicKeyBase64(pubKey);
-        RSAPrivateKey privateKey=parsePrivateKeyBase64(priKey);
-        KeyPair keyPair=new KeyPair(publicKey,privateKey);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        String pubKey = reader.readLine();
+        String priKey = reader.readLine();
+        pubKey = Base64Obfuscator.decode(pubKey);
+        priKey = Base64Obfuscator.decode(priKey);
+        RSAPublicKey publicKey = parsePublicKeyBase64(pubKey);
+        RSAPrivateKey privateKey = parsePrivateKeyBase64(priKey);
+        KeyPair keyPair = new KeyPair(publicKey, privateKey);
         return new RsaKey(keyPair);
     }
 
-    public static void saveRsaKey(RsaKey rsaKey,File file) throws IOException {
-        if(!file.getParentFile().exists()){
+    public static void saveRsaKey(RsaKey rsaKey, File file) throws IOException {
+        if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
-        FileOutputStream fos=new FileOutputStream(file);
-        saveRsaKey(rsaKey,fos);
+        FileOutputStream fos = new FileOutputStream(file);
+        saveRsaKey(rsaKey, fos);
         fos.close();
     }
 
     public static RsaKey loadRsaKey(File file) throws IOException, InvalidKeyException {
-        FileInputStream fis=new FileInputStream(file);
-        RsaKey rsaKey=loadRsaKey(fis);
+        FileInputStream fis = new FileInputStream(file);
+        RsaKey rsaKey = loadRsaKey(fis);
         fis.close();
         return rsaKey;
     }

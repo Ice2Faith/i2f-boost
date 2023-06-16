@@ -1,5 +1,6 @@
 package i2f.springboot.secure.core;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import i2f.core.j2ee.web.HttpServletRequestProxyWrapper;
 import i2f.core.j2ee.web.HttpServletResponseProxyWrapper;
 import i2f.core.thread.NamingThreadFactory;
@@ -26,6 +27,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -98,6 +104,15 @@ public class SecureTransferFilter implements Filter, InitializingBean {
             return;
         }
 
+        String contentType = request.getContentType();
+        if (contentType != null) {
+            contentType = contentType.toLowerCase();
+        }
+        if ("multipart/form-data".equals(contentType)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         if (!StringUtils.isEmpty(secureConfig.getResponseCharset())) {
             response.setCharacterEncoding(secureConfig.getResponseCharset());
         }
@@ -125,7 +140,7 @@ public class SecureTransferFilter implements Filter, InitializingBean {
             nextResponse = responseProxyWrapper;
         }
 
-        String decryped = (String)request.getAttribute(SecureConsts.FILTER_DECRYPT_HEADER);
+        String decryped = (String) request.getAttribute(SecureConsts.FILTER_DECRYPT_HEADER);
         SecureHeader requestHeader = null;
         if (ctrl.in && !SecureConsts.FLAG_ENABLE.equals(decryped)) {
             // 包装请求，使得能够再次消费，以进行解密处理
@@ -159,12 +174,23 @@ public class SecureTransferFilter implements Filter, InitializingBean {
 
                 byte[] bytes = requestProxyWrapper.getBodyBytes();
                 String srcText = null;
+                String srcSswp=null;
+
+                srcSswp=request.getParameter(secureConfig.getParameterName());
 
                 // 如果有请求体，解密请求体
                 if (bytes.length > 0) {
                     srcText = new String(bytes, request.getCharacterEncoding());
                 }
-                boolean ok = SecureUtils.verifySecureHeader(srcText, requestHeader);
+
+                String signText="";
+                if(srcText!=null){
+                    signText+=srcText;
+                }
+                if(srcSswp!=null){
+                    signText+=srcSswp;
+                }
+                boolean ok = SecureUtils.verifySecureHeader(signText, requestHeader);
                 if (!ok) {
                     throw new SecureException(SecureErrorCode.BAD_SIGN, "签名验证失败");
                 }
@@ -173,12 +199,42 @@ public class SecureTransferFilter implements Filter, InitializingBean {
                 if (aesKey == null) {
                     throw new SecureException(SecureErrorCode.BAD_RANDOM_KEY, "随机秘钥无效或已失效，请重试！");
                 }
+                String replaceQueryString=null;
+                Map<String,List<String>> replaceParameterMap=null;
+                if(!StringUtils.isEmpty(srcSswp)){
+                    String json=secureTransfer.decrypt(srcSswp,aesKey);
+                    String ps=new ObjectMapper().readValue(json,String.class);
+                    String[] arr=ps.split("&");
+                    Map<String, List<String>> pmap=new HashMap<>();
+                    for(int i=0;i<arr.length;i++){
+                        String item=arr[i];
+                        String[] pair=item.split("=",2);
+                        String pk=pair[0];
+                        String pv="";
+                        if(pair.length>1){
+                            pv=pair[1];
+                        }
+                        if(!pmap.containsKey(pk)){
+                            pmap.put(pk,new ArrayList<>());
+                        }
+                        pv= URLDecoder.decode(pv,"UTF-8");
+                        pmap.get(pk).add(pv);
+                    }
+                    replaceQueryString=ps;
+                    replaceParameterMap=pmap;
+                }
                 if (srcText != null) {
                     log.debug("src body:" + srcText);
                     String decryptText = secureTransfer.decrypt(srcText, aesKey);
                     log.debug("decrypt body:" + decryptText);
                     // 将解密的数据重新包装
                     requestProxyWrapper = new HttpServletRequestProxyWrapper(request, decryptText.getBytes(request.getCharacterEncoding()));
+                }
+                if(replaceQueryString!=null){
+                    requestProxyWrapper.setQueryString(replaceQueryString);
+                }
+                if(replaceParameterMap!=null){
+                    requestProxyWrapper.setParameterMap(replaceParameterMap);
                 }
 
             } catch (Throwable e) {
@@ -215,7 +271,7 @@ public class SecureTransferFilter implements Filter, InitializingBean {
         byte[] edata = responseProxyWrapper.getBodyBytes();
 
         String requireResp = (String) request.getAttribute(SecureConsts.SECURE_REQUIRE_RESPONSE);
-        String encryped=(String)request.getAttribute(SecureConsts.FILTER_ENCRYPT_HEADER);
+        String encryped = (String) request.getAttribute(SecureConsts.FILTER_ENCRYPT_HEADER);
         // 只有响应头包含加密头时，才加密请求
         if ((ctrl.out || SecureConsts.FLAG_ENABLE.equals(requireResp))
                 && edata.length > 0
@@ -272,7 +328,7 @@ public class SecureTransferFilter implements Filter, InitializingBean {
             }
             secureTransfer.setExposeHeader(response);
 
-            request.setAttribute(SecureConsts.FILTER_ENCRYPT_HEADER,SecureConsts.FLAG_ENABLE);
+            request.setAttribute(SecureConsts.FILTER_ENCRYPT_HEADER, SecureConsts.FLAG_ENABLE);
         }
 
         log.debug("write response and finish...");

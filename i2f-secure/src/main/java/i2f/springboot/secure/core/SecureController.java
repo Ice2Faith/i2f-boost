@@ -15,15 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnExpression("${i2f.springboot.config.secure.api.enable:true}")
 @RestController
 @RequestMapping("secure")
-public class SecureController  {
+public class SecureController {
 
     @Autowired
     private SecureTransfer secureTransfer;
 
-    @SecureParams(in = false,out = false)
+    @SecureParams(in = false, out = false)
     @PostMapping("key")
-    public String rsa(){
-        String pubKey= secureTransfer.getWebRsaPublicKey();
+    public String rsa() {
+        String pubKey = secureTransfer.getWebRsaPublicKey();
         return pubKey;
     }
 }

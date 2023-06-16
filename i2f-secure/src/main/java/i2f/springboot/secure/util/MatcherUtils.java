@@ -11,31 +11,35 @@ import java.util.Collection;
  * @desc
  */
 public class MatcherUtils {
-    private static AntPathMatcher antUrlMatcher=new AntPathMatcher("/");
-    private static AntPathMatcher antPkgMatcher=new AntPathMatcher(".");
-    public static boolean antUrlMatched(String str,String patten){
+    private static AntPathMatcher antUrlMatcher = new AntPathMatcher("/");
+    private static AntPathMatcher antPkgMatcher = new AntPathMatcher(".");
+
+    public static boolean antUrlMatched(String str, String patten) {
         return antUrlMatcher.match(patten, str);
     }
-    public static boolean antPkgMatched(String str,String patten){
-        return antPkgMatcher.match(patten,str);
+
+    public static boolean antPkgMatched(String str, String patten) {
+        return antPkgMatcher.match(patten, str);
     }
-    public static boolean antUrlMatchedAny(String str, Collection<String> pattens){
+
+    public static boolean antUrlMatchedAny(String str, Collection<String> pattens) {
         for (String patten : pattens) {
-            if(StringUtils.isEmpty(patten)){
+            if (StringUtils.isEmpty(patten)) {
                 continue;
             }
-            if(antUrlMatched(str,patten)){
+            if (antUrlMatched(str, patten)) {
                 return true;
             }
         }
         return false;
     }
-    public static boolean antPkgMatchedAny(String str, Collection<String> pattens){
+
+    public static boolean antPkgMatchedAny(String str, Collection<String> pattens) {
         for (String patten : pattens) {
-            if(StringUtils.isEmpty(patten)){
+            if (StringUtils.isEmpty(patten)) {
                 continue;
             }
-            if(antPkgMatched(str,patten)){
+            if (antPkgMatched(str, patten)) {
                 return true;
             }
         }

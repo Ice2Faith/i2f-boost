@@ -39,7 +39,7 @@ public class ByteArrayServletOutputStream extends ServletOutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        bos.write(b,off,len);
+        bos.write(b, off, len);
     }
 
     @Override

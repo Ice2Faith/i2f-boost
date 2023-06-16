@@ -11,6 +11,44 @@ import ObjectUtils from "../util/ObjectUtils";
 import qs from 'qs'
 
 const SecureTransferFilter = {
+    getRequestContentType(config){
+        let contentType=null
+        let method=config.method
+        Object.keys(config.headers).forEach((key)=>{
+            let lkey=key.toLowerCase()
+            if(lkey=='content-type'){
+                contentType=config.headers[key]
+            }
+        })
+        let methodHeader=config.headers[method]
+        if(contentType==null){
+            Object.keys(methodHeader).forEach((key)=>{
+                let lkey=key.toLowerCase()
+                if(lkey=='content-type'){
+                    contentType=methodHeader[key]
+                }
+            })
+        }
+        return contentType
+    },
+    isInWhiteList(url,whiteList){
+      if(whiteList==null || whiteList==undefined){
+          return false
+      }
+      if(!url.startsWith('/')){
+          url='/'+url
+      }
+      for(let i=0;i<whiteList.length;i++){
+          let wurl=whiteList[i]
+          if(!wurl.startsWith('/')){
+              wurl='/'+wurl
+          }
+          if(url==wurl){
+              return true
+          }
+      }
+      return false
+    },
     // 请求加密过滤，config需要包含属性：data,params,headers
     // 分别对应请求体，请求参数，请求头
     // 根据请求头中的SECURE_DATA_HEADER头值为SECURE_HEADER_ENABLE时，进行自动加密请求体
@@ -18,76 +56,75 @@ const SecureTransferFilter = {
     // 也就是说，如果请求头中，这两个请求头不存在，或者值不为SECURE_HEADER_ENABLE，都将不会处理
     // 也就是手动处理，部分参数的情形
     requestFilter(config) {
+        let contentType=this.getRequestContentType(config)
+        if(!StringUtils.isEmpty(contentType)){
+            contentType=contentType.toLowerCase()
+        }
+        if("multipart/form-data" == contentType){
+            return config
+        }
+        if(this.isInWhiteList(config.url,SecureConfig.whileList)){
+            return config
+        }
         if(SecureConfig.enableDebugLog){
-            console.log('request:beforeSecureConfig:',ObjectUtils.deepClone(config))
+            console.log('request:beforeSecureConfig:',config.url,ObjectUtils.deepClone(config))
         }
         if (config.headers[SecureConsts.SECURE_URL_HEADER()] === SecureConsts.FLAG_ENABLE()) {
             delete config.headers[SecureConsts.SECURE_URL_HEADER()]
-            config.url = SecureConfig.encUrlPath + SecureUtils.encodeEncTrueUrl(config.url)
+            if(!this.isInWhiteList(config.url,SecureConfig.encWhiteList)){
+                config.url = SecureConfig.encUrlPath + SecureUtils.encodeEncTrueUrl(config.url)
+            }
         }
+        let secureData=false
+        let secureParams=false
         if (config.headers[SecureConsts.SECURE_DATA_HEADER()] === SecureConsts.FLAG_ENABLE()) {
             delete config.headers[SecureConsts.SECURE_DATA_HEADER()]
-            let aesKey = SecureTransfer.aesKeyGen16();
-            let requestHeader = SecureHeader.newObj()
-            requestHeader.nonce = new Date().getTime().toString(16) + '' + Math.floor(Math.random() * 0x0fff).toString(16);
-            requestHeader.randomKey = SecureTransfer.getRequestSecureHeader(aesKey)
-            requestHeader.rsaSign = SecureTransfer.getRsaSign()
+            secureData=true
+        }
+        if (config.headers[SecureConsts.SECURE_PARAMS_HEADER()] === SecureConsts.FLAG_ENABLE()) {
+            delete config.headers[SecureConsts.SECURE_PARAMS_HEADER()]
+            secureParams=true
+        }
+        if(!secureData && !secureParams){
+            return config
+        }
+        let aesKey = SecureTransfer.aesKeyGen16();
+        let requestHeader = SecureHeader.newObj()
+        requestHeader.nonce = new Date().getTime().toString(16) + '' + Math.floor(Math.random() * 0x0fff).toString(16);
+        requestHeader.randomKey = SecureTransfer.getRequestSecureHeader(aesKey)
+        requestHeader.rsaSign = SecureTransfer.getRsaSign()
+        let signText=''
+        if (secureData) {
             if (config.data) {
                 let method=config.method
                 if(method=='put' || method=='post'){
-                    let contentType=null
-                    Object.keys(config.headers).forEach((key)=>{
-                        let lkey=key.toLowerCase()
-                        if(lkey=='content-type'){
-                            contentType=config.headers[key]
-                        }
-                    })
-                    let methodHeader=config.headers[method]
-                    if(contentType==null){
-                        Object.keys(methodHeader).forEach((key)=>{
-                            let lkey=key.toLowerCase()
-                            if(lkey=='content-type'){
-                                contentType=methodHeader[key]
-                            }
-                        })
-                    }
                     if(!StringUtils.isEmpty(contentType)){
-                        contentType=contentType.toLowerCase()
                         if(contentType.indexOf("application/x-www-form-urlencoded")>=0){
                             config.data=qs.stringify(config.data)
                         }
                     }
-
                 }
                 config.data = SecureTransfer.encrypt(config.data, aesKey);
+                signText+=config.data
             }
 
-            requestHeader.sign = SecureUtils.makeSecureSign(config.data, requestHeader)
             if(SecureConfig.enableDebugLog){
-                console.log('request:secureHeader:',ObjectUtils.deepClone(requestHeader))
-            }
-            config.headers[SecureConfig.headerName] = SecureUtils.encodeSecureHeader(requestHeader, SecureConfig.headerSeparator)
-
-            if (config.headers[SecureConsts.SECURE_PARAMS_HEADER()] === SecureConsts.FLAG_ENABLE()) {
-                delete config.headers[SecureConsts.SECURE_PARAMS_HEADER()]
-                if (config.params) {
-                    for (const propName of Object.keys(config.params)) {
-                        const value = config.params[propName];
-                        if (value !== null && typeof (value) !== "undefined") {
-                            if (typeof value === 'object') {
-                                for (const key of Object.keys(value)) {
-                                    value[key] = SecureTransfer.encrypt(value[key], aesKey);
-                                }
-                            } else {
-                                config.params[propName] = SecureTransfer.encrypt(config.params[propName], aesKey);
-                            }
-                        }
-                    }
-                }
+                console.log('request:secureHeader:',config.url,ObjectUtils.deepClone(requestHeader))
             }
         }
+        if (secureParams) {
+            if (config.params) {
+                let paramText=qs.stringify(config.params)
+                config.params={}
+                config.params[SecureConfig.parameterName]=SecureTransfer.encrypt(paramText, aesKey)
+                signText+=config.params[SecureConfig.parameterName]
+            }
+        }
+        requestHeader.sign = SecureUtils.makeSecureSign(signText, requestHeader)
+        config.headers[SecureConfig.headerName] = SecureUtils.encodeSecureHeader(requestHeader, SecureConfig.headerSeparator)
+
         if(SecureConfig.enableDebugLog){
-            console.log('request:afterSecureConfig:',ObjectUtils.deepClone(config))
+            console.log('request:afterSecureConfig:',config.url,ObjectUtils.deepClone(config))
         }
         return config;
     },
@@ -96,12 +133,12 @@ const SecureTransferFilter = {
     // 当响应头中存在SECURE_DATA_HEADER时，将会自动解密响应体
     responseFilter(res) {
         if(SecureConfig.enableDebugLog){
-            console.log('response:beforeSecureRes:',ObjectUtils.deepClone(res))
+            console.log('response:beforeSecureRes:',res.config.url,ObjectUtils.deepClone(res))
         }
         let skeyHeader = res.headers[SecureConsts.SECURE_DYNAMIC_KEY_HEADER()];
         if (!StringUtils.isEmpty(skeyHeader)) {
             if(SecureConfig.enableDebugLog){
-                console.log('response:updateRsaPubKey:',skeyHeader)
+                console.log('response:updateRsaPubKey:',res.config.url,skeyHeader)
             }
             SecureTransfer.saveRsaPubKey(skeyHeader);
         }
@@ -116,7 +153,7 @@ const SecureTransferFilter = {
 
         res.data = SecureTransfer.decrypt(res.data, aesKey);
         if(SecureConfig.enableDebugLog){
-            console.log('response:afterSecureRes:',ObjectUtils.deepClone(res))
+            console.log('response:afterSecureRes:',res.config.url,ObjectUtils.deepClone(res))
         }
         return res;
     },
