@@ -93,7 +93,8 @@ export default {
     invokeMap(){
       this.$axios({
         url: 'test/map',
-        method: 'get'
+        method: 'get',
+        headers: SecureTransfer.getSecureHeader(false, false)
       }).then(({data})=>{
         console.log('map',data)
       })

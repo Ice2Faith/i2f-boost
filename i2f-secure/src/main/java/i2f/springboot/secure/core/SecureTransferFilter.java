@@ -1,9 +1,12 @@
 package i2f.springboot.secure.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import i2f.core.j2ee.web.HttpServletRequestProxyWrapper;
 import i2f.core.j2ee.web.HttpServletResponseProxyWrapper;
 import i2f.core.thread.NamingThreadFactory;
+import i2f.secure.StackTraceUtils;
 import i2f.spring.mapping.MappingUtil;
 import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.consts.SecureConsts;
@@ -14,10 +17,14 @@ import i2f.springboot.secure.exception.SecureException;
 import i2f.springboot.secure.util.RequestUtils;
 import i2f.springboot.secure.util.SecureUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -50,7 +57,7 @@ import java.util.concurrent.*;
                 DispatcherType.FORWARD
         }
 )
-public class SecureTransferFilter implements Filter, InitializingBean {
+public class SecureTransferFilter implements Filter, InitializingBean, ApplicationContextAware {
 
     @Override
     public void afterPropertiesSet() {
@@ -66,11 +73,26 @@ public class SecureTransferFilter implements Filter, InitializingBean {
     @Autowired
     private MappingUtil mappingUtil;
 
+    private ApplicationContext context;
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.context = applicationContext;
+    }
+
     private ConcurrentMap<String, Long> nonceCache = new ConcurrentHashMap<>();
     private ScheduledExecutorService pool = Executors.newScheduledThreadPool(30, new NamingThreadFactory("secure", "nonce"));
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(Long.class, ToStringSerializer.instance);
+        module.addSerializer(long.class, ToStringSerializer.instance);
+        module.addSerializer(Long.TYPE, ToStringSerializer.instance);
+
+        Map<String, MappingJackson2HttpMessageConverter> beans = context.getBeansOfType(MappingJackson2HttpMessageConverter.class, true, true);
+
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -264,6 +286,8 @@ public class SecureTransferFilter implements Filter, InitializingBean {
 
         // 开始进入过滤器
         chain.doFilter(nextRequest, nextResponse);
+
+        log.info("filter trace:\n" + StackTraceUtils.getCurrentStackTrace());
 
         if (!ctrl.out && !wrapEncResp) {
             log.debug("not require secure response.");

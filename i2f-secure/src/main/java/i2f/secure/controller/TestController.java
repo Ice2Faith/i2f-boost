@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,11 +59,13 @@ public class TestController {
     @RequestMapping("map")
     public Object getMap() {
         Map<String, Object> map = new HashMap<>();
-        map.put("inum",random.nextInt(100));
-        map.put("dnum",random.nextDouble());
-        map.put("bool",random.nextBoolean());
-        map.put("date",LocalDateTime.now());
-        map.put("dateStr",fmt.format(LocalDateTime.now()));
+        map.put("inum", random.nextInt(100));
+        map.put("dnum", random.nextDouble());
+        map.put("bool", random.nextBoolean());
+        map.put("ldate", LocalDateTime.now());
+        map.put("date", new Date());
+        map.put("dateStr", fmt.format(LocalDateTime.now()));
+        map.put("lid", 1000200031234567891L);
         return map;
     }
 

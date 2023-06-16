@@ -28,17 +28,22 @@ i2f:
         headerSeparator: ;
         # 动态刷新RSA秘钥的响应头，默认skey
         dynamicKeyHeaderName: skey
+        # URL加密的后端forward路径
+        encUrlPath: /enc/
+        # 请求URL参数加密的加密参数名
+        parameterName: sswp
         # 默认的安全控制策略，也就是当注解和白名单都未配置时的策略模式，默认关闭
         defaultControl:
           # 入站是否安全
-          in: false
+          in: true
           # 出站是否安全
-          out: false
+          out: true
         # 白名单配置列表项，符合ant-match模式
         whiteList:
           # 进出站都忽略的列表清单
           bothPattens:
             - /file/**
+            - /secure/key
           # 进站忽略的列表清单
           inPattens:
             - /common/upload/**
@@ -63,4 +68,22 @@ i2f:
           # 是否开启enc的url解密请求转发，默认true
           # 请求路径: /enc/**
           enable: true
+        # MVC替换converter为spring注册converter实现自定义
+        # 当出现如果自定义的converter不生效时，需要开启
+        # 当long类型需要转换为string类型给前端时，必须开启
+        mvc:
+          # 是否开启自定义替换converter
+          enable: true
+        # 针对jackson的拓展自定义配置
+        jackson:
+          # 是否开启自定义配置
+          enable: true
+          # 是否开启long类型转string类型给前端
+          enableLongToString: true
+          # 注意，LocalDateTime的格式化模式和spring.jackson.date-format配置一致
+          # 因此，不用特殊配置
+          # 定义LocalDate的格式化模式
+          localDateFormat: yyyy-MM-dd
+          # 定义LocalTime的格式化模式
+          localTimeFormat: HH:mm:ss
 

@@ -4,17 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 
-import java.util.Locale;
 import java.util.Map;
 
 @Component
 public class JacksonJsonProcessor {
     protected volatile ObjectMapper mapper;
 
-    public JacksonJsonProcessor() {
-        mapper = new ObjectMapper();
-        mapper.setLocale(Locale.getDefault());
-    }
 
     public JacksonJsonProcessor(ObjectMapper mapper) {
         this.mapper = mapper;

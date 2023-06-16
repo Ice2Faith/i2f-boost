@@ -2,13 +2,19 @@ package i2f.springboot.secure;
 
 
 import i2f.springboot.secure.consts.SecureConsts;
+import i2f.springboot.secure.core.SecureTransferFilter;
 import i2f.springboot.secure.data.SecureCtrl;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.servlet.DispatcherType;
 import java.util.Set;
 
 /**
@@ -57,5 +63,20 @@ public class SecureConfig {
         private Set<String> bothPattens;
         private Set<String> inPattens;
         private Set<String> outPattens;
+    }
+
+    @Autowired
+    private AutowireCapableBeanFactory autowireCapableBeanFactory;
+
+    @Bean
+    public FilterRegistrationBean<SecureTransferFilter> filterFilterRegistrationBean() {
+        SecureTransferFilter filter = new SecureTransferFilter();
+        autowireCapableBeanFactory.autowireBean(filter);
+        FilterRegistrationBean<SecureTransferFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.addUrlPatterns("/**");
+        registrationBean.setOrder(-1);
+        registrationBean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.FORWARD);
+        return registrationBean;
     }
 }
