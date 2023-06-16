@@ -69,6 +69,7 @@
 - 直接是请求体中的，则只需要请求头中存在sswh即可
 - 另外这里在方法上加了@SecureParams注解，其中in/out默认为true
 - 则代表对返回值加密响应给前端，同时前端发送过来的也需要加密
+
 ```java
 @SecureParams
 @PostMapping("safe")
@@ -76,11 +77,13 @@ public Object safe(@RequestBody UserDto user){
     return user;
 }
 ```
+
 - 这是另一种，加密参数在URL中的形式
 - 因为这里的password在URL参数中，因此无法被正常的请求体解密处理
 - 因此在参数上添加@SecureParams注解，其中in默认为true
 - 则会自动进行解密
 - 方法上也有该注解，上面已经说了，不再重复
+
 ```java
 @SecureParams
 @PostMapping("param")
@@ -95,6 +98,7 @@ public Object param(@SecureParams String password){
 - 接口返回内容从 SecureTransfer.getWebRsaPublicKey() 获取
 - 可以如下定义：
 - 也可以通过配置i2f.springboot.config.secure.api.enable=true直接启用内置的SecureController提供接口secure/key
+
 ```java
 @RestController
 @RequestMapping("secure")
@@ -110,8 +114,10 @@ public class SecureController {
     }
 }
 ```
+
 - 客户端收到之后进行保存
 - 默认是存储在session中，如有其他需要，请修改secure-transfer.js
+
 ```js
 this.$axios({
     url: 'secure/rsa',
@@ -120,6 +126,7 @@ this.$axios({
     this.$secureTransfer.saveRsaPubKey(data);
   })
 ```
+
 - 此获取RSA公钥的代码
 - 如果是使用Vue等虚拟DOM主体时
 - 建议在Vue等主体的初始化时进行调用
@@ -127,9 +134,11 @@ this.$axios({
     - 在Vue主体实例创建时调用获取RSA公钥
     - 如果后端配置了动态刷新RSA，则建议使用定时器进行定时刷新
     - 否则可能出现请求失败，后端无法解密情况
+
 ```bash
 App.vue
 ```
+
 ```js
 import SecureTransfer from "@/secure/core/secure-transfer";
 
@@ -166,6 +175,7 @@ export default {
 ### 服务端（springboot环境）
 #### 安装
 - maven添加依赖
+
 ```xml
 <dependency>
     <groupId>org.bouncycastle</groupId>
@@ -173,10 +183,12 @@ export default {
     <version>1.52</version>
 </dependency>
 ```
+
 - 引入本包secure
 - 如果本包在项目的扫描路径下，则不需要配置
 - 如果不再扫描路径下，则在启动类上添加注解 @EnableSecureConfig 注解，以自动引入此功能
 - 剩下就是使用了，在上面的示例中已经演示了，如何使用
+
 #### 使用
 - 查看上面的使用示例
 
@@ -187,6 +199,7 @@ export default {
 - 当然你也可以单独npm install这些依赖，这里使用另一种方式
 - 先添加前三个依赖到对应的dependencies节点中，直接复制进去即可
 - 这里保留了vue的两个依赖，方便做参考
+
 ```json
 "dependencies": {
     "axios": "0.21.0",
@@ -196,15 +209,19 @@ export default {
     "vue-router": "^3.0.1"
 },
 ```
+
 - 保存package.json之后，进入自己的项目路径
 - 进行npm install,这就会自动把新加的依赖进行下载
+
 ```bash
 npm install
 ```
+
 - 【注意】，你可能知道jsencrypt有现成的npm依赖可以用
 - 但是不要那么做，npm中的jsencrypt不能使用，这是别人从jsencrypt分支出来的一个修复版本
 - 所以，不要替换成npm依赖，否则将不会正常工作
 - 下面是文件夹结构
+
 ```bash
 - web-root
     - src
@@ -217,38 +234,52 @@ npm install
         - App.vue
         - main.js
 ```
+
 - 在main.js中引入本包
+
 ```js
 import './secure/secure-vue-main'
 ```
+
 - web端是基于过滤器实现的自动加解密
 - 因此，需要对请求响应拦截器进行配置
 - 以axios中使用请求响应拦截器为例
 - 简单的封装，可以以此文件作为参考
+
 ```js
 ./secure/secure-axios.js
 ```
+
 - 如果你使用默认的axios
 - 则在main.js中引入
+
 ```js
 import './secure/secure-axios'
 ```
+
 - 然后根据自己项目修改一下两个文件内容
+
 ```js
 ./secure/server.js
 ./secure/secure-axios.js
 ```
+
 - 下面介绍，自己封装的过程
 - 在axios包装中，引入过滤器（当然还有必不可少的axios）
 - 引入axios
+
 ```js
 import axios from 'axios'
 ```
+
 - 引入过滤器
+
 ```js
 import SecureTransferFilter from "./secure/core/secure-transfer-filter";
 ```
+
 - 添加一个请求实例
+
 ```js
 const request = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
@@ -257,7 +288,9 @@ const request = axios.create({
   timeout: 60000
 })
 ```
+
 - 为这个实例，添加请求拦截器
+
 ```js
 // request拦截器
 request.interceptors.request.use(config => {
@@ -275,7 +308,9 @@ request.interceptors.request.use(config => {
   Promise.reject(error)
 })
 ```
+
 - 添加响应拦截器
+
 ```js
 // 响应拦截器
 request.interceptors.response.use(res => {
@@ -304,12 +339,15 @@ request.interceptors.response.use(res => {
   }
 )
 ```
+
 - 下面为了方便使用，将其绑定到Vue原型上
+
 ```js
 import Vue from 'vue'
 
 Vue.prototype.$axios=request;
 ```
+
 - 下面开始使用
 
 #### 使用
@@ -317,6 +355,7 @@ Vue.prototype.$axios=request;
 - 主要的就是添加一个secure的请求头
 - 过滤器，将会检测这个请求头，如果包含这个请求头，将会进行自动的data加密
 - 通过这个方法，进行给headers附加加密标记
+
 ```js
 // 使用场景，需要获取纯粹的secure请求标记头或者直接只有设置标记头时
 // 可能是大多数情况下使用的
@@ -329,6 +368,7 @@ secureTransfer.getSecureHeader(openSecureParams,openSecureUrl)
 // 返回值，入参的headers对象
 secureTransfer.getSecureHeaderInto(headers,openSecureParams,openSecureUrl)
 ```
+
 ```js
 this.$axios({
     url: 'test/safe',
@@ -344,7 +384,9 @@ this.$axios({
     this.form.output=data;
   })
 ```
+
 - 使用URL参数params
+
 ```js
 this.$axios({
     url:'test/param',
@@ -357,7 +399,9 @@ this.$axios({
     this.form.output=data
   })
 ```
+
 - 使用编码后的URL转发
+
 ```js
 this.$axios({
     url:'test/enc',
@@ -370,7 +414,9 @@ this.$axios({
     this.form.output=data
   })
 ```
+
 - 全功能开启
+
 ```js
 this.$axios({
     url:'test/all',
@@ -384,4 +430,131 @@ this.$axios({
   }).then(({data})=>{
     this.form.output=data
   })
+```
+
+## 后端配置详解
+
+```yml
+# secure 配置
+i2f:
+  springboot:
+    config:
+      secure:
+        # 是否开启
+        enable: true
+        # rsa秘钥的存储路径，默认../
+        rsa-store-path: ../
+        # 响应字符集，默认UTF-8
+        responseCharset: 'UTF-8'
+        # RSA秘钥长度，默认1024
+        rsaKeySize: 1024
+        # 随机秘钥生成的随机数的最大值，默认8192
+        randomKeyBound: 8192
+        # 一次性消息的保持时间秒数，默认6*60
+        # 这段时间内重复出现的nonce将会被认为是重放请求被拦截
+        nonceTimeoutSeconds: 360
+        # 是否启动动态RSA更新秘钥，默认true
+        enableDynamicRsaKey: true
+        # 每次更新秘钥的时长秒数，默认6*60
+        dynamicRefreshDelaySeconds: 360
+        # 最多保留多少历史秘钥，默认5
+        dynamicMaxHistoriesCount: 5
+        # 用于存储安全头的请求头名称，默认sswh
+        headerName: sswh
+        # 安全头格式的分隔符，默认;
+        headerSeparator: ;
+        # 动态刷新RSA秘钥的响应头，默认skey
+        dynamicKeyHeaderName: skey
+        # URL加密的后端forward路径
+        encUrlPath: /enc/
+        # 请求URL参数加密的加密参数名
+        parameterName: sswp
+        # 默认的安全控制策略，也就是当注解和白名单都未配置时的策略模式，默认关闭
+        defaultControl:
+          # 入站是否安全
+          in: true
+          # 出站是否安全
+          out: true
+        # 白名单配置列表项，符合ant-match模式
+        whiteList:
+          # 进出站都忽略的列表清单
+          bothPattens:
+            - /file/**
+            - /secure/key
+          # 进站忽略的列表清单
+          inPattens:
+            - /common/upload/**
+          # 出站忽略的列表清单
+          outPattens:
+            - /common/download/**
+        # AOP功能
+        aop:
+          # 是否启用AOP功能，默认true
+          # 改功能包含抛出核心filter的异常，使得能够通过ExceptionHandler进行捕获异常
+          # 包含支持解密String类型的RequestParam请求参数
+          # 包含controller为String类型返回值时的特殊处理
+          # 因此不建议关闭此功能，关闭之后也需要自己进行覆盖实现
+          enable: true
+        # 内置的API接口
+        api:
+          # 是否开启默认的API响应RSA秘钥获取请求，默认true
+          # 请求路径：/secure/key
+          enable: true
+        # 内置的URL请求路径转发接口
+        enc-url-forward:
+          # 是否开启enc的url解密请求转发，默认true
+          # 请求路径: /enc/**
+          enable: true
+        # MVC替换converter为spring注册converter实现自定义
+        # 当出现如果自定义的converter不生效时，需要开启
+        # 当long类型需要转换为string类型给前端时，必须开启
+        mvc:
+          # 是否开启自定义替换converter
+          enable: true
+        # 针对jackson的拓展自定义配置
+        jackson:
+          # 是否开启自定义配置
+          enable: true
+          # 是否开启long类型转string类型给前端
+          enableLongToString: true
+          # 注意，LocalDateTime的格式化模式和spring.jackson.date-format配置一致
+          # 因此，不用特殊配置
+          # 定义LocalDate的格式化模式
+          localDateFormat: yyyy-MM-dd
+          # 定义LocalTime的格式化模式
+          localTimeFormat: HH:mm:ss
+
+```
+
+## 前端配置详解
+
+```js
+/**
+ * 主配置
+ */
+import SecureConsts from "./consts/secure-consts";
+
+const SecureConfig={
+   // 随机秘钥生成的随机数的最大值，默认8192
+   randomKeyBound: 8192,
+   // 用于存储安全头的请求头名称，默认sswh
+   headerName: SecureConsts.DEFAULT_SECURE_HEADER_NAME(),
+   // 动态刷新RSA秘钥的响应头，默认skey
+   dynamicKeyHeaderName:SecureConsts.SECURE_DYNAMIC_KEY_HEADER(),
+   // 安全头格式的分隔符，默认;
+   headerSeparator:SecureConsts.DEFAULT_HEADER_SEPARATOR(),
+   // 指定在使用编码URL转发时的转发路径
+   encUrlPath:SecureConsts.ENC_URL_PATH(),
+
+   parameterName:SecureConsts.DEFAULT_SECURE_PARAMETER_NAME(),
+   // 是否开启详细日志
+   // 在正式环境中，请禁用
+   enableDebugLog: true,
+
+   whileList:['/secure/key','/login'],
+
+   encWhiteList:['/secure/key','/login']
+}
+
+export default SecureConfig
 ```
