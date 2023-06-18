@@ -1,8 +1,6 @@
 package i2f.springboot.secure.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import i2f.core.j2ee.web.HttpServletRequestProxyWrapper;
 import i2f.core.j2ee.web.HttpServletResponseProxyWrapper;
 import i2f.core.thread.NamingThreadFactory;
@@ -24,7 +22,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -85,14 +82,6 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(Long.class, ToStringSerializer.instance);
-        module.addSerializer(long.class, ToStringSerializer.instance);
-        module.addSerializer(Long.TYPE, ToStringSerializer.instance);
-
-        Map<String, MappingJackson2HttpMessageConverter> beans = context.getBeansOfType(MappingJackson2HttpMessageConverter.class, true, true);
-
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -314,7 +303,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
             }
 
             // 每次生成随机aes加密秘钥
-            String aesKey = secureTransfer.aesKeyGen();
+            String aesKey = secureTransfer.aesKeyGen(secureConfig.getAesKeySize() / 8);
 
             SecureHeader responseHeader = new SecureHeader();
             responseHeader.randomKey = secureTransfer.getResponseSecureHeader(aesKey);

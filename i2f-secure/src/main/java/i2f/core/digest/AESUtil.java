@@ -1,14 +1,23 @@
 package i2f.core.digest;
 
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.Security;
 
 /**
  * @author ltb
  * @date 2021/9/2
  */
 public class AESUtil {
+    private static final BouncyCastleProvider provider = new BouncyCastleProvider();
+
+    public static void registryProvider() {
+        Security.addProvider(provider);
+    }
+
     public static final String CHAR_SET = "UTF-8";
 
     public static String genKey(String key) {
@@ -41,9 +50,10 @@ public class AESUtil {
 
     public static Cipher getAes(String key, int mode) {
         try {
+            registryProvider();
             byte[] keyRaw = key.getBytes(CHAR_SET);
             SecretKeySpec keySpec = new SecretKeySpec(keyRaw, "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/ISO10126Padding");
+            Cipher cipher = Cipher.getInstance("AES/ECB/ISO10126Padding", "BC");
             cipher.init(mode, keySpec);
             return cipher;
         } catch (Exception e) {
@@ -54,9 +64,10 @@ public class AESUtil {
 
     public static Cipher getAes(byte[] key, int mode) {
         try {
+            registryProvider();
             byte[] keyRaw = key;
             SecretKeySpec keySpec = new SecretKeySpec(keyRaw, "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/ISO10126Padding");
+            Cipher cipher = Cipher.getInstance("AES/ECB/ISO10126Padding", "BC");
             cipher.init(mode, keySpec);
             return cipher;
         } catch (Exception e) {

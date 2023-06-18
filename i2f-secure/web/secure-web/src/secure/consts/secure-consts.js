@@ -2,13 +2,20 @@
  * 定义常量
 */
 const SecureConsts={
-    // 默认安全头
-    DEFAULT_SECURE_HEADER_NAME:()=>"sswh",
+    RSA_KEY_SIZE_1024: () => 1024,
+    RSA_KEY_SIZE_2048: () => 2048,
 
-    DEFAULT_SECURE_PARAMETER_NAME:()=>"sswp",
+    AES_KEY_SIZE_128: () => 128,
+    AES_KEY_SIZE_192: () => 192,
+    AES_KEY_SIZE_256: () => 256,
+
+    // 默认安全头
+    DEFAULT_SECURE_HEADER_NAME: () => "sswh",
+
+    DEFAULT_SECURE_PARAMETER_NAME: () => "sswp",
 
     // 安全头的分隔符
-    DEFAULT_HEADER_SEPARATOR:()=>";",
+    DEFAULT_HEADER_SEPARATOR: () => ";",
 
     // 动态RSA公钥的响应头
     SECURE_DYNAMIC_KEY_HEADER:()=>"skey",

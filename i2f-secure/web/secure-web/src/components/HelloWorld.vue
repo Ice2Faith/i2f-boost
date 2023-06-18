@@ -76,7 +76,8 @@ export default {
     invokeInt(){
       this.$axios({
         url: 'test/int',
-        method: 'get'
+        method: 'get',
+        headers: SecureTransfer.getSecureHeader(false, false)
       }).then(({data})=>{
         console.log('int',data)
       })
@@ -84,7 +85,8 @@ export default {
     invokeStr(){
       this.$axios({
         url: 'test/str',
-        method: 'get'
+        method: 'get',
+        headers: SecureTransfer.getSecureHeader(false, false)
       }).then((res)=>{
         let data=res.data
         console.log('str',data)

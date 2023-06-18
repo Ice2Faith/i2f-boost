@@ -6,11 +6,18 @@ package i2f.springboot.secure.consts;
  * @desc
  */
 public interface SecureConsts {
+    int RSA_KEY_SIZE_1024 = 1024;
+    int RSA_KEY_SIZE_2048 = 2048;
+
+    int AES_KEY_SIZE_128 = 128;
+    int AES_KEY_SIZE_192 = 192;
+    int AES_KEY_SIZE_256 = 256;
+
     // secure sign web header
     String DEFAULT_SECURE_HEADER_NAME = "sswh";
 
     // secure sign web parameter
-    String DEFAULT_SECURE_PARAMETER_NAME="sswp";
+    String DEFAULT_SECURE_PARAMETER_NAME = "sswp";
 
     String FILTER_EXCEPTION_ATTR_KEY = "SECURE_FILTER_EXCEPTION";
 

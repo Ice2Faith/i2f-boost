@@ -148,7 +148,7 @@ public class SecureTransfer implements InitializingBean {
     }
 
     public String aesKeyGen() {
-        return aesKeyGen(16);
+        return aesKeyGen(32);
     }
 
     public String encrypt(Object obj, String aesKey) {

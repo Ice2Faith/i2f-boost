@@ -31,7 +31,9 @@ public class SecureConfig {
 
     private String responseCharset = "UTF-8";
 
-    private int rsaKeySize = 1024;
+    private int rsaKeySize = SecureConsts.RSA_KEY_SIZE_1024;
+
+    private int aesKeySize = SecureConsts.AES_KEY_SIZE_128;
 
     private int randomKeyBound = 8192;
 

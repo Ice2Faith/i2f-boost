@@ -88,7 +88,7 @@ const SecureTransferFilter = {
         if(!secureData && !secureParams){
             return config
         }
-        let aesKey = SecureTransfer.aesKeyGen16();
+        let aesKey = SecureTransfer.aesKeyGen(SecureConfig.aesKeySize / 8);
         let requestHeader = SecureHeader.newObj()
         requestHeader.nonce = new Date().getTime().toString(16) + '' + Math.floor(Math.random() * 0x0fff).toString(16);
         requestHeader.randomKey = SecureTransfer.getRequestSecureHeader(aesKey)
