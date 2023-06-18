@@ -90,17 +90,14 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
     }
 
     public boolean isEncUrl(HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        String contextPath = request.getContextPath();
-        String encUrl = SecureUtils.combinePath(contextPath, secureConfig.getEncUrlPath(), "/");
+        String uri = SecureUtils.getTrimContextPathRequestUri(request);
+
+        String encUrl = secureConfig.getEncUrlPath();
         if (!encUrl.startsWith("/")) {
             encUrl = "/" + encUrl;
         }
         if (!encUrl.endsWith("/")) {
             encUrl = encUrl + "/";
-        }
-        if (!uri.startsWith("/")) {
-            uri = "/" + uri;
         }
         boolean isEnc = uri.startsWith(encUrl);
         return isEnc;

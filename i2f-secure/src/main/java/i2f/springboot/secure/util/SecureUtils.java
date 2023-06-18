@@ -53,8 +53,36 @@ public class SecureUtils {
         }
     }
 
-    public static SecureCtrl parseSecureCtrl(HttpServletRequest request, SecureConfig secureConfig, MappingUtil mappingUtil) {
+    public static String getTrimContextPathRequestUri(HttpServletRequest request) {
         String requestUrl = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        if (StringUtils.isEmpty(contextPath)) {
+            contextPath = "/";
+        }
+        if (!contextPath.startsWith("/")) {
+            contextPath = "/" + contextPath;
+        }
+        if (!contextPath.endsWith("/")) {
+            contextPath = contextPath + "/";
+        }
+        if (!requestUrl.startsWith("/")) {
+            requestUrl = "/" + requestUrl;
+        }
+        if (requestUrl.startsWith(contextPath)) {
+            requestUrl = requestUrl.substring(contextPath.length());
+        } else {
+            String tmp = requestUrl + "/";
+            if (contextPath.equals(tmp)) {
+                requestUrl = "/";
+            }
+        }
+        if (!requestUrl.startsWith("/")) {
+            requestUrl = "/" + requestUrl;
+        }
+        return requestUrl;
+    }
+
+    public static SecureCtrl parseSecureCtrl(HttpServletRequest request, SecureConfig secureConfig, MappingUtil mappingUtil) {
         Method method = mappingUtil.getRequestMappingMethod(request);
         SecureCtrl ctrl = null;
         if (method != null) {
@@ -68,8 +96,9 @@ public class SecureUtils {
         if (ctrl == null) {
             SecureConfig.SecureWhiteListConfig whiteList = secureConfig.getWhiteList();
             if (whiteList != null) {
-                ctrl = new SecureCtrl();
+                ctrl = new SecureCtrl(true, true);
             }
+            String requestUrl = getTrimContextPathRequestUri(request);
             SecureUtils.parseUrlWhiteList(ctrl, requestUrl, whiteList);
         }
 
