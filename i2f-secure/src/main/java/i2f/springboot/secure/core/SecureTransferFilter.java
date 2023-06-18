@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import i2f.core.j2ee.web.HttpServletRequestProxyWrapper;
 import i2f.core.j2ee.web.HttpServletResponseProxyWrapper;
 import i2f.core.thread.NamingThreadFactory;
-import i2f.secure.StackTraceUtils;
 import i2f.spring.mapping.MappingUtil;
 import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.consts.SecureConsts;
@@ -273,7 +272,6 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
         // 开始进入过滤器
         chain.doFilter(nextRequest, nextResponse);
 
-        log.info("filter trace:\n" + StackTraceUtils.getCurrentStackTrace());
 
         if (!ctrl.out && !wrapEncResp) {
             log.debug("not require secure response.");

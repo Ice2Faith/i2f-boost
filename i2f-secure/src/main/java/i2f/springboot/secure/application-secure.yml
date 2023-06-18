@@ -9,8 +9,10 @@ i2f:
         rsa-store-path: ../
         # 响应字符集，默认UTF-8
         responseCharset: 'UTF-8'
-        # RSA秘钥长度，默认1024
+        # RSA秘钥长度，默认1024，可选1024,2048
         rsaKeySize: 1024
+        # AES秘钥长度，默认128，可选128,192,256
+        aesKeySize: 128
         # 随机秘钥生成的随机数的最大值，默认8192
         randomKeyBound: 8192
         # 一次性消息的保持时间秒数，默认6*60

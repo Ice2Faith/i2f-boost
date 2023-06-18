@@ -1,4 +1,5 @@
-# RSA+AES secure transfer solution usage
+# RSA+AES 安全网络传输方案使用指南
+
 ---
 ## 简介
 - 方案说明
@@ -177,10 +178,23 @@ export default {
 - maven添加依赖
 
 ```xml
+<!-- 加密算法的BC实现，没有出口政策限制，可以使用更强的加密强度 -->
 <dependency>
     <groupId>org.bouncycastle</groupId>
     <artifactId>bcprov-jdk15on</artifactId>
-    <version>1.52</version>
+    <version>1.64</version>
+</dependency>
+```
+
+- 如果你需要替换其中的算法为国密SM系列算法
+- 还需要引入此依赖
+
+```xml
+<!-- 增加了对国密SM系列算法的支持 -->
+<dependency>
+    <groupId>org.bouncycastle</groupId>
+    <artifactId>bcpkix-jdk15on</artifactId>
+    <version>1.64</version>
 </dependency>
 ```
 
@@ -348,6 +362,43 @@ import Vue from 'vue'
 Vue.prototype.$axios=request;
 ```
 
+#### 注意事项
+- 关于 secure/static/jsencrypt.js
+- 如果直接引入编译报错，也就是webpack方式引入报错
+- 请注释 secure/util/rsa.js 中关于这个依赖的引入
+- 改为直接在html中通过script方式引入
+- 如下
+
+```bash
+secure/util/rsa.js
+```
+
+```js
+/**
+ * RSA工具
+ */
+// 注释掉webpack引入方式
+// import JSEncrypt from '../static/jsencrypt'
+
+const Rsa = {
+    ...
+```
+
+```bash
+index.html
+```
+
+```html
+<html>
+<head>
+    ...
+    <!-- 通过静态引入方式引入，注意这个路径，放到自己的静态资源目录中对应引入 -->
+    <script src="./jsencrypt.js"></script>
+    ...
+</head>
+</html>
+```
+
 - 下面开始使用
 
 #### 使用
@@ -446,8 +497,10 @@ i2f:
         rsa-store-path: ../
         # 响应字符集，默认UTF-8
         responseCharset: 'UTF-8'
-        # RSA秘钥长度，默认1024
+        # RSA秘钥长度，默认1024，可选1024,2048
         rsaKeySize: 1024
+        # AES秘钥长度，默认128，可选128,192,256
+        aesKeySize: 128
         # 随机秘钥生成的随机数的最大值，默认8192
         randomKeyBound: 8192
         # 一次性消息的保持时间秒数，默认6*60
@@ -535,24 +588,26 @@ i2f:
 import SecureConsts from "./consts/secure-consts";
 
 const SecureConfig={
+   // AES秘钥长度，默认128，可选128,192,256
+   aesKeySize: SecureConsts.AES_KEY_SIZE_128(),
    // 随机秘钥生成的随机数的最大值，默认8192
    randomKeyBound: 8192,
    // 用于存储安全头的请求头名称，默认sswh
    headerName: SecureConsts.DEFAULT_SECURE_HEADER_NAME(),
    // 动态刷新RSA秘钥的响应头，默认skey
-   dynamicKeyHeaderName:SecureConsts.SECURE_DYNAMIC_KEY_HEADER(),
+   dynamicKeyHeaderName: SecureConsts.SECURE_DYNAMIC_KEY_HEADER(),
    // 安全头格式的分隔符，默认;
-   headerSeparator:SecureConsts.DEFAULT_HEADER_SEPARATOR(),
+   headerSeparator: SecureConsts.DEFAULT_HEADER_SEPARATOR(),
    // 指定在使用编码URL转发时的转发路径
-   encUrlPath:SecureConsts.ENC_URL_PATH(),
-
+   encUrlPath: SecureConsts.ENC_URL_PATH(),
+   // 安全URL参数的参数名称
    parameterName:SecureConsts.DEFAULT_SECURE_PARAMETER_NAME(),
    // 是否开启详细日志
    // 在正式环境中，请禁用
    enableDebugLog: true,
-
+   // 加密配置的白名单url
    whileList:['/secure/key','/login'],
-
+   // 加密URL的URL白名单
    encWhiteList:['/secure/key','/login']
 }
 
