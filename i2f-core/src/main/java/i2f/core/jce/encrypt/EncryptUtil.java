@@ -1,9 +1,14 @@
 package i2f.core.jce.encrypt;
 
-import i2f.core.jce.encrypt.aes.AesEncryptor;
-import i2f.core.jce.encrypt.aes.AesKgenEncryptor;
-import i2f.core.jce.encrypt.aes.AesType;
-import i2f.core.jce.encrypt.des.*;
+import i2f.core.jce.encrypt.symmetric.aes.AesEncryptor;
+import i2f.core.jce.encrypt.symmetric.aes.AesKgenEncryptor;
+import i2f.core.jce.encrypt.symmetric.aes.AesType;
+import i2f.core.jce.encrypt.symmetric.des.DesEncryptor;
+import i2f.core.jce.encrypt.symmetric.des.DesKgenEncryptor;
+import i2f.core.jce.encrypt.symmetric.des.DesType;
+import i2f.core.jce.encrypt.symmetric.des.ede.DesEdeEncryptor;
+import i2f.core.jce.encrypt.symmetric.des.ede.DesEdeKgenEncryptor;
+import i2f.core.jce.encrypt.symmetric.des.ede.DesEdeType;
 
 /**
  * @author ltb
@@ -11,6 +16,8 @@ import i2f.core.jce.encrypt.des.*;
  * @desc
  */
 public class EncryptUtil {
+
+
     public static AesEncryptor aes(byte[] secretKey){
         return new AesEncryptor(secretKey);
     }

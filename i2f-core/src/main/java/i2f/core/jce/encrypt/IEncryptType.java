@@ -7,9 +7,40 @@ package i2f.core.jce.encrypt;
  */
 public interface IEncryptType {
     String type();
+
     String algorithmName();
-    int secretBytesLen();
-    int vectorBytesLen();
+
     boolean noPadding();
+
     boolean requireVector();
+
+    int[] secretBytesLen();
+
+    int[] vectorBytesLen();
+
+    default boolean supportSecretBytesLen(int len) {
+        int[] arr = secretBytesLen();
+        if (arr == null) {
+            return true;
+        }
+        for (int item : arr) {
+            if (item == len) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    default boolean supportVectorBytesLen(int len) {
+        int[] arr = vectorBytesLen();
+        if (arr == null) {
+            return true;
+        }
+        for (int item : arr) {
+            if (item == len) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

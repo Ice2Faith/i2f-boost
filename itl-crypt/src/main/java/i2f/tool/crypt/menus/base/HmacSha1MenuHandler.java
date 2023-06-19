@@ -1,9 +1,9 @@
 package i2f.tool.crypt.menus.base;
 
-import i2f.core.digest.HexStringUtil;
-import i2f.core.jce.md.IMessageDigestor;
-import i2f.core.jce.md.MessageDigestUtil;
-import i2f.core.jce.md.sha.ShaType;
+import i2f.core.jce.codec.CodecUtil;
+import i2f.core.jce.digest.IMessageDigester;
+import i2f.core.jce.digest.MessageDigestUtil;
+import i2f.core.jce.digest.sha.ShaType;
 import i2f.tool.crypt.IMenuHandler;
 
 public class HmacSha1MenuHandler implements IMenuHandler {
@@ -21,10 +21,10 @@ public class HmacSha1MenuHandler implements IMenuHandler {
             System.out.println(name() + " hello world");
             return;
         }
-        IMessageDigestor encoder = MessageDigestUtil.hmac(ShaType.SHA1, args[0].getBytes("UTF-8"));
+        IMessageDigester encoder = MessageDigestUtil.hmac(ShaType.SHA1, args[0].getBytes("UTF-8"));
         for (int i = 1; i < args.length; i++) {
             String item = args[i];
-            String encode = HexStringUtil.toHexString(encoder.mds(item.getBytes("UTF-8")));
+            String encode = CodecUtil.toHexString(encoder.mds(item.getBytes("UTF-8")));
             System.out.println(item + "==> (key=" + args[0] + ") ==> " + encode);
         }
     }

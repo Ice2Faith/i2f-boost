@@ -1,7 +1,7 @@
 package i2f.tool.crypt.menus.jce;
 
 import i2f.core.jce.encrypt.EncryptUtil;
-import i2f.core.jce.encrypt.IEncryptor;
+import i2f.core.jce.encrypt.symmetric.SymmetricEncryptor;
 import i2f.tool.crypt.IMenuHandler;
 
 import java.util.Base64;
@@ -26,7 +26,7 @@ public class AesKeygenB64DecoderMenuHandler implements IMenuHandler {
             System.out.println(name() + " hello world");
             return;
         }
-        IEncryptor encryptor = EncryptUtil.aesKgen(Base64.getDecoder().decode(args[0]));
+        SymmetricEncryptor encryptor = EncryptUtil.aesKgen(Base64.getDecoder().decode(args[0]));
         for (int i = 1; i < args.length; i++) {
             String item = args[i];
             String encode = new String(encryptor.decrypt(Base64.getDecoder().decode(item)), "UTF-8");

@@ -1,15 +1,13 @@
 package test.jce;
 
-import i2f.core.digest.HexStringUtil;
-import i2f.core.jce.encrypt.IEncryptor;
-import i2f.core.jce.encrypt.aes.AesKgenEncryptor;
-import i2f.core.jce.encrypt.aes.AesType;
-import i2f.core.jce.encrypt.des.DesEdeKgenEncryptor;
-import i2f.core.jce.encrypt.des.DesEdeType;
-import i2f.core.jce.encrypt.des.DesKgenEncryptor;
-import i2f.core.jce.encrypt.des.DesType;
-import i2f.core.jce.encrypt.rsa.RsaEncryptor;
-import i2f.core.jce.encrypt.rsa.RsaUnlimitEncryptor;
+import i2f.core.jce.codec.CodecUtil;
+import i2f.core.jce.encrypt.symmetric.SymmetricEncryptor;
+import i2f.core.jce.encrypt.symmetric.aes.AesKgenEncryptor;
+import i2f.core.jce.encrypt.symmetric.aes.AesType;
+import i2f.core.jce.encrypt.symmetric.des.DesKgenEncryptor;
+import i2f.core.jce.encrypt.symmetric.des.DesType;
+import i2f.core.jce.encrypt.symmetric.des.ede.DesEdeKgenEncryptor;
+import i2f.core.jce.encrypt.symmetric.des.ede.DesEdeType;
 
 /**
  * @author ltb
@@ -32,23 +30,23 @@ public class TestEncryptor {
                 "\n" +
                 "关于PKCS#1 padding规范可参考：RFC2313 chapter 8.1，咱们在把明文送给RSA加密器前，要确认这个值是否是大于n，也就是若是接近n位长，那么须要先padding再分段加密。除非咱们是“定长定量本身可控可理解”的加密不须要padding。";
 
-        String secretStr="hello";
-        byte[] secretBytes=secretStr.getBytes();
+        String secretStr = "hello";
+        byte[] secretBytes = secretStr.getBytes();
 
-        String vectorStr="world";
-        byte[] vectorBytes=vectorStr.getBytes();
+        String vectorStr = "world";
+        byte[] vectorBytes = vectorStr.getBytes();
 
-        IEncryptor encryptor = new RsaEncryptor(secretBytes);
-        doTest(encryptor,str);
+//        SymmetricEncryptor encryptor = new RsaEncryptor(secretBytes);
+//        doTest(encryptor,str);
 
-        encryptor=new AesKgenEncryptor(secretBytes);
-        doTest(encryptor,str);
+        SymmetricEncryptor encryptor = new AesKgenEncryptor(secretBytes);
+        doTest(encryptor, str);
 
-        encryptor=new DesKgenEncryptor(secretBytes);
-        doTest(encryptor,str);
+        encryptor = new DesKgenEncryptor(secretBytes);
+        doTest(encryptor, str);
 
-        encryptor=new DesEdeKgenEncryptor(secretBytes);
-        doTest(encryptor,str);
+        encryptor = new DesEdeKgenEncryptor(secretBytes);
+        doTest(encryptor, str);
 
         encryptor=new AesKgenEncryptor(AesType.CBC_PKCS5PADDING,secretBytes,vectorBytes);
         doTest(encryptor,str);
@@ -59,21 +57,19 @@ public class TestEncryptor {
         encryptor=new DesEdeKgenEncryptor(DesEdeType.CBC_PKCS5PADDING,secretBytes,vectorBytes);
         doTest(encryptor,str);
 
-        encryptor=new RsaUnlimitEncryptor(secretBytes);
-        doTest(encryptor,str);
     }
 
-    public static void doTest(IEncryptor encryptor, String str) throws Exception {
-        try{
+    public static void doTest(SymmetricEncryptor encryptor, String str) throws Exception {
+        try {
             System.out.println("-----------------------------------");
-            System.out.println("enc:"+encryptor.getClass().getName());
+            System.out.println("enc:" + encryptor.getClass().getName());
             System.out.println("src:" + str);
-            byte[] sdata=str.getBytes();
-            System.out.println("sdata:" + HexStringUtil.toHexString(sdata, ",0x"));
+            byte[] sdata = str.getBytes();
+            System.out.println("sdata:" + CodecUtil.toHexString(sdata, ",0x"));
             byte[] edata = encryptor.encrypt(sdata);
-            System.out.println("edata:" + HexStringUtil.toHexString(edata, ",0x"));
+            System.out.println("edata:" + CodecUtil.toHexString(edata, ",0x"));
             byte[] ddata = encryptor.decrypt(edata);
-            System.out.println("ddata:" + HexStringUtil.toHexString(ddata, ",0x"));
+            System.out.println("ddata:" + CodecUtil.toHexString(ddata, ",0x"));
             String rstr = new String(ddata);
 
             System.out.println("dst:" + rstr);

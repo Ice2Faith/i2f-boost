@@ -1,6 +1,7 @@
 package i2f.core.digest;
 
 import i2f.core.exception.BoostException;
+import i2f.core.jce.codec.CodecUtil;
 
 import java.security.MessageDigest;
 
@@ -33,7 +34,7 @@ public class MessageDigestUtil {
 
     public static String getMdsAsHex(byte[] data,MessageDigest md){
         byte[] dgs=getMds(data,md);
-        return HexStringUtil.toHexString(dgs);
+        return CodecUtil.toHexString(dgs);
     }
 
     public static MessageDigest getMessageDigestInstance(String name){

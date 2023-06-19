@@ -1,13 +1,13 @@
 package test.jce;
 
-import i2f.core.digest.HexStringUtil;
+import i2f.core.jce.codec.CodecUtil;
 import i2f.core.jce.encrypt.EncryptUtil;
-import i2f.core.jce.md.IMessageDigestor;
-import i2f.core.jce.md.MessageDigestUtil;
-import i2f.core.jce.md.md.MdMessageDigestor;
-import i2f.core.jce.md.md.MdType;
-import i2f.core.jce.md.sha.ShaMessageDigestor;
-import i2f.core.jce.md.sha.ShaType;
+import i2f.core.jce.digest.IMessageDigester;
+import i2f.core.jce.digest.MessageDigestUtil;
+import i2f.core.jce.digest.md.MdMessageDigester;
+import i2f.core.jce.digest.md.MdType;
+import i2f.core.jce.digest.sha.ShaMessageDigester;
+import i2f.core.jce.digest.sha.ShaType;
 
 /**
  * @author ltb
@@ -31,44 +31,44 @@ public class TestMessageDigest {
                 "关于PKCS#1 padding规范可参考：RFC2313 chapter 8.1，咱们在把明文送给RSA加密器前，要确认这个值是否是大于n，也就是若是接近n位长，那么须要先padding再分段加密。除非咱们是“定长定量本身可控可理解”的加密不须要padding。";
 
         byte[] data = EncryptUtil.aesKgen("hello".getBytes()).encrypt("hello".getBytes());
-        System.out.println(HexStringUtil.toHexString(data,",0x"));
+        System.out.println(CodecUtil.toHexString(data, ",0x"));
 
         byte[] mdd = MessageDigestUtil.sha(ShaType.SHA384).mds("hello".getBytes());
-        System.out.println(HexStringUtil.toHexString(mdd));
+        System.out.println(CodecUtil.toHexString(mdd));
 
-        IMessageDigestor digestor = new MdMessageDigestor();
+        IMessageDigester digestor = new MdMessageDigester();
         doTest(digestor,str);
 
-        digestor=new MdMessageDigestor(MdType.MD2);
-        doTest(digestor,str);
+        digestor = new MdMessageDigester(MdType.MD2);
+        doTest(digestor, str);
 
-        digestor=new ShaMessageDigestor();
-        doTest(digestor,str);
+        digestor = new ShaMessageDigester();
+        doTest(digestor, str);
 
-        digestor=new ShaMessageDigestor(ShaType.SHA224);
-        doTest(digestor,str);
+        digestor = new ShaMessageDigester(ShaType.SHA224);
+        doTest(digestor, str);
 
-        digestor=new ShaMessageDigestor(ShaType.SHA256);
-        doTest(digestor,str);
+        digestor = new ShaMessageDigester(ShaType.SHA256);
+        doTest(digestor, str);
 
-        digestor=new ShaMessageDigestor(ShaType.SHA384);
-        doTest(digestor,str);
+        digestor = new ShaMessageDigester(ShaType.SHA384);
+        doTest(digestor, str);
 
-        digestor=new ShaMessageDigestor(ShaType.SHA512);
-        doTest(digestor,str);
+        digestor = new ShaMessageDigester(ShaType.SHA512);
+        doTest(digestor, str);
     }
 
-    public static void doTest(IMessageDigestor digestor, String str) throws Exception {
-        try{
+    public static void doTest(IMessageDigester digestor, String str) throws Exception {
+        try {
             System.out.println("-----------------------------------");
-            System.out.println("enc:"+digestor.getClass().getName());
+            System.out.println("enc:" + digestor.getClass().getName());
             System.out.println("src:" + str);
-            byte[] sdata=str.getBytes();
-            System.out.println("sdata:" + HexStringUtil.toHexString(sdata, ",0x"));
+            byte[] sdata = str.getBytes();
+            System.out.println("sdata:" + CodecUtil.toHexString(sdata, ",0x"));
             byte[] edata = digestor.mds(sdata);
-            String rstr=HexStringUtil.toHexString(edata);
+            String rstr = CodecUtil.toHexString(edata);
             System.out.println("dst:" + rstr);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
