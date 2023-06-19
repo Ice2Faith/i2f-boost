@@ -153,7 +153,7 @@ const SecureTransferFilter = {
 
         let headerValue = res.headers[SecureConfig.headerName]
         if (StringUtils.isEmpty(headerValue)) {
-            return
+            return res
         }
         let responseHeader = SecureUtils.parseSecureHeader(SecureConfig.headerName, SecureConfig.headerSeparator, res)
 
