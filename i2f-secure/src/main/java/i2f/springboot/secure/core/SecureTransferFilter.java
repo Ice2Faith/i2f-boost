@@ -107,16 +107,19 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
             chain.doFilter(request, response);
             return;
         }
+
         if (request instanceof MultipartHttpServletRequest) {
             chain.doFilter(request, response);
             return;
         }
 
         String contentType = request.getContentType();
-        if (contentType != null) {
-            contentType = contentType.toLowerCase();
+        if (contentType == null) {
+            contentType = "";
         }
-        if ("multipart/form-data".equals(contentType)) {
+        contentType = contentType.toLowerCase();
+
+        if (contentType.contains("multipart/form-data")) {
             chain.doFilter(request, response);
             return;
         }
@@ -186,21 +189,21 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
 
                 byte[] bytes = requestProxyWrapper.getBodyBytes();
                 String srcText = null;
-                String srcSswp=null;
+                String srcSswp = null;
 
-                srcSswp=request.getParameter(secureConfig.getParameterName());
+                srcSswp = request.getParameter(secureConfig.getParameterName());
 
                 // 如果有请求体，解密请求体
                 if (bytes.length > 0) {
                     srcText = new String(bytes, request.getCharacterEncoding());
                 }
 
-                String signText="";
-                if(srcText!=null){
-                    signText+=srcText;
+                String signText = "";
+                if (srcText != null) {
+                    signText += srcText;
                 }
-                if(srcSswp!=null){
-                    signText+=srcSswp;
+                if (srcSswp != null) {
+                    signText += srcSswp;
                 }
                 boolean ok = SecureUtils.verifySecureHeader(signText, requestHeader);
                 if (!ok) {
@@ -211,29 +214,29 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                 if (aesKey == null) {
                     throw new SecureException(SecureErrorCode.BAD_RANDOM_KEY, "随机秘钥无效或已失效，请重试！");
                 }
-                String replaceQueryString=null;
-                Map<String,List<String>> replaceParameterMap=null;
-                if(!StringUtils.isEmpty(srcSswp)){
-                    String json=secureTransfer.decrypt(srcSswp,aesKey);
-                    String ps=new ObjectMapper().readValue(json,String.class);
-                    String[] arr=ps.split("&");
-                    Map<String, List<String>> pmap=new HashMap<>();
-                    for(int i=0;i<arr.length;i++){
-                        String item=arr[i];
-                        String[] pair=item.split("=",2);
-                        String pk=pair[0];
-                        String pv="";
-                        if(pair.length>1){
-                            pv=pair[1];
+                String replaceQueryString = null;
+                Map<String, List<String>> replaceParameterMap = null;
+                if (!StringUtils.isEmpty(srcSswp)) {
+                    String json = secureTransfer.decrypt(srcSswp, aesKey);
+                    String ps = new ObjectMapper().readValue(json, String.class);
+                    String[] arr = ps.split("&");
+                    Map<String, List<String>> pmap = new HashMap<>();
+                    for (int i = 0; i < arr.length; i++) {
+                        String item = arr[i];
+                        String[] pair = item.split("=", 2);
+                        String pk = pair[0];
+                        String pv = "";
+                        if (pair.length > 1) {
+                            pv = pair[1];
                         }
-                        if(!pmap.containsKey(pk)){
-                            pmap.put(pk,new ArrayList<>());
+                        if (!pmap.containsKey(pk)) {
+                            pmap.put(pk, new ArrayList<>());
                         }
-                        pv= URLDecoder.decode(pv,"UTF-8");
+                        pv = URLDecoder.decode(pv, "UTF-8");
                         pmap.get(pk).add(pv);
                     }
-                    replaceQueryString=ps;
-                    replaceParameterMap=pmap;
+                    replaceQueryString = ps;
+                    replaceParameterMap = pmap;
                 }
                 if (srcText != null) {
                     log.debug("src body:" + srcText);
@@ -242,10 +245,10 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                     // 将解密的数据重新包装
                     requestProxyWrapper = new HttpServletRequestProxyWrapper(request, decryptText.getBytes(request.getCharacterEncoding()));
                 }
-                if(replaceQueryString!=null){
+                if (replaceQueryString != null) {
                     requestProxyWrapper.setQueryString(replaceQueryString);
                 }
-                if(replaceParameterMap!=null){
+                if (replaceParameterMap != null) {
                     requestProxyWrapper.setParameterMap(replaceParameterMap);
                 }
 

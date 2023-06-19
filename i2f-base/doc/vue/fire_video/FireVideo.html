@@ -308,7 +308,20 @@
         el: '#app',
         data: {
             activeTabName: 'mainRec',
-            streamUrl: 'http://45.11.0.248:9455/stream.php?format_id=22&video_id=',
+            streamLbList: [
+                '45.11.0.100',
+                '45.11.0.102',
+                '45.11.0.103',
+                '45.11.0.216',
+                '45.11.0.240',
+                '45.11.0.246',
+                '45.11.0.247',
+                '45.11.0.248',
+                '45.11.0.249',
+                '45.11.0.251',
+                '45.11.0.254',
+            ],
+            streamUrl: 'http://LBHOST:9455/stream.php?format_id=22&video_id=',
             play: {
                 title: '视频播放',
                 url: '',
@@ -331,7 +344,11 @@
                     route: (data) => data.data.list,
                     play: {
                         title: (item) => app.escapeHtml(item.title),
-                        url: (item) => app.streamUrl + item.video_id,
+                        url: (item) => {
+                            let idx = Math.floor(Math.random() * app.streamLbList.length)
+                            let host = app.streamLbList[idx]
+                            return app.streamUrl.replace('LBHOST', host) + item.video_id
+                        }
                     },
                     data: [],
                     query: {
@@ -370,7 +387,11 @@
                     route: (data) => data.data.list,
                     play: {
                         title: (item) => app.escapeHtml(item.title),
-                        url: (item) => app.streamUrl + item.video_id,
+                        url: (item) => {
+                            let idx = Math.floor(Math.random() * app.streamLbList.length)
+                            let host = app.streamLbList[idx]
+                            return app.streamUrl.replace('LBHOST', host) + item.video_id
+                        }
                     },
                     data: [],
                     query: {
@@ -384,7 +405,11 @@
                     route: (data) => data.data.list,
                     play: {
                         title: (item) => app.escapeHtml(item.title),
-                        url: (item) => app.streamUrl + item.video_id,
+                        url: (item) => {
+                            let idx = Math.floor(Math.random() * app.streamLbList.length)
+                            let host = app.streamLbList[idx]
+                            return app.streamUrl.replace('LBHOST', host) + item.video_id
+                        }
                     },
                     data: [],
                     query: {
@@ -397,7 +422,11 @@
                     route: (data) => data.data.list,
                     play: {
                         title: (item) => app.escapeHtml(item.title),
-                        url: (item) => app.streamUrl + item.video_id,
+                        url: (item) => {
+                            let idx = Math.floor(Math.random() * app.streamLbList.length)
+                            let host = app.streamLbList[idx]
+                            return app.streamUrl.replace('LBHOST', host) + item.video_id
+                        }
                     },
                     data: [],
                     query: {
@@ -410,7 +439,11 @@
                     route: (data) => data.data.list,
                     play: {
                         title: (item) => app.escapeHtml(item.title),
-                        url: (item) => app.streamUrl + item.video_id,
+                        url: (item) => {
+                            let idx = Math.floor(Math.random() * app.streamLbList.length)
+                            let host = app.streamLbList[idx]
+                            return app.streamUrl.replace('LBHOST', host) + item.video_id
+                        }
                     },
                     data: [],
                     query: {

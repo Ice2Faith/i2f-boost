@@ -133,28 +133,24 @@ public class SecureUtils {
         }
         Set<String> bothPattens = whiteList.getBothPattens();
         if (bothPattens != null && bothPattens.iterator().hasNext()) {
-            if (!MatcherUtils.antUrlMatchedAny(requestUrl, bothPattens)) {
-                if (!ctrl.in) {
-                    ctrl.in = true;
-                }
-                if (!ctrl.out) {
-                    ctrl.out = true;
-                }
+            if (MatcherUtils.antUrlMatchedAny(requestUrl, bothPattens)) {
+                ctrl.in = false;
+                ctrl.out = false;
             }
         }
         if (!ctrl.in) {
             Set<String> inPattens = whiteList.getInPattens();
             if (inPattens != null && inPattens.iterator().hasNext()) {
-                if (!MatcherUtils.antUrlMatchedAny(requestUrl, inPattens)) {
-                    ctrl.in = true;
+                if (MatcherUtils.antUrlMatchedAny(requestUrl, inPattens)) {
+                    ctrl.in = false;
                 }
             }
         }
         if (!ctrl.out) {
             Set<String> outPattens = whiteList.getOutPattens();
             if (outPattens != null && outPattens.iterator().hasNext()) {
-                if (!MatcherUtils.antUrlMatchedAny(requestUrl, outPattens)) {
-                    ctrl.out = true;
+                if (MatcherUtils.antUrlMatchedAny(requestUrl, outPattens)) {
+                    ctrl.out = false;
                 }
             }
         }

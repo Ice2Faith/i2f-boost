@@ -10,18 +10,21 @@ import SecureErrorCode from "../consts/secure-error-code";
 import StringSignature from "../util/string-signature";
 import SecureException from "../excception/secure-exception";
 const SecureUtils={
-    parseSecureHeader(key,separator,res){
-        let value=this.getPossibleValue(res)
-        return this.decodeSecureHeader(value,separator)
+    typeOf(data) {
+        return Object.prototype.toString.call(data).slice(8, -1).toLowerCase()
     },
-    getPossibleValue(res){
+    parseSecureHeader(key, separator, res) {
+        let value = this.getPossibleValue(res)
+        return this.decodeSecureHeader(value, separator)
+    },
+    getPossibleValue(res) {
         return res.headers[SecureConfig.headerName]
     },
-    decodeSecureHeader(str,separator){
-        if(StringUtils.isEmpty(str)){
-            throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_EMPTY(),"空安全头")
+    decodeSecureHeader(str, separator) {
+        if (StringUtils.isEmpty(str)) {
+            throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_EMPTY(), "空安全头")
         }
-        str=B64.decrypt(Base64Obfuscator.decode(str))
+        str = B64.decrypt(Base64Obfuscator.decode(str))
         let arr = str.split(separator);
         if(arr.length<4){
             throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_STRUCTURE(),"不正确的安全头结构")
