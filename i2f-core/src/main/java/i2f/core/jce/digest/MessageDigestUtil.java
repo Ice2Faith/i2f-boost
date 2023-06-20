@@ -12,9 +12,9 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
+import java.security.Security;
 
 /**
  * @author ltb
@@ -43,14 +43,44 @@ public class MessageDigestUtil {
         return new HmacMessageDigester(type, key);
     }
 
-
     public static byte[] mds(byte[] data, IMessageDigestType type) throws Exception {
-        return mds(new ByteArrayInputStream(data), type);
+        return mds(data, type, null);
+    }
+
+    public static byte[] mds(byte[] data, IMessageDigestType type, String providerName) throws Exception {
+        return mds(new ByteArrayInputStream(data), type, providerName);
     }
 
     public static byte[] mds(InputStream is, IMessageDigestType type) throws Exception {
-        MessageDigest md = MessageDigest.getInstance(type.type());
+        return mds(is, type, null);
+    }
+
+    public static byte[] mds(InputStream is, IMessageDigestType type, String providerName) throws Exception {
+        MessageDigest md = messageDigestOf(type, providerName);
         return getMds(is, md);
+    }
+
+    public static MessageDigest messageDigestOf(IMessageDigestType type, String providerName) throws Exception {
+        return messageDigestOf(type.type(), providerName);
+    }
+
+    public static MessageDigest messageDigestOf(String type, String providerName) throws Exception {
+        if ("".equals(providerName)) {
+            providerName = null;
+        }
+        if (providerName != null) {
+            Provider provider = Security.getProvider(providerName);
+            if (provider == null) {
+                providerName = null;
+            }
+        }
+        MessageDigest md = null;
+        if (providerName != null) {
+            md = MessageDigest.getInstance(type, providerName);
+        } else {
+            md = MessageDigest.getInstance(type);
+        }
+        return md;
     }
 
     public static byte[] getMds(InputStream is, MessageDigest md) throws IOException {
@@ -63,11 +93,34 @@ public class MessageDigestUtil {
         return md.digest();
     }
 
-    public static Mac hmacInstance(IMessageDigestType type, byte[] key) throws NoSuchAlgorithmException, InvalidKeyException {
+    public static Mac hmacInstance(IMessageDigestType type, byte[] key) throws Exception {
+        return hmacInstance(type, key, null);
+    }
+
+    public static Mac hmacInstance(IMessageDigestType type, byte[] key, String providerName) throws Exception {
         String hmacName = "Hmac" + type.type().replaceAll("-", "");
         SecretKey skey = new SecretKeySpec(key, hmacName);
-        Mac mac = Mac.getInstance(hmacName);
+        Mac mac = macOf(hmacName, providerName);
         mac.init(skey);
+        return mac;
+    }
+
+    public static Mac macOf(String type, String providerName) throws Exception {
+        if ("".equals(providerName)) {
+            providerName = null;
+        }
+        if (providerName != null) {
+            Provider provider = Security.getProvider(providerName);
+            if (provider == null) {
+                providerName = null;
+            }
+        }
+        Mac mac = null;
+        if (providerName != null) {
+            mac = Mac.getInstance(type, providerName);
+        } else {
+            mac = Mac.getInstance(type);
+        }
         return mac;
     }
 

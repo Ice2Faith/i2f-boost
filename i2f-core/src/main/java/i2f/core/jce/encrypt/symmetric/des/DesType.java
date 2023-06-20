@@ -9,14 +9,18 @@ import i2f.core.jce.encrypt.IEncryptType;
  */
 public enum DesType implements IEncryptType {
     /**
+     * 默认
+     */
+    DEFAULT("DES", false, false),
+    /**
      * 有向量加密模式, 不足8位用0补足8位, 需代码给加密内容添加0, 如{65,65,65,0,0,0,0,0}
      */
-    CBC_NO_PADDING("DES/CBC/NoPadding",true,true),
+    CBC_NO_PADDING("DES/CBC/NoPadding", true, true),
     /**
      * 有向量加密模式, 不足8位用余位数补足8位, 如{65,65,65,5,5,5,5,5}或{97,97,97,97,97,97,2,2};
      * 刚好8位补8位8
      */
-    CBC_PKCS5PADDING("DES/CBC/PKCS5Padding",false,true),
+    CBC_PKCS5PADDING("DES/CBC/PKCS5Padding", false, true),
     /**
      * 无向量加密模式, 不足8位用0补足8位, 需代码给加密内容添加0
      */

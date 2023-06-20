@@ -1,10 +1,10 @@
 package i2f.core.jce.digest.hmac;
 
-import i2f.core.jce.digest.BasicMessageDigester;
 import i2f.core.jce.digest.IMessageDigestType;
 import i2f.core.jce.digest.MessageDigestUtil;
 import i2f.core.jce.digest.exception.MessageDigestException;
 import i2f.core.jce.digest.md.MdType;
+import i2f.core.jce.digest.std.basic.BasicMessageDigester;
 
 import javax.crypto.Mac;
 import java.io.ByteArrayInputStream;
@@ -41,7 +41,7 @@ public class HmacMessageDigester extends BasicMessageDigester {
     @Override
     public byte[] mds(InputStream is) {
         try {
-            Mac mac = MessageDigestUtil.hmacInstance(type, key);
+            Mac mac = MessageDigestUtil.hmacInstance(type, key, providerName);
             return MessageDigestUtil.getHmacs(is, mac);
         } catch (Exception e) {
             throw new MessageDigestException(e.getMessage(), e);

@@ -1,13 +1,13 @@
 package test.jce;
 
 import i2f.core.jce.codec.CodecUtil;
-import i2f.core.jce.encrypt.EncryptUtil;
-import i2f.core.jce.digest.IMessageDigester;
 import i2f.core.jce.digest.MessageDigestUtil;
 import i2f.core.jce.digest.md.MdMessageDigester;
 import i2f.core.jce.digest.md.MdType;
 import i2f.core.jce.digest.sha.ShaMessageDigester;
 import i2f.core.jce.digest.sha.ShaType;
+import i2f.core.jce.digest.std.IMessageDigester;
+import i2f.core.jce.encrypt.EncryptUtil;
 
 /**
  * @author ltb

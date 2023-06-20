@@ -39,8 +39,6 @@ public class EncryptUtil {
     }
 
 
-
-
     public static DesEncryptor des(byte[] secretKey){
         return new DesEncryptor(secretKey);
     }

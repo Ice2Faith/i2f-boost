@@ -1,6 +1,11 @@
-package i2f.core.jce.digest;
+package i2f.core.jce.digest.std.basic;
 
+import i2f.core.jce.digest.IMessageDigestType;
+import i2f.core.jce.digest.MessageDigestUtil;
 import i2f.core.jce.digest.exception.MessageDigestException;
+import i2f.core.jce.digest.std.IMessageDigester;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.InputStream;
 
@@ -9,8 +14,11 @@ import java.io.InputStream;
  * @date 2022/6/9 17:54
  * @desc
  */
+@Getter
+@Setter
 public class BasicMessageDigester implements IMessageDigester {
     protected IMessageDigestType type;
+    protected String providerName;
 
     public BasicMessageDigester(IMessageDigestType type) {
         this.type = type;
@@ -19,7 +27,7 @@ public class BasicMessageDigester implements IMessageDigester {
     @Override
     public byte[] mds(byte[] data) {
         try {
-            return MessageDigestUtil.mds(data, type);
+            return MessageDigestUtil.mds(data, type, providerName);
         } catch (Exception e) {
             throw new MessageDigestException(e.getMessage(), e);
         }
@@ -28,7 +36,7 @@ public class BasicMessageDigester implements IMessageDigester {
     @Override
     public byte[] mds(InputStream is) {
         try {
-            return MessageDigestUtil.mds(is, type);
+            return MessageDigestUtil.mds(is, type, providerName);
         } catch (Exception e) {
             throw new MessageDigestException(e.getMessage(), e);
         }

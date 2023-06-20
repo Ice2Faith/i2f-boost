@@ -2,9 +2,10 @@ package i2f.core.jce.test;
 
 import i2f.core.jce.digest.MessageDigestUtil;
 import i2f.core.jce.digest.sha.ShaType;
-import i2f.core.jce.encrypt.asymmetric.AsymmetricEncryptor;
+import i2f.core.jce.encrypt.CipherUtil;
 import i2f.core.jce.encrypt.asymmetric.rsa.RsaEncryptor;
 import i2f.core.jce.encrypt.asymmetric.rsa.RsaType;
+import i2f.core.jce.encrypt.std.asymmetric.AsymmetricEncryptor;
 import i2f.core.jce.encrypt.symmetric.aes.AesKgenEncryptor;
 import i2f.core.jce.encrypt.symmetric.aes.AesType;
 import i2f.core.jce.encrypt.symmetric.des.DesKgenEncryptor;
@@ -12,7 +13,12 @@ import i2f.core.jce.encrypt.symmetric.des.DesType;
 import i2f.core.jce.encrypt.symmetric.des.ede.DesEdeKgenEncryptor;
 import i2f.core.jce.encrypt.symmetric.des.ede.DesEdeType;
 
+import java.nio.charset.Charset;
 import java.security.KeyPair;
+import java.security.Provider;
+import java.security.Security;
+import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * @author Ice2Faith
@@ -21,6 +27,15 @@ import java.security.KeyPair;
  */
 public class TestJce {
     public static void main(String[] args) throws Exception {
+        SortedMap<String, Charset> map = Charset.availableCharsets();
+        for (Map.Entry<String, Charset> entry : map.entrySet()) {
+            System.out.println(entry.getKey() + ":" + entry.getValue());
+        }
+
+        for (Provider provider : Security.getProviders()) {
+            System.out.println(provider.getName() + ":" + provider);
+        }
+
         String md5 = MessageDigestUtil.MD5.mdsText("hello".getBytes());
         String sha256 = MessageDigestUtil.SHA256.mdsText("hello".getBytes());
         System.out.println(md5);
@@ -54,7 +69,7 @@ public class TestJce {
         }
 
         if (true) {
-            KeyPair keyPair = RsaEncryptor.genKeyPair(RsaType.ECB_PKCS1PADDING, "123456".getBytes());
+            KeyPair keyPair = CipherUtil.genKeyPair(RsaType.ECB_PKCS1PADDING, "123456".getBytes(), 1024, null);
 
             AsymmetricEncryptor encryptor = new RsaEncryptor(RsaType.ECB_PKCS1PADDING, keyPair.getPublic().getEncoded(), keyPair.getPrivate().getEncoded());
 

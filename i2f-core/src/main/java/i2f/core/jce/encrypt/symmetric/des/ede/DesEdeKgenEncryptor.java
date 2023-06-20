@@ -1,16 +1,16 @@
 package i2f.core.jce.encrypt.symmetric.des.ede;
 
-import i2f.core.jce.encrypt.symmetric.basic.BasicKgenEncryptor;
+import i2f.core.jce.encrypt.std.symmetric.basic.BasicKgenSymmetricEncryptor;
 
 /**
  * @author ltb
  * @date 2022/6/8 9:17
  * @desc DES-EDE加解密器
  */
-public class DesEdeKgenEncryptor extends BasicKgenEncryptor {
+public class DesEdeKgenEncryptor extends BasicKgenSymmetricEncryptor {
 
     public DesEdeKgenEncryptor(byte[] secretBytes) {
-        super(DesEdeType.ECB_PKCS5PADDING,secretBytes);
+        super(DesEdeType.ECB_PKCS5PADDING, secretBytes);
     }
 
     public DesEdeKgenEncryptor(DesEdeType type, byte[] secretBytes) {

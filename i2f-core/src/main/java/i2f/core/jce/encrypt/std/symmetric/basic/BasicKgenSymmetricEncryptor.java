@@ -1,4 +1,4 @@
-package i2f.core.jce.encrypt.symmetric.basic;
+package i2f.core.jce.encrypt.std.symmetric.basic;
 
 import i2f.core.jce.encrypt.CipherUtil;
 import i2f.core.jce.encrypt.IEncryptType;
@@ -14,16 +14,16 @@ import javax.crypto.Cipher;
  */
 @Getter
 @Setter
-public class BasicKgenEncryptor extends BasicEncryptor {
+public class BasicKgenSymmetricEncryptor extends BasicSymmetricEncryptor {
     protected String secureRandomAlgotithm = "SHA1PRNG";
     protected int secretBytesLen = -1;
     protected int vectorBytesLen = -1;
 
-    public BasicKgenEncryptor(IEncryptType type, byte[] secretBytes) {
+    public BasicKgenSymmetricEncryptor(IEncryptType type, byte[] secretBytes) {
         super(type, secretBytes);
     }
 
-    public BasicKgenEncryptor(IEncryptType type, byte[] secretBytes, byte[] vectorBytes) {
+    public BasicKgenSymmetricEncryptor(IEncryptType type, byte[] secretBytes, byte[] vectorBytes) {
         super(type, secretBytes, vectorBytes);
     }
 

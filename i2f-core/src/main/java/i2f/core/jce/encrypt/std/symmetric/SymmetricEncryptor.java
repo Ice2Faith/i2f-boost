@@ -1,4 +1,4 @@
-package i2f.core.jce.encrypt.symmetric;
+package i2f.core.jce.encrypt.std.symmetric;
 
 /**
  * @author Ice2Faith

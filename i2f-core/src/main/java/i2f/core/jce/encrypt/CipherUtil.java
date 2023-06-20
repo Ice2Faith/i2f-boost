@@ -5,9 +5,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.Provider;
-import java.security.SecureRandom;
-import java.security.Security;
+import java.security.*;
 
 /**
  * @author Ice2Faith
@@ -15,6 +13,10 @@ import java.security.Security;
  * @desc
  */
 public class CipherUtil {
+    public static SecretKey genSecretKey(IEncryptType type, byte[] secretBytes, int genSecretLen) throws Exception {
+        return genSecretKey(type, secretBytes, genSecretLen, null);
+    }
+
     /**
      * 获取加密的密匙，传入的slatKey可以是任意长度的，作为SecureRandom的随机种子，
      * 而在KeyGenerator初始化时设置密匙的长度128bit(16位byte)
@@ -28,6 +30,10 @@ public class CipherUtil {
         random.setSeed(secretBytes);
         kgen.init(genSecretLen, random);
         return kgen.generateKey();
+    }
+
+    public static IvParameterSpec genIvParameterSpec(IEncryptType type, byte[] vectorBytes, int genVectorLen) throws Exception {
+        return genIvParameterSpec(type, vectorBytes, genVectorLen, null);
     }
 
     /**
@@ -45,13 +51,36 @@ public class CipherUtil {
         return iv;
     }
 
+    public static KeyPair genKeyPair(IEncryptType type, byte[] secretBytes, int genSecretLen) throws Exception {
+        return genKeyPair(type, secretBytes, genSecretLen, null);
+    }
+
+    /**
+     * 根据slatKey获取公匙，传入的slatKey作为SecureRandom的随机种子
+     * 若使用new SecureRandom()创建公匙，则需要记录下私匙，解密时使用
+     */
+    public static KeyPair genKeyPair(IEncryptType type, byte[] secretBytes, int genSecretLen, String secureRandomAlgorithmName) throws Exception {
+        if (secureRandomAlgorithmName == null || "".equals(secureRandomAlgorithmName)) {
+            secureRandomAlgorithmName = "SHA1PRNG";
+        }
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(type.algorithmName());
+        SecureRandom random = SecureRandom.getInstance(secureRandomAlgorithmName);
+        random.setSeed(secretBytes);
+        keyPairGenerator.initialize(genSecretLen, random);
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        return keyPair;
+    }
+
     public static Cipher getCipher(IEncryptType type, String providerName, boolean encryptMode, byte[] secretBytes, byte[] vectorBytes) throws Exception {
         return getCipher(type, providerName, encryptMode, secretBytes, vectorBytes,
                 false, null, -1, -1);
     }
 
-    public static Cipher getCipher(IEncryptType type, String providerName, boolean encryptMode, byte[] secretBytes, byte[] vectorBytes,
-                                   boolean useKeygen, String secureRandomAlgorithmName, int secretBytesLen, int vectorBytesLen) throws Exception {
+    public static Cipher cipherOf(IEncryptType type, String providerName) throws Exception {
+        return cipherOf(type.type(), providerName);
+    }
+
+    public static Cipher cipherOf(String type, String providerName) throws Exception {
         if ("".equals(providerName)) {
             providerName = null;
         }
@@ -61,13 +90,20 @@ public class CipherUtil {
                 providerName = null;
             }
         }
-        int mode = encryptMode ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE;
         Cipher cipher = null;
         if (providerName == null) {
-            cipher = Cipher.getInstance(type.type());
+            cipher = Cipher.getInstance(type);
         } else {
-            cipher = Cipher.getInstance(type.type(), providerName);
+            cipher = Cipher.getInstance(type, providerName);
         }
+        return cipher;
+    }
+
+    public static Cipher getCipher(IEncryptType type, String providerName, boolean encryptMode, byte[] secretBytes, byte[] vectorBytes,
+                                   boolean useKeygen, String secureRandomAlgorithmName, int secretBytesLen, int vectorBytesLen) throws Exception {
+
+        int mode = encryptMode ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE;
+        Cipher cipher = cipherOf(type, providerName);
         SecretKey secretKey = null;
         IvParameterSpec iv = null;
         if (useKeygen) {

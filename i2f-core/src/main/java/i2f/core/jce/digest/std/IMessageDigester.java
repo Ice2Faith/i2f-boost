@@ -1,4 +1,4 @@
-package i2f.core.jce.digest;
+package i2f.core.jce.digest.std;
 
 import i2f.core.jce.codec.CodecUtil;
 

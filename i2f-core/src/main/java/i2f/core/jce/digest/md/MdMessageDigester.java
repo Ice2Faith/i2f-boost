@@ -1,6 +1,6 @@
 package i2f.core.jce.digest.md;
 
-import i2f.core.jce.digest.BasicMessageDigester;
+import i2f.core.jce.digest.std.basic.BasicMessageDigester;
 
 /**
  * @author ltb

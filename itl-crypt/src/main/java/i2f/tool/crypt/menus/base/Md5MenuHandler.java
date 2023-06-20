@@ -1,9 +1,9 @@
 package i2f.tool.crypt.menus.base;
 
 import i2f.core.jce.codec.CodecUtil;
-import i2f.core.jce.digest.IMessageDigester;
 import i2f.core.jce.digest.MessageDigestUtil;
 import i2f.core.jce.digest.md.MdType;
+import i2f.core.jce.digest.std.IMessageDigester;
 import i2f.tool.crypt.IMenuHandler;
 
 public class Md5MenuHandler implements IMenuHandler {

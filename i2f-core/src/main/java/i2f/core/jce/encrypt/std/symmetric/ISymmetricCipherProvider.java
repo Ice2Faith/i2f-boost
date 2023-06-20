@@ -1,4 +1,4 @@
-package i2f.core.jce.encrypt;
+package i2f.core.jce.encrypt.std.symmetric;
 
 import javax.crypto.Cipher;
 
@@ -7,7 +7,8 @@ import javax.crypto.Cipher;
  * @date 2022/6/8 10:15
  * @desc
  */
-public interface IChiperProvider {
+public interface ISymmetricCipherProvider {
     Cipher getEncryptCipher() throws Exception;
+
     Cipher getDecryptCipher() throws Exception;
 }

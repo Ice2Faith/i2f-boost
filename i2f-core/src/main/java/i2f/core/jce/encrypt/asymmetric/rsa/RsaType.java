@@ -9,13 +9,17 @@ import i2f.core.jce.encrypt.IEncryptType;
  */
 public enum RsaType implements IEncryptType {
     /**
+     * 默认
+     */
+    DEFAULT("RSA", false, false),
+    /**
      * 无向量加密模式, PKCS1Padding模式填充
      */
-    ECB_PKCS1PADDING("RSA/ECB/PKCS1Padding",false,false),
+    ECB_PKCS1PADDING("RSA/ECB/PKCS1Padding", false, false),
     /**
      * 无向量加密模式, SHA-1摘要 + MGF1方式填充
      */
-    ECB_OAEP_WITH_SHA1_AND_MGF_1PADDING("RSA/ECB/OAEPWithSHA-1AndMGF1Padding",false,false),
+    ECB_OAEP_WITH_SHA1_AND_MGF_1PADDING("RSA/ECB/OAEPWithSHA-1AndMGF1Padding", false, false),
     /**
      * 无向量加密模式, SHA-256摘要 + MGF1方式填充
      */

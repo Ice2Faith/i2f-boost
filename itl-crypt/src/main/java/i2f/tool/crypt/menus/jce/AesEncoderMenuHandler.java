@@ -1,7 +1,7 @@
 package i2f.tool.crypt.menus.jce;
 
 import i2f.core.jce.encrypt.EncryptUtil;
-import i2f.core.jce.encrypt.symmetric.SymmetricEncryptor;
+import i2f.core.jce.encrypt.std.symmetric.SymmetricEncryptor;
 import i2f.tool.crypt.IMenuHandler;
 
 import java.util.Base64;
