@@ -6,6 +6,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
+import java.util.Arrays;
 
 /**
  * @author Ice2Faith
@@ -132,12 +133,12 @@ public class CipherUtil {
             }
         } else {
             if (secretBytes == null || !type.supportSecretBytesLen(secretBytes.length * 8)) {
-                throw new UnsupportedOperationException("secret bytes length must be " + type.secretBytesLen());
+                throw new UnsupportedOperationException("secret bytes length must in " + Arrays.toString(type.secretBytesLen()));
             }
             secretKey = new SecretKeySpec(secretBytes, type.algorithmName());
             if (type.requireVector()) {
                 if (vectorBytes == null || !type.supportVectorBytesLen(vectorBytes.length * 8)) {
-                    throw new UnsupportedOperationException("vector bytes length must be " + type.vectorBytesLen());
+                    throw new UnsupportedOperationException("vector bytes length must in " + Arrays.toString(type.vectorBytesLen()));
                 }
                 iv = new IvParameterSpec(vectorBytes);
             }
