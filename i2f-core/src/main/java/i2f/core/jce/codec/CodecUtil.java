@@ -5,6 +5,7 @@ import i2f.core.annotations.remark.Author;
 import i2f.core.jce.codec.bytes.base64.Base64MimeStringByteCodec;
 import i2f.core.jce.codec.bytes.base64.Base64StringByteCodec;
 import i2f.core.jce.codec.bytes.base64.Base64UrlStringByteCodec;
+import i2f.core.jce.codec.bytes.charset.CharsetStringByteCodec;
 import i2f.core.jce.codec.bytes.raw.BinStringByteCodec;
 import i2f.core.jce.codec.bytes.raw.DecStringByteCodec;
 import i2f.core.jce.codec.bytes.raw.HexStringByteCodec;
@@ -116,5 +117,29 @@ public class CodecUtil {
 
     public static String parseUrl(String data) {
         return UrlStringStringCodec.INSTANCE.decode(data);
+    }
+
+    public static String ofUtf8(byte[] data) {
+        return CharsetStringByteCodec.UTF8.encode(data);
+    }
+
+    public static byte[] toUtf8(String data) {
+        return CharsetStringByteCodec.UTF8.decode(data);
+    }
+
+    public static String ofGbk(byte[] data) {
+        return CharsetStringByteCodec.GBK.encode(data);
+    }
+
+    public static byte[] toGbk(String data) {
+        return CharsetStringByteCodec.GBK.decode(data);
+    }
+
+    public static String ofIso88591(byte[] data) {
+        return CharsetStringByteCodec.ISO88591.encode(data);
+    }
+
+    public static byte[] toIso88591(String data) {
+        return CharsetStringByteCodec.ISO88591.decode(data);
     }
 }
