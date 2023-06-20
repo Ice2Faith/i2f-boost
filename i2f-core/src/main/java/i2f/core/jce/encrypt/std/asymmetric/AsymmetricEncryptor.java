@@ -1,5 +1,7 @@
 package i2f.core.jce.encrypt.std.asymmetric;
 
+import i2f.core.jce.codec.CodecUtil;
+
 /**
  * @author Ice2Faith
  * @date 2023/6/19 15:00
@@ -18,5 +20,25 @@ public interface AsymmetricEncryptor {
 
     default byte[] privateEncrypt(byte[] data) throws Exception {
         throw new UnsupportedOperationException("algorithm not support private encrypt");
+    }
+
+    default String publicEncryptAsBase64(byte[] data) throws Exception {
+        byte[] enc = publicEncrypt(data);
+        return CodecUtil.toBase64(enc);
+    }
+
+    default byte[] privateDecryptByBase64(String enc) throws Exception {
+        byte[] data = CodecUtil.parseBase64(enc);
+        return privateDecrypt(data);
+    }
+
+    default byte[] publicDecryptByBase64(String enc) throws Exception {
+        byte[] data = CodecUtil.parseBase64(enc);
+        return publicDecrypt(data);
+    }
+
+    default String privateEncryptAsBase64(byte[] data) throws Exception {
+        byte[] enc = privateEncrypt(data);
+        return CodecUtil.toBase64(enc);
     }
 }
