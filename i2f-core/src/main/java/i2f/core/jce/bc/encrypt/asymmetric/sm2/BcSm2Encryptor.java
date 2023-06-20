@@ -1,7 +1,7 @@
-package i2f.core.jce.encrypt.asymmetric.rsa;
+package i2f.core.jce.bc.encrypt.asymmetric.sm2;
 
+import i2f.core.jce.bc.BouncyCastleHolder;
 import i2f.core.jce.encrypt.CipherUtil;
-import i2f.core.jce.encrypt.CipherWorker;
 import i2f.core.jce.encrypt.std.asymmetric.basic.BasicAsymmetricEncryptor;
 
 import javax.crypto.Cipher;
@@ -18,31 +18,18 @@ import java.security.spec.X509EncodedKeySpec;
  * @date 2022/6/8 9:17
  * @desc RSA加解密器
  */
-public class RsaEncryptor extends BasicAsymmetricEncryptor {
-    public RsaEncryptor(byte[] publicBytes, byte[] privateBytes) {
-        super(RsaType.ECB_PKCS1PADDING, publicBytes, privateBytes);
+public class BcSm2Encryptor extends BasicAsymmetricEncryptor {
+    {
+        BouncyCastleHolder.registry();
+        providerName = BouncyCastleHolder.PROVIDER_NAME;
     }
 
-    public RsaEncryptor(RsaType type, byte[] publicBytes, byte[] privateBytes) {
+    public BcSm2Encryptor(byte[] publicBytes, byte[] privateBytes) {
+        super(BcSm2Type.DEFAULT, publicBytes, privateBytes);
+    }
+
+    public BcSm2Encryptor(BcSm2Type type, byte[] publicBytes, byte[] privateBytes) {
         super(type, publicBytes, privateBytes);
-    }
-
-    @Override
-    public byte[] publicDecrypt(byte[] data) throws Exception {
-        Cipher cipher = getDecryptCipher(false);
-        if (type.noPadding()) {
-            data = CipherWorker.handleNoPaddingEncryptFormat(cipher, data);
-        }
-        return cipher.doFinal(data);
-    }
-
-    @Override
-    public byte[] privateEncrypt(byte[] data) throws Exception {
-        Cipher cipher = getEncryptCipher(true);
-        if (type.noPadding()) {
-            data = CipherWorker.handleNoPaddingEncryptFormat(cipher, data);
-        }
-        return cipher.doFinal(data);
     }
 
     @Override

@@ -1,5 +1,12 @@
 package i2f.core.jce.test;
 
+import i2f.core.jce.bc.BouncyCastleHolder;
+import i2f.core.jce.bc.digest.sm.BcSm3MessageDigester;
+import i2f.core.jce.bc.digest.sm.BcSm3Type;
+import i2f.core.jce.bc.encrypt.asymmetric.sm2.BcSm2Encryptor;
+import i2f.core.jce.bc.encrypt.asymmetric.sm2.BcSm2Type;
+import i2f.core.jce.bc.encrypt.symmetric.sm4.BcSm4Encryptor;
+import i2f.core.jce.bc.encrypt.symmetric.sm4.BcSm4Type;
 import i2f.core.jce.digest.MessageDigestUtil;
 import i2f.core.jce.digest.sha.ShaType;
 import i2f.core.jce.encrypt.CipherUtil;
@@ -12,13 +19,9 @@ import i2f.core.jce.encrypt.symmetric.des.DesKgenEncryptor;
 import i2f.core.jce.encrypt.symmetric.des.DesType;
 import i2f.core.jce.encrypt.symmetric.des.ede.DesEdeKgenEncryptor;
 import i2f.core.jce.encrypt.symmetric.des.ede.DesEdeType;
+import org.bouncycastle.crypto.CryptoServiceProperties;
 
-import java.nio.charset.Charset;
 import java.security.KeyPair;
-import java.security.Provider;
-import java.security.Security;
-import java.util.Map;
-import java.util.SortedMap;
 
 /**
  * @author Ice2Faith
@@ -26,23 +29,54 @@ import java.util.SortedMap;
  * @desc
  */
 public class TestJce {
+
+    private static CryptoServiceProperties service(String var0, int var1) {
+        return null;
+    }
+
+
     public static void main(String[] args) throws Exception {
-        SortedMap<String, Charset> map = Charset.availableCharsets();
-        for (Map.Entry<String, Charset> entry : map.entrySet()) {
-            System.out.println(entry.getKey() + ":" + entry.getValue());
+
+
+        if (true) {
+            BouncyCastleHolder.registry();
+            KeyPair keyPair = CipherUtil.genKeyPair(BcSm2Type.DEFAULT, BouncyCastleHolder.PROVIDER_NAME, "123456".getBytes(), 256, null);
+
+            AsymmetricEncryptor encryptor = new BcSm2Encryptor(BcSm2Type.DEFAULT, keyPair.getPublic().getEncoded(), keyPair.getPrivate().getEncoded());
+
+//            byte[] pridata = encryptor.privateEncrypt("hello".getBytes());
+//            byte[] ddata = encryptor.publicDecrypt(pridata);
+//            System.out.println(new String(ddata));
+
+            byte[] ddata = "hello".getBytes();
+            byte[] pubdata = encryptor.publicEncrypt(ddata);
+            byte[] pdata = encryptor.privateDecrypt(pubdata);
+            System.out.println(new String(pdata));
         }
 
-        for (Provider provider : Security.getProviders()) {
-            System.out.println(provider.getName() + ":" + provider);
+        if (true) {
+            BcSm4Encryptor encryptor = new BcSm4Encryptor(BcSm4Type.ECB_ISO10126PADDING, "0123456789ABCDEF".getBytes());
+            byte[] edata = encryptor.encrypt("hello".getBytes());
+            byte[] ddata = encryptor.decrypt(edata);
+            String str = new String(ddata);
+            System.out.println(str);
         }
 
-        String md5 = MessageDigestUtil.MD5.mdsText("hello".getBytes());
-        String sha256 = MessageDigestUtil.SHA256.mdsText("hello".getBytes());
-        System.out.println(md5);
-        System.out.println(sha256);
+        if (true) {
+            String sm3 = new BcSm3MessageDigester(BcSm3Type.SM3).mdsText("hello".getBytes());
+            System.out.println(sm3);
+        }
+        if (true) {
+            String md5 = MessageDigestUtil.MD5.mdsText("hello".getBytes());
+            String sha256 = MessageDigestUtil.SHA256.mdsText("hello".getBytes());
+            System.out.println(md5);
+            System.out.println(sha256);
+        }
 
-        String hmacsha256 = MessageDigestUtil.hmac(ShaType.SHA256, "123456".getBytes()).mdsText("hello".getBytes());
-        System.out.println(hmacsha256);
+        if (true) {
+            String hmacsha256 = MessageDigestUtil.hmac(ShaType.SHA256, "123456".getBytes()).mdsText("hello".getBytes());
+            System.out.println(hmacsha256);
+        }
 
         if (true) {
             AesKgenEncryptor encryptor = new AesKgenEncryptor(AesType.ECB_ISO10126PADDING, "123456".getBytes());

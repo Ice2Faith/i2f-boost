@@ -31,17 +31,16 @@
         <!-- 加密算法的BC实现，没有出口政策限制，可以使用更强的加密强度 -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.64</version>
-            <scope>provided</scope>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.73</version>
         </dependency>
+
 
         <!-- 增加了对国密SM系列算法的支持 -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.64</version>
-            <scope>provided</scope>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.73</version>
         </dependency>
 
         <!--        <dependency>-->

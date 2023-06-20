@@ -2,13 +2,14 @@ package i2f.core.jce.bc.encrypt.asymmetric.rsa;
 
 import i2f.core.jce.bc.BouncyCastleHolder;
 import i2f.core.jce.encrypt.CipherUtil;
+import i2f.core.jce.encrypt.CipherWorker;
 import i2f.core.jce.encrypt.std.asymmetric.basic.BasicAsymmetricEncryptor;
 
 import javax.crypto.Cipher;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -33,36 +34,54 @@ public class BcRsaEncryptor extends BasicAsymmetricEncryptor {
     }
 
     @Override
+    public byte[] publicDecrypt(byte[] data) throws Exception {
+        Cipher cipher = getDecryptCipher(false);
+        if (type.noPadding()) {
+            data = CipherWorker.handleNoPaddingEncryptFormat(cipher, data);
+        }
+        return cipher.doFinal(data);
+    }
+
+    @Override
+    public byte[] privateEncrypt(byte[] data) throws Exception {
+        Cipher cipher = getEncryptCipher(true);
+        if (type.noPadding()) {
+            data = CipherWorker.handleNoPaddingEncryptFormat(cipher, data);
+        }
+        return cipher.doFinal(data);
+    }
+
+    @Override
     public Cipher getCipher(boolean encryptMode, boolean isPrivate) throws Exception {
         int mode = encryptMode ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE;
         Cipher cipher = CipherUtil.cipherOf(type, providerName);
         if (encryptMode) {
             if (isPrivate) {
-                RSAPrivateKey priKey = getRsaPrivateKey(privateBytes);
+                PrivateKey priKey = getPrivateKey(privateBytes);
                 cipher.init(mode, priKey);
             } else {
-                RSAPublicKey pubKey = getRsaPublicKey(publicBytes);
+                PublicKey pubKey = getPublicKey(publicBytes);
                 cipher.init(mode, pubKey);
             }
         } else {
             if (isPrivate) {
-                RSAPrivateKey priKey = getRsaPrivateKey(privateBytes);
+                PrivateKey priKey = getPrivateKey(privateBytes);
                 cipher.init(mode, priKey);
             } else {
-                RSAPublicKey pubKey = getRsaPublicKey(publicBytes);
+                PublicKey pubKey = getPublicKey(publicBytes);
                 cipher.init(mode, pubKey);
             }
         }
         return cipher;
     }
 
-    public RSAPublicKey getRsaPublicKey(byte[] codes) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(type.algorithmName()).generatePublic(new X509EncodedKeySpec(codes));
+    public PublicKey getPublicKey(byte[] codes) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        PublicKey pubKey = KeyFactory.getInstance(type.algorithmName()).generatePublic(new X509EncodedKeySpec(codes));
         return pubKey;
     }
 
-    public RSAPrivateKey getRsaPrivateKey(byte[] codes) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(type.algorithmName()).generatePrivate(new PKCS8EncodedKeySpec(codes));
+    public PrivateKey getPrivateKey(byte[] codes) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        PrivateKey priKey = KeyFactory.getInstance(type.algorithmName()).generatePrivate(new PKCS8EncodedKeySpec(codes));
         return priKey;
     }
 

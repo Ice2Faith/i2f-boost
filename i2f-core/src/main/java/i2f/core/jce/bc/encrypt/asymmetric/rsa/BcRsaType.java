@@ -13,6 +13,10 @@ public enum BcRsaType implements IEncryptType {
      */
     DEFAULT("RSA", false, false),
     /**
+     * 默认工作模式, PKCS1Padding模式填充
+     */
+    NONE_PKCS1PADDING("RSA/None/PKCS1Padding", false, false),
+    /**
      * 无向量加密模式, PKCS1Padding模式填充
      */
     ECB_PKCS1PADDING("RSA/ECB/PKCS1Padding", false, false),

@@ -42,23 +42,6 @@ public abstract class BasicAsymmetricEncryptor implements AsymmetricEncryptor, I
         return cipher.doFinal(data);
     }
 
-    @Override
-    public byte[] publicDecrypt(byte[] data) throws Exception {
-        Cipher cipher = getDecryptCipher(false);
-        if (type.noPadding()) {
-            data = CipherWorker.handleNoPaddingEncryptFormat(cipher, data);
-        }
-        return cipher.doFinal(data);
-    }
-
-    @Override
-    public byte[] privateEncrypt(byte[] data) throws Exception {
-        Cipher cipher = getEncryptCipher(true);
-        if (type.noPadding()) {
-            data = CipherWorker.handleNoPaddingEncryptFormat(cipher, data);
-        }
-        return cipher.doFinal(data);
-    }
 
     @Override
     public Cipher getEncryptCipher(boolean isPrivate) throws Exception {

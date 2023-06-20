@@ -60,10 +60,28 @@ public class CipherUtil {
      * 若使用new SecureRandom()创建公匙，则需要记录下私匙，解密时使用
      */
     public static KeyPair genKeyPair(IEncryptType type, byte[] secretBytes, int genSecretLen, String secureRandomAlgorithmName) throws Exception {
+        return genKeyPair(type, null, secretBytes, genSecretLen, secureRandomAlgorithmName);
+    }
+
+    public static KeyPair genKeyPair(IEncryptType type, String providerName, byte[] secretBytes, int genSecretLen, String secureRandomAlgorithmName) throws Exception {
         if (secureRandomAlgorithmName == null || "".equals(secureRandomAlgorithmName)) {
             secureRandomAlgorithmName = "SHA1PRNG";
         }
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(type.algorithmName());
+        if ("".equals(providerName)) {
+            providerName = null;
+        }
+        if (providerName != null) {
+            Provider provider = Security.getProvider(providerName);
+            if (provider == null) {
+                providerName = null;
+            }
+        }
+        KeyPairGenerator keyPairGenerator = null;
+        if (providerName != null) {
+            keyPairGenerator = KeyPairGenerator.getInstance(type.algorithmName(), providerName);
+        } else {
+            keyPairGenerator = KeyPairGenerator.getInstance(type.algorithmName());
+        }
         SecureRandom random = SecureRandom.getInstance(secureRandomAlgorithmName);
         random.setSeed(secretBytes);
         keyPairGenerator.initialize(genSecretLen, random);
@@ -113,12 +131,12 @@ public class CipherUtil {
                 iv = genIvParameterSpec(type, vectorBytes, vectorBytesLen, secureRandomAlgorithmName);
             }
         } else {
-            if (secretBytes == null || !type.supportSecretBytesLen(secretBytes.length / 8)) {
+            if (secretBytes == null || !type.supportSecretBytesLen(secretBytes.length * 8)) {
                 throw new UnsupportedOperationException("secret bytes length must be " + type.secretBytesLen());
             }
             secretKey = new SecretKeySpec(secretBytes, type.algorithmName());
             if (type.requireVector()) {
-                if (vectorBytes == null || !type.supportVectorBytesLen(vectorBytes.length / 8)) {
+                if (vectorBytes == null || !type.supportVectorBytesLen(vectorBytes.length * 8)) {
                     throw new UnsupportedOperationException("vector bytes length must be " + type.vectorBytesLen());
                 }
                 iv = new IvParameterSpec(vectorBytes);
