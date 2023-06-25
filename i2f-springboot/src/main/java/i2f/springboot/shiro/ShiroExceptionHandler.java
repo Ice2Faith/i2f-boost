@@ -1,6 +1,6 @@
 package i2f.springboot.shiro;
 
-import i2f.core.api.ApiResp;
+import i2f.core.std.api.ApiResp;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.HostUnauthorizedException;

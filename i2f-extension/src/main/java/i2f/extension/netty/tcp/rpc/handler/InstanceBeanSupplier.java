@@ -1,6 +1,6 @@
 package i2f.extension.netty.tcp.rpc.handler;
 
-import i2f.core.functional.supplier.ISupplier1;
+import i2f.core.lang.functional.supplier.ISupplier1;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 

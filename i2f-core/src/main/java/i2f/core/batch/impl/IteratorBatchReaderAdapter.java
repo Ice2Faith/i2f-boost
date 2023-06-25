@@ -3,7 +3,10 @@ package i2f.core.batch.impl;
 import i2f.core.annotations.notice.CloudBe;
 import i2f.core.batch.IBatchReader;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author ltb

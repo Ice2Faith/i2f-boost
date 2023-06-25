@@ -1,7 +1,7 @@
 package i2f.spring.secret.web;
 
-import i2f.core.secret.impl.ram.api.Md5Hasher;
-import i2f.core.secret.util.SecretUtil;
+import i2f.core.security.secret.impl.ram.api.Md5Hasher;
+import i2f.core.security.secret.util.SecretUtil;
 import i2f.spring.secret.web.annotations.SecretParams;
 import i2f.spring.secret.web.core.SecretWebCore;
 import org.springframework.beans.factory.annotation.Autowired;

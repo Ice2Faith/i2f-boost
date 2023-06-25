@@ -2,13 +2,13 @@ package i2f.core.generate;
 
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.functional.common.IMapper;
 import i2f.core.generate.core.ObjectFinder;
 import i2f.core.generate.core.impl.*;
 import i2f.core.generate.data.JsonControlMeta;
 import i2f.core.generate.impl.DefaultValueMapper;
 import i2f.core.generate.impl.FileTemplateLoader;
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.lang.functional.common.IMapper;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 
 import java.util.HashMap;
 import java.util.List;

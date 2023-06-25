@@ -1,6 +1,6 @@
 package i2f.extension.elasticsearch;
 
-import i2f.core.api.ApiPage;
+import i2f.core.std.api.ApiPage;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;

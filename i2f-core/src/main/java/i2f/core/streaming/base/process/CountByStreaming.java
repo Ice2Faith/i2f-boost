@@ -1,9 +1,9 @@
 package i2f.core.streaming.base.process;
 
-import i2f.core.iterator.impl.LazyIterator;
+import i2f.core.container.iterator.impl.LazyIterator;
 import i2f.core.streaming.base.AbsStreaming;
-import i2f.core.tuple.Tuples;
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.type.tuple.Tuples;
+import i2f.core.type.tuple.impl.Tuple2;
 
 import java.util.Iterator;
 import java.util.LinkedList;

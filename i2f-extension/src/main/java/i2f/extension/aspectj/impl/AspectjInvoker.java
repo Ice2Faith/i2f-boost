@@ -1,6 +1,6 @@
 package i2f.extension.aspectj.impl;
 
-import i2f.core.proxy.impl.IMethodAccessInvokable;
+import i2f.core.lang.proxy.impl.IMethodAccessInvokable;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 

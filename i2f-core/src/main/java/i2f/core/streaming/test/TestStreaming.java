@@ -5,7 +5,7 @@ import i2f.core.streaming.Streaming;
 import i2f.core.streaming.collect.Collectors;
 import i2f.core.streaming.support.sink.FileTextLineSinkStreaming;
 import i2f.core.streaming.support.source.FileTextLineSourceStreaming;
-import i2f.core.tuple.Tuples;
+import i2f.core.type.tuple.Tuples;
 
 import java.io.File;
 import java.util.ArrayList;

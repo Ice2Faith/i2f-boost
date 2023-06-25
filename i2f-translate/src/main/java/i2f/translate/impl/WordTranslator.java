@@ -1,11 +1,11 @@
 package i2f.translate.impl;
 
-import i2f.core.file.FileUtil;
-import i2f.core.jdbc.data.DBResultList;
+import i2f.core.database.jdbc.data.DBResultList;
+import i2f.core.io.file.FileUtil;
 import i2f.core.resource.ResourceUtil;
-import i2f.core.str.Strings;
-import i2f.core.str.data.RegexFindPartMeta;
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.type.str.Strings;
+import i2f.core.type.str.data.RegexFindPartMeta;
+import i2f.core.type.tuple.impl.Tuple2;
 
 import java.io.File;
 import java.io.InputStream;

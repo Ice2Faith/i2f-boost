@@ -1,8 +1,8 @@
 package i2f.core.generate.core.impl;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.functional.common.IMapper;
 import i2f.core.generate.core.IGenerate;
+import i2f.core.lang.functional.common.IMapper;
 import lombok.Data;
 
 import java.text.SimpleDateFormat;

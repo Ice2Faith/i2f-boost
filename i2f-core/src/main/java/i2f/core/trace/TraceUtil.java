@@ -3,9 +3,9 @@ package i2f.core.trace;
 
 import i2f.core.annotations.remark.Author;
 import i2f.core.check.CheckUtil;
-import i2f.core.reflect.core.ReflectResolver;
-import i2f.core.str.Appender;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.core.thread.ThreadUtil;
+import i2f.core.type.str.Appender;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

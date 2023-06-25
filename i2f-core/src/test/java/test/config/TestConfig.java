@@ -1,7 +1,7 @@
 package test.config;
 
 
-import i2f.core.db.annotations.DbName;
+import i2f.core.database.db.annotations.DbName;
 
 /**
  * @author ltb

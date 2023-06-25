@@ -65,7 +65,7 @@
 ### 用法总览
 ```java
 import com.fasterxml.jackson.core.type.TypeReference;
-import i2f.core.serialize.ISerializer;
+import i2f.core.serialize.std.ISerializer;
 import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import i2f.spring.serialize.jackson.JacksonXmlSerializer;
 import i2f.spring.serialize.jackson.JacksonYamlSerializer;

@@ -1,9 +1,9 @@
 package i2f.core.delegate.retry;
 
-import i2f.core.functional.supplier.ISupplier0;
-import i2f.core.functional.supplier.ISupplier1;
-import i2f.core.functional.supplier.ISupplier2;
-import i2f.core.functional.supplier.ISupplier3;
+import i2f.core.lang.functional.supplier.ISupplier0;
+import i2f.core.lang.functional.supplier.ISupplier1;
+import i2f.core.lang.functional.supplier.ISupplier2;
+import i2f.core.lang.functional.supplier.ISupplier3;
 
 public class RetryDelegator {
 

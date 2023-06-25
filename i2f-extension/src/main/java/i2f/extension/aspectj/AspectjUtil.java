@@ -1,6 +1,6 @@
 package i2f.extension.aspectj;
 
-import i2f.core.proxy.IProxyHandler;
+import i2f.core.lang.proxy.IProxyHandler;
 import i2f.core.zplugin.inject.InjectProxyHandler;
 import i2f.core.zplugin.inject.core.InjectProvider;
 import i2f.core.zplugin.validate.ValidateProxyHandler;

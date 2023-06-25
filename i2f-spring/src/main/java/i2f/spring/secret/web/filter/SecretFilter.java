@@ -1,9 +1,9 @@
 package i2f.spring.secret.web.filter;
 
 import i2f.core.j2ee.web.HttpServletResponseProxyWrapper;
-import i2f.core.secret.data.Base64SecretMsg;
-import i2f.core.secret.data.SecretMsg;
-import i2f.core.secret.exception.SecretException;
+import i2f.core.security.secret.data.Base64SecretMsg;
+import i2f.core.security.secret.data.SecretMsg;
+import i2f.core.security.secret.exception.SecretException;
 import i2f.spring.secret.web.annotations.SecretParams;
 import i2f.spring.secret.web.core.SecretWebCore;
 import lombok.extern.slf4j.Slf4j;

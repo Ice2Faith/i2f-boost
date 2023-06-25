@@ -1,7 +1,7 @@
 package i2f.core.digest;
 
 import i2f.core.exception.BoostException;
-import i2f.core.jce.codec.CodecUtil;
+import i2f.core.security.jce.codec.CodecUtil;
 
 import java.security.MessageDigest;
 

@@ -1,9 +1,9 @@
 package i2f.spring.secret.web;
 
-import i2f.core.secret.api.key.IKeyPair;
-import i2f.core.secret.core.SecretProvider;
-import i2f.core.secret.impl.ram.RamSecretProvider;
-import i2f.core.secret.util.SecretUtil;
+import i2f.core.security.secret.api.key.IKeyPair;
+import i2f.core.security.secret.core.SecretProvider;
+import i2f.core.security.secret.impl.ram.RamSecretProvider;
+import i2f.core.security.secret.util.SecretUtil;
 import i2f.spring.mapping.MappingUtil;
 import i2f.spring.secret.web.aop.SecretAop;
 import i2f.spring.secret.web.core.SecretWebCore;

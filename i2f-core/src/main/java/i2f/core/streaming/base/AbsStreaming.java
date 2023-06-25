@@ -1,11 +1,11 @@
 package i2f.core.streaming.base;
 
 import i2f.core.delegate.batch.IBatchResolver;
-import i2f.core.functional.common.IExecutor;
-import i2f.core.functional.common.IFilter;
-import i2f.core.functional.common.IMapper;
-import i2f.core.functional.consumer.IConsumer2;
-import i2f.core.functional.jvf.*;
+import i2f.core.lang.functional.common.IExecutor;
+import i2f.core.lang.functional.common.IFilter;
+import i2f.core.lang.functional.common.IMapper;
+import i2f.core.lang.functional.consumer.IConsumer2;
+import i2f.core.lang.functional.jvf.*;
 import i2f.core.streaming.Streaming;
 import i2f.core.streaming.api.process.IProcessStreaming;
 import i2f.core.streaming.api.process.ProcessStreaming;
@@ -17,7 +17,7 @@ import i2f.core.streaming.base.process.*;
 import i2f.core.streaming.base.sink.*;
 import i2f.core.streaming.group.GroupStreamingImpl;
 import i2f.core.thread.AtomicCountDownLatch;
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.type.tuple.impl.Tuple2;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;

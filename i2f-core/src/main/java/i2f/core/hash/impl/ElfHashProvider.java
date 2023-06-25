@@ -1,6 +1,6 @@
 package i2f.core.hash.impl;
 
-import i2f.core.serialize.IBytesSerializer;
+import i2f.core.serialize.std.IBytesSerializer;
 
 /**
  * @author ltb

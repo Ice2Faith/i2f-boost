@@ -3,7 +3,7 @@ package i2f.extension.json.gson;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import i2f.core.json.impl.AbstractJsonProcessor;
+import i2f.core.serialize.json.impl.AbstractJsonProcessor;
 
 import java.util.Map;
 

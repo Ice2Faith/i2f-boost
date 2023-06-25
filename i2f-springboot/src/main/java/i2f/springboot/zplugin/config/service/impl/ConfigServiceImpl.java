@@ -1,8 +1,8 @@
 package i2f.springboot.zplugin.config.service.impl;
 
 
-import i2f.core.api.ApiPage;
 import i2f.core.convert.TreeConvertUtil;
+import i2f.core.std.api.ApiPage;
 import i2f.springboot.zplugin.config.dto.ConfigDto;
 import i2f.springboot.zplugin.config.mapper.ConfigMapper;
 import i2f.springboot.zplugin.config.service.ConfigService;

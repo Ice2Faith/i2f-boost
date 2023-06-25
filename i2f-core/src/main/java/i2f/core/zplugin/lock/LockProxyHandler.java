@@ -1,9 +1,9 @@
 package i2f.core.zplugin.lock;
 
-import i2f.core.proxy.IInvokable;
-import i2f.core.proxy.impl.BasicProxyHandler;
-import i2f.core.proxy.impl.IMethodAccessInvokable;
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.lang.proxy.IInvokable;
+import i2f.core.lang.proxy.impl.BasicProxyHandler;
+import i2f.core.lang.proxy.impl.IMethodAccessInvokable;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.core.zplugin.lock.annotations.ReadLock;
 import i2f.core.zplugin.lock.annotations.ReentrantLock;
 import i2f.core.zplugin.lock.annotations.WriteLock;

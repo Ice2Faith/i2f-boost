@@ -1,9 +1,12 @@
 package i2f.core.delegate.batch;
 
 
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.type.tuple.impl.Tuple2;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
 /**

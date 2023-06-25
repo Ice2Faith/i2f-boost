@@ -1,13 +1,13 @@
 package test.jce;
 
-import i2f.core.jce.codec.CodecUtil;
-import i2f.core.jce.encrypt.std.symmetric.SymmetricEncryptor;
-import i2f.core.jce.encrypt.symmetric.aes.AesKgenEncryptor;
-import i2f.core.jce.encrypt.symmetric.aes.AesType;
-import i2f.core.jce.encrypt.symmetric.des.DesKgenEncryptor;
-import i2f.core.jce.encrypt.symmetric.des.DesType;
-import i2f.core.jce.encrypt.symmetric.des.ede.DesEdeKgenEncryptor;
-import i2f.core.jce.encrypt.symmetric.des.ede.DesEdeType;
+import i2f.core.security.jce.codec.CodecUtil;
+import i2f.core.security.jce.encrypt.std.symmetric.SymmetricEncryptor;
+import i2f.core.security.jce.encrypt.symmetric.aes.AesKgenEncryptor;
+import i2f.core.security.jce.encrypt.symmetric.aes.AesType;
+import i2f.core.security.jce.encrypt.symmetric.des.DesKgenEncryptor;
+import i2f.core.security.jce.encrypt.symmetric.des.DesType;
+import i2f.core.security.jce.encrypt.symmetric.des.ede.DesEdeKgenEncryptor;
+import i2f.core.security.jce.encrypt.symmetric.des.ede.DesEdeType;
 
 /**
  * @author ltb

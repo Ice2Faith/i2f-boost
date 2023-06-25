@@ -1,14 +1,14 @@
 package test.sql.wrapper;
 
-import i2f.core.collection.Collections;
-import i2f.core.jdbc.sql.consts.Sql;
-import i2f.core.jdbc.sql.wrapper.DeleteWrapper;
-import i2f.core.jdbc.sql.wrapper.InsertWrapper;
-import i2f.core.jdbc.sql.wrapper.QueryWrapper;
-import i2f.core.jdbc.sql.wrapper.UpdateWrapper;
-import i2f.core.jdbc.sql.wrapper.core.BindSql;
-import i2f.core.jdbc.sql.wrapper.ddl.CreateTableWrapper;
-import i2f.core.jdbc.sql.wrapper.ddl.DropTableWrapper;
+import i2f.core.container.collection.Collections;
+import i2f.core.database.jdbc.sql.consts.Sql;
+import i2f.core.database.jdbc.sql.wrapper.DeleteWrapper;
+import i2f.core.database.jdbc.sql.wrapper.InsertWrapper;
+import i2f.core.database.jdbc.sql.wrapper.QueryWrapper;
+import i2f.core.database.jdbc.sql.wrapper.UpdateWrapper;
+import i2f.core.database.jdbc.sql.wrapper.core.BindSql;
+import i2f.core.database.jdbc.sql.wrapper.ddl.CreateTableWrapper;
+import i2f.core.database.jdbc.sql.wrapper.ddl.DropTableWrapper;
 import test.lambda.SysUser;
 
 /**

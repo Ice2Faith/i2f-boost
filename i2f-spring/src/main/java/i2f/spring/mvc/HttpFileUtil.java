@@ -1,6 +1,6 @@
 package i2f.spring.mvc;
 
-import i2f.core.file.core.FileMime;
+import i2f.core.io.file.core.FileMime;
 import i2f.core.j2ee.web.ServletFileUtil;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;

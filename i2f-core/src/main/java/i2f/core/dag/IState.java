@@ -1,6 +1,6 @@
 package i2f.core.dag;
 
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.type.tuple.impl.Tuple2;
 
 public interface IState<EVENT, STATE> {
     // 获取所有的事件和事件之后到达的状态

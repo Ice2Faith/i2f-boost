@@ -1,7 +1,7 @@
 package i2f.core.zplugin.validate.impl;
 
-import i2f.core.reflect.core.ReflectResolver;
-import i2f.core.reflect.interfaces.PropertyAccessor;
+import i2f.core.reflection.reflect.core.ReflectResolver;
+import i2f.core.reflection.reflect.interfaces.PropertyAccessor;
 import i2f.core.zplugin.validate.IValidator;
 import i2f.core.zplugin.validate.annotations.Validate;
 import i2f.core.zplugin.validate.core.ValidateProvider;

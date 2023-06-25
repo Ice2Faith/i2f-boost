@@ -1,12 +1,12 @@
 package proxy;
 
-import i2f.core.collection.Collections;
+import i2f.core.container.collection.Collections;
 import i2f.core.functions.Algorithm;
-import i2f.core.functional.impl.SysPrintlnExecutor;
-import i2f.core.proxy.IInvokable;
-import i2f.core.proxy.IProxyHandler;
-import i2f.core.proxy.IProxyProvider;
-import i2f.core.proxy.impl.JdkProxyProvider;
+import i2f.core.lang.functional.impl.SysPrintlnExecutor;
+import i2f.core.lang.proxy.IInvokable;
+import i2f.core.lang.proxy.IProxyHandler;
+import i2f.core.lang.proxy.IProxyProvider;
+import i2f.core.lang.proxy.impl.JdkProxyProvider;
 import i2f.extension.proxy.cglib.CglibProxyProvider;
 
 /**

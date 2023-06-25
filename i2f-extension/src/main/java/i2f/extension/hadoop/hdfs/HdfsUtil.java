@@ -1,7 +1,7 @@
 package i2f.extension.hadoop.hdfs;
 
-import i2f.core.file.FileUtil;
-import i2f.core.stream.StreamUtil;
+import i2f.core.io.file.FileUtil;
+import i2f.core.io.stream.StreamUtil;
 import i2f.extension.hadoop.hdfs.data.IHdfsMeta;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;

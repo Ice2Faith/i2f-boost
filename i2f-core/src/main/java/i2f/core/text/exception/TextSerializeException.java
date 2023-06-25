@@ -1,7 +1,7 @@
 package i2f.core.text.exception;
 
 
-import i2f.core.serialize.SerializeException;
+import i2f.core.serialize.std.SerializeException;
 
 /**
  * @author ltb

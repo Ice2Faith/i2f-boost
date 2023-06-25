@@ -3,9 +3,9 @@ package i2f.core.functions;
 import i2f.core.annotations.notice.Nullable;
 import i2f.core.annotations.notice.NullableReturn;
 import i2f.core.annotations.remark.Author;
-import i2f.core.functional.common.IExecutor;
-import i2f.core.functional.common.IFilter;
-import i2f.core.functional.common.IMapper;
+import i2f.core.lang.functional.common.IExecutor;
+import i2f.core.lang.functional.common.IFilter;
+import i2f.core.lang.functional.common.IMapper;
 
 import java.util.Collection;
 import java.util.Enumeration;

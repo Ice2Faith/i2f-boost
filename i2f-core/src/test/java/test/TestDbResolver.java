@@ -1,14 +1,14 @@
 package test;
 
-import i2f.core.db.reverse.DbReverseEngineer;
-import i2f.core.db.reverse.impl.TableBuildReverseProcessor;
-import i2f.core.db.core.DbBeanResolver;
-import i2f.core.db.core.DbResolver;
-import i2f.core.db.data.TableColumnMeta;
-import i2f.core.db.data.TableMeta;
-import i2f.core.jdbc.core.JdbcMetaAdapter;
-import i2f.core.jdbc.core.JdbcProvider;
-import i2f.core.jdbc.core.TransactionManager;
+import i2f.core.database.db.core.DbBeanResolver;
+import i2f.core.database.db.core.DbResolver;
+import i2f.core.database.db.data.TableColumnMeta;
+import i2f.core.database.db.data.TableMeta;
+import i2f.core.database.db.reverse.DbReverseEngineer;
+import i2f.core.database.db.reverse.impl.TableBuildReverseProcessor;
+import i2f.core.database.jdbc.core.JdbcMetaAdapter;
+import i2f.core.database.jdbc.core.JdbcProvider;
+import i2f.core.database.jdbc.core.TransactionManager;
 
 import java.sql.Connection;
 import java.sql.SQLException;

@@ -1,6 +1,6 @@
 package i2f.springboot.activity.demo;
 
-import i2f.core.api.ApiResp;
+import i2f.core.std.api.ApiResp;
 import i2f.springboot.activity.ActivityManager;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.repository.Deployment;

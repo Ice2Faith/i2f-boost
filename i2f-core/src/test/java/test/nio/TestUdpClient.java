@@ -1,6 +1,6 @@
 package test.nio;
 
-import i2f.core.nio.net.udp.UdpClient;
+import i2f.core.io.nio.net.udp.UdpClient;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

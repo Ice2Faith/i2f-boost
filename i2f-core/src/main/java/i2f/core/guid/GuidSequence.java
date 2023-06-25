@@ -1,8 +1,8 @@
 package i2f.core.guid;
 
 
-import i2f.core.date.SystemClock;
 import i2f.core.safe.Asserts;
+import i2f.core.type.date.SystemClock;
 
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;

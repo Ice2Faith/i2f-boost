@@ -1,7 +1,7 @@
 package i2f.extension.mybatis.interceptor.proxy;
 
-import i2f.core.proxy.IProxyHandler;
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.lang.proxy.IProxyHandler;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.extension.mybatis.interceptor.proxy.core.MybatisInterceptorProxy;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.Invocation;

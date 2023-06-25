@@ -1,11 +1,11 @@
 package i2f.core.safe;
 
-import i2f.core.array.Arrays;
-import i2f.core.collection.Collections;
-import i2f.core.map.Maps;
-import i2f.core.functional.jvf.BiSupplier;
-import i2f.core.reflect.Reflects;
-import i2f.core.str.Strings;
+import i2f.core.container.array.Arrays;
+import i2f.core.container.collection.Collections;
+import i2f.core.container.map.Maps;
+import i2f.core.lang.functional.jvf.BiSupplier;
+import i2f.core.reflection.reflect.Reflects;
+import i2f.core.type.str.Strings;
 
 import java.util.Collection;
 import java.util.Map;

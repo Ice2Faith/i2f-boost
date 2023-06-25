@@ -1,6 +1,6 @@
 package i2f.extension.mybatis.interceptor.impl;
 
-import i2f.core.str.Strings;
+import i2f.core.type.str.Strings;
 
 import java.util.ArrayList;
 import java.util.HashMap;

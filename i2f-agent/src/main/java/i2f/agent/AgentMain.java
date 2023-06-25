@@ -1,6 +1,6 @@
 package i2f.agent;
 
-import i2f.core.agent.AgentUtil;
+import i2f.core.lang.agent.AgentUtil;
 import i2f.core.match.StringMatcher;
 
 import java.lang.instrument.Instrumentation;

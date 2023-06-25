@@ -1,8 +1,8 @@
 package i2f.extension.httpclient.impl;
 
-import i2f.core.net.http.data.HttpRequest;
-import i2f.core.net.http.interfaces.IHttpRequestBodyHandler;
-import i2f.core.xml.IXmlProcessor;
+import i2f.core.network.net.http.data.HttpRequest;
+import i2f.core.network.net.http.interfaces.IHttpRequestBodyHandler;
+import i2f.core.serialize.xml.IXmlProcessor;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.entity.StringEntity;
 

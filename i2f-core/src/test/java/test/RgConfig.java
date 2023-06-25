@@ -1,6 +1,6 @@
 package test;
 
-import i2f.core.db.annotations.*;
+import i2f.core.database.db.annotations.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

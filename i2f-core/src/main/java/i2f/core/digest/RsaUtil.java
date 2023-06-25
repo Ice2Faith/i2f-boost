@@ -1,7 +1,7 @@
 package i2f.core.digest;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.str.Strings;
+import i2f.core.type.str.Strings;
 
 import javax.crypto.Cipher;
 import java.security.KeyPair;

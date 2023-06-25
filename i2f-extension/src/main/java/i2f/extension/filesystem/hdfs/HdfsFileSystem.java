@@ -1,7 +1,7 @@
 package i2f.extension.filesystem.hdfs;
 
-import i2f.core.filesystem.IFile;
-import i2f.core.filesystem.abs.AbsFileSystem;
+import i2f.core.io.filesystem.IFile;
+import i2f.core.io.filesystem.abs.AbsFileSystem;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;

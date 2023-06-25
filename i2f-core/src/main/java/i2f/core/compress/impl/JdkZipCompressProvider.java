@@ -3,7 +3,7 @@ package i2f.core.compress.impl;
 import i2f.core.compress.ICompressProvider;
 import i2f.core.compress.data.CompressBindData;
 import i2f.core.compress.data.CompressBindFile;
-import i2f.core.stream.StreamUtil;
+import i2f.core.io.stream.StreamUtil;
 
 import java.io.*;
 import java.util.zip.ZipEntry;

@@ -1,8 +1,8 @@
 package i2f.springboot.zplugin.config.controller;
 
 
-import i2f.core.api.ApiPage;
-import i2f.core.api.ApiResp;
+import i2f.core.std.api.ApiPage;
+import i2f.core.std.api.ApiResp;
 import i2f.springboot.zplugin.config.dto.ConfigDto;
 import i2f.springboot.zplugin.config.service.ConfigService;
 import i2f.springboot.zplugin.config.vo.ConfigVo;

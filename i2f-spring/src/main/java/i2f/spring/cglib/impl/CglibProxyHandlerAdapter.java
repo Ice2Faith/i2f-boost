@@ -1,8 +1,8 @@
 package i2f.spring.cglib.impl;
 
-import i2f.core.proxy.IInvokable;
-import i2f.core.proxy.IProxyHandler;
-import i2f.core.proxy.impl.MethodInvoker;
+import i2f.core.lang.proxy.IInvokable;
+import i2f.core.lang.proxy.IProxyHandler;
+import i2f.core.lang.proxy.impl.MethodInvoker;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
 

@@ -2,7 +2,7 @@ package i2f.springboot.secure.util;
 
 import i2f.core.digest.Base64Util;
 import i2f.core.digest.RsaKey;
-import i2f.core.str.Strings;
+import i2f.core.type.str.Strings;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.Cipher;

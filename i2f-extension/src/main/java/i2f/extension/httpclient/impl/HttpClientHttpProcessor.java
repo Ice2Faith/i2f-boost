@@ -1,16 +1,16 @@
 package i2f.extension.httpclient.impl;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.collection.Collections;
+import i2f.core.container.collection.Collections;
 import i2f.core.data.Triple;
-import i2f.core.file.FileUtil;
-import i2f.core.net.core.NetTransfer;
-import i2f.core.net.http.HttpUtil;
-import i2f.core.net.http.data.HttpRequest;
-import i2f.core.net.http.data.HttpResponse;
-import i2f.core.net.http.interfaces.IHttpProcessor;
-import i2f.core.net.http.interfaces.IHttpRequestBodyHandler;
-import i2f.core.stream.StreamUtil;
+import i2f.core.io.file.FileUtil;
+import i2f.core.io.stream.StreamUtil;
+import i2f.core.network.net.core.NetTransfer;
+import i2f.core.network.net.http.HttpUtil;
+import i2f.core.network.net.http.data.HttpRequest;
+import i2f.core.network.net.http.data.HttpResponse;
+import i2f.core.network.net.http.interfaces.IHttpProcessor;
+import i2f.core.network.net.http.interfaces.IHttpRequestBodyHandler;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;

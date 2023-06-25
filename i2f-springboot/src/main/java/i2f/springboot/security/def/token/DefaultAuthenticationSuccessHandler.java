@@ -1,7 +1,7 @@
 package i2f.springboot.security.def.token;
 
-import i2f.core.api.ApiResp;
 import i2f.core.digest.CodeUtil;
+import i2f.core.std.api.ApiResp;
 import i2f.springboot.security.SecurityForwardUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

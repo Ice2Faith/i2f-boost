@@ -1,8 +1,8 @@
 package test.nio;
 
-import i2f.core.nio.net.udp.IUdpConnector;
-import i2f.core.nio.net.udp.IUdpListener;
-import i2f.core.nio.net.udp.UdpServer;
+import i2f.core.io.nio.net.udp.IUdpConnector;
+import i2f.core.io.nio.net.udp.IUdpListener;
+import i2f.core.io.nio.net.udp.UdpServer;
 
 import java.io.IOException;
 import java.net.SocketAddress;

@@ -1,9 +1,9 @@
 package i2f.core.dict.type.impl;
 
 
-import i2f.core.date.Dates;
 import i2f.core.dict.type.ITypeConverter;
 import i2f.core.dict.type.TypeUtil;
+import i2f.core.type.date.Dates;
 
 import java.sql.Timestamp;
 import java.util.Date;

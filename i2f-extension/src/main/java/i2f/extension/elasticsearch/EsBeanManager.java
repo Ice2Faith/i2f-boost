@@ -1,9 +1,9 @@
 package i2f.extension.elasticsearch;
 
-import i2f.core.api.ApiPage;
-import i2f.core.reflect.bean.BeanResolver;
-import i2f.core.reflect.core.ReflectResolver;
-import i2f.core.reflect.interfaces.PropertyAccessor;
+import i2f.core.reflection.reflect.bean.BeanResolver;
+import i2f.core.reflection.reflect.core.ReflectResolver;
+import i2f.core.reflection.reflect.interfaces.PropertyAccessor;
+import i2f.core.std.api.ApiPage;
 import i2f.extension.elasticsearch.annotation.EsField;
 import i2f.extension.elasticsearch.annotation.EsId;
 import i2f.extension.elasticsearch.annotation.EsIndex;

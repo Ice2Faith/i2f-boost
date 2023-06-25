@@ -1,6 +1,6 @@
 package i2f.core.streaming.base.sink;
 
-import i2f.core.functional.jvf.BiSupplier;
+import i2f.core.lang.functional.jvf.BiSupplier;
 
 import java.util.Iterator;
 import java.util.Map;

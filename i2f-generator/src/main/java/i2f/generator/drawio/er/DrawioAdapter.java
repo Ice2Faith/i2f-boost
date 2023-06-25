@@ -1,7 +1,7 @@
 package i2f.generator.drawio.er;
 
-import i2f.core.db.data.TableColumnMeta;
-import i2f.core.db.data.TableMeta;
+import i2f.core.database.db.data.TableColumnMeta;
+import i2f.core.database.db.data.TableMeta;
 
 import java.util.LinkedList;
 import java.util.List;

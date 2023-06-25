@@ -2,7 +2,7 @@ package i2f.core.streaming.base.sink;
 
 import i2f.core.delegate.batch.BatchDelegator;
 import i2f.core.delegate.batch.IBatchResolver;
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.type.tuple.impl.Tuple2;
 
 import java.util.Iterator;
 import java.util.List;

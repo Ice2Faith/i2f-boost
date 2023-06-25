@@ -1,6 +1,6 @@
 package i2f.springboot.refresh;
 
-import i2f.core.api.ApiResp;
+import i2f.core.std.api.ApiResp;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

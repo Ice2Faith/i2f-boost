@@ -1,7 +1,7 @@
 package i2f.extension.table.impl.poi;
 
 
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.type.tuple.impl.Tuple2;
 import i2f.extension.table.TableWriter;
 import i2f.extension.table.impl.poi.base.DefaultExcelWriterListener;
 import i2f.extension.table.impl.poi.base.ExcelWriter;

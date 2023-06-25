@@ -1,6 +1,6 @@
 package i2f.generator.module;
 
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.generator.GeneratorDriver;
 import i2f.generator.api.ApiMethod;
 import i2f.generator.api.ApiMethodResolver;

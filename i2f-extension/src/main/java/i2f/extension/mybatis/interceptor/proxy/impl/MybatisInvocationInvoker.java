@@ -1,6 +1,6 @@
 package i2f.extension.mybatis.interceptor.proxy.impl;
 
-import i2f.core.proxy.impl.IMethodAccessInvokable;
+import i2f.core.lang.proxy.impl.IMethodAccessInvokable;
 import org.apache.ibatis.plugin.Invocation;
 
 import java.lang.reflect.Method;

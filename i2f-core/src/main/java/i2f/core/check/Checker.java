@@ -3,7 +3,7 @@ package i2f.core.check;
 
 import i2f.core.annotations.remark.Author;
 import i2f.core.annotations.remark.Usage;
-import i2f.core.functional.common.IFilter;
+import i2f.core.lang.functional.common.IFilter;
 
 import java.util.Collection;
 import java.util.Map;

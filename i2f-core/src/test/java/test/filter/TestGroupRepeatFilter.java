@@ -1,6 +1,6 @@
 package test.filter;
 
-import i2f.core.collection.Collections;
+import i2f.core.container.collection.Collections;
 import i2f.core.data.IDataReader;
 import i2f.core.data.IDataWriter;
 import i2f.core.data.impl.StreamReaderDataReader;

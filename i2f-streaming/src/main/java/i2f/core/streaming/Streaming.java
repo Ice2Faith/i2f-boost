@@ -1,6 +1,6 @@
 package i2f.core.streaming;
 
-import i2f.core.iterator.impl.EnumerationIterator;
+import i2f.core.container.iterator.impl.EnumerationIterator;
 import i2f.core.streaming.impl.AbsStreaming;
 import i2f.core.streaming.impl.NumberStreaming;
 import i2f.core.streaming.impl.StreamingContext;
@@ -8,7 +8,7 @@ import i2f.core.streaming.iterator.LazyIterator;
 import i2f.core.streaming.keyed.KeyedStreaming;
 import i2f.core.streaming.process.StreamingProcessor;
 import i2f.core.streaming.sink.StreamingSinker;
-import i2f.core.tuple.impl.*;
+import i2f.core.type.tuple.impl.*;
 
 import java.util.*;
 import java.util.function.*;

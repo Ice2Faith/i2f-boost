@@ -1,8 +1,8 @@
 package test.nio;
 
-import i2f.core.nio.net.tcp.ITcpConnector;
-import i2f.core.nio.net.tcp.ITcpServerListener;
-import i2f.core.nio.net.tcp.TcpServer;
+import i2f.core.io.nio.net.tcp.ITcpConnector;
+import i2f.core.io.nio.net.tcp.ITcpServerListener;
+import i2f.core.io.nio.net.tcp.TcpServer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

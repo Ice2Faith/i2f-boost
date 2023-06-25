@@ -3,11 +3,11 @@ package i2f.core.generate.core.impl;
 import i2f.core.annotations.remark.Author;
 import i2f.core.data.Pair;
 import i2f.core.data.Triple;
-import i2f.core.functional.common.IMapper;
 import i2f.core.generate.RegexGenerator;
 import i2f.core.generate.core.IGenerate;
 import i2f.core.generate.core.ObjectFinder;
-import i2f.core.reflect.convert.ConvertResolver;
+import i2f.core.lang.functional.common.IMapper;
+import i2f.core.reflection.reflect.convert.ConvertResolver;
 import lombok.Data;
 
 import java.math.BigDecimal;

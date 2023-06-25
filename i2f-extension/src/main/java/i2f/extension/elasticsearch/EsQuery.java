@@ -1,7 +1,7 @@
 package i2f.extension.elasticsearch;
 
-import i2f.core.api.ApiPage;
-import i2f.core.array.Arrays;
+import i2f.core.container.array.Arrays;
+import i2f.core.std.api.ApiPage;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;

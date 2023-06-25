@@ -1,6 +1,6 @@
 package i2f.springboot.websocket;
 
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.spring.context.SpringUtil;
 import i2f.spring.environment.EnvironmentUtil;
 import lombok.Data;

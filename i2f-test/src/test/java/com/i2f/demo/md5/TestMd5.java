@@ -1,11 +1,11 @@
 package com.i2f.demo.md5;
 
-import i2f.core.collection.Collections;
+import i2f.core.container.collection.Collections;
+import i2f.core.database.jdbc.core.IJdbcMeta;
+import i2f.core.database.jdbc.core.JdbcProvider;
+import i2f.core.database.jdbc.core.TransactionManager;
 import i2f.core.digest.MessageDigestUtil;
-import i2f.core.jdbc.core.IJdbcMeta;
-import i2f.core.jdbc.core.JdbcProvider;
-import i2f.core.jdbc.core.TransactionManager;
-import i2f.core.str.Strings;
+import i2f.core.type.str.Strings;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

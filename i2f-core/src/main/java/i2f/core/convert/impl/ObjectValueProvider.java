@@ -1,7 +1,7 @@
 package i2f.core.convert.impl;
 
 import i2f.core.convert.IValueProvider;
-import i2f.core.reflect.ValueResolver;
+import i2f.core.reflection.reflect.ValueResolver;
 
 /**
  * @author ltb

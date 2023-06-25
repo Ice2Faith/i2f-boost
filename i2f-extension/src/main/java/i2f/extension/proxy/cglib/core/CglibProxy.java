@@ -1,6 +1,6 @@
 package i2f.extension.proxy.cglib.core;
 
-import i2f.core.proxy.IProxyHandler;
+import i2f.core.lang.proxy.IProxyHandler;
 import i2f.extension.proxy.cglib.IEnhancerSetting;
 import i2f.extension.proxy.cglib.impl.CglibProxyHandlerAdapter;
 import i2f.extension.proxy.cglib.impl.NoneEnhancerSetting;

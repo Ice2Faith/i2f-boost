@@ -1,6 +1,6 @@
 package i2f.springboot.exception;
 
-import i2f.core.api.ApiResp;
+import i2f.core.std.api.ApiResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

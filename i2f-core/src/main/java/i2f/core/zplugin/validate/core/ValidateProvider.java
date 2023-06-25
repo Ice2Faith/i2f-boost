@@ -1,6 +1,6 @@
 package i2f.core.zplugin.validate.core;
 
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.core.zplugin.validate.IValidator;
 import i2f.core.zplugin.validate.annotations.Validate;
 import i2f.core.zplugin.validate.exception.ValidateException;

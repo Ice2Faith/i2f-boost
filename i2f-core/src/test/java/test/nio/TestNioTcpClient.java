@@ -1,8 +1,8 @@
 package test.nio;
 
-import i2f.core.nio.net.tcp.ITcpClientListener;
-import i2f.core.nio.net.tcp.ITcpConnector;
-import i2f.core.nio.net.tcp.TcpClient;
+import i2f.core.io.nio.net.tcp.ITcpClientListener;
+import i2f.core.io.nio.net.tcp.ITcpConnector;
+import i2f.core.io.nio.net.tcp.TcpClient;
 import lombok.SneakyThrows;
 
 import java.io.IOException;

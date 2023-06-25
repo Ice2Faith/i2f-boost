@@ -1,7 +1,7 @@
 package i2f.spring.secret.web.aop;
 
-import i2f.core.secret.data.SecretMsg;
-import i2f.core.secret.util.SecretUtil;
+import i2f.core.security.secret.data.SecretMsg;
+import i2f.core.security.secret.util.SecretUtil;
 import i2f.spring.secret.web.annotations.SecretParams;
 import i2f.spring.secret.web.core.SecretWebCore;
 import lombok.extern.slf4j.Slf4j;

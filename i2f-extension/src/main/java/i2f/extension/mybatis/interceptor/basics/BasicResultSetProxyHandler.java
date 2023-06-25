@@ -1,7 +1,7 @@
 package i2f.extension.mybatis.interceptor.basics;
 
-import i2f.core.proxy.impl.BasicProxyHandler;
-import i2f.core.reflect.ValueResolver;
+import i2f.core.lang.proxy.impl.BasicProxyHandler;
+import i2f.core.reflection.reflect.ValueResolver;
 import i2f.extension.mybatis.interceptor.proxy.MybatisInterceptorUtil;
 import org.apache.ibatis.executor.resultset.DefaultResultSetHandler;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;

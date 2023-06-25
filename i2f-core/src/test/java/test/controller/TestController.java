@@ -1,11 +1,11 @@
 package test.controller;
 
-import i2f.core.db.annotations.DbCatalog;
-import i2f.core.db.annotations.DbComment;
-import i2f.core.db.annotations.DbName;
+import i2f.core.database.db.annotations.DbCatalog;
+import i2f.core.database.db.annotations.DbComment;
+import i2f.core.database.db.annotations.DbName;
 import i2f.core.id.IdNumberUtil;
 import i2f.core.id.data.IdNumberData;
-import i2f.core.pkg.PackageUtil;
+import i2f.core.reflection.pkg.PackageUtil;
 
 import java.io.IOException;
 import java.util.List;

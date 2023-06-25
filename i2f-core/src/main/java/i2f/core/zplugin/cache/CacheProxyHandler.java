@@ -2,11 +2,11 @@ package i2f.core.zplugin.cache;
 
 import i2f.core.cache.ICache;
 import i2f.core.cache.impl.mem.MemCache;
-import i2f.core.proxy.IInvokable;
-import i2f.core.proxy.impl.BasicProxyHandler;
-import i2f.core.proxy.impl.IMethodAccessInvokable;
-import i2f.core.reflect.core.ReflectResolver;
-import i2f.core.str.Appender;
+import i2f.core.lang.proxy.IInvokable;
+import i2f.core.lang.proxy.impl.BasicProxyHandler;
+import i2f.core.lang.proxy.impl.IMethodAccessInvokable;
+import i2f.core.reflection.reflect.core.ReflectResolver;
+import i2f.core.type.str.Appender;
 import i2f.core.zplugin.cache.annotations.Cached;
 import i2f.core.zplugin.databind.DatabindResolver;
 import i2f.core.zplugin.databind.annotations.DataBind;

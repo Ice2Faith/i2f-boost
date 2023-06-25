@@ -1,9 +1,9 @@
 package i2f.core.j2ee.web;
 
 import i2f.core.check.CheckUtil;
-import i2f.core.file.FileUtil;
-import i2f.core.file.core.FileMime;
-import i2f.core.stream.StreamUtil;
+import i2f.core.io.file.FileUtil;
+import i2f.core.io.file.core.FileMime;
+import i2f.core.io.stream.StreamUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

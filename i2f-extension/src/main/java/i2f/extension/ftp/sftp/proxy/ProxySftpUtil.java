@@ -1,7 +1,7 @@
 package i2f.extension.ftp.sftp.proxy;
 
 import com.jcraft.jsch.*;
-import i2f.core.file.FileUtil;
+import i2f.core.io.file.FileUtil;
 import i2f.extension.ftp.sftp.proxy.data.IProxySftpMeta;
 
 import java.io.*;

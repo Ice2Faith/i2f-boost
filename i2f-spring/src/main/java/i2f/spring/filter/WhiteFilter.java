@@ -1,7 +1,7 @@
 package i2f.spring.filter;
 
 
-import i2f.core.functional.common.IGetter;
+import i2f.core.lang.functional.common.IGetter;
 import org.springframework.util.AntPathMatcher;
 
 import java.util.Collection;

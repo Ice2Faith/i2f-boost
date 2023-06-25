@@ -1,7 +1,7 @@
 package test.appender;
 
-import i2f.core.collection.Collections;
-import i2f.core.str.Appender;
+import i2f.core.container.collection.Collections;
+import i2f.core.type.str.Appender;
 
 /**
  * @author ltb

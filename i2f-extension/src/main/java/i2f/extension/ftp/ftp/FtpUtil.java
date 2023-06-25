@@ -1,6 +1,6 @@
 package i2f.extension.ftp.ftp;
 
-import i2f.core.file.FileUtil;
+import i2f.core.io.file.FileUtil;
 import i2f.extension.ftp.ftp.data.IFtpMeta;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;

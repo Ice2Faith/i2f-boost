@@ -4,9 +4,9 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
-import i2f.core.filesystem.IFile;
-import i2f.core.filesystem.abs.AbsFileSystem;
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.io.filesystem.IFile;
+import i2f.core.io.filesystem.abs.AbsFileSystem;
+import i2f.core.type.tuple.impl.Tuple2;
 
 import java.io.Closeable;
 import java.io.IOException;

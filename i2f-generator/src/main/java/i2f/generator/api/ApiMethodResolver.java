@@ -1,7 +1,7 @@
 package i2f.generator.api;
 
-import i2f.core.reflect.Reflects;
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.reflection.reflect.Reflects;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import io.swagger.annotations.*;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.web.bind.annotation.*;

@@ -1,6 +1,6 @@
 package test.service.impl;
 
-import i2f.core.db.annotations.DbCatalog;
+import i2f.core.database.db.annotations.DbCatalog;
 import test.service.TestService;
 
 /**

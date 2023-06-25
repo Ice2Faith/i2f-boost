@@ -1,6 +1,6 @@
 package i2f.springboot.shiro;
 
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.spring.environment.EnvironmentUtil;
 import i2f.springboot.security.impl.LoginPasswordDecoder;
 import i2f.springboot.shiro.def.DefaultLoginSuccessHandler;

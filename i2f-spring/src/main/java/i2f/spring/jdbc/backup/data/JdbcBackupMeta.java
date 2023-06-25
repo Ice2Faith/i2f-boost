@@ -1,6 +1,6 @@
 package i2f.spring.jdbc.backup.data;
 
-import i2f.core.jdbc.core.JdbcMetaAdapter;
+import i2f.core.database.jdbc.core.JdbcMetaAdapter;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

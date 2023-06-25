@@ -1,15 +1,18 @@
 package i2f.core.resource;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.array.Arrays;
-import i2f.core.collection.Collections;
+import i2f.core.container.array.Arrays;
+import i2f.core.container.collection.Collections;
+import i2f.core.io.stream.StreamUtil;
 import i2f.core.match.IMatcher;
 import i2f.core.match.impl.AntMatcher;
-import i2f.core.stream.StreamUtil;
 
 import java.io.*;
 import java.net.URL;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 

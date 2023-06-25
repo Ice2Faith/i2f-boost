@@ -1,7 +1,7 @@
 package i2f.extension.table;
 
 
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.type.tuple.impl.Tuple2;
 
 import java.io.File;
 import java.io.IOException;

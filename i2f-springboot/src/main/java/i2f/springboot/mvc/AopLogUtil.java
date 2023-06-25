@@ -1,6 +1,6 @@
 package i2f.springboot.mvc;
 
-import i2f.core.str.Appender;
+import i2f.core.type.str.Appender;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.web.bind.annotation.GetMapping;

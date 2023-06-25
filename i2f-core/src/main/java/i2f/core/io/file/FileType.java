@@ -1,0 +1,170 @@
+package i2f.core.io.file;
+
+/**
+ * @author Ice2Faith
+ * @date 2023/6/21 8:48
+ * @desc 根据文件头魔数判断文件类型不一定正确
+ * 但是，针对文件头固定的文件的识别
+ * 是比使用后缀更好的
+ */
+public enum FileType {
+    UNKNOWN(null, "Unknown type", new byte[0], 0),
+    ZIP(".zip|.xlsx|.docx|.pptx|.apk|.jar|.vsdx", "ZIP Archive", new byte[]{0x50, 0x4B, 0x03, 0x04}, 0),
+    RAR(".rar", "RAR Archive", new byte[]{0x52, 0x61, 0x72, 0x21, 0x1A, 0x07, 0x00, (byte) 0xCF}, 0),
+    TAR(".tar", "Tape Archive", new byte[]{0x1f, (byte) 0x8b, 0x08}, 0),
+    GZIP(".gz|.tgz", "GNU Zip", new byte[]{0x1F, (byte) 0x8B, 0x08, 0x00}, 0),
+    Z7Z(".7z", "7Z", new byte[]{0x37, 0x7A, (byte) 0xBC, (byte) 0xAF, 0x27, 0x1C}, 0),
+
+
+    CLASS(".class", "Java Class File", new byte[]{(byte) 0xCA, (byte) 0xFE, (byte) 0xBA, (byte) 0xBE}, 0),
+    JAR(".jar|.war", "Java Runtime File", new byte[]{0x50, 0x4B, 0x03, 0x04, 0x14, 0x00, 0x08, 0x08, 0x08, 0x00}, 0),
+    SMALI(".smali", "Java decomplier file", new byte[]{0x2E, 0x63, 0x6C, 0x61, 0x73}, 0),
+
+
+    MS2003(".xls|.doc|.ppt", "Microsoft Office 2003", new byte[]{(byte) 0xD0, (byte) 0xCF, 0x11, (byte) 0xE0, (byte) 0xA1, (byte) 0xB1, 0x1A, (byte) 0xE1}, 0),
+    MS2007(".docx|.xlsx|.pptx|.vsdx", "Microsoft Office 2007", new byte[]{0x50, 0x4B, 0x03, 0x04, 0x14, 0x00, 0x06, 0x00, 0x08}, 0),
+    PDF(".pdf", "Adobe Acrobat (PDF)", new byte[]{0x25, 0x50, 0x44, 0x46}, 0),
+    DOC(".doc", "DOC", new byte[]{0x7B, 0x5C, 0x72, 0x74, 0x66, 0x31}, 0),
+    WPS(".wps", "Wps Office", new byte[]{(byte) 0xD0, (byte) 0xCF, 0x11, (byte) 0xE0, (byte) 0xA1}, 0),
+
+    PNG(".png", "Portable Network Graphics", new byte[]{(byte) 0x89, 0x50, 0x4e, 0x47}, 0),
+    PNG_1(".png", "Portable Network Graphics", new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE1}, 0),
+    JPG(".jpg|jpeg", "Joint Photographic Experts Group", new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00}, 0),
+    BMP(".bmp", "Bitmap", new byte[]{0x42, 0x4d}, 0),
+    GIF(".gif", "Graphics Interchange Format", new byte[]{0x47, 0x49, 0x46, 0x38, 0x39}, 0),
+    WEBP(".webp", "Web picture", new byte[]{0x52, 0x49, 0x46, 0x46}, 0),
+    ICO(".ico", "ICON", new byte[]{0x00, 0x00, 0x01, 0x00}, 0),
+    BSD(".bsd", "BSD", new byte[]{0x43, 0x6F, 0x70, 0x79, 0x72, 0x69, 0x67, 0x68}, 0),
+
+    MP3(".mp3", "MPEG-1 Audio Layer III", new byte[]{0x49, 0x44, 0x33, 0x00}, 0),
+    MP3_1(".mp3", "MPEG-1 Audio Layer III", new byte[]{0x49, 0x44, 0x33, 0x03, 0x00}, 0),
+    MPEG2(".mp3|.mpg|.mpe|.mpeg|.m2v|.vob", "MPEG-2 Video Encoder", new byte[]{(byte) 0xFF, (byte) 0xFB, (byte) 0x90}, 0),
+    WAV(".wav", "Waveform Audio File Format", new byte[]{0x52, 0x49, 0x46, 0x46}, 0),
+    AMR(".amr", "Mobile Audio Record File", new byte[]{0x02, 0x23, 0x21, 0x53, 0x49, 0x4C, 0x4B, 0x5F, 0x56, 0x33}, 0),
+    AMR_2(".amr", "Mobile Audio Record File", new byte[]{0x23, 0x21, 0x41, 0x4D, 0x52, 0x0A}, 0),
+
+
+    MP4(".mp4", "MPEG-4 Part 14", new byte[]{0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6F, 0x6D}, 4),
+    FLV(".flv", "Flash Video", new byte[]{0x46, 0x4c, 0x56, 0x01}, 0),
+    AVI(".avi", "Audio Video Interleave", new byte[]{0x66, 0x74, 0x79, 0x70, 0x6D, 0x70, 0x34, 0x32}, 0),
+
+    EXE(".exe|.dll", "Windows Executable And Linkable file", new byte[]{0x4D, 0x5A, (byte) 0x90, 0x00, 0x03, 0x00, 0x00, 0x00}, 0),
+    EXE_1(".exe|.dll", "Windows Executable And Linkable file", new byte[]{0x4D, 0x5A, (byte) 0x78, 0x00, 0x01, 0x00, 0x00, 0x00}, 0),
+    EXE_2(".exe|.dll", "Windows Executable And Linkable file", new byte[]{0x4D, 0x5A, (byte) 0x50, 0x00, 0x02, 0x00, 0x00, 0x00}, 0),
+    LIB(".lib", "Library", new byte[]{(byte) 0xF0, 0x0D, 0x00, 0x00}, 0),
+    ELF(".elf", "Linux Executable and Linkable Format", new byte[]{0x7f, 0x45, 0x4c, 0x46, 0x02, 0x01}, 0),
+    SO(".so", "Shared Object", new byte[]{0x7f, 0x45, 0x4c, 0x46, 0x01, 0x02}, 0),
+    OBJ(".o", "Object", new byte[]{0x4C, 0x01}, 0),
+    LUAC(".luac", "Lua C File", new byte[]{0x1B, 0x4C, 0x75, 0x61, 0x51, 0x00, 0x01, 0x04}, 0),
+    PYC(".pyc", "Python C File", new byte[]{0x33, 0x0D, 0x0D, 0x0A}, 0),
+
+
+    TTF(".ttf", "TrueType (TTF)", new byte[]{0x54, 0x72, 0x69, 0x66}, 0),
+    OTF(".otf", "OpenType (OTF)", new byte[]{0x4f, 0x54, 0x54, 0x4f}, 0),
+    PSD(".psd", "AFEdobe Photoshop Document", new byte[]{0x38, 0x42, 0x50, 0x53}, 0),
+    WMV(".wmv", "Windows Media Video", new byte[]{0x52, 0x49, 0x46, 0x46}, 0),
+    OPF(".opf", "Open Font Format (OFP)", new byte[]{0x00, 0x01, 0x00, 0x00}, 0),
+    WOFF(".woff", "Windows Font File Format (WOFF)", new byte[]{0x77, 0x4f, 0x56, 0x32}, 0),
+    WOFF_1(".woff", "Windows Font File Format (WOFF)", new byte[]{0x77, 0x4f, 0x46, 0x46}, 0),
+    WOFF2(".woff2", "Windows Font File Format (WOFF)", new byte[]{0x77, 0x4f, 0x46, 0x32}, 0),
+
+    SQLITE(".db", "SQLITE", new byte[]{0x53, 0x51, 0x4C, 0x69, 0x74, 0x65, 0x20, 0x66, 0x6F}, 0),
+    DB(".db", "DB", new byte[]{0x56, 0x41, 0x52, 0x44, 0x59}, 0),
+    IDX(".idx", "MySQL Index File", new byte[]{(byte) 0xFF, 0x74, 0x4F, 0x63, 0x00, 0x00, 0x00, 0x02}, 0),
+    INNODB(".indb|.indd", "MySQL InnoDB File", new byte[]{0x06, 0x06, (byte) 0xED, (byte) 0xF5, (byte) 0xD8, 0x1D, 0x46, (byte) 0xE5}, 0),
+    MDB(".mdb", "SQL Server DB File", new byte[]{0x06, 0x00, 0x00, 0x00}, 0),
+
+
+    CHM(".chm|.chw", "CHM", new byte[]{0x49, 0x54, 0x53, 0x46, 0x03, 0x00, 0x00, 0x00, 0x60, 0x00, 0x00, 0x00}, 0),
+    UNITY_PACKAGE(".unitypackege", "Unity Package", new byte[]{0x1F, (byte) 0x8B, 0x08, 0x08}, 0),
+
+    IMG(".img", "Image File", new byte[]{0x41, 0x4E, 0x44, 0x52, 0x4F, 0x49, 0x44, 0x21}, 0),
+
+    ADM(".adml|.admx|.addin", "ADM", new byte[]{0x3C, 0x3F, 0x78, 0x6D, 0x6C, 0x20}, 0),
+    AM(".am", "AM", new byte[]{0x4A, (byte) 0xA5, 0x14, 0x1C, 0x05, (byte) 0x99, (byte) 0xCC, 0x44}, 0),
+    AVS(".avs", "AVS", new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}, 0),
+    BDR(".bdr", "BDR", new byte[]{0x58, 0x54, 0x01}, 0),
+    BFC(".bfc", "BFC", new byte[]{0x00, 0x14, 0x00}, 0),
+    CAT(".cat", "CAT", new byte[]{0x30, (byte) 0x82}, 0),
+    CDFMS(".cdf-ms", "CDF-MS", new byte[]{0x50, 0x63, 0x6D, 0x48, 0x01}, 0),
+    DLL(".dll", "DLL", new byte[]{0x44, 0x43, 0x53, 0x01, 0x01}, 0),
+    HDR(".hdr", "HDR", new byte[]{0x49, 0x53, 0x63, 0x28, 0x00, 0x70}, 0),
+    PNF(".pnf", "PNF", new byte[]{0x03, 0x03, 0x02, 0x00, (byte) 0x83}, 0),
+    PRI(".pri", "PRI", new byte[]{0x6D, 0x72, 0x6D, 0x5F, 0x70, 0x72, 0x69, 0x32}, 0),
+    RESX(".resx", "RESX", new byte[]{0x44, 0x43, 0x53, 0x01, 0x01, 0x00}, 0),
+    ROM(".rom", "ROM", new byte[]{0x55, (byte) 0xAA}, 0),
+    SYS(".sys", "SYS", new byte[]{0x44, 0x43, 0x53, 0x01, 0x01}, 0),
+    TCL(".tcl", "TCL", new byte[]{0x23, 0x20}, 0),
+    TTC(".ttc", "TTC", new byte[]{0x74, 0x74, 0x63, 0x66, 0x00, 0x02}, 0),
+    TTF_2(".ttf", "TTF", new byte[]{0x00, 0x01, 0x00, 0x00, 0x00}, 0),
+    UCE(".uce", "UCE", new byte[]{0x55, 0x43, 0x45, 0x58}, 0),
+    XBF(".xbf", "XBF", new byte[]{0x58, 0x42, 0x46, 0x00}, 0),
+
+    //
+    MPG(".mpeg", "Moving Picture Experts Group", new byte[]{(byte) 0xd0, (byte) 0xcf, 0x11, (byte) 0xe0}, 0),
+    MOV(".mov", "QuickTime Movie", new byte[]{0x56, 0x4f, 0x20, 0x57, 0x6f}, 0),
+    MKV(".mkv", "Matroska", new byte[]{0x1A, 0x45, (byte) 0x86, 0x75, 0x6E, 0x73, 0x79, 0x6D, 0x70, 0x73, 0x74, 0x72, 0x69, 0x63, 0x78}, 0),
+    AIFF(".aiff", "Audio Interchange File Format", new byte[]{0x4d, 0x41, 0x49, 0x46}, 0),
+    WMA(".wma", "Windows Media Audio", new byte[]{0x57, 0x41, 0x56, 0x45}, 0),
+    AC3(".ac3", "Dolby Digital", new byte[]{0x00, 0x00, 0x00, 0x1c, 0x66, 0x74, 0x79}, 0),
+    DTS(".dts", "Digital Theater Systems", new byte[]{0x00, 0x00, 0x01, (byte) 0xba}, 0),
+    JPEG(".jpeg", "Joint Photographic Experts Group", new byte[]{(byte) 0xff, (byte) 0xd8, (byte) 0xff}, 0),
+    TIFF(".tiff", "Tagged Image File Format", new byte[]{0x49, 0x49, 0x2a, 0x00}, 0),
+    MSI(".msi", "Microsoft Installer Package", new byte[]{(byte) 0xb7, (byte) 0xb2, (byte) 0xa4, (byte) 0xc1, 0x1a}, 0),
+    CAB(".cab", "Common Application Binary", new byte[]{(byte) 0xca, (byte) 0xbf, (byte) 0xee, (byte) 0xdf, (byte) 0xac, (byte) 0xe0}, 0),
+    DYN(".dyn", "Dynamic Shared Object", new byte[]{0x7f, 0x45, 0x4c, 0x46, 0x02, 0x01}, 0),
+    GOT(".got", "Global Object Tabl", new byte[]{0x7f, 0x45, 0x4c, 0x46, 0x01, 0x01}, 0),
+    PLT(".plt", "Procedure Linkage Table", new byte[]{0x7f, 0x45, 0x4c, 0x46, 0x01, 0x02}, 0),
+    BZIP2(".bz2", "Bzip2", new byte[]{0x42, 0x5a, 0x68, 0x00}, 0),
+    XZ(".xz", "XZ-compressed data", new byte[]{0x37, 0x7a, 0x5a, 0x65}, 0),
+    APK(".apk", "Android Package", new byte[]{0x4b, 0x03, 0x04}, 1),
+    ISO(".iso", "International Organization for Standardization", new byte[]{0x49, 0x44, 0x33, 0x00}, 1),
+    UDF(".udf", "Universal Disk Format", new byte[]{0x55, (byte) 0xaa}, 1),
+    VHD(".vhd", "Virtual Hard Disk", new byte[]{0x56, 0x4d, 0x4c, 0x57}, 1),
+    EBR(".ebr", "Extended BIOS Boot Record", new byte[]{(byte) 0xeb, 0x52, 0x42, 0x49, 0x56}, 1),
+    MBR(".mbr", "Master Boot Record", new byte[]{(byte) 0xaa, 0x55, (byte) 0xaa}, 1),
+    DMR(".dmr", "Dynamic Multi-Rate", new byte[]{0x21, 0x5a, 0x01}, 1),
+    GRUB(".grub", "GRand Unified Bootloader", new byte[]{(byte) 0x81, (byte) 0xc3}, 1),
+    JRF(".jar", "Java Resource File (JAR)", new byte[]{(byte) 0xff, (byte) 0xfe, 0x00, 0x00}, 0),
+    WAR(".war", "Java Web Start Application Archive (WAR)", new byte[]{(byte) 0xca, (byte) 0xfe, (byte) 0xba, (byte) 0xbe}, 1),
+    SAR(".sar", "Java Web Start Library Archive (SAR)", new byte[]{(byte) 0xca, (byte) 0xfe, (byte) 0xba, (byte) 0xbe}, 1),
+    MSAR(".msar", "Java Web Start Module Archive (MSAR)", new byte[]{(byte) 0xca, (byte) 0xfe, (byte) 0xba, (byte) 0xbe}, 1),
+    SSAR(".ssar", "Java Web Start Script Archive (SSAR)", new byte[]{(byte) 0xca, (byte) 0xfe, (byte) 0xba, (byte) 0xbe}, 1),
+    ISAR(".isar", "Java Web Start Image Archive (ISAR)", new byte[]{(byte) 0xca, (byte) 0xfe, (byte) 0xba, (byte) 0xbe}, 1),
+    IASR(".iasr", "Java Web Start Applet Archive (IASR)", new byte[]{(byte) 0xca, (byte) 0xfe, (byte) 0xba, (byte) 0xbe}, 1),
+    ESAR(".esar", "Java Web Start Extension Archive (ESAR)", new byte[]{(byte) 0xca, (byte) 0xfe, (byte) 0xba, (byte) 0xbe}, 1),
+    PS(".ps", "PostScript Type 1 (PS)", new byte[]{0x25, 0x00, 0x41, 0x00}, 0),
+    AFT(".aft", "Adobe Type 1 (AFT)", new byte[]{0x25, 0x00, 0x41, 0x00}, 0),
+    DOCX(".docx", "Microsoft Word (DOCX)", new byte[]{(byte) 0xd0, (byte) 0xcf, 0x11, (byte) 0xe0}, 0),
+    ODT(".odt", "OpenDocument Text (ODT)", new byte[]{(byte) 0xd0, (byte) 0xcf, 0x11, (byte) 0xe0}, 0),
+    RTF(".rft", "Rich Text Format (RTF)", new byte[]{(byte) 0xdb, 0x0a, 0x0d, 0x0a}, 0),
+    ;
+
+    private String suffix;
+    private String description;
+    private final byte[] magicNumber;
+    private int jumpBytes;
+
+    FileType(String suffix, String description, byte[] magicNumber, int jumpBytes) {
+        this.suffix = suffix;
+        this.description = description;
+        this.magicNumber = magicNumber;
+        this.jumpBytes = jumpBytes;
+    }
+
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public byte[] getMagicNumber() {
+        return magicNumber;
+    }
+
+    public int getJumpBytes() {
+        return jumpBytes;
+    }
+}

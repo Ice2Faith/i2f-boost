@@ -2,10 +2,10 @@ package i2f.core.generate.core;
 
 import i2f.core.annotations.remark.Author;
 import i2f.core.annotations.remark.Usage;
-import i2f.core.collection.Collections;
-import i2f.core.reflect.ValueResolver;
-import i2f.core.reflect.convert.ConvertResolver;
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.container.collection.Collections;
+import i2f.core.reflection.reflect.ValueResolver;
+import i2f.core.reflection.reflect.convert.ConvertResolver;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

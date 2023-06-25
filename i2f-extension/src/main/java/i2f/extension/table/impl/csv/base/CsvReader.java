@@ -1,8 +1,8 @@
 package i2f.extension.table.impl.csv.base;
 
 import i2f.core.generate.RegexGenerator;
-import i2f.core.str.Strings;
-import i2f.core.str.data.RegexFindPartMeta;
+import i2f.core.type.str.Strings;
+import i2f.core.type.str.data.RegexFindPartMeta;
 
 import java.io.BufferedReader;
 import java.io.IOException;

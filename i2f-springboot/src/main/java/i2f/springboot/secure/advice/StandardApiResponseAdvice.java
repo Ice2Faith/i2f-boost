@@ -1,7 +1,7 @@
 package i2f.springboot.secure.advice;
 
 
-import i2f.core.api.ApiResp;
+import i2f.core.std.api.ApiResp;
 import i2f.spring.jackson.JacksonJsonProcessor;
 import i2f.springboot.secure.annotation.StandardApiResp;
 import i2f.springboot.secure.core.SecureTransfer;

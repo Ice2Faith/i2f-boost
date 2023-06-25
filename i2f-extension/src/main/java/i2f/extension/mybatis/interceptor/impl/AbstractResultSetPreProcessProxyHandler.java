@@ -1,12 +1,12 @@
 package i2f.extension.mybatis.interceptor.impl;
 
-import i2f.core.jdbc.data.DBResultList;
-import i2f.core.proxy.IInvokable;
-import i2f.core.proxy.impl.IMethodAccessInvokable;
-import i2f.core.reflect.ValueResolver;
-import i2f.core.reflect.bean.BeanResolver;
-import i2f.core.reflect.convert.ConvertResolver;
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.database.jdbc.data.DBResultList;
+import i2f.core.lang.proxy.IInvokable;
+import i2f.core.lang.proxy.impl.IMethodAccessInvokable;
+import i2f.core.reflection.reflect.ValueResolver;
+import i2f.core.reflection.reflect.bean.BeanResolver;
+import i2f.core.reflection.reflect.convert.ConvertResolver;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.extension.mybatis.interceptor.annotations.MybatisCamel;
 import i2f.extension.mybatis.interceptor.basics.BasicResultSetProxyHandler;
 import org.apache.ibatis.executor.resultset.DefaultResultSetHandler;

@@ -1,8 +1,8 @@
 package i2f.extension.httpclient.impl;
 
-import i2f.core.net.http.data.HttpRequest;
-import i2f.core.net.http.data.MultipartFile;
-import i2f.core.net.http.interfaces.IHttpRequestBodyHandler;
+import i2f.core.network.net.http.data.HttpRequest;
+import i2f.core.network.net.http.data.MultipartFile;
+import i2f.core.network.net.http.interfaces.IHttpRequestBodyHandler;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;

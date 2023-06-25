@@ -1,7 +1,7 @@
 package i2f.extension.aspectj.core;
 
-import i2f.core.proxy.IInvokable;
-import i2f.core.proxy.IProxyHandler;
+import i2f.core.lang.proxy.IInvokable;
+import i2f.core.lang.proxy.IProxyHandler;
 import i2f.extension.aspectj.impl.AspectjInvoker;
 import org.apache.poi.ss.formula.functions.T;
 import org.aspectj.lang.ProceedingJoinPoint;

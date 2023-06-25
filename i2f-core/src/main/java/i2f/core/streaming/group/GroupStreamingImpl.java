@@ -1,18 +1,21 @@
 package i2f.core.streaming.group;
 
-import i2f.core.functional.common.IExecutor;
-import i2f.core.functional.common.IFilter;
-import i2f.core.functional.common.IMapper;
-import i2f.core.functional.jvf.*;
-import i2f.core.iterator.impl.LazyIterator;
-import i2f.core.streaming.base.AbsStreaming;
+import i2f.core.container.iterator.impl.LazyIterator;
+import i2f.core.lang.functional.common.IExecutor;
+import i2f.core.lang.functional.common.IFilter;
+import i2f.core.lang.functional.common.IMapper;
+import i2f.core.lang.functional.jvf.BiConsumer;
+import i2f.core.lang.functional.jvf.BiFunction;
+import i2f.core.lang.functional.jvf.BiSupplier;
+import i2f.core.lang.functional.jvf.Consumer;
 import i2f.core.streaming.GroupStreaming;
 import i2f.core.streaming.Streaming;
 import i2f.core.streaming.api.process.IProcessStreaming;
 import i2f.core.streaming.api.sink.ISinkStreaming;
+import i2f.core.streaming.base.AbsStreaming;
 import i2f.core.thread.NamingForkJoinPool;
-import i2f.core.tuple.Tuples;
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.type.tuple.Tuples;
+import i2f.core.type.tuple.impl.Tuple2;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;

@@ -1,8 +1,8 @@
 package i2f.core.zplugin.inject.core;
 
-import i2f.core.iterator.Iterators;
-import i2f.core.reflect.ValueResolver;
-import i2f.core.str.Strings;
+import i2f.core.container.iterator.Iterators;
+import i2f.core.reflection.reflect.ValueResolver;
+import i2f.core.type.str.Strings;
 import i2f.core.zplugin.inject.IInjectFieldProvider;
 import i2f.core.zplugin.inject.annotations.Injects;
 

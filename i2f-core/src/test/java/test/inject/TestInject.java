@@ -1,6 +1,6 @@
 package test.inject;
 
-import i2f.core.proxy.impl.JdkProxyProvider;
+import i2f.core.lang.proxy.impl.JdkProxyProvider;
 import i2f.core.zplugin.inject.IInjectFieldProvider;
 import i2f.core.zplugin.inject.InjectProxyHandler;
 import i2f.core.zplugin.inject.core.InjectProvider;

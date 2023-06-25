@@ -2,9 +2,9 @@ package i2f.core.j2ee.web;
 
 
 import i2f.core.check.CheckUtil;
-import i2f.core.collection.Collections;
-import i2f.core.file.FileUtil;
-import i2f.core.net.http.HttpHeaders;
+import i2f.core.container.collection.Collections;
+import i2f.core.io.file.FileUtil;
+import i2f.core.network.net.http.HttpHeaders;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;

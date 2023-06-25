@@ -1,6 +1,6 @@
 package i2f.extension.mybatis.interceptor.proxy.core;
 
-import i2f.core.proxy.IProxyHandler;
+import i2f.core.lang.proxy.IProxyHandler;
 import i2f.extension.mybatis.interceptor.proxy.impl.MybatisInvocationInvoker;
 import org.apache.ibatis.plugin.Invocation;
 

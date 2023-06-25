@@ -1,10 +1,10 @@
 package i2f.core.streaming.base.process;
 
-import i2f.core.functional.jvf.BiFunction;
-import i2f.core.functional.jvf.BiPredicate;
-import i2f.core.iterator.impl.LazyIterator;
-import i2f.core.streaming.base.AbsStreaming;
+import i2f.core.container.iterator.impl.LazyIterator;
+import i2f.core.lang.functional.jvf.BiFunction;
+import i2f.core.lang.functional.jvf.BiPredicate;
 import i2f.core.streaming.Streaming;
+import i2f.core.streaming.base.AbsStreaming;
 
 import java.util.Iterator;
 import java.util.LinkedList;

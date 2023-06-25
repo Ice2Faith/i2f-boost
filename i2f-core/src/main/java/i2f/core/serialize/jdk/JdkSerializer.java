@@ -1,7 +1,7 @@
 package i2f.core.serialize.jdk;
 
-import i2f.core.serialize.IBytesSerializer;
-import i2f.core.serialize.SerializeException;
+import i2f.core.serialize.std.IBytesSerializer;
+import i2f.core.serialize.std.SerializeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

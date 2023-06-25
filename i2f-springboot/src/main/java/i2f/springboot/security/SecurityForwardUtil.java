@@ -1,7 +1,7 @@
 package i2f.springboot.security;
 
-import i2f.core.api.ApiResp;
 import i2f.core.j2ee.web.ServletContextUtil;
+import i2f.core.std.api.ApiResp;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

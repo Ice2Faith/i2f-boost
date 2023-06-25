@@ -1,7 +1,7 @@
 package i2f.spring.jdbc.backup.apis;
 
 
-import i2f.core.jdbc.data.PageMeta;
+import i2f.core.database.jdbc.data.PageMeta;
 import i2f.spring.jdbc.backup.data.BasicIoMeta;
 
 import java.util.List;

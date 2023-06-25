@@ -1,8 +1,8 @@
 package i2f.springboot.log.preset.spy;
 
-import i2f.core.perf.PerfUtil;
-import i2f.core.perf.data.LinuxFreeDto;
-import i2f.core.perf.data.LinuxTop5Dto;
+import i2f.core.os.perf.PerfUtil;
+import i2f.core.os.perf.data.LinuxFreeDto;
+import i2f.core.os.perf.data.LinuxTop5Dto;
 import i2f.springboot.log.SysLogger;
 import i2f.springboot.log.SysLoggerFactory;
 import i2f.springboot.log.annotations.SysLog;

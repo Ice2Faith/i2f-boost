@@ -2,7 +2,7 @@ package i2f.agent;
 
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
-import i2f.core.agent.AgentUtil;
+import i2f.core.lang.agent.AgentUtil;
 
 import java.net.URL;
 import java.util.List;

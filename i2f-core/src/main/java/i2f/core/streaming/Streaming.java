@@ -1,20 +1,20 @@
 package i2f.core.streaming;
 
+import i2f.core.container.iterator.impl.ArrayIterator;
+import i2f.core.container.iterator.impl.ArrayObjectIterator;
+import i2f.core.container.iterator.impl.EnumerationIterator;
 import i2f.core.delegate.batch.IBatchResolver;
-import i2f.core.functional.common.IExecutor;
-import i2f.core.functional.common.IFilter;
-import i2f.core.functional.common.IMapper;
-import i2f.core.functional.jvf.*;
-import i2f.core.iterator.impl.ArrayIterator;
-import i2f.core.iterator.impl.ArrayObjectIterator;
-import i2f.core.iterator.impl.EnumerationIterator;
+import i2f.core.lang.functional.common.IExecutor;
+import i2f.core.lang.functional.common.IFilter;
+import i2f.core.lang.functional.common.IMapper;
+import i2f.core.lang.functional.jvf.*;
 import i2f.core.streaming.api.process.IProcessStreaming;
 import i2f.core.streaming.api.sink.ISinkStreaming;
 import i2f.core.streaming.api.source.ISourceStreaming;
 import i2f.core.streaming.api.source.SourceStreaming;
 import i2f.core.streaming.base.source.SimpleSourceStreaming;
 import i2f.core.streaming.group.GroupStreamingImpl;
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.type.tuple.impl.Tuple2;
 
 import java.util.*;
 import java.util.stream.Collector;

@@ -2,12 +2,11 @@ package i2f.extension.image.gif;
 
 import com.madgag.gif.fmsware.AnimatedGifEncoder;
 import com.madgag.gif.fmsware.GifDecoder;
-import i2f.core.command.CmdLineExecutor;
-import i2f.core.graphics.image.ImageUtil;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 /**

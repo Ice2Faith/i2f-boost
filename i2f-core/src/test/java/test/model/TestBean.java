@@ -1,7 +1,7 @@
 package test.model;
 
-import i2f.core.reflect.bean.BeanTagResolver;
-import i2f.core.reflect.bean.annotations.BeanTag;
+import i2f.core.reflection.reflect.bean.BeanTagResolver;
+import i2f.core.reflection.reflect.bean.annotations.BeanTag;
 import i2f.core.zplugin.validate.impl.VNotEmpty;
 import i2f.core.zplugin.validate.impl.VNotNull;
 import lombok.Data;

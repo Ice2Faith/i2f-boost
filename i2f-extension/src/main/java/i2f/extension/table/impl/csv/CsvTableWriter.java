@@ -1,7 +1,7 @@
 package i2f.extension.table.impl.csv;
 
 
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.type.tuple.impl.Tuple2;
 import i2f.extension.table.TableWriter;
 import i2f.extension.table.impl.csv.base.CsvWriter;
 import i2f.extension.table.impl.csv.base.DefaultCsvWriterListener;

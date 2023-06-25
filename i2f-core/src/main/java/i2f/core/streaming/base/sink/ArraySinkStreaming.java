@@ -1,6 +1,6 @@
 package i2f.core.streaming.base.sink;
 
-import i2f.core.array.Arrays;
+import i2f.core.container.array.Arrays;
 
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;

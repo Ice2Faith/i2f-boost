@@ -1,9 +1,9 @@
 package test.dynamicProxy.test;
 
-import i2f.core.net.http.rest.annotations.RestClient;
-import i2f.core.net.http.rest.annotations.RestGetMapping;
-import i2f.core.net.http.rest.annotations.RestHeader;
-import i2f.core.net.http.rest.annotations.RestParam;
+import i2f.core.network.net.http.rest.annotations.RestClient;
+import i2f.core.network.net.http.rest.annotations.RestGetMapping;
+import i2f.core.network.net.http.rest.annotations.RestHeader;
+import i2f.core.network.net.http.rest.annotations.RestParam;
 
 /**
  * @author ltb

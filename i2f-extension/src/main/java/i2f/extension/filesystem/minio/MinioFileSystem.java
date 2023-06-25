@@ -1,9 +1,9 @@
 package i2f.extension.filesystem.minio;
 
-import i2f.core.filesystem.IFile;
-import i2f.core.filesystem.abs.AbsFileSystem;
-import i2f.core.filesystem.abs.FileSystemUtil;
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.io.filesystem.IFile;
+import i2f.core.io.filesystem.abs.AbsFileSystem;
+import i2f.core.io.filesystem.abs.FileSystemUtil;
+import i2f.core.type.tuple.impl.Tuple2;
 import io.minio.*;
 import io.minio.messages.Item;
 

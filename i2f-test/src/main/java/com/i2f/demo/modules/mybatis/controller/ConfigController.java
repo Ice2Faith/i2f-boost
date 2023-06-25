@@ -2,7 +2,7 @@ package com.i2f.demo.modules.mybatis.controller;
 
 import com.i2f.demo.modules.mybatis.domain.ConfigDomain;
 import com.i2f.demo.modules.mybatis.mapper.ConfigMapper;
-import i2f.core.api.ApiResp;
+import i2f.core.std.api.ApiResp;
 import i2f.springboot.secure.annotation.SecureParams;
 import i2f.springboot.secure.annotation.StandardApiResp;
 import org.apache.shiro.authz.annotation.RequiresRoles;

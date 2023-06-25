@@ -1,6 +1,6 @@
 package i2f.core.streaming.support.sink;
 
-import i2f.core.functional.common.IMapper;
+import i2f.core.lang.functional.common.IMapper;
 import i2f.core.streaming.api.sink.ISinkStreaming;
 
 import java.io.BufferedWriter;

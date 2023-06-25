@@ -13,8 +13,8 @@ import i2f.core.streaming.process.StreamingProcessor;
 import i2f.core.streaming.rich.RichStreamingWrapper;
 import i2f.core.streaming.sink.SinkWrappers;
 import i2f.core.streaming.sink.StreamingSinker;
-import i2f.core.tuple.Selectors;
-import i2f.core.tuple.impl.*;
+import i2f.core.type.tuple.Selectors;
+import i2f.core.type.tuple.impl.*;
 
 import java.util.*;
 import java.util.function.*;

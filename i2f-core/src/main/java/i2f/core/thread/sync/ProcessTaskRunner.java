@@ -1,7 +1,7 @@
 package i2f.core.thread.sync;
 
 
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.type.tuple.impl.Tuple2;
 
 import java.util.List;
 import java.util.Map;

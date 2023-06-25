@@ -1,8 +1,8 @@
 package test.dynamicProxy;
 
-import i2f.core.lambda.Lambdas;
-import i2f.core.proxy.JdkProxyUtil;
-import i2f.core.proxy.impl.BasicDynamicProxyHandler;
+import i2f.core.lang.lambda.Lambdas;
+import i2f.core.lang.proxy.JdkProxyUtil;
+import i2f.core.lang.proxy.impl.BasicDynamicProxyHandler;
 
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;

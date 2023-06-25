@@ -1,8 +1,8 @@
 package i2f.core.generate.impl;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.file.FileUtil;
-import i2f.core.functional.common.IMapper;
+import i2f.core.io.file.FileUtil;
+import i2f.core.lang.functional.common.IMapper;
 
 import java.io.File;
 

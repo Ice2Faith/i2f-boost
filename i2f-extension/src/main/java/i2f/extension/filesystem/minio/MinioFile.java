@@ -1,7 +1,7 @@
 package i2f.extension.filesystem.minio;
 
-import i2f.core.filesystem.IFileSystem;
-import i2f.core.filesystem.abs.AbsFile;
+import i2f.core.io.filesystem.IFileSystem;
+import i2f.core.io.filesystem.abs.AbsFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

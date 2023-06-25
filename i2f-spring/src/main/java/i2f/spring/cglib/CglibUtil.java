@@ -1,6 +1,6 @@
 package i2f.spring.cglib;
 
-import i2f.core.proxy.IProxyHandler;
+import i2f.core.lang.proxy.IProxyHandler;
 
 /**
  * @author ltb

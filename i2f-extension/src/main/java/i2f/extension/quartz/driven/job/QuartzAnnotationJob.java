@@ -1,7 +1,7 @@
 package i2f.extension.quartz.driven.job;
 
 
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.extension.quartz.QuartzUtil;
 import i2f.extension.quartz.driven.model.QuartzJobMeta;
 import lombok.SneakyThrows;

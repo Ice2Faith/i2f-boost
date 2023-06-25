@@ -1,9 +1,9 @@
 package i2f.core.j2ee.web;
 
-import i2f.core.json.IJsonProcessor;
-import i2f.core.json.Json2Processor;
-import i2f.core.xml.IXmlProcessor;
-import i2f.core.xml.Xml2Processor;
+import i2f.core.serialize.json.IJsonProcessor;
+import i2f.core.serialize.json.Json2Processor;
+import i2f.core.serialize.xml.IXmlProcessor;
+import i2f.core.serialize.xml.Xml2Processor;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;

@@ -1,6 +1,6 @@
 package i2f.core.zplugin.log.impl;
 
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.core.zplugin.log.ILogWriter;
 import i2f.core.zplugin.log.data.LogData;
 

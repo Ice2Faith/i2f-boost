@@ -1,6 +1,6 @@
 package test.lambda;
 
-import i2f.core.lambda.Lambdas;
+import i2f.core.lang.lambda.Lambdas;
 
 /**
  * @author ltb

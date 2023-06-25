@@ -2,7 +2,7 @@ package i2f.spring.jackson;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import i2f.core.json.impl.AbstractJsonProcessor;
+import i2f.core.serialize.json.impl.AbstractJsonProcessor;
 import i2f.core.text.exception.TextFormatException;
 import org.springframework.stereotype.Component;
 

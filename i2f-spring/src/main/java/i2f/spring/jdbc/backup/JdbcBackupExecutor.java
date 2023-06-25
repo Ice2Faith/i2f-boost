@@ -1,9 +1,9 @@
 package i2f.spring.jdbc.backup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import i2f.core.jdbc.core.JdbcProvider;
-import i2f.core.jdbc.core.TransactionManager;
-import i2f.core.jdbc.data.PageMeta;
+import i2f.core.database.jdbc.core.JdbcProvider;
+import i2f.core.database.jdbc.core.TransactionManager;
+import i2f.core.database.jdbc.data.PageMeta;
 import i2f.spring.jdbc.backup.apis.IInputResolver;
 import i2f.spring.jdbc.backup.apis.IOutputResolver;
 import i2f.spring.jdbc.backup.data.*;

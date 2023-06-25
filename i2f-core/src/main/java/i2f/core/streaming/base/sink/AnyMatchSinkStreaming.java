@@ -1,6 +1,6 @@
 package i2f.core.streaming.base.sink;
 
-import i2f.core.functional.common.IFilter;
+import i2f.core.lang.functional.common.IFilter;
 
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;

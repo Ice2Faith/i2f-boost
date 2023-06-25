@@ -1,12 +1,12 @@
 package i2f.generator;
 
-import i2f.core.db.core.DbBeanResolver;
-import i2f.core.db.core.DbResolver;
-import i2f.core.db.data.TableMeta;
-import i2f.core.reflect.Reflects;
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.database.db.core.DbBeanResolver;
+import i2f.core.database.db.core.DbResolver;
+import i2f.core.database.db.data.TableMeta;
+import i2f.core.reflection.reflect.Reflects;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.core.resource.ResourceUtil;
-import i2f.core.xml.Xml2;
+import i2f.core.serialize.xml.Xml2;
 import i2f.extension.template.velocity.VelocityGenerator;
 import i2f.generator.api.ApiLine;
 import i2f.generator.api.ApiMethod;

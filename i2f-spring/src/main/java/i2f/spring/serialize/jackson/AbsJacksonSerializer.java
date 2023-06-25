@@ -3,8 +3,8 @@ package i2f.spring.serialize.jackson;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import i2f.core.serialize.IStringSerializer;
-import i2f.core.serialize.SerializeException;
+import i2f.core.serialize.std.IStringSerializer;
+import i2f.core.serialize.std.SerializeException;
 
 
 public abstract class AbsJacksonSerializer implements IStringSerializer {

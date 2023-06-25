@@ -1,7 +1,7 @@
 package i2f.spring.serialize.test;
 
 
-import i2f.core.serialize.ISerializer;
+import i2f.core.serialize.std.ISerializer;
 import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import i2f.spring.serialize.jackson.JacksonJsonWithTypeSerializer;
 import i2f.spring.serialize.jackson.JacksonXmlSerializer;

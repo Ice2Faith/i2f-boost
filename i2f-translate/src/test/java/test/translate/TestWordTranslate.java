@@ -1,6 +1,6 @@
 package test.translate;
 
-import i2f.core.tuple.impl.Tuple2;
+import i2f.core.type.tuple.impl.Tuple2;
 import i2f.translate.impl.WordTranslator;
 
 import java.util.List;

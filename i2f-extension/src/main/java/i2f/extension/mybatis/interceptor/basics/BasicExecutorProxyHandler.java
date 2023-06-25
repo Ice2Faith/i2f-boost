@@ -1,6 +1,6 @@
 package i2f.extension.mybatis.interceptor.basics;
 
-import i2f.core.proxy.impl.BasicProxyHandler;
+import i2f.core.lang.proxy.impl.BasicProxyHandler;
 import i2f.extension.mybatis.interceptor.proxy.MybatisInterceptorUtil;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;

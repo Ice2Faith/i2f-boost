@@ -1,10 +1,10 @@
 package test;
 
-import i2f.core.net.http.HttpUtil;
-import i2f.core.net.http.impl.BasicHttpProcessorProvider;
-import i2f.core.net.http.impl.HttpUrlConnectProcessor;
-import i2f.core.net.http.interfaces.HttpProcessorProvider;
-import i2f.core.proxy.impl.JdkProxyProvider;
+import i2f.core.lang.proxy.impl.JdkProxyProvider;
+import i2f.core.network.net.http.HttpUtil;
+import i2f.core.network.net.http.impl.BasicHttpProcessorProvider;
+import i2f.core.network.net.http.impl.HttpUrlConnectProcessor;
+import i2f.core.network.net.http.interfaces.HttpProcessorProvider;
 import i2f.core.zplugin.log.LoggerFactory;
 import i2f.core.zplugin.log.context.LogLevelMappingHolder;
 import i2f.core.zplugin.log.context.LogWriterHolder;

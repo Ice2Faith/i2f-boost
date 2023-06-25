@@ -1,7 +1,7 @@
 package i2f.extension.proxy.cglib;
 
-import i2f.core.proxy.IProxyHandler;
-import i2f.core.proxy.IProxyProvider;
+import i2f.core.lang.proxy.IProxyHandler;
+import i2f.core.lang.proxy.IProxyProvider;
 import i2f.extension.proxy.cglib.core.CglibProxy;
 
 /**

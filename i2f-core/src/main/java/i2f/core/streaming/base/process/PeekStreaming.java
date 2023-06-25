@@ -1,7 +1,7 @@
 package i2f.core.streaming.base.process;
 
-import i2f.core.functional.jvf.Consumer;
-import i2f.core.iterator.impl.LazyIterator;
+import i2f.core.container.iterator.impl.LazyIterator;
+import i2f.core.lang.functional.jvf.Consumer;
 import i2f.core.streaming.base.AbsStreaming;
 
 import java.util.Iterator;

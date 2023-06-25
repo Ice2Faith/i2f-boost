@@ -1,6 +1,6 @@
 package i2f.springboot.zplugin.config.data;
 
-import i2f.core.api.ApiPage;
+import i2f.core.std.api.ApiPage;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

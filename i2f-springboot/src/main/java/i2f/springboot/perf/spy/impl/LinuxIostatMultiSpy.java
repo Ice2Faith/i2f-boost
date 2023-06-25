@@ -1,8 +1,8 @@
 package i2f.springboot.perf.spy.impl;
 
-import i2f.core.perf.PerfUtil;
-import i2f.core.perf.data.LinuxIostatDto;
-import i2f.core.perf.data.LinuxIostatItemDto;
+import i2f.core.os.perf.PerfUtil;
+import i2f.core.os.perf.data.LinuxIostatDto;
+import i2f.core.os.perf.data.LinuxIostatItemDto;
 import i2f.springboot.perf.data.PerfIndex;
 import i2f.springboot.perf.spy.PerfMultiSpy;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package i2f.springboot.shiro.def;
 
-import i2f.core.api.ApiResp;
+import i2f.core.std.api.ApiResp;
 import i2f.springboot.security.SecurityForwardUtil;
 import i2f.springboot.shiro.ShiroConfig;
 import i2f.springboot.shiro.handler.ILoginFailureHandler;

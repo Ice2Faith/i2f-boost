@@ -1,7 +1,7 @@
 package i2f.extension.ftp.sftp.basic;
 
 import com.jcraft.jsch.*;
-import i2f.core.file.FileUtil;
+import i2f.core.io.file.FileUtil;
 import i2f.extension.ftp.sftp.basic.data.ISftpMeta;
 
 import java.io.*;

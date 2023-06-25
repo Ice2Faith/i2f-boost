@@ -1,7 +1,7 @@
 package i2f.core.tool;
 
-import i2f.core.str.Appender;
 import i2f.core.trace.TraceUtil;
+import i2f.core.type.str.Appender;
 
 import java.io.PrintStream;
 

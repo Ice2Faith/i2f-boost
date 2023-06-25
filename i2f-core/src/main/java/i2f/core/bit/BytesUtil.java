@@ -1,9 +1,9 @@
 package i2f.core.bit;
 
-import i2f.core.array.Arrays;
 import i2f.core.check.CheckUtil;
-import i2f.core.collection.Collections;
-import i2f.core.str.Appender;
+import i2f.core.container.array.Arrays;
+import i2f.core.container.collection.Collections;
+import i2f.core.type.str.Appender;
 
 import java.util.ArrayList;
 import java.util.List;

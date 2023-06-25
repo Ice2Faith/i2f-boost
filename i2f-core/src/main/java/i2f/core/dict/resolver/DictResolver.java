@@ -8,7 +8,7 @@ import i2f.core.dict.provider.IDictProvider;
 import i2f.core.dict.provider.impl.DictsAnnotationDictProvider;
 import i2f.core.dict.reflect.ReflectUtil;
 import i2f.core.dict.type.ConvertUtil;
-import i2f.core.str.Strings;
+import i2f.core.type.str.Strings;
 
 import java.lang.reflect.Field;
 import java.util.*;

@@ -1,7 +1,7 @@
 package i2f.core.match;
 
 import i2f.core.annotations.notice.CloudBe;
-import i2f.core.iterator.Iterators;
+import i2f.core.container.iterator.Iterators;
 import i2f.core.match.impl.AntMatcher;
 import i2f.core.match.impl.SimpleMatcher;
 

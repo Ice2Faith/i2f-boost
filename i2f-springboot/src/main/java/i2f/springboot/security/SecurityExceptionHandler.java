@@ -1,6 +1,6 @@
 package i2f.springboot.security;
 
-import i2f.core.api.ApiResp;
+import i2f.core.std.api.ApiResp;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.access.AccessDeniedException;

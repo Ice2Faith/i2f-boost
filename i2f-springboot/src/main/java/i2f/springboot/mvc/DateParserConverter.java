@@ -1,6 +1,6 @@
 package i2f.springboot.mvc;
 
-import i2f.core.date.Dates;
+import i2f.core.type.date.Dates;
 import org.springframework.core.convert.converter.Converter;
 
 import java.util.Date;

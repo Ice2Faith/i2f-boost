@@ -1,8 +1,8 @@
 package test.encStream;
 
-import i2f.core.stream.encrypt.EncryptStreamUtil;
-import i2f.core.stream.encrypt.IEncryptor;
-import i2f.core.stream.encrypt.XorEncryptor;
+import i2f.core.io.stream.encrypt.EncryptStreamUtil;
+import i2f.core.io.stream.encrypt.IEncryptor;
+import i2f.core.io.stream.encrypt.XorEncryptor;
 
 import java.io.IOException;
 

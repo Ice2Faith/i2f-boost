@@ -1,8 +1,8 @@
 package i2f.extension.mybatis.interceptor.impl;
 
-import i2f.core.proxy.IInvokable;
-import i2f.core.reflect.ValueResolver;
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.lang.proxy.IInvokable;
+import i2f.core.reflection.reflect.ValueResolver;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.extension.mybatis.interceptor.annotations.MybatisLog;
 import i2f.extension.mybatis.interceptor.basics.BasicStatementProxyHandler;
 import org.apache.ibatis.executor.statement.RoutingStatementHandler;

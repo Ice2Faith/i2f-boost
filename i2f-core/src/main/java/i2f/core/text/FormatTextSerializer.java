@@ -1,9 +1,9 @@
 package i2f.core.text;
 
-import i2f.core.reflect.convert.ConvertResolver;
-import i2f.core.reflect.core.ReflectResolver;
-import i2f.core.reflect.type.TypeResolver;
-import i2f.core.serialize.IStringSerializer;
+import i2f.core.reflection.reflect.convert.ConvertResolver;
+import i2f.core.reflection.reflect.core.ReflectResolver;
+import i2f.core.reflection.reflect.type.TypeResolver;
+import i2f.core.serialize.std.IStringSerializer;
 import i2f.core.text.exception.TextSerializeException;
 
 /**

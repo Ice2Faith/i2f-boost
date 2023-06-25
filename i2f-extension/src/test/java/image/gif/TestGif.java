@@ -1,7 +1,7 @@
 package image.gif;
 
-import i2f.core.command.CmdLineExecutor;
 import i2f.core.graphics.image.ImageUtil;
+import i2f.core.os.command.CmdLineExecutor;
 import i2f.extension.image.gif.Gif;
 import i2f.extension.image.gif.GifFrame;
 import i2f.extension.image.gif.GifUtil;

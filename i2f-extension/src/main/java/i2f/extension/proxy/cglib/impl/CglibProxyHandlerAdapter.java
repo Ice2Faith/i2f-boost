@@ -1,8 +1,8 @@
 package i2f.extension.proxy.cglib.impl;
 
-import i2f.core.proxy.IInvokable;
-import i2f.core.proxy.IProxyHandler;
-import i2f.core.proxy.impl.MethodInvoker;
+import i2f.core.lang.proxy.IInvokable;
+import i2f.core.lang.proxy.IProxyHandler;
+import i2f.core.lang.proxy.impl.MethodInvoker;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 

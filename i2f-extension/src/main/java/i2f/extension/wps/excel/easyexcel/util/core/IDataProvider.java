@@ -1,6 +1,6 @@
 package i2f.extension.wps.excel.easyexcel.util.core;
 
-import i2f.core.api.ApiPage;
+import i2f.core.std.api.ApiPage;
 
 import java.util.List;
 

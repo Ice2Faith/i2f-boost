@@ -1,8 +1,8 @@
 package i2f.core.thread;
 
 
-import i2f.core.tuple.Tuples;
-import i2f.core.tuple.impl.*;
+import i2f.core.type.tuple.Tuples;
+import i2f.core.type.tuple.impl.*;
 
 import java.util.Map;
 import java.util.Optional;

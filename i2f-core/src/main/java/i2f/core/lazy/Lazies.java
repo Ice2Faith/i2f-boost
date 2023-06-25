@@ -1,9 +1,9 @@
 package i2f.core.lazy;
 
-import i2f.core.functional.jvf.Supplier;
-import i2f.core.iterator.impl.LazyIterator;
-import i2f.core.stream.LazyInputStream;
-import i2f.core.stream.LazyOutputStream;
+import i2f.core.container.iterator.impl.LazyIterator;
+import i2f.core.io.stream.LazyInputStream;
+import i2f.core.io.stream.LazyOutputStream;
+import i2f.core.lang.functional.jvf.Supplier;
 
 import java.io.InputStream;
 import java.io.OutputStream;

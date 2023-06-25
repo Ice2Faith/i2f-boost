@@ -1,7 +1,7 @@
 package i2f.core.above;
 
 import i2f.core.data.Pair;
-import i2f.core.functional.common.IMapper;
+import i2f.core.lang.functional.common.IMapper;
 
 import java.io.IOException;
 import java.io.InputStream;

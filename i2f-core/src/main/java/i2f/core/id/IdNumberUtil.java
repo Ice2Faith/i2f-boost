@@ -2,9 +2,9 @@ package i2f.core.id;
 
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.date.Dates;
 import i2f.core.id.data.IdNumberData;
 import i2f.core.id.data.RegionMap;
+import i2f.core.type.date.Dates;
 
 @Author("i2f")
 public class IdNumberUtil {

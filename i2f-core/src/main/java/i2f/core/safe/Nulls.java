@@ -1,8 +1,8 @@
 package i2f.core.safe;
 
-import i2f.core.functional.common.IGetter;
-import i2f.core.functional.common.ISetter;
-import i2f.core.functional.jvf.BiSupplier;
+import i2f.core.lang.functional.common.IGetter;
+import i2f.core.lang.functional.common.ISetter;
+import i2f.core.lang.functional.jvf.BiSupplier;
 
 
 public class Nulls {

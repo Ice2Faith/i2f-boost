@@ -2,7 +2,7 @@ package i2f.extension.mybatis.page;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import i2f.core.api.ApiPage;
+import i2f.core.std.api.ApiPage;
 
 import java.util.List;
 

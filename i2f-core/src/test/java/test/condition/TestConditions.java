@@ -1,9 +1,9 @@
 package test.condition;
 
-import i2f.core.lambda.column.Column;
-import i2f.core.lambda.column.Columns;
-import i2f.core.lambda.condition.Condition;
-import i2f.core.lambda.condition.Conditions;
+import i2f.core.lang.lambda.column.Column;
+import i2f.core.lang.lambda.column.Columns;
+import i2f.core.lang.lambda.condition.Condition;
+import i2f.core.lang.lambda.condition.Conditions;
 
 /**
  * @author ltb

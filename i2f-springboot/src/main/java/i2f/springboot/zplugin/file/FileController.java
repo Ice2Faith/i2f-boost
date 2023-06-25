@@ -1,7 +1,7 @@
 package i2f.springboot.zplugin.file;
 
 import i2f.core.j2ee.web.ServletContextUtil;
-import i2f.core.str.Strings;
+import i2f.core.type.str.Strings;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

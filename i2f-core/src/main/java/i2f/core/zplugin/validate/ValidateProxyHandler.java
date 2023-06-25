@@ -1,8 +1,8 @@
 package i2f.core.zplugin.validate;
 
-import i2f.core.proxy.IInvokable;
-import i2f.core.proxy.impl.BasicProxyHandler;
-import i2f.core.proxy.impl.IMethodAccessInvokable;
+import i2f.core.lang.proxy.IInvokable;
+import i2f.core.lang.proxy.impl.BasicProxyHandler;
+import i2f.core.lang.proxy.impl.IMethodAccessInvokable;
 import i2f.core.zplugin.validate.core.ValidateProvider;
 
 import java.lang.reflect.Method;

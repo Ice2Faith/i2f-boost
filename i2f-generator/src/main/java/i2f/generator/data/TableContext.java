@@ -1,6 +1,6 @@
 package i2f.generator.data;
 
-import i2f.core.db.data.TableMeta;
+import i2f.core.database.db.data.TableMeta;
 import i2f.extension.template.velocity.GeneratorTool;
 import lombok.Data;
 

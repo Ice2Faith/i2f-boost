@@ -1,9 +1,9 @@
 package i2f.tool.crypt.menus.base;
 
-import i2f.core.jce.codec.CodecUtil;
-import i2f.core.jce.digest.MessageDigestUtil;
-import i2f.core.jce.digest.sha.ShaType;
-import i2f.core.jce.digest.std.IMessageDigester;
+import i2f.core.security.jce.codec.CodecUtil;
+import i2f.core.security.jce.digest.MessageDigestUtil;
+import i2f.core.security.jce.digest.sha.ShaType;
+import i2f.core.security.jce.digest.std.IMessageDigester;
 import i2f.tool.crypt.IMenuHandler;
 
 public class HmacSha256MenuHandler implements IMenuHandler {

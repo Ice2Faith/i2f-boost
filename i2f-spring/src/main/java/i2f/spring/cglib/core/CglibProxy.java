@@ -1,6 +1,6 @@
 package i2f.spring.cglib.core;
 
-import i2f.core.proxy.IProxyHandler;
+import i2f.core.lang.proxy.IProxyHandler;
 import i2f.spring.cglib.IEnhancerSetting;
 import i2f.spring.cglib.impl.CglibProxyHandlerAdapter;
 import i2f.spring.cglib.impl.NoneEnhancerSetting;

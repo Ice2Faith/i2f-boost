@@ -1,7 +1,7 @@
 package i2f.springboot.mvc;
 
-import i2f.core.api.ApiResp;
 import i2f.core.exception.BoostException;
+import i2f.core.std.api.ApiResp;
 import i2f.spring.jackson.JacksonJsonProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;

@@ -1,6 +1,6 @@
 package i2f.core.streaming.collect;
 
-import i2f.core.collection.ConcurrentHashSet;
+import i2f.core.container.collection.ConcurrentHashSet;
 import i2f.core.streaming.Streaming;
 
 import java.util.*;

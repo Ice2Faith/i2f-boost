@@ -1,9 +1,9 @@
 package com.i2f.demo.modules.generate;
 
 import i2f.core.annotations.remark.Remark;
-import i2f.core.db.data.TableColumnMeta;
-import i2f.core.db.data.TableMeta;
-import i2f.core.reflect.core.ReflectResolver;
+import i2f.core.database.db.data.TableColumnMeta;
+import i2f.core.database.db.data.TableMeta;
+import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.core.resource.ResourceUtil;
 import i2f.generator.GeneratorDriver;
 import i2f.generator.api.ApiLine;
