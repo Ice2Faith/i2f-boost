@@ -1,7 +1,10 @@
 package i2f.core.security.jce.codec.bytes.base64;
 
+import i2f.core.io.stream.StreamUtil;
 import i2f.core.security.jce.codec.bytes.IStringByteCodec;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Base64;
 
 /**
@@ -20,5 +23,24 @@ public class Base64StringByteCodec implements IStringByteCodec {
     @Override
     public byte[] decode(String enc) {
         return Base64.getDecoder().decode(enc);
+    }
+
+    public static String imageToBase64(File file, boolean prefix) throws IOException {
+        String webPrefix = "data:image/*;base64,";
+        byte[] data = StreamUtil.readBytes(file);
+        String b64 = INSTANCE.encode(data);
+        if (prefix) {
+            return webPrefix + b64;
+        }
+        return b64;
+    }
+
+    public static void base64ToFile(String base64, File file) throws IOException {
+        String webPrefix = "data:image/*;base64,";
+        if (base64.startsWith(webPrefix)) {
+            base64 = base64.substring(webPrefix.length());
+        }
+        byte[] data = INSTANCE.decode(base64);
+        StreamUtil.writeBytes(data, file);
     }
 }
