@@ -49,7 +49,7 @@ public class SimpleLogger extends AbstractProxyLogger {
             log.withType(type);
         }
         if(log.getLine()==null){
-            StackTraceElement elem= TraceUtil.getTrace(4);
+            StackTraceElement elem = TraceUtil.getHereTrace();
             log.withTrace(elem);
         }
         writer.write(log);

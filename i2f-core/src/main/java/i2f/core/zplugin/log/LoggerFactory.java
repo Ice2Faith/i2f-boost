@@ -24,7 +24,7 @@ public class LoggerFactory {
                 .withClass(clazz);
     }
     public static ILogger getLogger(ILogWriter writer){
-        StackTraceElement elem= TraceUtil.getTrace(3);
+        StackTraceElement elem = TraceUtil.getHereTrace();
         return new SimpleLogger(getDecisionLogWriter(writer))
                 .withType(LogType.DIRECT)
                 .withClass(elem.getClassName());
@@ -42,7 +42,7 @@ public class LoggerFactory {
                 .withClass(clazz);
     }
     public static ILogger getLogger(String system,String module,String label,ILogWriter writer){
-        StackTraceElement elem= TraceUtil.getTrace(3);
+        StackTraceElement elem = TraceUtil.getHereTrace();
         return new SimpleLogger(getDecisionLogWriter(writer))
                 .withType(LogType.DIRECT)
                 .withSystematics(system, module, label)
@@ -60,7 +60,7 @@ public class LoggerFactory {
                 .withClass(clazz);
     }
     public static ILogger getLogger(){
-        StackTraceElement elem= TraceUtil.getTrace(3);
+        StackTraceElement elem = TraceUtil.getHereTrace();
         return new SimpleLogger(LogWriterHolder.getWriter())
                 .withType(LogType.DIRECT)
                 .withClass(elem.getClassName());
@@ -78,7 +78,7 @@ public class LoggerFactory {
                 .withClass(clazz);
     }
     public static ILogger getLogger(String system,String module,String label){
-        StackTraceElement elem= TraceUtil.getTrace(3);
+        StackTraceElement elem = TraceUtil.getHereTrace();
         return new SimpleLogger(LogWriterHolder.getWriter())
                 .withType(LogType.DIRECT)
                 .withSystematics(system, module, label)
