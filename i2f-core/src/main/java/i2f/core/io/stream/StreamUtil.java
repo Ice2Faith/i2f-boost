@@ -1,6 +1,8 @@
 package i2f.core.io.stream;
 
 import i2f.core.annotations.remark.Author;
+import i2f.core.io.file.FileUtil;
+import i2f.core.io.stream.impl.TempFileInputStream;
 import i2f.core.lang.functional.common.IMapper;
 
 import java.io.*;
@@ -91,14 +93,25 @@ public class StreamUtil {
         if (offset > 0) {
             is.skip(offset);
         }
-        long rdSize = 0;
-        while (rdSize != size) {
-            int bt = is.read();
-            if (bt >= 0) {
-                os.write(bt);
-                rdSize++;
-            } else {
+        int batchCount = 1024 * 16;
+        byte[] buf = new byte[batchCount];
+        long count = 0;
+        int len = 0;
+        while ((count + batchCount) <= size) {
+            len = is.read(buf);
+            if (len <= 0) {
                 break;
+            }
+            os.write(buf, 0, len);
+            count += len;
+        }
+        int diffCount = (int) (size - count);
+        if (diffCount > 0) {
+            byte[] data = new byte[diffCount];
+            len = is.read(data);
+            if (len > 0) {
+                os.write(data, 0, len);
+                count += len;
             }
         }
 
@@ -112,7 +125,7 @@ public class StreamUtil {
             is.close();
         }
 
-        return rdSize;
+        return count;
     }
 
     public static void convertByteStream(InputStream is, OutputStream os, IMapper<Byte, Byte> mapper) throws IOException {
@@ -153,22 +166,23 @@ public class StreamUtil {
         while ((ch = reader.read()) >= 0) {
             builder.append((char) ch);
         }
-        if(closeIs){
+        if (closeIs) {
             reader.close();
         }
         return builder.toString();
     }
-    public static String readString(InputStream is,String charset,boolean closeIs) throws IOException {
-        InputStreamReader reader=new InputStreamReader(is,charset);
-        return readString(reader,closeIs);
+
+    public static String readString(InputStream is, String charset, boolean closeIs) throws IOException {
+        InputStreamReader reader = new InputStreamReader(is, charset);
+        return readString(reader, closeIs);
     }
 
-    public static void writeBytes(byte[] data,OutputStream os,boolean closeOs) throws IOException {
-        ByteArrayInputStream bis=new ByteArrayInputStream(data);
-        streamCopy(bis,os,closeOs,true);
+    public static void writeBytes(byte[] data, OutputStream os, boolean closeOs) throws IOException {
+        ByteArrayInputStream bis = new ByteArrayInputStream(data);
+        streamCopy(bis, os, closeOs, true);
     }
 
-    public static void writeString(String str,OutputStream os,String charset,boolean closeOs) throws IOException {
+    public static void writeString(String str, OutputStream os, String charset, boolean closeOs) throws IOException {
         byte[] data = str.getBytes(charset);
         writeBytes(data, os, closeOs);
     }
@@ -251,6 +265,51 @@ public class StreamUtil {
         InputStream is = url.openStream();
         OutputStream os = new FileOutputStream(file);
         streamCopy(is, os, true, true);
+    }
+
+    public static InputStream localStream(InputStream is, boolean force) throws IOException {
+        return localStream(is, -1, force);
+    }
+
+    public static InputStream localStream(InputStream is, int memLimit, boolean force) throws IOException {
+        if (!force) {
+            if (is instanceof ByteArrayInputStream) {
+                return is;
+            }
+            if (is instanceof FileInputStream) {
+                return is;
+            }
+        }
+        return localStream(is, memLimit);
+    }
+
+    public static InputStream localStream(InputStream is) throws IOException {
+        return localStream(is, -1);
+    }
+
+    public static InputStream localStream(InputStream is, int memLimit) throws IOException {
+        int defaultMaxLimit = Integer.MAX_VALUE - 1024;
+        if (memLimit < 0) {
+            memLimit = defaultMaxLimit;
+        }
+        memLimit = Math.min(memLimit, defaultMaxLimit);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        long count = streamCopyRange(is, bos, 0, memLimit, false, false);
+
+        if (count >= memLimit) {
+            File file = FileUtil.getTempFile();
+            OutputStream fos = new FileOutputStream(file);
+
+            bos.flush();
+            ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+            streamCopy(bis, fos, false, true);
+
+            streamCopy(is, fos, true, true);
+
+            return new TempFileInputStream(file);
+        } else {
+            return new ByteArrayInputStream(bos.toByteArray());
+        }
     }
 
 }
