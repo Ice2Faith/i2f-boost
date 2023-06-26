@@ -4,7 +4,6 @@ package i2f.core.trace;
 import i2f.core.annotations.remark.Author;
 import i2f.core.check.CheckUtil;
 import i2f.core.reflection.reflect.core.ReflectResolver;
-import i2f.core.thread.ThreadUtil;
 import i2f.core.type.str.Appender;
 
 import java.lang.reflect.Method;
@@ -13,6 +12,8 @@ import java.lang.reflect.Parameter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.function.Predicate;
 
 @Author("i2f")
 public class TraceUtil {
@@ -100,28 +101,12 @@ public class TraceUtil {
         }
     }
 
-    public static StackTraceElement[] getStackTrace(){
-        return ThreadUtil.currentThread().getStackTrace();
-    }
-
-    public static StackTraceElement getTrace(int offset){
-        StackTraceElement[] traces=ThreadUtil.currentThread().getStackTrace();
-        return traces[offset];
-    }
-    public static StackTraceElement[] getTraces(int offset){
-        StackTraceElement[] traces=ThreadUtil.currentThread().getStackTrace();
-        StackTraceElement[] ret=new StackTraceElement[traces.length-offset];
-        for(int i=0;i<ret.length;i++){
-            ret[i]=traces[i+offset];
-        }
-        return ret;
-    }
 
     private void getBaseInfos() {
-        StackTraceElement[] traces = getStackTrace();
-        lastTraceElem = traces[3];
-        if (traces.length >= 5) {
-            parentTraceElem = traces[4];
+        StackTraceElement[] traces = getTrace();
+        lastTraceElem = traces[0];
+        if (traces.length >= 2) {
+            parentTraceElem = traces[1];
         }
         try {
             lastClass = Class.forName(lastTraceElem.getClassName());
@@ -202,79 +187,134 @@ public class TraceUtil {
         System.out.println(this.toString());
     }
     public static StackTraceElement[] getHereTraces() {
-        StackTraceElement[] traces = getStackTrace();
-        StackTraceElement[] ret=new StackTraceElement[traces.length-2];
-        for (int i = 0; i < ret.length; i++) {
-            ret[i]=traces[i+2];
-        }
-        return ret;
-    }
-    public static StackTraceElement[] getHereInvokerTraces() {
-        StackTraceElement[] traces = getStackTrace();
-        if(traces.length>=4) {
-            StackTraceElement[] ret=new StackTraceElement[traces.length-3];
-            for (int i = 0; i < ret.length; i++) {
-                ret[i]=traces[i+3];
-            }
-            return ret;
-        }
-        return new StackTraceElement[0];
+        return getTrace();
     }
 
     public static StackTraceElement getHereTrace() {
-        StackTraceElement[] traces = getStackTrace();
-        return traces[2];
+        StackTraceElement[] traces = getTrace();
+        if (traces.length == 0) {
+            return null;
+        }
+        return traces[0];
     }
     public static StackTraceElement getHereInvokerTrace() {
-        StackTraceElement[] traces = getStackTrace();
-        if(traces.length>=4) {
-            return traces[3];
+        StackTraceElement[] traces = getTrace();
+        if (traces.length >= 1) {
+            return traces[1];
         }
         return null;
     }
     public static String getHereClass() {
-        StackTraceElement[] traces = getStackTrace();
-        return traces[2].getClassName();
+        StackTraceElement trace = getHereTrace();
+        if (trace != null) {
+            return trace.getClassName();
+        }
+        return "jvm";
     }
     public static String getHereMethod() {
-        StackTraceElement[] traces = getStackTrace();
-        return traces[2].getMethodName();
+        StackTraceElement trace = getHereTrace();
+        if (trace != null) {
+            return trace.getMethodName();
+        }
+        return "jvm";
     }
     public static String getHereFileName() {
-        StackTraceElement[] traces = getStackTrace();
-        return traces[2].getFileName();
+        StackTraceElement trace = getHereTrace();
+        if (trace != null) {
+            return trace.getFileName();
+        }
+        return "jvm";
     }
     public static int getHereLineNumber() {
-        StackTraceElement[] traces = getStackTrace();
-        return traces[2].getLineNumber();
+        StackTraceElement trace = getHereTrace();
+        if (trace != null) {
+            return trace.getLineNumber();
+        }
+        return -1;
     }
 
     public static String getHereInvokerClass() {
-        StackTraceElement[] traces = getStackTrace();
-        if(traces.length>=4) {
-            return traces[3].getClassName();
+        StackTraceElement trace = getHereInvokerTrace();
+        if (trace != null) {
+            return trace.getClassName();
         }
         return "jvm";
     }
     public static String getHereInvokerMethod() {
-        StackTraceElement[] traces = getStackTrace();
-        if(traces.length>=4) {
-            return traces[3].getMethodName();
+        StackTraceElement trace = getHereInvokerTrace();
+        if (trace != null) {
+            return trace.getMethodName();
         }
         return "jvm";
     }
     public static String getHereInvokerFileName() {
-        StackTraceElement[] traces = getStackTrace();
-        if(traces.length>=4) {
-            return traces[3].getFileName();
+        StackTraceElement trace = getHereInvokerTrace();
+        if (trace != null) {
+            return trace.getFileName();
         }
         return "jvm";
     }
+
     public static int getHereInvokerLineNumber() {
-        StackTraceElement[] traces = getStackTrace();
-        if(traces.length>=4) {
-            return traces[3].getLineNumber();
+        StackTraceElement trace = getHereInvokerTrace();
+        if (trace != null) {
+            return trace.getLineNumber();
         }
         return -1;
+    }
+
+
+    public static final Class<?> TRACE_CLASS = TraceUtil.class;
+    public static final String TRACE_CLASS_NAME = TRACE_CLASS.getName();
+
+    public static StackTraceElement[] getTrace() {
+        return getTrace(null);
+    }
+
+    public static StackTraceElement[] getTraceWithoutJava() {
+        return getTrace((elem) -> {
+            String className = elem.getClassName();
+            if (className.startsWith("java.")) {
+                return false;
+            }
+            if (className.startsWith("javax.")) {
+                return false;
+            }
+            if (className.startsWith("javafx.")) {
+                return false;
+            }
+            if (className.startsWith("sun.")) {
+                return false;
+            }
+            return true;
+        });
+    }
+
+    public static StackTraceElement[] getTrace(Predicate<StackTraceElement> filter) {
+        StackTraceElement[] elems = Thread.currentThread().getStackTrace();
+        List<StackTraceElement> ret = new ArrayList<>(Math.max(32, elems.length));
+        int idx = elems.length - 1;
+        while (idx >= 0) {
+            StackTraceElement item = elems[idx];
+            String className = item.getClassName();
+            if (TRACE_CLASS_NAME.equals(className)) {
+                idx++;
+                break;
+            }
+            idx--;
+        }
+        idx = Math.max(0, idx);
+        while (idx < elems.length) {
+            StackTraceElement item = elems[idx];
+            idx++;
+            if (filter != null) {
+                if (!filter.test(item)) {
+                    continue;
+                }
+            }
+            ret.add(item);
+        }
+
+        return ret.toArray(new StackTraceElement[0]);
     }
 }
