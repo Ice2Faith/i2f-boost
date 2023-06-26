@@ -18,6 +18,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.function.Predicate;
 
 @Author("i2f")
 public class FileUtil {
@@ -79,19 +80,27 @@ public class FileUtil {
         return getFile(path.getAbsolutePath(), subPath);
     }
 
-    public static String getNameSuffix(String fileName) {
+    public static String getFilename(String fileName) {
         return new File(fileName).getName();
     }
 
-    public static String getNameNoSuffix(String fileName) {
-        return Strings.trimExtension(getNameSuffix(fileName));
+    public static String getNameOnly(String fileName) {
+        return Strings.trimExtension(getFilename(fileName));
     }
 
-    public static String getNameNoSuffix(File file) {
-        return getNameNoSuffix(file.getName());
+    public static String getNameOnly(File file) {
+        return getNameOnly(file.getName());
     }
 
-    public static void merge(File dstFile, boolean withMeta, File[] srcFiles, IFileFilter filter) throws IOException {
+    public static String getSuffix(String fileName) {
+        return Strings.getExtension(fileName);
+    }
+
+    public static String getSuffix(File file) {
+        return Strings.getExtension(file.getName());
+    }
+
+    public static void merge(File dstFile, boolean withMeta, File[] srcFiles, Predicate<File> filter) throws IOException {
         if (CheckUtil.isEmptyArray(srcFiles)) {
             return;
         }
@@ -102,7 +111,7 @@ public class FileUtil {
         }
     }
 
-    private static OutputStream mergeNext(File dstFile, OutputStream os, boolean withMeta, String rootPath, File[] files, @Nullable IFileFilter filter) throws IOException {
+    private static OutputStream mergeNext(File dstFile, OutputStream os, boolean withMeta, String rootPath, File[] files, @Nullable Predicate<File> filter) throws IOException {
         for (File item : files) {
             if (!item.exists()) {
                 continue;
@@ -139,7 +148,7 @@ public class FileUtil {
         return os;
     }
 
-    public static void splitMeta(File dstPath, File metaFile,@Nullable IFileFilter filter) throws IOException {
+    public static void splitMeta(File dstPath, File metaFile, @Nullable Predicate<File> filter) throws IOException {
         if (!metaFile.exists()) {
             return;
         }
@@ -206,7 +215,7 @@ public class FileUtil {
         StreamUtil.streamCopy(is, os, true);
     }
 
-    public static void copy(File dstFile, File srcFile,@Nullable IFileFilter filter) throws IOException {
+    public static void copy(File dstFile, File srcFile, @Nullable Predicate<File> filter) throws IOException {
         if (CheckUtil.isExNull(srcFile, dstFile)) {
             return;
         }
@@ -229,7 +238,7 @@ public class FileUtil {
         }
     }
 
-    public static void delete(File file,@Nullable IFileFilter filter) {
+    public static void delete(File file, @Nullable Predicate<File> filter) {
         if (CheckUtil.isNull(file)) {
             return;
         }
@@ -258,7 +267,7 @@ public class FileUtil {
         }
     }
 
-    public static List<File> tree(File file, int level,@Nullable IFileFilter filter) {
+    public static List<File> tree(File file, int level, @Nullable Predicate<File> filter) {
         List<File> ret = new ArrayList<>();
         if (CheckUtil.isNull(file) || level == 0) {
             return ret;
@@ -288,16 +297,16 @@ public class FileUtil {
         return ret;
     }
 
-    private static boolean checkWhenFilter(File file, @Nullable IFileFilter filter) {
+    private static boolean checkWhenFilter(File file, @Nullable Predicate<File> filter) {
         if (CheckUtil.notNull(filter)) {
-            if (!filter.save(file)) {
+            if (!filter.test(file)) {
                 return false;
             }
         }
         return true;
     }
 
-    private static void addFileItem2List(List<File> list, File file,@Nullable IFileFilter filter) {
+    private static void addFileItem2List(List<File> list, File file, @Nullable Predicate<File> filter) {
         if (checkWhenFilter(file, filter)) {
             list.add(file);
         }
@@ -463,11 +472,35 @@ public class FileUtil {
      * @return
      */
     public static File getFileWithClasspath(String fileName) throws IOException {
-        if(fileName==null){
+        if (fileName == null) {
             return null;
         }
-        fileName=fileName.trim();
-        URL url= ResourceUtil.getClasspathResource(fileName);
+        fileName = fileName.trim();
+        URL url = ResourceUtil.getClasspathResource(fileName);
         return new File(url.getFile());
+    }
+
+    public static File overwriteRenameFile(File file) {
+        if (!file.exists()) {
+            return file;
+        }
+        int cnt = 1;
+        File dir = file.getParentFile();
+        String nameOnly = getNameOnly(file);
+        String suffix = getSuffix(file);
+        do {
+            String fileName = nameOnly + "-" + cnt + suffix;
+            file = new File(dir, fileName);
+            cnt++;
+        } while (file.exists());
+        return file;
+    }
+
+    public static String realpath(String path) {
+        return Strings.pathGen(path);
+    }
+
+    public static String realpath(String path, String subpath) {
+        return Strings.pathGen(path, subpath);
     }
 }

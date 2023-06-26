@@ -9,7 +9,5 @@ import i2f.core.lang.functional.supplier.ISupplier1;
  */
 @FunctionalInterface
 public interface Function<R, V1> extends ISupplier1<R, V1> {
-    default R apply(V1 v1) {
-        return get(v1);
-    }
+
 }
