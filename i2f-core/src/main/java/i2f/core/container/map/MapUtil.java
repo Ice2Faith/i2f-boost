@@ -2,13 +2,16 @@ package i2f.core.container.map;
 
 import i2f.core.annotations.notice.Nullable;
 import i2f.core.annotations.remark.Author;
-import i2f.core.container.collection.Collections;
+import i2f.core.container.collection.CollectionUtil;
 import i2f.core.data.Pair;
 import i2f.core.type.tuple.Tuples;
 import i2f.core.type.tuple.impl.Tuple2;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * @author ltb
@@ -16,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @desc
  */
 @Author("i2f")
-public class Maps {
+public class MapUtil {
     public static boolean isEmpty(Map<?, ?> map) {
         return map == null || !map.keySet().iterator().hasNext();
     }
@@ -56,7 +59,7 @@ public class Maps {
     }
 
     public static <K, V> HashMap<K, V> hashMap(Tuple2<K, V>... kvs) {
-        return collect(new HashMap<K, V>(Collections.hashSize(kvs.length)), kvs);
+        return collect(new HashMap<K, V>(CollectionUtil.hashSize(kvs.length)), kvs);
     }
 
     public static <K extends Comparable<K>, V> TreeMap<K, V> treeMap(Tuple2<K, V>... kvs) {
@@ -68,7 +71,7 @@ public class Maps {
     }
 
     public static <K, V> ConcurrentHashMap<K, V> concurrentHashMap(Tuple2<K, V>... kvs) {
-        return collect(new ConcurrentHashMap<K, V>(Collections.hashSize(kvs.length)), kvs);
+        return collect(new ConcurrentHashMap<K, V>(CollectionUtil.hashSize(kvs.length)), kvs);
     }
 
     public static <K, V, MAP extends Map<K, V>> MAP collect(MAP map, K k1, V v1) {
@@ -286,17 +289,17 @@ public class Maps {
         return map;
     }
 
-    public static <K, V, R extends Map<K, V>> R collect(R map, Iterable<Pair<K, V>> ite) {
+    public static <K, V, R extends Map<K, V>> R collect(R map, Iterable<Map.Entry<K, V>> ite) {
         if (map == null) {
             return map;
         }
-        Iterator<Pair<K, V>> iterator = ite.iterator();
+        Iterator<Map.Entry<K, V>> iterator = ite.iterator();
         while (iterator.hasNext()) {
-            Pair<K, V> pair = iterator.next();
+            Map.Entry<K, V> pair = iterator.next();
             if (pair.getKey() == null) {
                 continue;
             }
-            map.put(pair.getKey(), pair.getVal());
+            map.put(pair.getKey(), pair.getValue());
         }
         return map;
     }
@@ -333,37 +336,88 @@ public class Maps {
         return map;
     }
 
-    public static<R extends Map> R removeNullValues(R map){
-        if(map==null){
-            return map;
-        }
-        List list=new ArrayList<>();
-        for(Object item : map.entrySet()){
-            Map.Entry<? extends Object,? extends Object> entry=(Map.Entry<? extends Object,? extends Object>)item;
-            if(entry.getValue()==null){
-                list.add(entry.getKey());
+
+    public static <K, V, MAP extends Map<K, V>> MAP collect(Supplier<MAP> mapSupplier, Map.Entry<K, V>... entries) {
+        return collect(mapSupplier.get(), entries);
+    }
+
+
+    public static <K, V, MAP extends Map<K, V>> MAP collect(Supplier<MAP> mapSupplier, Iterable<Map.Entry<K, V>> entries) {
+        return collect(mapSupplier.get(), entries);
+    }
+
+    public static <K, V, MAP extends Map<K, V>> MAP collect(Supplier<MAP> mapSupplier, Iterator<Map.Entry<K, V>> entries) {
+        return collect(mapSupplier.get(), entries);
+    }
+
+    public static <K, V, MAP extends Map<K, V>> MAP collect(MAP map, Iterator<Map.Entry<K, V>> entries) {
+        while (entries.hasNext()) {
+            Map.Entry<K, V> entry = entries.next();
+            if (entry == null) {
+                continue;
             }
-        }
-        for(Object item : list){
-            map.remove(item);
+            map.put(entry.getKey(), entry.getValue());
         }
         return map;
     }
 
-    public static<R extends Map> R emptyValues2Null(R map){
-        if(map==null){
+    public static <R extends Map> R removeNullValues(R map) {
+        if (map == null) {
             return map;
         }
-        for(Object item : map.entrySet()){
-            Map.Entry<? extends Object,? extends Object> entry=(Map.Entry<? extends Object,? extends Object>)item;
-            if(entry.getValue()!=null && entry.getValue() instanceof String){
-                String str=(String)entry.getValue();
-                if("".equals(str)){
-                    map.put(entry.getKey(),null);
-                }
-            }
+        removeValues(map, e -> e == null);
+        return map;
+    }
+
+    public static <R extends Map> R emptyValues2Null(R map) {
+        if (map == null) {
+            return map;
         }
+        valueConvert(map, (e) -> "".equals(e) ? null : e);
 
         return map;
+    }
+
+
+    public static <K, V> void keyConvert(Map<K, V> map, Function<K, K> keyConverter) {
+        List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
+        map.clear();
+        for (Map.Entry<K, V> entry : list) {
+            K key = keyConverter.apply(entry.getKey());
+            map.put(key, entry.getValue());
+        }
+    }
+
+    public static <K, V> void valueConvert(Map<K, V> map, Function<V, V> valConverter) {
+        List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
+        map.clear();
+        for (Map.Entry<K, V> entry : list) {
+            V val = valConverter.apply(entry.getValue());
+            map.put(entry.getKey(), val);
+        }
+    }
+
+    public static <K, V> void removeValues(Map<K, V> map, Predicate<V> predicate) {
+        List<K> list = new LinkedList<>();
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (predicate.test(entry.getValue())) {
+                list.add(entry.getKey());
+            }
+        }
+        for (K key : list) {
+            map.remove(key);
+        }
+    }
+
+    public static <K, V> void removeKeys(Map<K, V> map, Predicate<K> predicate) {
+        List<K> list = new LinkedList<>();
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (predicate.test(entry.getKey())) {
+                list.add(entry.getKey());
+            }
+        }
+        for (K key : list) {
+            map.remove(key);
+        }
     }
 }

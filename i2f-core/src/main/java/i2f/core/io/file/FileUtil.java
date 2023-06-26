@@ -22,9 +22,7 @@ import java.util.*;
 @Author("i2f")
 public class FileUtil {
     public static String getTempFileName() {
-        return "tmp_" + System.currentTimeMillis()
-                + "_" + System.nanoTime()
-                + "_" + UUID.randomUUID().toString().replaceAll("-", "")
+        return "tmp_" + UUID.randomUUID().toString().replaceAll("-", "")
                 + "_" + Thread.currentThread().getId();
     }
 

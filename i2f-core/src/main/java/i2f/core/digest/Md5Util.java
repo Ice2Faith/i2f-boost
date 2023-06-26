@@ -1,11 +1,10 @@
 package i2f.core.digest;
 
 import i2f.core.annotations.remark.Author;
+import i2f.core.security.jce.codec.CodecUtil;
+import i2f.core.security.jce.digest.MessageDigestUtil;
 
 import java.io.*;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * @author ltb
@@ -21,7 +20,7 @@ public class Md5Util {
      * @return
      */
     public static String makeMD5(String str) {
-        return makeMD5(str.getBytes());
+        return MessageDigestUtil.MD5.mdsText(CodecUtil.toUtf8(str));
     }
 
     /**
@@ -33,43 +32,12 @@ public class Md5Util {
      * @return MD5串
      */
     public static String makeMD5(byte[] data) {
-        try {
-            byte[] secretBytes = MessageDigest.getInstance("md5").digest(data);
-            return secretBytes2MD5(secretBytes);
-        } catch (NoSuchAlgorithmException e) {
-
-        }
-        return null;
+        return MessageDigestUtil.MD5.mdsText(data);
     }
 
-    private static String secretBytes2MD5(byte[] secretBytes) {
-        String md5code = new BigInteger(1, secretBytes).toString(16).toUpperCase();
-        for (int i = 0; i < 32 - md5code.length(); i++) {
-            md5code = "0" + md5code;
-        }
-        return md5code;
-    }
 
     public static String makeMD5(InputStream is) {
-        try {
-            MessageDigest md5 = MessageDigest.getInstance("md5");
-
-            byte[] buffer = new byte[8192];
-            int len = 0;
-            while ((len = is.read(buffer)) != -1) {
-                md5.update(buffer, 0, len);
-            }
-
-            is.close();
-
-            byte[] secretBytes = md5.digest();
-            return secretBytes2MD5(secretBytes);
-        } catch (NoSuchAlgorithmException e) {
-
-        } catch (IOException e) {
-
-        }
-        return null;
+        return MessageDigestUtil.MD5.mdsText(is);
     }
 
     /**
@@ -83,15 +51,12 @@ public class Md5Util {
     public static String makeMD5(File file) {
         try {
             InputStream fis = new BufferedInputStream(new FileInputStream(file));
-            String md5code = makeMD5(fis);
+            String ret = MessageDigestUtil.MD5.mdsText(fis);
             fis.close();
-            return md5code;
-        } catch (FileNotFoundException e) {
-
+            return ret;
         } catch (IOException e) {
 
         }
-
         return "";
     }
 }

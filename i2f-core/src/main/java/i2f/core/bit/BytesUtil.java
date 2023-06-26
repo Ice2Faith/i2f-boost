@@ -1,10 +1,12 @@
 package i2f.core.bit;
 
 import i2f.core.check.CheckUtil;
-import i2f.core.container.array.Arrays;
-import i2f.core.container.collection.Collections;
+import i2f.core.container.array.ArrayUtil;
+import i2f.core.container.collection.CollectionUtil;
 import i2f.core.type.str.Appender;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +63,7 @@ public class BytesUtil {
                 pi+=len;
             }
         }else{
-            arr.addAll(Collections.arrayList(str.split(sep)));
+            arr.addAll(CollectionUtil.arrayList(str.split(sep)));
         }
 
         for(String item : arr){
@@ -80,7 +82,7 @@ public class BytesUtil {
             ret.add(b);
         }
 
-        Byte[] bts = Arrays.collect(ret, Byte[].class);
+        Byte[] bts = ArrayUtil.collect(ret, Byte[].class);
         byte[] bytes = new byte[bts.length];
         for (int i = 0; i < bts.length; i++) {
             bytes[i]=bts[i];
@@ -105,15 +107,47 @@ public class BytesUtil {
         boolean isFirst=true;
         for(byte item : bytes){
             if(!isFirst){
-                builder.addWhen(!emptySep,sep);
+                builder.addWhen(!emptySep, sep);
             }
-            builder.addWhen(!emptyPrefix,prefix)
-                    .addFormat("%02x",(int)(item&0x0ff))
-                    .addWhen(!emptySuffix,suffix);
-            isFirst=false;
+            builder.addWhen(!emptyPrefix, prefix)
+                    .addFormat("%02x", (int) (item & 0x0ff))
+                    .addWhen(!emptySuffix, suffix);
+            isFirst = false;
         }
         return builder.get();
     }
 
+    public static byte[] toBytes(long num) {
+        return toBytes(num, ByteOrder.BIG_ENDIAN);
+    }
+
+    public static byte[] toBytes(long num, ByteOrder order) {
+        ByteBuffer buf = ByteBuffer.allocate(Long.BYTES);
+        buf.order(order);
+        buf.putLong(num);
+        return buf.array();
+    }
+
+    public static byte[] toBytes(int num) {
+        return toBytes(num, ByteOrder.BIG_ENDIAN);
+    }
+
+    public static byte[] toBytes(int num, ByteOrder order) {
+        ByteBuffer buf = ByteBuffer.allocate(Integer.BYTES);
+        buf.order(order);
+        buf.putInt(num);
+        return buf.array();
+    }
+
+    public static byte[] toBytes(short num) {
+        return toBytes(num, ByteOrder.BIG_ENDIAN);
+    }
+
+    public static byte[] toBytes(short num, ByteOrder order) {
+        ByteBuffer buf = ByteBuffer.allocate(Short.BYTES);
+        buf.order(order);
+        buf.putShort(num);
+        return buf.array();
+    }
 
 }

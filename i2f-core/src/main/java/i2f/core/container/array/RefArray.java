@@ -14,18 +14,18 @@ public class RefArray<T> implements Iterable<T> {
     }
 
     public boolean isArray() {
-        return Arrays.isArray(arr);
+        return ArrayUtil.isArray(arr);
     }
 
     public int length() {
-        if (Arrays.isArray(arr)) {
+        if (ArrayUtil.isArray(arr)) {
             return Array.getLength(arr);
         }
         return 1;
     }
 
     public T get(int i) {
-        if (Arrays.isArray(arr)) {
+        if (ArrayUtil.isArray(arr)) {
             return (T) Array.get(arr, i);
         }
         if (i == 0) {
@@ -35,7 +35,7 @@ public class RefArray<T> implements Iterable<T> {
     }
 
     public void set(int i, T elem) {
-        if (Arrays.isArray(arr)) {
+        if (ArrayUtil.isArray(arr)) {
             Array.set(arr, i, elem);
             return;
         }

@@ -1,10 +1,10 @@
 package com.i2f.demo.md5;
 
-import i2f.core.container.collection.Collections;
+import i2f.core.container.collection.CollectionUtil;
 import i2f.core.database.jdbc.core.IJdbcMeta;
 import i2f.core.database.jdbc.core.JdbcProvider;
 import i2f.core.database.jdbc.core.TransactionManager;
-import i2f.core.digest.MessageDigestUtil;
+import i2f.core.security.jce.digest.MessageDigestUtil;
 import i2f.core.type.str.Strings;
 
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class TestMd5 {
     }
 
     public static void save2db() throws SQLException, IOException {
-        List<String> pass = Collections.arrayList(
+        List<String> pass = CollectionUtil.arrayList(
                 "nacos", "spring", "springboot", "springBoot", "springcloud", "springCloud", "rabbitMq", "rabbitMQ", "zookeeper",
                 "redis", "shiro", "security", "auth", "token", "session", "okhttp", "feign", "rabbin", "actuator", "admin", "administrator",
                 "anyone", "test1", "test123", "dev", "dev1", "dev123", "test111", "test11", "dev11", "dev111", "admin1", "admin123", "admin111",

@@ -1,7 +1,7 @@
 package i2f.core.reflection.reflect;
 
-import i2f.core.container.collection.Collections;
-import i2f.core.container.map.Maps;
+import i2f.core.container.collection.CollectionUtil;
+import i2f.core.container.map.MapUtil;
 import i2f.core.lang.functional.jvf.Predicate;
 import i2f.core.type.str.Strings;
 
@@ -127,8 +127,8 @@ public class Reflects {
         if (clazz == null) {
             return ret;
         }
-        Collections.collect(ret, filter, clazz.getFields());
-        Collections.collect(ret, filter, clazz.getDeclaredFields());
+        CollectionUtil.collect(ret, filter, clazz.getFields());
+        CollectionUtil.collect(ret, filter, clazz.getDeclaredFields());
         return ret;
     }
 
@@ -137,8 +137,8 @@ public class Reflects {
         if (clazz == null) {
             return ret;
         }
-        Collections.collect(ret, filter, clazz.getMethods());
-        Collections.collect(ret, filter, clazz.getDeclaredMethods());
+        CollectionUtil.collect(ret, filter, clazz.getMethods());
+        CollectionUtil.collect(ret, filter, clazz.getDeclaredMethods());
         return ret;
     }
 
@@ -147,8 +147,8 @@ public class Reflects {
         if (clazz == null) {
             return ret;
         }
-        Collections.collect(ret, filter, (Constructor<T>[]) clazz.getConstructors());
-        Collections.collect(ret, filter, (Constructor<T>[]) clazz.getDeclaredConstructors());
+        CollectionUtil.collect(ret, filter, (Constructor<T>[]) clazz.getConstructors());
+        CollectionUtil.collect(ret, filter, (Constructor<T>[]) clazz.getDeclaredConstructors());
         return ret;
     }
 
@@ -158,7 +158,7 @@ public class Reflects {
             return ret;
         }
         Set<Field> fields = fields(clazz, filter);
-        Maps.valueAs(ret, clazz, fields.iterator());
+        MapUtil.valueAs(ret, clazz, fields.iterator());
         if (recursive) {
             if (!Object.class.equals(clazz)) {
                 Class<? super T> superClass = clazz.getSuperclass();
@@ -177,7 +177,7 @@ public class Reflects {
             return ret;
         }
         Set<Method> methods = methods(clazz, filter);
-        Maps.valueAs(ret, clazz, methods.iterator());
+        MapUtil.valueAs(ret, clazz, methods.iterator());
         if (recursive) {
             if (!Object.class.equals(clazz)) {
                 Class<? super T> superClass = clazz.getSuperclass();
@@ -224,8 +224,8 @@ public class Reflects {
         if (elem == null) {
             return ret;
         }
-        Collections.collect(ret, filter, elem.getAnnotations());
-        Collections.collect(ret, filter, elem.getDeclaredAnnotations());
+        CollectionUtil.collect(ret, filter, elem.getAnnotations());
+        CollectionUtil.collect(ret, filter, elem.getDeclaredAnnotations());
         return ret;
     }
 

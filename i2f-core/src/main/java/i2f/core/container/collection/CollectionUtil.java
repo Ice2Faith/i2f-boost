@@ -18,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @desc
  */
 @Author("i2f")
-public class Collections {
+public class CollectionUtil {
 
     public static int hashSize(int size) {
         if (size < 32) {

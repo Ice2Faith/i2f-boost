@@ -1,6 +1,6 @@
 package i2f.core.container.iterator.impl;
 
-import i2f.core.container.array.Arrays;
+import i2f.core.container.array.ArrayUtil;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
@@ -20,7 +20,7 @@ public class ArrayObjectIterator<T> implements Iterator<T> {
 
     @Override
     public boolean hasNext() {
-        if (Arrays.isArray(arr)) {
+        if (ArrayUtil.isArray(arr)) {
             return i < Array.getLength(arr);
         }
         return i == 0;
@@ -28,7 +28,7 @@ public class ArrayObjectIterator<T> implements Iterator<T> {
 
     @Override
     public T next() {
-        if (Arrays.isArray(arr)) {
+        if (ArrayUtil.isArray(arr)) {
             T ret = (T) Array.get(arr, i);
             i++;
             return ret;

@@ -2,7 +2,7 @@ package i2f.core.j2ee.web;
 
 
 import i2f.core.check.CheckUtil;
-import i2f.core.container.collection.Collections;
+import i2f.core.container.collection.CollectionUtil;
 import i2f.core.io.file.FileUtil;
 import i2f.core.network.net.http.HttpHeaders;
 
@@ -48,7 +48,7 @@ public class ServletContextUtil {
     }
 
     public static ArrayList<String> getHeaders(HttpServletRequest request,String key){
-        return Collections.arrayList(request.getHeaders(key));
+        return CollectionUtil.arrayList(request.getHeaders(key));
     }
     public static ServletContext getServletContext(HttpSession session){
         return session.getServletContext();

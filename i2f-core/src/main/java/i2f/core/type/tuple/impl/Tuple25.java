@@ -1,6 +1,6 @@
 package i2f.core.type.tuple.impl;
 
-import i2f.core.container.collection.Collections;
+import i2f.core.container.collection.CollectionUtil;
 import i2f.core.type.tuple.ITuple;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,6 +41,6 @@ public class Tuple25<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14
 
     @Override
     public List<Object> toList() {
-        return Collections.arrayList(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25);
+        return CollectionUtil.arrayList(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25);
     }
 }

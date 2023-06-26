@@ -1,6 +1,6 @@
 package i2f.core.reflection.reflect;
 
-import i2f.core.container.map.Maps;
+import i2f.core.container.map.MapUtil;
 import i2f.core.type.tuple.Tuples;
 
 import java.lang.reflect.Field;
@@ -11,7 +11,7 @@ import java.util.Map;
 
 
 public class Signatures {
-    public static final Map<String, Class> simpleSignaturesNameTypeMap = Collections.unmodifiableMap(Maps.concurrentHashMap(
+    public static final Map<String, Class> simpleSignaturesNameTypeMap = Collections.unmodifiableMap(MapUtil.concurrentHashMap(
             Tuples.of("Z", boolean.class),
             Tuples.of("B", byte.class),
             Tuples.of("C", char.class),
@@ -22,7 +22,7 @@ public class Signatures {
             Tuples.of("D", double.class),
             Tuples.of("V", void.class)
     ));
-    public static final Map<Class, String> simpleSignaturesTypeNameMap = Collections.unmodifiableMap(Maps.swapKv(simpleSignaturesNameTypeMap, Maps.concurrentHashMap(), null));
+    public static final Map<Class, String> simpleSignaturesTypeNameMap = Collections.unmodifiableMap(MapUtil.swapKv(simpleSignaturesNameTypeMap, MapUtil.concurrentHashMap(), null));
 
     public static <T> String toSign(Class<T> clazz) {
         String sign = simpleSignaturesTypeNameMap.get(clazz);

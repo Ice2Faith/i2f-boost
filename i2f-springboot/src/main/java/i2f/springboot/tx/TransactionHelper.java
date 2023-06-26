@@ -108,10 +108,16 @@ public class TransactionHelper {
 
     public void commit(TransactionStatus status) {
         dataSourceTransactionManager.commit(status);
+        if (autoCommitMap.containsKey(status)) {
+            autoCommitMap.remove(status);
+        }
     }
 
     public void rollback(TransactionStatus status) {
         dataSourceTransactionManager.rollback(status);
+        if (autoCommitMap.containsKey(status)) {
+            autoCommitMap.remove(status);
+        }
     }
 
     @FunctionalInterface

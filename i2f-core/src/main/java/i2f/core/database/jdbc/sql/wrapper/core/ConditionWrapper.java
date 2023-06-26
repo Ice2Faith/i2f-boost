@@ -1,6 +1,6 @@
 package i2f.core.database.jdbc.sql.wrapper.core;
 
-import i2f.core.container.collection.Collections;
+import i2f.core.container.collection.CollectionUtil;
 import i2f.core.database.jdbc.sql.consts.Sql;
 import i2f.core.database.jdbc.sql.core.DbFinder;
 import i2f.core.database.jdbc.sql.enums.SqlLink;
@@ -48,7 +48,7 @@ public class ConditionWrapper<N>
     }
     /////////////////////////////////////////////////////////////////////////////////
     public ConditionWrapper<N> condFree(boolean cond,String sql,Object ... params){
-        BindSql bind = new BindSql(sql, Collections.arrayList(params));
+        BindSql bind = new BindSql(sql, CollectionUtil.arrayList(params));
         return cond(cond,bind);
     }
     public ConditionWrapper<N> cond(boolean cond,BindSql bind){

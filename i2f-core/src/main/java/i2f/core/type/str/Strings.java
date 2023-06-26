@@ -3,7 +3,7 @@ package i2f.core.type.str;
 
 import i2f.core.annotations.remark.Author;
 import i2f.core.check.CheckUtil;
-import i2f.core.container.array.Arrays;
+import i2f.core.container.array.ArrayUtil;
 import i2f.core.data.Pair;
 import i2f.core.lang.functional.common.IMapper;
 import i2f.core.type.str.data.RegexFindPartMeta;
@@ -280,7 +280,7 @@ public class Strings {
             }
             result.add(item);
         }
-        return Arrays.collect(result, String[].class);
+        return ArrayUtil.collect(result, String[].class);
     }
 
     public static String path2ClassName(String path){

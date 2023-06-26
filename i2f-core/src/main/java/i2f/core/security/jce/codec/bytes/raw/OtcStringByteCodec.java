@@ -1,6 +1,6 @@
 package i2f.core.security.jce.codec.bytes.raw;
 
-import i2f.core.container.collection.Collections;
+import i2f.core.container.collection.CollectionUtil;
 import i2f.core.security.jce.codec.bytes.IStringByteCodec;
 import i2f.core.type.str.Appender;
 
@@ -41,7 +41,7 @@ public class OtcStringByteCodec implements IStringByteCodec {
     public byte[] decode(String enc) {
         List<String> parts = new ArrayList<>();
         if (separator != null) {
-            Collections.collect(parts, enc.split(separator));
+            CollectionUtil.collect(parts, enc.split(separator));
         } else {
             int dlen = enc.length();
             for (int i = 0; (i + 3) <= dlen; i += 3) {

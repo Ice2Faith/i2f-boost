@@ -1,8 +1,8 @@
 package i2f.core.safe;
 
-import i2f.core.container.array.Arrays;
-import i2f.core.container.collection.Collections;
-import i2f.core.container.map.Maps;
+import i2f.core.container.array.ArrayUtil;
+import i2f.core.container.collection.CollectionUtil;
+import i2f.core.container.map.MapUtil;
 import i2f.core.lang.functional.jvf.BiSupplier;
 import i2f.core.reflection.reflect.Reflects;
 import i2f.core.type.str.Strings;
@@ -89,7 +89,7 @@ public class Asserts {
     }
 
     public <T> Asserts isEmpty(T[] arr, String msg) {
-        return isTrue(Arrays.isEmpty(arr), msg);
+        return isTrue(ArrayUtil.isEmpty(arr), msg);
     }
 
     public <T> Asserts notIsEmpty(T[] arr) {
@@ -97,7 +97,7 @@ public class Asserts {
     }
 
     public <T> Asserts notIsEmpty(T[] arr, String msg) {
-        return isFalse(Arrays.isEmpty(arr), msg);
+        return isFalse(ArrayUtil.isEmpty(arr), msg);
     }
 
 
@@ -122,7 +122,7 @@ public class Asserts {
     }
 
     public Asserts isEmpty(Collection<?> col, String msg) {
-        return isTrue(Collections.isEmpty(col), msg);
+        return isTrue(CollectionUtil.isEmpty(col), msg);
     }
 
     public Asserts notIsEmpty(Collection<?> col) {
@@ -130,7 +130,7 @@ public class Asserts {
     }
 
     public Asserts notIsEmpty(Collection<?> col, String msg) {
-        return isFalse(Collections.isEmpty(col), msg);
+        return isFalse(CollectionUtil.isEmpty(col), msg);
     }
 
     public Asserts isEmpty(Map<?, ?> map) {
@@ -138,7 +138,7 @@ public class Asserts {
     }
 
     public Asserts isEmpty(Map<?, ?> map, String msg) {
-        return isTrue(Maps.isEmpty(map), msg);
+        return isTrue(MapUtil.isEmpty(map), msg);
     }
 
     public Asserts notIsEmpty(Map<?, ?> map) {
@@ -146,7 +146,7 @@ public class Asserts {
     }
 
     public Asserts notIsEmpty(Map<?, ?> map, String msg) {
-        return isFalse(Maps.isEmpty(map), msg);
+        return isFalse(MapUtil.isEmpty(map), msg);
     }
 
     public Asserts isBlank(String str) {
@@ -170,7 +170,7 @@ public class Asserts {
     }
 
     public Asserts isArray(Object obj, String msg) {
-        return isTrue(Arrays.isArray(obj), msg);
+        return isTrue(ArrayUtil.isArray(obj), msg);
     }
 
     public Asserts notIsArray(Object obj) {
@@ -178,7 +178,7 @@ public class Asserts {
     }
 
     public Asserts notIsArray(Object obj, String msg) {
-        return isFalse(Arrays.isArray(obj), msg);
+        return isFalse(ArrayUtil.isArray(obj), msg);
     }
 
     public Asserts isTypeOf(Class clazz, Class type) {

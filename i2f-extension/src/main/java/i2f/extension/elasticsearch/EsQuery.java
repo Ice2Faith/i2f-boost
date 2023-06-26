@@ -1,6 +1,6 @@
 package i2f.extension.elasticsearch;
 
-import i2f.core.container.array.Arrays;
+import i2f.core.container.array.ArrayUtil;
 import i2f.core.std.api.ApiPage;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -240,8 +240,8 @@ public class EsQuery {
     }
 
     protected EsQuery applyCols() {
-        String[] includes = Arrays.collect(includesCols, String[].class);
-        String[] excludes = Arrays.collect(excludesCols, String[].class);
+        String[] includes = ArrayUtil.collect(includesCols, String[].class);
+        String[] excludes = ArrayUtil.collect(excludesCols, String[].class);
         builder.fetchSource(includes, excludes);
         return this;
     }

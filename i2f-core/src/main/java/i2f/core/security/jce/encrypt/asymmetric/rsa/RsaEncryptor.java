@@ -5,10 +5,7 @@ import i2f.core.security.jce.encrypt.CipherWorker;
 import i2f.core.security.jce.encrypt.std.asymmetric.basic.BasicAsymmetricEncryptor;
 
 import javax.crypto.Cipher;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -25,6 +22,14 @@ public class RsaEncryptor extends BasicAsymmetricEncryptor {
 
     public RsaEncryptor(RsaType type, byte[] publicBytes, byte[] privateBytes) {
         super(type, publicBytes, privateBytes);
+    }
+
+    public RsaEncryptor(KeyPair keyPair) {
+        this(keyPair.getPublic().getEncoded(), keyPair.getPrivate().getEncoded());
+    }
+
+    public RsaEncryptor(RsaType type, KeyPair keyPair) {
+        this(type, keyPair.getPublic().getEncoded(), keyPair.getPrivate().getEncoded());
     }
 
     @Override

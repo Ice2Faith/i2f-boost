@@ -1,4 +1,4 @@
-package i2f.core.io.stream;
+package i2f.core.io.stream.impl;
 
 import i2f.core.lang.functional.jvf.Supplier;
 import i2f.core.lazy.Lazyable;

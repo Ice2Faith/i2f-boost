@@ -1,7 +1,7 @@
 package i2f.extension.httpclient.impl;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.container.collection.Collections;
+import i2f.core.container.collection.CollectionUtil;
 import i2f.core.data.Triple;
 import i2f.core.io.file.FileUtil;
 import i2f.core.io.stream.StreamUtil;
@@ -93,7 +93,7 @@ public class HttpClientHttpProcessor implements IHttpProcessor {
             for(Header item : headers){
                 String name=item.getName();
                 String value=item.getValue();
-                respHeader.put(name, Collections.arrayList(value));
+                respHeader.put(name, CollectionUtil.arrayList(value));
             }
             response.setHeader(respHeader);
 

@@ -1,6 +1,6 @@
 package i2f.core.streaming.base.sink;
 
-import i2f.core.container.array.Arrays;
+import i2f.core.container.array.ArrayUtil;
 
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
@@ -20,6 +20,6 @@ public class ArraySinkStreaming<E> extends AbsSinkStreaming<E[], E, E> {
 
     @Override
     protected E[] sink(Iterator<E> iterator, ExecutorService pool) {
-        return Arrays.collect(iterator, tarType);
+        return ArrayUtil.collect(iterator, tarType);
     }
 }

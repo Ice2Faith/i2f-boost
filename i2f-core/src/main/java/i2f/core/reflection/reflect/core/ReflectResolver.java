@@ -4,7 +4,7 @@ package i2f.core.reflection.reflect.core;
 import i2f.core.annotations.notice.Name;
 import i2f.core.annotations.remark.Author;
 import i2f.core.check.CheckUtil;
-import i2f.core.container.collection.Collections;
+import i2f.core.container.collection.CollectionUtil;
 import i2f.core.reflection.reflect.convert.ConvertResolver;
 import i2f.core.reflection.reflect.exception.InstanceException;
 import i2f.core.reflection.reflect.exception.MethodAccessFoundException;
@@ -87,7 +87,7 @@ public class ReflectResolver {
      */
     public static List<PropertyAccessor> getLogicalReadableFields(Class clazz) {
         if (logicalReadableFields.containsKey(clazz)) {
-            return Collections.collect(new ArrayList<PropertyAccessor>(), logicalReadableFields.get(clazz));
+            return CollectionUtil.collect(new ArrayList<PropertyAccessor>(), logicalReadableFields.get(clazz));
         }
         List<PropertyAccessor> ret = new ArrayList<>();
         Set<String> fields = new HashSet<>();
@@ -120,7 +120,7 @@ public class ReflectResolver {
         }
 
         logicalReadableFields.put(clazz, ret);
-        return Collections.collect(new ArrayList<PropertyAccessor>(), ret);
+        return CollectionUtil.collect(new ArrayList<PropertyAccessor>(), ret);
     }
 
     /**
@@ -132,7 +132,7 @@ public class ReflectResolver {
      */
     public static List<PropertyAccessor> getLogicalWritableFields(Class clazz) {
         if (logicalWritableFields.containsKey(clazz)) {
-            return Collections.collect(new ArrayList<PropertyAccessor>(), logicalWritableFields.get(clazz));
+            return CollectionUtil.collect(new ArrayList<PropertyAccessor>(), logicalWritableFields.get(clazz));
         }
         List<PropertyAccessor> ret = new ArrayList<>();
         Set<String> fields = new HashSet<>();
@@ -163,12 +163,12 @@ public class ReflectResolver {
         }
 
         logicalWritableFields.put(clazz, ret);
-        return Collections.collect(new ArrayList<PropertyAccessor>(), ret);
+        return CollectionUtil.collect(new ArrayList<PropertyAccessor>(), ret);
     }
 
     public static List<PropertyAccessor> getLogicalReadWriteFields(Class clazz){
         if(logicalReadWriteFields.containsKey(clazz)){
-            return Collections.collect(new ArrayList<PropertyAccessor>(), logicalReadWriteFields.get(clazz));
+            return CollectionUtil.collect(new ArrayList<PropertyAccessor>(), logicalReadWriteFields.get(clazz));
         }
         List<PropertyAccessor> ret=new ArrayList<>();
         Set<String> set=new HashSet<>();
@@ -203,7 +203,7 @@ public class ReflectResolver {
         }
 
         logicalReadWriteFields.put(clazz,ret);
-        return Collections.collect(new ArrayList<PropertyAccessor>(), ret);
+        return CollectionUtil.collect(new ArrayList<PropertyAccessor>(), ret);
     }
 
     public static List<PropertyAccessor> getLogicalReadableFieldsWithAnnotations(Class clazz,boolean ckAnnotatedAnn,Class<? extends Annotation> ... annTypes){
@@ -271,7 +271,7 @@ public class ReflectResolver {
         if (fastGetter.containsKey(clazz)) {
             Map<String, Set<Method>> map = fastGetter.get(clazz);
             if (map.containsKey(fieldName)) {
-                return Collections.collect(new HashSet<Method>(), map.get(fieldName));
+                return CollectionUtil.collect(new HashSet<Method>(), map.get(fieldName));
             }
         }
         return new HashSet<>();
@@ -299,7 +299,7 @@ public class ReflectResolver {
         if (fastSetter.containsKey(clazz)) {
             Map<String, Set<Method>> map = fastSetter.get(clazz);
             if (map.containsKey(fieldName)) {
-                return Collections.collect(new HashSet<Method>(), map.get(fieldName));
+                return CollectionUtil.collect(new HashSet<Method>(), map.get(fieldName));
             }
         }
         return new HashSet<>();
@@ -343,7 +343,7 @@ public class ReflectResolver {
 
     public static Set<Constructor> getAllConstructors(Class clazz){
         if (cacheConstructors.containsKey(clazz)) {
-            return Collections.collect(new HashSet<Constructor>(), cacheConstructors.get(clazz));
+            return CollectionUtil.collect(new HashSet<Constructor>(), cacheConstructors.get(clazz));
         }
         Set<Constructor> ret = new HashSet<>();
         for (Constructor item : clazz.getConstructors()) {
@@ -353,7 +353,7 @@ public class ReflectResolver {
             ret.add(item);
         }
         cacheConstructors.put(clazz, ret);
-        return Collections.collect(new HashSet<Constructor>(), ret);
+        return CollectionUtil.collect(new HashSet<Constructor>(), ret);
     }
 
     /**
@@ -364,7 +364,7 @@ public class ReflectResolver {
      */
     public static Set<Method> getAllMethods(Class clazz) {
         if (cacheMethods.containsKey(clazz)) {
-            return Collections.collect(new HashSet<Method>(), cacheMethods.get(clazz));
+            return CollectionUtil.collect(new HashSet<Method>(), cacheMethods.get(clazz));
         }
         Set<Method> ret = new HashSet<>();
         for (Method item : clazz.getMethods()) {
@@ -374,7 +374,7 @@ public class ReflectResolver {
             ret.add(item);
         }
         cacheMethods.put(clazz, ret);
-        return Collections.collect(new HashSet<Method>(), ret);
+        return CollectionUtil.collect(new HashSet<Method>(), ret);
     }
 
     /**
@@ -385,7 +385,7 @@ public class ReflectResolver {
      */
     public static Set<Method> getAllGetters(Class clazz) {
         if (cacheGetters.containsKey(clazz)) {
-            return Collections.collect(new HashSet<Method>(), cacheGetters.get(clazz));
+            return CollectionUtil.collect(new HashSet<Method>(), cacheGetters.get(clazz));
         }
         Set<Method> ret = new HashSet<>();
         Set<Method> methods = getAllMethods(clazz);
@@ -395,7 +395,7 @@ public class ReflectResolver {
             }
         }
         cacheGetters.put(clazz, ret);
-        return Collections.collect(new HashSet<Method>(), ret);
+        return CollectionUtil.collect(new HashSet<Method>(), ret);
     }
 
     /**
@@ -406,7 +406,7 @@ public class ReflectResolver {
      */
     public static Set<Method> getAllSetters(Class clazz) {
         if (cacheSetters.containsKey(clazz)) {
-            return Collections.collect(new HashSet<Method>(), cacheSetters.get(clazz));
+            return CollectionUtil.collect(new HashSet<Method>(), cacheSetters.get(clazz));
         }
         Set<Method> ret = new HashSet<>();
         Set<Method> methods = getAllMethods(clazz);
@@ -416,7 +416,7 @@ public class ReflectResolver {
             }
         }
         cacheSetters.put(clazz, ret);
-        return Collections.collect(new HashSet<Method>(), ret);
+        return CollectionUtil.collect(new HashSet<Method>(), ret);
     }
 
     /**
@@ -427,7 +427,7 @@ public class ReflectResolver {
      */
     public static Set<Field> getAllFields(Class clazz) {
         if (cacheFields.containsKey(clazz)) {
-            return Collections.collect(new HashSet<Field>(), cacheFields.get(clazz));
+            return CollectionUtil.collect(new HashSet<Field>(), cacheFields.get(clazz));
         }
         Set<Field> ret = new HashSet<>();
         for (Field item : clazz.getFields()) {
@@ -437,7 +437,7 @@ public class ReflectResolver {
             ret.add(item);
         }
         cacheFields.put(clazz, ret);
-        return Collections.collect(new HashSet<Field>(), ret);
+        return CollectionUtil.collect(new HashSet<Field>(), ret);
     }
 
     /**
@@ -460,7 +460,7 @@ public class ReflectResolver {
             }
         }
         setFastGetterProxy(clazz, fieldName, ret);
-        return Collections.collect(new HashSet<Method>(), ret);
+        return CollectionUtil.collect(new HashSet<Method>(), ret);
     }
 
     /**
@@ -483,7 +483,7 @@ public class ReflectResolver {
             }
         }
         setFastSetterProxy(clazz, fieldName, ret);
-        return Collections.collect(new HashSet<Method>(), ret);
+        return CollectionUtil.collect(new HashSet<Method>(), ret);
     }
 
     /**
@@ -564,7 +564,7 @@ public class ReflectResolver {
      */
     public static Set<Field> forceAllFields(Class clazz) {
         if (cacheForceFields.containsKey(clazz)) {
-            return Collections.collect(new HashSet<Field>(), cacheForceFields.get(clazz));
+            return CollectionUtil.collect(new HashSet<Field>(), cacheForceFields.get(clazz));
         }
         Set<Field> ret = new HashSet<>();
         if (null == clazz) {
@@ -581,7 +581,7 @@ public class ReflectResolver {
             ret.addAll(sfds);
         }
         cacheForceFields.put(clazz, ret);
-        return Collections.collect(new HashSet<Field>(), ret);
+        return CollectionUtil.collect(new HashSet<Field>(), ret);
     }
 
     /**
@@ -758,7 +758,7 @@ public class ReflectResolver {
 
     public static Set<Annotation> getAllAnnotations(AnnotatedElement elem) {
         Set<Annotation> ret = new HashSet<>();
-        return Collections.merge(ret, elem.getAnnotations(), elem.getDeclaredAnnotations());
+        return CollectionUtil.merge(ret, elem.getAnnotations(), elem.getDeclaredAnnotations());
     }
 
 

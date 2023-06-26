@@ -1,8 +1,8 @@
 package i2f.core.digest;
 
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
+import i2f.core.security.jce.encrypt.symmetric.aes.AesEncryptor;
+import i2f.core.security.jce.encrypt.symmetric.aes.AesType;
 
 /**
  * @author ltb
@@ -36,34 +36,11 @@ public class AESUtil {
         }
         return builder.toString();
     }
-    public static Cipher getAes(String key,int mode){
-        try{
-            byte[] keyRaw=key.getBytes(CHAR_SET);
-            SecretKeySpec keySpec=new SecretKeySpec(keyRaw,"AES" );
-            Cipher cipher=Cipher.getInstance("AES/ECB/ISO10126Padding");
-            cipher.init(mode,keySpec);
-            return cipher;
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-    public static Cipher getAes(byte[] key,int mode){
-        try{
-            byte[] keyRaw=key;
-            SecretKeySpec keySpec=new SecretKeySpec(keyRaw,"AES" );
-            Cipher cipher=Cipher.getInstance("AES/ECB/ISO10126Padding");
-            cipher.init(mode,keySpec);
-            return cipher;
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
+
     public static String encrypt(byte[] data,String key){
-        try{
-            Cipher cipher=getAes(key,Cipher.ENCRYPT_MODE);
-            byte[] sdata=cipher.doFinal(data);
+        try {
+            AesEncryptor encryptor = new AesEncryptor(AesType.ECB_ISO10126PADDING, key.getBytes());
+            byte[] sdata = encryptor.encrypt(data);
             return Base64Util.encode(sdata);
         }catch(Exception e){
             e.printStackTrace();
@@ -71,20 +48,20 @@ public class AESUtil {
         return null;
     }
     public static byte[] decrypt(String data,String key){
-        try{
-            byte[] sdata=Base64Util.decode(data);
-            Cipher cipher=getAes(key,Cipher.DECRYPT_MODE);
-            return cipher.doFinal(sdata);
+        try {
+            byte[] sdata = Base64Util.decode(data);
+            AesEncryptor encryptor = new AesEncryptor(AesType.ECB_ISO10126PADDING, key.getBytes());
+            return encryptor.decrypt(sdata);
         }catch(Exception e){
             e.printStackTrace();
         }
         return null;
     }
     public static byte[] decrypt(String data,byte[] key){
-        try{
-            byte[] sdata=Base64Util.decode(data);
-            Cipher cipher=getAes(key,Cipher.DECRYPT_MODE);
-            return cipher.doFinal(sdata);
+        try {
+            byte[] sdata = Base64Util.decode(data);
+            AesEncryptor encryptor = new AesEncryptor(AesType.ECB_ISO10126PADDING, key);
+            return encryptor.decrypt(sdata);
         }catch(Exception e){
             e.printStackTrace();
         }

@@ -2,7 +2,7 @@ package i2f.core.lang.agent;
 
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
-import i2f.core.container.collection.Collections;
+import i2f.core.container.collection.CollectionUtil;
 
 import java.lang.instrument.Instrumentation;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
 public class AgentUtil {
     public static List<Class> getLoadedClasses(Instrumentation inst){
         Class[] classes=inst.getAllLoadedClasses();
-        return Collections.arrayList(classes);
+        return CollectionUtil.arrayList(classes);
     }
     public static VirtualMachine agentByPid(String pid,String agentJarPath,String arg) throws Exception {
         VirtualMachine vm = VirtualMachine.attach(pid);

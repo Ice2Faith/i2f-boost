@@ -1,6 +1,6 @@
 package i2f.core.database.jdbc.sql.wrapper;
 
-import i2f.core.container.collection.Collections;
+import i2f.core.container.collection.CollectionUtil;
 import i2f.core.data.Triple;
 import i2f.core.database.jdbc.sql.consts.Sql;
 import i2f.core.database.jdbc.sql.wrapper.core.*;
@@ -59,7 +59,7 @@ public class InsertWrapper
                 .line().add(")").line()
                 .get();
         List<Object> params=new ArrayList<>();
-        Collections.collect(params, kvs.kvs, 0, -1, null, (Triple<String, String, Object> item) -> {
+        CollectionUtil.collect(params, kvs.kvs, 0, -1, null, (Triple<String, String, Object> item) -> {
             return item.trd;
         });
         return new BindSql(sql,params);

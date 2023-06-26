@@ -1,57 +1,47 @@
 package i2f.core.digest;
 
 import i2f.core.annotations.remark.Author;
+import i2f.core.security.jce.encrypt.CipherUtil;
+import i2f.core.security.jce.encrypt.asymmetric.rsa.RsaEncryptor;
+import i2f.core.security.jce.encrypt.asymmetric.rsa.RsaType;
 import i2f.core.type.str.Strings;
 
 import javax.crypto.Cipher;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.interfaces.RSAPrivateKey;
 
 //私钥加密，公钥解密，网络传输中，传输公钥和密文
 @Author("i2f")
 public class RsaUtil {
     public static int UPDATE_SIZE=116;//require lower than 117
     public static int DEFAULT_KEY_SIZE=1024;
-    public static String CHAR_SET_NAME="UTF-8";
+    public static String CHAR_SET_NAME = "UTF-8";
+    public static RsaType RSA_TYPE = RsaType.DEFAULT;
 
-    public static RsaKey genRsaKeyData() throws NoSuchAlgorithmException{
+    public static RsaKey genRsaKeyData() throws Exception {
         return genRsaKeyData(DEFAULT_KEY_SIZE);
     }
-    public static RsaKey genRsaKeyData(int size) throws NoSuchAlgorithmException {
+
+    public static RsaKey genRsaKeyData(int size) throws Exception {
         return getRsaKeyData(genRsaKeyPair(size));
     }
-    public static KeyPair genRsaKeyPair() throws NoSuchAlgorithmException {
+
+    public static KeyPair genRsaKeyPair() throws Exception {
         return genRsaKeyPair(DEFAULT_KEY_SIZE);
     }
-    public static KeyPair genRsaKeyPair(int size) throws NoSuchAlgorithmException {
-        KeyPairGenerator generator=KeyPairGenerator.getInstance("RSA");
-        generator.initialize(size,new SecureRandom());
-        return generator.generateKeyPair();
+
+    public static KeyPair genRsaKeyPair(int size) throws Exception {
+        return CipherUtil.genKeyPair(RSA_TYPE, null, "".getBytes(), size, null);
     }
-    public static RsaKey getRsaKeyData(KeyPair keyPair){
+
+    public static RsaKey getRsaKeyData(KeyPair keyPair) {
         return new RsaKey(keyPair);
     }
 
-    /**
-     * 获取RSA
-     * @return
-     */
-    public static Cipher rsaCipher(){
-        try{
-            Cipher cipher=Cipher.getInstance("RSA");
-            return cipher;
-        }catch(Exception e){
-            throw new RuntimeException(e.getMessage(),e);
-        }
-    }
 
-    public static byte[] doCipherWorker(Cipher cipher,byte[] data){
-        byte[] result=new byte[data.length];
-        int plen=0;
-        while(plen<data.length){
+    public static byte[] doCipherWorker(Cipher cipher, byte[] data) {
+        byte[] result = new byte[data.length];
+        int plen = 0;
+        while (plen < data.length) {
             int cplen=UPDATE_SIZE;
             if(data.length-plen<UPDATE_SIZE){
                 cplen=data.length-plen;
@@ -65,12 +55,6 @@ public class RsaUtil {
         return result;
     }
 
-    public static byte[] rsaEncrypt(byte[] data, RSAPrivateKey privateKey) throws Exception {
-        Cipher cipher=rsaCipher();
-        cipher.init(Cipher.ENCRYPT_MODE,privateKey);
-        return doCipherWorker(cipher,data);
-    }
-
 
     /**
      * 私钥解密
@@ -79,10 +63,10 @@ public class RsaUtil {
      * @return
      */
     public static byte[] privateKeyDecrypt(RsaKey key,byte[] data){
-        try{
-            Cipher cipher=rsaCipher();
-            cipher.init(Cipher.DECRYPT_MODE,key.privateKey());
-            return doCipherWorker(cipher,data);
+        try {
+            RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.publicKeyBytes(), key.privateKeyBytes());
+            Cipher cipher = encryptor.getCipher(false, true);
+            return doCipherWorker(cipher, data);
         }catch(Exception e){
             throw new RuntimeException(e.getMessage(),e);
         }
@@ -95,10 +79,10 @@ public class RsaUtil {
      * @return
      */
     public static byte[] privateKeyEncrypt(RsaKey key,byte[] data){
-        try{
-            Cipher cipher=rsaCipher();
-            cipher.init(Cipher.ENCRYPT_MODE,key.privateKey());
-            return doCipherWorker(cipher,data);
+        try {
+            RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.publicKeyBytes(), key.privateKeyBytes());
+            Cipher cipher = encryptor.getCipher(true, true);
+            return doCipherWorker(cipher, data);
         }catch(Exception e){
             throw new RuntimeException(e.getMessage(),e);
         }
@@ -111,10 +95,10 @@ public class RsaUtil {
      * @return
      */
     public static byte[] publicKeyDecrypt(RsaKey key,byte[] data){
-        try{
-            Cipher cipher=rsaCipher();
-            cipher.init(Cipher.DECRYPT_MODE,key.publicKey());
-            return doCipherWorker(cipher,data);
+        try {
+            RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.publicKeyBytes(), key.privateKeyBytes());
+            Cipher cipher = encryptor.getCipher(false, false);
+            return doCipherWorker(cipher, data);
         }catch(Exception e){
             throw new RuntimeException(e.getMessage(),e);
         }
@@ -127,10 +111,10 @@ public class RsaUtil {
      * @return
      */
     public static byte[] publicKeyEncrypt(RsaKey key,byte[] data){
-        try{
-            Cipher cipher=rsaCipher();
-            cipher.init(Cipher.ENCRYPT_MODE,key.publicKey());
-            return doCipherWorker(cipher,data);
+        try {
+            RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.publicKeyBytes(), key.privateKeyBytes());
+            Cipher cipher = encryptor.getCipher(true, false);
+            return doCipherWorker(cipher, data);
         }catch(Exception e){
             throw new RuntimeException(e.getMessage(),e);
         }
