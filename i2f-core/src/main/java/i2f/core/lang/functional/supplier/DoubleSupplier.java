@@ -8,7 +8,7 @@ import i2f.core.lang.functional.ISupplier;
  * @desc
  */
 @FunctionalInterface
-public interface DoubleSupplier<R> extends ISupplier, java.util.function.DoubleSupplier {
+public interface DoubleSupplier extends ISupplier, java.util.function.DoubleSupplier {
     double get();
 
     @Override

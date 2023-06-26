@@ -8,7 +8,7 @@ import i2f.core.lang.functional.ISupplier;
  * @desc
  */
 @FunctionalInterface
-public interface ShortSupplier<R> extends ISupplier {
+public interface ShortSupplier extends ISupplier {
     short get();
 
     default short getAsShort() {

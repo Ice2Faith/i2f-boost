@@ -11,5 +11,5 @@ import java.util.function.BiConsumer;
  */
 @FunctionalInterface
 public interface IConsumer2<V1, V2> extends IConsumer, BiConsumer<V1, V2> {
-    void accept(V1 v1, V2 v2);
+
 }

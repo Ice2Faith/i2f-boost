@@ -11,5 +11,5 @@ import java.util.function.Consumer;
  */
 @FunctionalInterface
 public interface IConsumer1<V1> extends IConsumer, Consumer<V1> {
-    void accept(V1 v1);
+
 }

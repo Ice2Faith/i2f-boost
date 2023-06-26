@@ -8,7 +8,7 @@ import i2f.core.lang.functional.ISupplier;
  * @desc
  */
 @FunctionalInterface
-public interface LongSupplier<R> extends ISupplier, java.util.function.LongSupplier {
+public interface LongSupplier extends ISupplier, java.util.function.LongSupplier {
     long get();
 
     @Override

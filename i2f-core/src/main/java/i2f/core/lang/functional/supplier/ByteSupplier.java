@@ -8,7 +8,7 @@ import i2f.core.lang.functional.ISupplier;
  * @desc
  */
 @FunctionalInterface
-public interface ByteSupplier<R> extends ISupplier {
+public interface ByteSupplier extends ISupplier {
     byte get();
 
     default byte getAsByte() {

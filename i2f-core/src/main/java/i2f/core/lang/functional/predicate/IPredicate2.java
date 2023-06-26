@@ -11,5 +11,5 @@ import java.util.function.BiPredicate;
  */
 @FunctionalInterface
 public interface IPredicate2<V1, V2> extends IPredicate, BiPredicate<V1, V2> {
-    boolean test(V1 v1, V2 v2);
+
 }

@@ -8,7 +8,7 @@ import i2f.core.lang.functional.ISupplier;
  * @desc
  */
 @FunctionalInterface
-public interface CharSupplier<R> extends ISupplier {
+public interface CharSupplier extends ISupplier {
     char get();
 
     default char getAsChar() {

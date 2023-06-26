@@ -8,11 +8,10 @@ import i2f.core.lang.functional.ISupplier;
  * @desc
  */
 @FunctionalInterface
-public interface IntSupplier extends ISupplier, java.util.function.IntSupplier {
-    int get();
+public interface FloatSupplier extends ISupplier {
+    float get();
 
-    @Override
-    default int getAsInt() {
+    default float getAsFloat() {
         return get();
     }
 }
