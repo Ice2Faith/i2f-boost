@@ -15,10 +15,10 @@ import java.util.function.Supplier;
  * @desc
  */
 public class IdPackCodec<T, C extends Collection<T>> implements IStringCollectionCodec<T, C> {
-    public static IdPackCodec<Object, Set<Object>> OBJ_CODEC = new IdPackCodec<>(LinkedHashSet::new, String::valueOf);
-    public static IdPackCodec<Long, Set<Long>> LONG_CODEC = new IdPackCodec<>(LinkedHashSet::new, Long::parseLong);
-    public static IdPackCodec<Integer, Set<Integer>> INT_CODEC = new IdPackCodec<>(LinkedHashSet::new, Integer::parseInt);
-    public static IdPackCodec<String, Set<String>> STRING_CODEC = new IdPackCodec<>(LinkedHashSet::new, String::valueOf);
+    public static IdPackCodec<Object, Set<Object>> INSTANCE_OBJ = new IdPackCodec<>(LinkedHashSet::new, String::valueOf);
+    public static IdPackCodec<Long, Set<Long>> INSTANCE_LONG = new IdPackCodec<>(LinkedHashSet::new, Long::parseLong);
+    public static IdPackCodec<Integer, Set<Integer>> INSTANCE_INT = new IdPackCodec<>(LinkedHashSet::new, Integer::parseInt);
+    public static IdPackCodec<String, Set<String>> INSTANCE_STRING = new IdPackCodec<>(LinkedHashSet::new, String::valueOf);
 
     protected Supplier<C> supplier;
     protected Function<String, T> converter;

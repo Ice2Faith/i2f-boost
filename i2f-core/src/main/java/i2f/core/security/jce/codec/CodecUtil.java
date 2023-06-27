@@ -207,23 +207,23 @@ public class CodecUtil {
     }
 
     public static String packIds(Collection<?> ids) {
-        return IdPackCodec.OBJ_CODEC.encode(new LinkedHashSet<>(ids));
+        return IdPackCodec.INSTANCE_OBJ.encode(new LinkedHashSet<>(ids));
     }
 
     public static String packIds(Object... ids) {
-        return IdPackCodec.OBJ_CODEC.encode(new LinkedHashSet<>(Arrays.asList(ids)));
+        return IdPackCodec.INSTANCE_OBJ.encode(new LinkedHashSet<>(Arrays.asList(ids)));
     }
 
     public static Set<String> unpackIds(String str) {
-        return IdPackCodec.STRING_CODEC.decode(str);
+        return IdPackCodec.INSTANCE_STRING.decode(str);
     }
 
     public static Set<Long> unpackIdsAsLong(String str) {
-        return IdPackCodec.LONG_CODEC.decode(str);
+        return IdPackCodec.INSTANCE_LONG.decode(str);
     }
 
     public static Set<Integer> unpackIdsAsInt(String str) {
-        return IdPackCodec.INT_CODEC.decode(str);
+        return IdPackCodec.INSTANCE_INT.decode(str);
     }
 
 }
