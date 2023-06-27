@@ -17,6 +17,7 @@ import i2f.core.security.jce.codec.compress.zip.ZipByteByteCodec;
 import i2f.core.security.jce.codec.ex.stream.compress.deflate.DeflateStreamCodecEx;
 import i2f.core.security.jce.codec.ex.stream.compress.gzip.GzipStreamCodecEx;
 import i2f.core.security.jce.codec.ex.stream.compress.zip.ZipStreamCodecEx;
+import i2f.core.security.jce.codec.serialize.bytes.jdk.JdkBytesObjectSerializer;
 import i2f.core.security.jce.codec.str.url.UrlStringStringCodec;
 
 import java.io.InputStream;
@@ -226,4 +227,11 @@ public class CodecUtil {
         return IdPackCodec.INSTANCE_INT.decode(str);
     }
 
+    public static byte[] jdkSerialize(Object obj) {
+        return JdkBytesObjectSerializer.INSTANCE.encode(obj);
+    }
+
+    public static <T> T jdkDeserialize(byte[] data) {
+        return (T) JdkBytesObjectSerializer.INSTANCE.decode(data);
+    }
 }
