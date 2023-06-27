@@ -28,12 +28,12 @@ public interface AsymmetricEncryptor {
     }
 
     default byte[] privateDecryptByBase64(String enc) throws Exception {
-        byte[] data = CodecUtil.parseBase64(enc);
+        byte[] data = CodecUtil.ofBase64(enc);
         return privateDecrypt(data);
     }
 
     default byte[] publicDecryptByBase64(String enc) throws Exception {
-        byte[] data = CodecUtil.parseBase64(enc);
+        byte[] data = CodecUtil.ofBase64(enc);
         return publicDecrypt(data);
     }
 

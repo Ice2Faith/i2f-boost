@@ -9,11 +9,11 @@ public class Base64Util {
         return CodecUtil.toBase64(data);
     }
     public static byte[] decode(String base64){
-        return CodecUtil.parseBase64(base64);
+        return CodecUtil.ofBase64(base64);
     }
 
     public static byte[] decodeUrl(String base64){
-        return CodecUtil.parseBase64Url(base64);
+        return CodecUtil.ofBase64Url(base64);
     }
     public static String encodeUrl(byte[] data){
         return CodecUtil.toBase64Url(data);

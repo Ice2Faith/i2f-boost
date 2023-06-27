@@ -10,7 +10,21 @@ import i2f.core.security.jce.codec.bytes.raw.BinStringByteCodec;
 import i2f.core.security.jce.codec.bytes.raw.DecStringByteCodec;
 import i2f.core.security.jce.codec.bytes.raw.HexStringByteCodec;
 import i2f.core.security.jce.codec.bytes.raw.OtcStringByteCodec;
+import i2f.core.security.jce.codec.collection.id.IdPackCodec;
+import i2f.core.security.jce.codec.compress.deflate.DeflateByteByteCodec;
+import i2f.core.security.jce.codec.compress.gzip.GzipByteByteCodec;
+import i2f.core.security.jce.codec.compress.zip.ZipByteByteCodec;
+import i2f.core.security.jce.codec.ex.stream.compress.deflate.DeflateStreamCodecEx;
+import i2f.core.security.jce.codec.ex.stream.compress.gzip.GzipStreamCodecEx;
+import i2f.core.security.jce.codec.ex.stream.compress.zip.ZipStreamCodecEx;
 import i2f.core.security.jce.codec.str.url.UrlStringStringCodec;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * @author ltb
@@ -28,11 +42,11 @@ public class CodecUtil {
         return new HexStringByteCodec(separator).encode(data);
     }
 
-    public static byte[] parseHexString(String data) {
+    public static byte[] ofHexString(String data) {
         return HexStringByteCodec.INSTANCE.decode(data);
     }
 
-    public static byte[] parseHexString(String data, String separator) {
+    public static byte[] ofHexString(String data, String separator) {
         return new HexStringByteCodec(separator).decode(data);
     }
 
@@ -45,11 +59,11 @@ public class CodecUtil {
         return new OtcStringByteCodec(separator).encode(data);
     }
 
-    public static byte[] parseOtcString(String data) {
+    public static byte[] ofOtcString(String data) {
         return OtcStringByteCodec.INSTANCE.decode(data);
     }
 
-    public static byte[] parseOtcString(String data, String separator) {
+    public static byte[] ofOtcString(String data, String separator) {
         return new OtcStringByteCodec(separator).decode(data);
     }
 
@@ -62,11 +76,11 @@ public class CodecUtil {
         return new BinStringByteCodec(separator).encode(data);
     }
 
-    public static byte[] parseBinString(String data) {
+    public static byte[] ofBinString(String data) {
         return BinStringByteCodec.INSTANCE.decode(data);
     }
 
-    public static byte[] parseBinString(String data, String separator) {
+    public static byte[] ofBinString(String data, String separator) {
         return new BinStringByteCodec(separator).decode(data);
     }
 
@@ -79,11 +93,11 @@ public class CodecUtil {
         return new DecStringByteCodec(separator).encode(data);
     }
 
-    public static byte[] parseDecString(String data) {
+    public static byte[] ofDecString(String data) {
         return DecStringByteCodec.INSTANCE.decode(data);
     }
 
-    public static byte[] parseDecString(String data, String separator) {
+    public static byte[] ofDecString(String data, String separator) {
         return new DecStringByteCodec(separator).decode(data);
     }
 
@@ -91,7 +105,7 @@ public class CodecUtil {
         return Base64StringByteCodec.INSTANCE.encode(data);
     }
 
-    public static byte[] parseBase64(String data) {
+    public static byte[] ofBase64(String data) {
         return Base64StringByteCodec.INSTANCE.decode(data);
     }
 
@@ -99,7 +113,7 @@ public class CodecUtil {
         return Base64UrlStringByteCodec.INSTANCE.encode(data);
     }
 
-    public static byte[] parseBase64Url(String data) {
+    public static byte[] ofBase64Url(String data) {
         return Base64UrlStringByteCodec.INSTANCE.decode(data);
     }
 
@@ -107,7 +121,7 @@ public class CodecUtil {
         return Base64MimeStringByteCodec.INSTANCE.encode(data);
     }
 
-    public static byte[] parseBase64Mime(String data) {
+    public static byte[] ofBase64Mime(String data) {
         return Base64MimeStringByteCodec.INSTANCE.decode(data);
     }
 
@@ -115,7 +129,7 @@ public class CodecUtil {
         return UrlStringStringCodec.INSTANCE.encode(data);
     }
 
-    public static String parseUrl(String data) {
+    public static String ofUrl(String data) {
         return UrlStringStringCodec.INSTANCE.decode(data);
     }
 
@@ -142,4 +156,74 @@ public class CodecUtil {
     public static byte[] toIso88591(String data) {
         return CharsetStringByteCodec.ISO88591.decode(data);
     }
+
+
+    public static byte[] toGzip(byte[] data) {
+        return GzipByteByteCodec.INSTANCE.encode(data);
+    }
+
+    public static byte[] ofGzip(byte[] data) {
+        return GzipByteByteCodec.INSTANCE.decode(data);
+    }
+
+    public static byte[] toDeflate(byte[] data) {
+        return DeflateByteByteCodec.INSTANCE.encode(data);
+    }
+
+    public static byte[] ofDeflate(byte[] data) {
+        return DeflateByteByteCodec.INSTANCE.decode(data);
+    }
+
+    public static byte[] toZip(byte[] data) {
+        return ZipByteByteCodec.INSTANCE.encode(data);
+    }
+
+    public static byte[] ofZip(byte[] data) {
+        return ZipByteByteCodec.INSTANCE.decode(data);
+    }
+
+    public static void toGzip(InputStream is, OutputStream os) {
+        GzipStreamCodecEx.INSTANCE.encode(is, os);
+    }
+
+    public static void ofGzip(InputStream is, OutputStream os) {
+        GzipStreamCodecEx.INSTANCE.decode(os, is);
+    }
+
+    public static void toDeflate(InputStream is, OutputStream os) {
+        DeflateStreamCodecEx.INSTANCE.encode(is, os);
+    }
+
+    public static void ofDeflate(InputStream is, OutputStream os) {
+        DeflateStreamCodecEx.INSTANCE.decode(os, is);
+    }
+
+    public static void toZip(InputStream is, OutputStream os) {
+        ZipStreamCodecEx.INSTANCE.encode(is, os);
+    }
+
+    public static void ofZip(InputStream is, OutputStream os) {
+        ZipStreamCodecEx.INSTANCE.decode(os, is);
+    }
+
+    public static String packIds(Collection<?> ids) {
+        return IdPackCodec.OBJ_CODEC.encode(new LinkedHashSet<>(ids));
+    }
+
+    public static String packIds(Object... ids) {
+        return IdPackCodec.OBJ_CODEC.encode(new LinkedHashSet<>(Arrays.asList(ids)));
+    }
+
+    public static Set<String> unpackIds(String str) {
+        return IdPackCodec.STRING_CODEC.decode(str);
+    }
+
+    public static Set<Long> unpackIdsAsLong(String str) {
+        return IdPackCodec.LONG_CODEC.decode(str);
+    }
+
+    public static Set<Integer> unpackIdsAsInt(String str) {
+        return IdPackCodec.INT_CODEC.decode(str);
+    }
+
 }

@@ -18,7 +18,7 @@ public interface SymmetricEncryptor {
     }
 
     default byte[] decryptByBase64(String enc) throws Exception {
-        byte[] data = CodecUtil.parseBase64(enc);
+        byte[] data = CodecUtil.ofBase64(enc);
         return decrypt(data);
     }
 }

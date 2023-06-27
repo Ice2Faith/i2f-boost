@@ -1,12 +1,11 @@
 package i2f.core.security.jce.codec.compress.deflate;
 
-import i2f.core.io.stream.StreamUtil;
 import i2f.core.security.jce.codec.compress.IByteByteCodec;
+import i2f.core.security.jce.codec.ex.stream.compress.deflate.DeflateStreamCodecEx;
 import i2f.core.security.jce.codec.exception.CodecException;
 
-import java.io.*;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.InflaterInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 /**
  * @author Ice2Faith
@@ -14,12 +13,14 @@ import java.util.zip.InflaterInputStream;
  * @desc
  */
 public class DeflateByteByteCodec implements IByteByteCodec {
+    public static DeflateByteByteCodec INSTANCE = new DeflateByteByteCodec();
+
     @Override
     public byte[] encode(byte[] data) {
         try {
             ByteArrayInputStream bis = new ByteArrayInputStream(data);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            deflateEncode(bis, bos, true, true);
+            DeflateStreamCodecEx.INSTANCE.encode(bis, bos);
             return bos.toByteArray();
         } catch (Exception e) {
             throw new CodecException(e.getMessage(), e);
@@ -31,20 +32,11 @@ public class DeflateByteByteCodec implements IByteByteCodec {
         try {
             ByteArrayInputStream bis = new ByteArrayInputStream(enc);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            deflateDecode(bis, bos, true, true);
+            DeflateStreamCodecEx.INSTANCE.decode(bos, bis);
             return bos.toByteArray();
         } catch (Exception e) {
             throw new CodecException(e.getMessage(), e);
         }
     }
 
-    public static void deflateEncode(InputStream is, OutputStream os, boolean closeOs, boolean closeIs) throws IOException {
-        DeflaterOutputStream gos = new DeflaterOutputStream(os);
-        StreamUtil.streamCopy(is, gos, closeOs, closeIs);
-    }
-
-    public static void deflateDecode(InputStream is, OutputStream os, boolean closeOs, boolean closeIs) throws IOException {
-        InflaterInputStream gis = new InflaterInputStream(is);
-        StreamUtil.streamCopy(gis, os, closeOs, closeIs);
-    }
 }
