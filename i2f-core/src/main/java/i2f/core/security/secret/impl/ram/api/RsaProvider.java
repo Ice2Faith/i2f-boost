@@ -4,11 +4,12 @@ import i2f.core.security.secret.api.key.IKeyPair;
 import i2f.core.security.secret.data.SecretKeyPair;
 import i2f.core.security.secret.exception.SecretException;
 import i2f.core.security.secret.util.SecretUtil;
-import sun.security.rsa.RSAPrivateCrtKeyImpl;
-import sun.security.rsa.RSAPublicKeyImpl;
 
 import javax.crypto.Cipher;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
 /**
  * @author ltb
@@ -78,15 +79,25 @@ public class RsaProvider {
 
     public KeyPair adaptRsaKeyPair(IKeyPair pair) {
         try {
-            PublicKey publicKey = new RSAPublicKeyImpl(pair.publicKey());
+            PublicKey publicKey = getPublicKey(pair.publicKey());
             PrivateKey privateKey = null;
             if (pair.privateKey() != null) {
-                privateKey = RSAPrivateCrtKeyImpl.newKey(pair.privateKey());
+                privateKey = getPrivateKey(pair.privateKey());
             }
             return new KeyPair(publicKey, privateKey);
         } catch (Exception e) {
             throw new SecretException(e);
         }
+    }
+
+    public PublicKey getPublicKey(byte[] codes) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        PublicKey pubKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(codes));
+        return pubKey;
+    }
+
+    public PrivateKey getPrivateKey(byte[] codes) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        PrivateKey priKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(codes));
+        return priKey;
     }
 
     public Cipher rsaCipher() {
