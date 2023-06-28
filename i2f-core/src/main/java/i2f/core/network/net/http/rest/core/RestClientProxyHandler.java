@@ -11,7 +11,7 @@ import i2f.core.network.net.http.interfaces.IHttpProcessor;
 import i2f.core.network.net.http.rest.annotations.*;
 import i2f.core.reflection.reflect.convert.ConvertResolver;
 import i2f.core.reflection.reflect.core.ReflectResolver;
-import i2f.core.serialize.std.IStringSerializer;
+import i2f.core.serialize.str.IStringObjectSerializer;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -25,9 +25,9 @@ import java.util.Map;
  * @desc
  */
 public class RestClientProxyHandler extends BasicDynamicProxyHandler {
-    protected IStringSerializer processor;
+    protected IStringObjectSerializer processor;
 
-    public RestClientProxyHandler(IStringSerializer processor) {
+    public RestClientProxyHandler(IStringObjectSerializer processor) {
         this.processor = processor;
     }
 

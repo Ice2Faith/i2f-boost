@@ -2,7 +2,7 @@ package i2f.springboot.secure.advice;
 
 
 import i2f.core.std.api.ApiResp;
-import i2f.spring.jackson.JacksonJsonProcessor;
+import i2f.spring.jackson.JacksonJsonSerializer;
 import i2f.springboot.secure.annotation.StandardApiResp;
 import i2f.springboot.secure.core.SecureTransfer;
 import lombok.SneakyThrows;
@@ -33,7 +33,7 @@ import java.util.LinkedHashMap;
 public class StandardApiResponseAdvice implements ResponseBodyAdvice<Object>, InitializingBean {
 
     @Autowired
-    private JacksonJsonProcessor processor;
+    private JacksonJsonSerializer processor;
 
     @Override
     public void afterPropertiesSet() throws Exception {

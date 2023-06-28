@@ -1,7 +1,7 @@
 package i2f.springboot.secure.core;
 
 
-import i2f.spring.jackson.JacksonJsonProcessor;
+import i2f.spring.jackson.JacksonJsonSerializer;
 import i2f.springboot.secure.annotation.SecureParams;
 import i2f.springboot.secure.exception.SecureException;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,7 @@ public class SecureTransferAop implements InitializingBean {
     private HttpServletResponse response;
 
     @Autowired
-    private JacksonJsonProcessor processor;
+    private JacksonJsonSerializer processor;
 
     @Override
     public void afterPropertiesSet() throws Exception {

@@ -6,7 +6,7 @@ import i2f.core.network.net.http.impl.HttpJsonRequestBodyHandler;
 import i2f.core.network.net.http.impl.HttpUrlConnectProcessor;
 import i2f.core.network.net.http.interfaces.IHttpProcessor;
 import i2f.core.network.net.http.interfaces.IHttpRequestBodyHandler;
-import i2f.core.serialize.json.IJsonProcessor;
+import i2f.core.serialize.str.json.IJsonSerializer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -88,16 +88,19 @@ public class HttpRequest {
         this.setRequestBodyHandler(new HttpFormUrlEncodedRequestBodyHandler());
         return this;
     }
-    public HttpRequest json(){
-        this.addHeader(HttpRequest.CONTENT_TYPE,HttpRequest.CONTENT_JSON);
+
+    public HttpRequest json() {
+        this.addHeader(HttpRequest.CONTENT_TYPE, HttpRequest.CONTENT_JSON);
         this.setRequestBodyHandler(new HttpJsonRequestBodyHandler());
         return this;
     }
-    public HttpRequest json(IJsonProcessor processor){
-        this.addHeader(HttpRequest.CONTENT_TYPE,HttpRequest.CONTENT_JSON);
+
+    public HttpRequest json(IJsonSerializer processor) {
+        this.addHeader(HttpRequest.CONTENT_TYPE, HttpRequest.CONTENT_JSON);
         this.setRequestBodyHandler(new HttpJsonRequestBodyHandler(processor));
         return this;
     }
+
     public HttpResponse send() throws IOException {
         return send(new HttpUrlConnectProcessor());
     }

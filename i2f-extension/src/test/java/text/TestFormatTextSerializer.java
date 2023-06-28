@@ -1,7 +1,7 @@
 package text;
 
-import i2f.core.text.FormatTextSerializer;
-import i2f.spring.jackson.JacksonJsonProcessor;
+import i2f.core.serialize.str.text.FormatTextSerializer;
+import i2f.spring.jackson.JacksonJsonSerializer;
 import model.TestBean;
 
 /**
@@ -11,8 +11,8 @@ import model.TestBean;
  */
 public class TestFormatTextSerializer {
     public static void main(String[] args){
-        FormatTextSerializer serializer=new FormatTextSerializer(new JacksonJsonProcessor());
-        String text=null;
+        FormatTextSerializer serializer = new FormatTextSerializer(new JacksonJsonSerializer());
+        String text = null;
         Object val=null;
 
         TestBean bean=new TestBean();

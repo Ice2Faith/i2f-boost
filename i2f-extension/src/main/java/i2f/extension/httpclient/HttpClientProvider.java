@@ -3,7 +3,7 @@ package i2f.extension.httpclient;
 import i2f.core.annotations.remark.Author;
 import i2f.core.network.net.http.impl.BasicHttpProcessorProvider;
 import i2f.core.network.net.http.interfaces.IHttpProcessor;
-import i2f.core.serialize.json.Json2Processor;
+import i2f.core.serialize.str.json.impl.Json2Processor;
 import i2f.extension.httpclient.impl.HttpClientHttpProcessor;
 import i2f.extension.httpclient.impl.HttpClientRequestFormDataHandler;
 import i2f.extension.httpclient.impl.HttpClientRequestJsonDataHandler;

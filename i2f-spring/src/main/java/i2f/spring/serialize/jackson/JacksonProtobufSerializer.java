@@ -4,7 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.protobuf.ProtobufMapper;
 
 public class JacksonProtobufSerializer extends AbsJacksonSerializer {
-    private static ProtobufMapper mapper = new ProtobufMapper();
+    private ProtobufMapper mapper = new ProtobufMapper();
+
+    public JacksonProtobufSerializer() {
+    }
+
+    public JacksonProtobufSerializer(ProtobufMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @Override
     public ObjectMapper getMapper() {

@@ -2,7 +2,6 @@ package i2f.spring.jdbc.backup.resolvers;
 
 
 import i2f.core.database.jdbc.data.PageMeta;
-import i2f.spring.jackson.JacksonSerializer;
 import i2f.spring.jdbc.backup.apis.IOutputResolver;
 import i2f.spring.jdbc.backup.data.BasicIoMeta;
 

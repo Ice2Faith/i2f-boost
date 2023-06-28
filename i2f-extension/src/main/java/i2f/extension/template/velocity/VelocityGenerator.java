@@ -1,6 +1,5 @@
 package i2f.extension.template.velocity;
 
-import i2f.extension.json.gson.GsonUtil;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;

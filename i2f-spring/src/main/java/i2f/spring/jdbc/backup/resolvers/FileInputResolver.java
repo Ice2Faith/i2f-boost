@@ -3,7 +3,6 @@ package i2f.spring.jdbc.backup.resolvers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import i2f.spring.jdbc.backup.apis.IInputResolver;
 import i2f.spring.jdbc.backup.data.BasicIoMeta;
-import i2f.spring.jackson.JacksonSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
 

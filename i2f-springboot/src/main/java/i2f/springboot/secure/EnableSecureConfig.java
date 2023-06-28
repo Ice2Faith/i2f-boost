@@ -1,6 +1,6 @@
 package i2f.springboot.secure;
 
-import i2f.spring.jackson.JacksonJsonProcessor;
+import i2f.spring.jackson.JacksonJsonSerializer;
 import i2f.spring.mapping.MappingUtil;
 import i2f.springboot.secure.advice.RequestBodyDecryptAdvice;
 import i2f.springboot.secure.advice.StandardApiResponseAdvice;
@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Import({
         SecureConfig.class,
-        JacksonJsonProcessor.class,
+        JacksonJsonSerializer.class,
         SecureTransferFilter.class,
         SecureTransferAop.class,
         SecureTransfer.class,

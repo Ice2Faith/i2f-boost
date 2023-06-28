@@ -1,6 +1,6 @@
 package i2f.springboot.mvc;
 
-import i2f.spring.jackson.JacksonJsonProcessor;
+import i2f.spring.jackson.JacksonJsonSerializer;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -17,7 +17,7 @@ import java.lang.annotation.*;
         SpringMvcConfig.class,
         LogAop.class,
         PublicExceptionResolver.class,
-        JacksonJsonProcessor.class
+        JacksonJsonSerializer.class
 })
 public @interface EnableMvcConfig {
 

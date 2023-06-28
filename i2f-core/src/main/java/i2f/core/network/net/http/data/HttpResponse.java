@@ -2,7 +2,7 @@ package i2f.core.network.net.http.data;
 
 import i2f.core.annotations.remark.Author;
 import i2f.core.io.stream.StreamUtil;
-import i2f.core.serialize.std.IStringSerializer;
+import i2f.core.serialize.str.IStringObjectSerializer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -50,12 +50,12 @@ public class HttpResponse implements Closeable {
         }
     }
 
-    public <T> T getContentAsObject(IStringSerializer processor, Class<T> clazz, String charset) throws IOException {
+    public <T> T getContentAsObject(IStringObjectSerializer processor, Class<T> clazz, String charset) throws IOException {
         String json = getContentAsString(charset);
         return processor.deserialize(json, clazz);
     }
 
-    public <T> T getContentAsRef(IStringSerializer processor, Object refToken, String charset) throws IOException {
+    public <T> T getContentAsRef(IStringObjectSerializer processor, Object refToken, String charset) throws IOException {
         String json = getContentAsString(charset);
         return processor.deserialize(json, refToken);
     }

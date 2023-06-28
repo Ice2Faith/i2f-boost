@@ -1,7 +1,7 @@
 package test.dynamicProxy.test;
 
 import i2f.core.network.net.http.rest.RestClientProvider;
-import i2f.core.serialize.json.Json2Processor;
+import i2f.core.serialize.str.json.impl.Json2Processor;
 
 /**
  * @author ltb

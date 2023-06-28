@@ -1,6 +1,6 @@
 package test.jce;
 
-import i2f.core.security.jce.codec.CodecUtil;
+import i2f.core.codec.CodecUtil;
 import i2f.core.security.jce.encrypt.std.symmetric.SymmetricEncryptor;
 import i2f.core.security.jce.encrypt.symmetric.aes.AesKgenEncryptor;
 import i2f.core.security.jce.encrypt.symmetric.aes.AesType;

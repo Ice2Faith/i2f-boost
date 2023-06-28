@@ -1,6 +1,6 @@
 package i2f.core.hash.impl;
 
-import i2f.core.serialize.std.IBytesSerializer;
+import i2f.core.serialize.bytes.IBytesObjectSerializer;
 
 /**
  * @author ltb
@@ -8,7 +8,7 @@ import i2f.core.serialize.std.IBytesSerializer;
  * @desc
  */
 public class DekHashProvider<T> extends IByteArrayHashProvider<T> {
-    public DekHashProvider(IBytesSerializer serializer) {
+    public DekHashProvider(IBytesObjectSerializer serializer) {
         super(serializer);
     }
 

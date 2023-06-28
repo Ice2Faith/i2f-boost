@@ -1,7 +1,6 @@
 package i2f.extension.netty.http.extension;
 
 import com.google.gson.JsonObject;
-import i2f.extension.json.gson.GsonUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;

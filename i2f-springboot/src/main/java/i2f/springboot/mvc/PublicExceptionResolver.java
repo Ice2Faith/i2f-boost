@@ -2,7 +2,7 @@ package i2f.springboot.mvc;
 
 import i2f.core.exception.BoostException;
 import i2f.core.std.api.ApiResp;
-import i2f.spring.jackson.JacksonJsonProcessor;
+import i2f.spring.jackson.JacksonJsonSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +23,7 @@ import java.net.URLEncoder;
 public class PublicExceptionResolver implements HandlerExceptionResolver {
 
     @Autowired
-    private JacksonJsonProcessor processor;
+    private JacksonJsonSerializer processor;
 
     // 返回值不为null，表示已经处理，不会再进入其他处理器处理
     @Override

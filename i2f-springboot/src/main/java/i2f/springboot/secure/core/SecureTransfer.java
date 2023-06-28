@@ -6,7 +6,7 @@ import i2f.core.digest.Base64Obfuscator;
 import i2f.core.digest.RsaKey;
 import i2f.core.digest.StringSignature;
 import i2f.core.thread.ThreadPools;
-import i2f.spring.jackson.JacksonJsonProcessor;
+import i2f.spring.jackson.JacksonJsonSerializer;
 import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.util.RsaUtil;
 import lombok.Data;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  */
 @ConditionalOnBean({
         SecureConfig.class,
-        JacksonJsonProcessor.class
+        JacksonJsonSerializer.class
 })
 @Slf4j
 @Data
@@ -79,7 +79,7 @@ public class SecureTransfer implements InitializingBean {
     public static final String FILTER_EXCEPTION_ATTR_KEY="secure_except";
 
     @Autowired
-    private JacksonJsonProcessor processor;
+    private JacksonJsonSerializer processor;
 
     @Autowired
     private SecureConfig secureConfig;

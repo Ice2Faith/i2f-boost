@@ -1,9 +1,9 @@
 package i2f.core.j2ee.web;
 
-import i2f.core.serialize.json.IJsonProcessor;
-import i2f.core.serialize.json.Json2Processor;
-import i2f.core.serialize.xml.IXmlProcessor;
-import i2f.core.serialize.xml.Xml2Processor;
+import i2f.core.serialize.str.json.IJsonSerializer;
+import i2f.core.serialize.str.json.impl.Json2Processor;
+import i2f.core.serialize.str.xml.IXmlSerializer;
+import i2f.core.serialize.str.xml.impl.Xml2Processor;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
@@ -15,32 +15,34 @@ import java.util.Collection;
  */
 public class ServletResponseUtil {
     public static void respJson(HttpServletResponse response,Object obj) throws Exception {
-        IJsonProcessor processor=new Json2Processor();
+        IJsonSerializer processor = new Json2Processor();
         respJson(response, obj,processor);
     }
 
-    public static void respJson(HttpServletResponse response, Object obj, IJsonProcessor processor) throws Exception{
+    public static void respJson(HttpServletResponse response, Object obj, IJsonSerializer processor) throws Exception {
         String json = processor.serialize(obj);
-        respJsonString(response,json);
+        respJsonString(response, json);
     }
-    public static void respJsonString(HttpServletResponse response, String content) throws Exception{
-        respJsonString(response, content,200);
+
+    public static void respJsonString(HttpServletResponse response, String content) throws Exception {
+        respJsonString(response, content, 200);
     }
     public static void respJsonString(HttpServletResponse response,String content,int status) throws Exception{
         respString(response,content,status,"application/json","UTF-8");
     }
 
     public static void respXml(HttpServletResponse response,Object obj) throws Exception {
-        IXmlProcessor processor=new Xml2Processor();
+        IXmlSerializer processor = new Xml2Processor();
         respXml(response, obj,processor);
     }
 
-    public static void respXml(HttpServletResponse response, Object obj, IXmlProcessor processor) throws Exception{
+    public static void respXml(HttpServletResponse response, Object obj, IXmlSerializer processor) throws Exception {
         String json = processor.serialize(obj);
-        respXmlString(response,json);
+        respXmlString(response, json);
     }
-    public static void respXmlString(HttpServletResponse response,String content) throws Exception{
-        respXmlString(response, content,200);
+
+    public static void respXmlString(HttpServletResponse response, String content) throws Exception {
+        respXmlString(response, content, 200);
     }
     public static void respXmlString(HttpServletResponse response,String content,int status) throws Exception{
         respString(response,content,status,"text/xml","UTF-8");

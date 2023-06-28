@@ -1,6 +1,6 @@
 package test.jce;
 
-import i2f.core.security.jce.codec.CodecUtil;
+import i2f.core.codec.CodecUtil;
 import i2f.core.security.jce.digest.MessageDigestUtil;
 import i2f.core.security.jce.digest.md.MdMessageDigester;
 import i2f.core.security.jce.digest.md.MdType;

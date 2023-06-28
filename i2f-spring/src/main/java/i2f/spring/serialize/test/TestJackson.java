@@ -1,7 +1,7 @@
 package i2f.spring.serialize.test;
 
 
-import i2f.core.serialize.std.ISerializer;
+import i2f.core.serialize.str.IStringObjectSerializer;
 import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import i2f.spring.serialize.jackson.JacksonJsonWithTypeSerializer;
 import i2f.spring.serialize.jackson.JacksonXmlSerializer;
@@ -19,16 +19,16 @@ public class TestJackson {
 //        testSerializer(new JacksonSmileSerializer());
     }
 
-    public static <T> void testSerializer(ISerializer<T> serializer) {
+    public static <T> void testSerializer(IStringObjectSerializer serializer) {
         System.out.println("==================================================");
         System.out.println("serializer=" + serializer.getClass().getSimpleName());
         System.out.println("==================================================");
 
         UserDto user = UserDto.makeRandom();
-        T xml = serializer.serialize(user, true);
+        String xml = serializer.serialize(user);
         System.out.println(xml);
 
-        UserDto bean = serializer.deserialize(xml, UserDto.class);
+        UserDto bean = (UserDto) serializer.deserialize(xml, UserDto.class);
         System.out.println(bean);
     }
 }

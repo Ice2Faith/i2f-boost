@@ -6,7 +6,7 @@ import i2f.core.database.db.data.TableMeta;
 import i2f.core.reflection.reflect.Reflects;
 import i2f.core.reflection.reflect.core.ReflectResolver;
 import i2f.core.resource.ResourceUtil;
-import i2f.core.serialize.xml.Xml2;
+import i2f.core.serialize.str.xml.impl.Xml2;
 import i2f.extension.template.velocity.VelocityGenerator;
 import i2f.generator.api.ApiLine;
 import i2f.generator.api.ApiMethod;

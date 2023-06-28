@@ -6,7 +6,14 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 
 public class JacksonJsonWithTypeSerializer extends AbsJacksonSerializer {
-    private static JsonMapper mapper = new JsonMapper();
+    private JsonMapper mapper = new JsonMapper();
+
+    public JacksonJsonWithTypeSerializer() {
+    }
+
+    public JacksonJsonWithTypeSerializer(JsonMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @Override
     public ObjectMapper getMapper() {

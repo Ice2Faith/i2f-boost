@@ -2,7 +2,7 @@ package i2f.core.network.net.http.rest;
 
 import i2f.core.lang.proxy.JdkProxyUtil;
 import i2f.core.network.net.http.rest.core.RestClientProxyHandler;
-import i2f.core.serialize.std.IStringSerializer;
+import i2f.core.serialize.str.IStringObjectSerializer;
 
 /**
  * @author ltb
@@ -10,7 +10,7 @@ import i2f.core.serialize.std.IStringSerializer;
  * @desc
  */
 public class RestClientProvider {
-    public <T> T getClient(Class<T> interfaces, IStringSerializer processor) {
+    public <T> T getClient(Class<T> interfaces, IStringObjectSerializer processor) {
         return JdkProxyUtil.proxy(interfaces, new RestClientProxyHandler(processor));
     }
 }

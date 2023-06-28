@@ -1,6 +1,6 @@
 package i2f.core.hash.impl;
 
-import i2f.core.serialize.std.IBytesSerializer;
+import i2f.core.serialize.bytes.IBytesObjectSerializer;
 
 /**
  * @author ltb
@@ -8,7 +8,7 @@ import i2f.core.serialize.std.IBytesSerializer;
  * @desc
  */
 public class PjwHashProvider<T> extends IByteArrayHashProvider<T> {
-    public PjwHashProvider(IBytesSerializer serializer) {
+    public PjwHashProvider(IBytesObjectSerializer serializer) {
         super(serializer);
     }
 

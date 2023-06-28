@@ -1,7 +1,6 @@
 package i2f.springboot.zplugin.file;
 
 import i2f.core.io.stream.StreamUtil;
-import i2f.spring.jackson.JacksonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;

@@ -2,7 +2,6 @@ package i2f.spring.mvc;
 
 import i2f.core.j2ee.web.ServletContextUtil;
 import i2f.core.j2ee.web.ServletResponseUtil;
-import i2f.spring.jackson.JacksonUtil;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;

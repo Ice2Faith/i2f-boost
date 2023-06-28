@@ -1,7 +1,7 @@
 package i2f.core.digest;
 
 import i2f.core.annotations.remark.Author;
-import i2f.core.security.jce.codec.CodecUtil;
+import i2f.core.codec.CodecUtil;
 
 @Author("i2f")
 public class Base64Util {

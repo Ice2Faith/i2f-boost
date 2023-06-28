@@ -1,9 +1,9 @@
 package i2f.core.security.jce.digest.std;
 
-import i2f.core.security.jce.codec.CodecUtil;
-import i2f.core.security.jce.codec.compress.IByteByteCodec;
-import i2f.core.security.jce.codec.ex.stream.IStreamCodecEx;
-import i2f.core.security.jce.codec.exception.CodecException;
+import i2f.core.codec.CodecUtil;
+import i2f.core.codec.compress.IByteByteCodec;
+import i2f.core.codec.ex.stream.IStreamCodecEx;
+import i2f.core.codec.exception.CodecException;
 
 import java.io.InputStream;
 import java.io.OutputStream;

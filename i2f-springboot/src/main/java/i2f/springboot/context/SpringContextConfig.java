@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import i2f.spring.context.SpringUtil;
 import i2f.spring.environment.EnvironmentUtil;
 import i2f.spring.event.EventManager;
-import i2f.spring.jackson.JacksonJsonProcessor;
-import i2f.spring.jackson.JacksonUtil;
+import i2f.spring.jackson.JacksonJsonSerializer;
 import i2f.spring.mapping.MappingUtil;
 import i2f.spring.spel.SpelExpressionResolver;
 import lombok.Data;
@@ -34,7 +33,7 @@ import org.springframework.util.AntPathMatcher;
 @Import({
         SpelExpressionResolver.class,
         MappingUtil.class,
-        JacksonJsonProcessor.class,
+        JacksonJsonSerializer.class,
         JacksonUtil.class,
         EventManager.class,
         EnvironmentUtil.class,
@@ -46,7 +45,7 @@ public class SpringContextConfig implements InitializingBean {
     protected ObjectMapper objectMapper;
 
     @Autowired
-    protected JacksonJsonProcessor jacksonJsonProcessor;
+    protected JacksonJsonSerializer jacksonJsonProcessor;
 
     public ObjectMapper getObjectMapper(){
         synchronized (this){

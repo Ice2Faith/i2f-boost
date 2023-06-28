@@ -1,9 +1,9 @@
 package i2f.core.digest;
 
+import i2f.core.codec.CodecUtil;
 import i2f.core.security.jce.bc.BouncyCastleHolder;
 import i2f.core.security.jce.bc.encrypt.asymmetric.rsa.BcRsaEncryptor;
 import i2f.core.security.jce.bc.encrypt.asymmetric.rsa.BcRsaType;
-import i2f.core.security.jce.codec.CodecUtil;
 import i2f.core.security.jce.encrypt.CipherUtil;
 
 import java.security.KeyPair;

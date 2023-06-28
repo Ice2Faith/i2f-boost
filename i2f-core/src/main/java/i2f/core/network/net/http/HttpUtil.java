@@ -4,8 +4,8 @@ import i2f.core.annotations.remark.Author;
 import i2f.core.network.net.http.data.HttpRequest;
 import i2f.core.network.net.http.impl.BasicHttpProcessorProvider;
 import i2f.core.network.net.http.impl.HttpUrlConnectProcessor;
-import i2f.core.serialize.json.IJsonProcessor;
-import i2f.core.serialize.json.Json2Processor;
+import i2f.core.serialize.str.json.IJsonSerializer;
+import i2f.core.serialize.str.json.impl.Json2Processor;
 
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
@@ -19,7 +19,7 @@ import java.util.Map;
 @Author("i2f")
 public class HttpUtil {
     public static volatile BasicHttpProcessorProvider httpProvider = new BasicHttpProcessorProvider(new HttpUrlConnectProcessor());
-    public static volatile IJsonProcessor jsonProcessor=new Json2Processor();
+    public static volatile IJsonSerializer jsonProcessor = new Json2Processor();
 
     public static BasicHttpProcessorProvider http(){
         return httpProvider;
