@@ -3,6 +3,7 @@ package i2f.spring.jdbc.backup.resolvers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import i2f.spring.jdbc.backup.apis.IInputResolver;
 import i2f.spring.jdbc.backup.data.BasicIoMeta;
+import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
 
@@ -117,7 +118,7 @@ public class FileInputResolver implements IInputResolver {
         bos.close();
         byte[] bytes = bos.toByteArray();
         String text = new String(bytes, "UTF-8");
-        return JacksonSerializer.parseJson(text, new TypeReference<List<Map<String, Object>>>() {
+        return JacksonJsonSerializer.INSTANCE.deserialize(text, new TypeReference<List<Map<String, Object>>>() {
         });
     }
 

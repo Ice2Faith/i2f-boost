@@ -4,6 +4,7 @@ package i2f.spring.jdbc.backup.resolvers;
 import i2f.core.database.jdbc.data.PageMeta;
 import i2f.spring.jdbc.backup.apis.IOutputResolver;
 import i2f.spring.jdbc.backup.data.BasicIoMeta;
+import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -87,7 +88,7 @@ public class FileOutputResolver implements IOutputResolver {
             file.getParentFile().mkdirs();
         }
         OutputStream os = new FileOutputStream(file);
-        String text = JacksonSerializer.toJson(list);
+        String text = JacksonJsonSerializer.INSTANCE.serialize(list);
         if (meta.compress != null && meta.compress) {
             ZipOutputStream zos = new ZipOutputStream(os);
             os = zos;

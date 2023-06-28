@@ -2,6 +2,7 @@ package i2f.spring.mvc;
 
 import i2f.core.j2ee.web.ServletContextUtil;
 import i2f.core.j2ee.web.ServletResponseUtil;
+import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -142,7 +143,7 @@ public class SpringMvcUtil {
     }
 
     public static void respJsonObj(Object obj) throws Exception {
-        respJson(JacksonUtil.toJson(obj),200);
+        respJson(JacksonJsonSerializer.INSTANCE.serialize(obj), 200);
     }
 
     /**

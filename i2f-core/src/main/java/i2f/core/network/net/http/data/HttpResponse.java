@@ -52,12 +52,12 @@ public class HttpResponse implements Closeable {
 
     public <T> T getContentAsObject(IStringObjectSerializer processor, Class<T> clazz, String charset) throws IOException {
         String json = getContentAsString(charset);
-        return processor.deserialize(json, clazz);
+        return (T) processor.deserialize(json, clazz);
     }
 
     public <T> T getContentAsRef(IStringObjectSerializer processor, Object refToken, String charset) throws IOException {
         String json = getContentAsString(charset);
-        return processor.deserialize(json, refToken);
+        return (T) processor.deserialize(json, refToken);
     }
 
     public File saveAsFile(File file) throws IOException {
