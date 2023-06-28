@@ -4,7 +4,7 @@ import i2f.core.annotations.remark.Author;
 import i2f.core.network.net.http.data.HttpRequest;
 import i2f.core.network.net.http.interfaces.IHttpRequestBodyHandler;
 import i2f.core.serialize.str.xml.IXmlSerializer;
-import i2f.core.serialize.str.xml.impl.Xml2Processor;
+import i2f.core.serialize.str.xml.impl.Xml2Serializer;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,7 +20,7 @@ public class HttpXmlRequestBodyHandler implements IHttpRequestBodyHandler {
     protected IXmlSerializer processor;
 
     public HttpXmlRequestBodyHandler() {
-        processor = new Xml2Processor();
+        processor = new Xml2Serializer();
     }
 
     public HttpXmlRequestBodyHandler(IXmlSerializer processor) {

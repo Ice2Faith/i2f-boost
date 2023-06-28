@@ -1,8 +1,9 @@
 package i2f.springboot.secure.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import i2f.core.j2ee.web.HttpServletRequestProxyWrapper;
-import i2f.core.j2ee.web.HttpServletResponseProxyWrapper;
+import i2f.core.j2ee.web.ServletContextUtil;
+import i2f.core.j2ee.wrapper.HttpServletRequestProxyWrapper;
+import i2f.core.j2ee.wrapper.HttpServletResponseProxyWrapper;
 import i2f.core.thread.NamingThreadFactory;
 import i2f.spring.mapping.MappingUtil;
 import i2f.springboot.secure.SecureConfig;
@@ -11,7 +12,6 @@ import i2f.springboot.secure.consts.SecureErrorCode;
 import i2f.springboot.secure.data.SecureCtrl;
 import i2f.springboot.secure.data.SecureHeader;
 import i2f.springboot.secure.exception.SecureException;
-import i2f.springboot.secure.util.RequestUtils;
 import i2f.springboot.secure.util.SecureUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -165,7 +165,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                 // 正常的请求是客户端发起的，每一次一次性头都是不同的
                 // 然而，非正常的请求，可以进行重放请求达到目的
                 // 这样的请求，就会出现一次性头重复，存在相同的签名
-                String clientIp = RequestUtils.getIp(request);
+                String clientIp = ServletContextUtil.getIp(request);
                 // 对于服务端而言，nonce从客户端发送过来，很难避免不同的客户端发送过来的nonce重复的问题
                 // 如果不进行客户端隔离，就会导致不少正常的请求被拦截为重放
                 // 因此需要结合客户端IP判定nonce

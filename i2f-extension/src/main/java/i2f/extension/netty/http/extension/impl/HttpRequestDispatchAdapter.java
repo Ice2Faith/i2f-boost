@@ -9,6 +9,7 @@ import i2f.extension.netty.http.annotation.*;
 import i2f.extension.netty.http.extension.AbstractHttpRequestHandler;
 import i2f.extension.netty.http.extension.HttpWebRequest;
 import i2f.extension.netty.http.extension.HttpWebResponse;
+import i2f.extension.serialize.json.gson.GsonJsonSerializer;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -127,7 +128,7 @@ public class HttpRequestDispatchAdapter extends AbstractHttpRequestHandler {
                 Object obj = exec.getDeclaringClass().getConstructor().newInstance();
                 Object ret = exec.invoke(obj, args);
                 if (!exec.getReturnType().equals(void.class)) {
-                    String retStr = GsonUtil.toJson(ret);
+                    String retStr = GsonJsonSerializer.INSTANCE.serialize(ret);
                     response.ok(retStr, "UTF-8", "application/json;charset=UTF-8");
                 }
             }catch (Throwable t){

@@ -1,6 +1,5 @@
 package i2f.springboot.secure;
 
-import i2f.spring.jackson.JacksonJsonProcessor;
 import i2f.spring.mapping.MappingUtil;
 import i2f.springboot.secure.converter.SecureJacksonMessageConverter;
 import i2f.springboot.secure.converter.SecureJacksonMvcConfigurer;
@@ -26,7 +25,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Import({
         SecureConfig.class,
-        JacksonJsonProcessor.class,
         SecureTransferFilter.class,
         SecureTransferAop.class,
         SecureTransfer.class,

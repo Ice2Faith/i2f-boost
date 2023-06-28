@@ -1,5 +1,7 @@
 package i2f.extension.template.velocity;
 
+import com.google.gson.reflect.TypeToken;
+import i2f.extension.serialize.json.gson.GsonJsonSerializer;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -46,7 +48,8 @@ public class VelocityGenerator {
             File pfile = new File(paramJsonFile);
             if (pfile.exists()) {
                 String json = readFileText(paramJsonFile, charset);
-                params = GsonUtil.fromJsonTypeToken(json);
+                params = GsonJsonSerializer.INSTANCE.deserialize(json, new TypeToken<Map<String, Object>>() {
+                });
             }
         }
         batchRender(templatePath, params, outputPath, charset);

@@ -24,18 +24,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MappingUtil implements InitializingBean {
 
     @Autowired
-    protected RequestMappingHandlerMapping requestMappingHandler;
+    protected RequestMappingHandlerMapping requestMappingHandlerMapping;
 
-    private Map<String,Map<RequestMappingInfo,HandlerMethod>> fastMapping=new ConcurrentHashMap<>();
+    private Map<String, Map<RequestMappingInfo, HandlerMethod>> fastMapping = new ConcurrentHashMap<>();
 
     public void initFastMapping() {
-        Map<String,Map<RequestMappingInfo,HandlerMethod>> ret=new ConcurrentHashMap<>();
-        Map<RequestMappingInfo, HandlerMethod> handlerMethods = requestMappingHandler.getHandlerMethods();
+        Map<String, Map<RequestMappingInfo, HandlerMethod>> ret = new ConcurrentHashMap<>();
+        Map<RequestMappingInfo, HandlerMethod> handlerMethods = requestMappingHandlerMapping.getHandlerMethods();
         for (Map.Entry<RequestMappingInfo, HandlerMethod> item : handlerMethods.entrySet()) {
             RequestMappingInfo key = item.getKey();
             HandlerMethod value = item.getValue();
             Set<String> patterns = key.getPatternsCondition().getPatterns();
-            for(String patten : patterns) {
+            for (String patten : patterns) {
                 if (!ret.containsKey(patten)) {
                     ret.put(patten, new ConcurrentHashMap<>());
                 }
@@ -43,11 +43,11 @@ public class MappingUtil implements InitializingBean {
             }
         }
 
-        fastMapping=new ConcurrentHashMap<>(ret.size());
-        for(Map.Entry<String,Map<RequestMappingInfo,HandlerMethod>> item : ret.entrySet()){
+        fastMapping = new ConcurrentHashMap<>(ret.size());
+        for (Map.Entry<String, Map<RequestMappingInfo, HandlerMethod>> item : ret.entrySet()) {
             String key = item.getKey();
             Map<RequestMappingInfo, HandlerMethod> value = item.getValue();
-            Map<RequestMappingInfo, HandlerMethod> umap= Collections.unmodifiableMap(value);
+            Map<RequestMappingInfo, HandlerMethod> umap = Collections.unmodifiableMap(value);
             fastMapping.put(key, umap);
         }
 
@@ -58,33 +58,33 @@ public class MappingUtil implements InitializingBean {
         initFastMapping();
     }
 
-    public Pair<RequestMappingInfo,HandlerMethod> getRequestMapping(HttpServletRequest request) {
-        Map<RequestMappingInfo, HandlerMethod> handlerMethods=requestMappingHandler.getHandlerMethods();
-        for(Map.Entry<RequestMappingInfo, HandlerMethod> item : handlerMethods.entrySet()){
+    public Pair<RequestMappingInfo, HandlerMethod> getRequestMapping(HttpServletRequest request) {
+        Map<RequestMappingInfo, HandlerMethod> handlerMethods = requestMappingHandlerMapping.getHandlerMethods();
+        for (Map.Entry<RequestMappingInfo, HandlerMethod> item : handlerMethods.entrySet()) {
             RequestMappingInfo key = item.getKey();
             HandlerMethod value = item.getValue();
             RequestMappingInfo cond = key.getMatchingCondition(request);
-            if(cond!=null){
-                HandlerMethod handler= handlerMethods.get(cond);
-                if(handler!=null){
-                    return new Pair<>(cond,handler);
+            if (cond != null) {
+                HandlerMethod handler = handlerMethods.get(cond);
+                if (handler != null) {
+                    return new Pair<>(cond, handler);
                 }
             }
         }
         return null;
     }
 
-    public HandlerMethod getRequestMappingHandlerMethod(HttpServletRequest request){
-        Pair<RequestMappingInfo,HandlerMethod> pair=getRequestMapping(request);
-        if(pair!=null){
+    public HandlerMethod getRequestMappingHandlerMethod(HttpServletRequest request) {
+        Pair<RequestMappingInfo, HandlerMethod> pair = getRequestMapping(request);
+        if (pair != null) {
             return pair.val;
         }
         return null;
     }
 
-    public Method getRequestMappingMethod(HttpServletRequest request){
-        HandlerMethod handlerMethod=getRequestMappingHandlerMethod(request);
-        if(handlerMethod!=null){
+    public Method getRequestMappingMethod(HttpServletRequest request) {
+        HandlerMethod handlerMethod = getRequestMappingHandlerMethod(request);
+        if (handlerMethod != null) {
             return handlerMethod.getMethod();
         }
         return null;

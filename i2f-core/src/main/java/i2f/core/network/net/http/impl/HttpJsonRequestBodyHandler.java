@@ -4,7 +4,7 @@ import i2f.core.annotations.remark.Author;
 import i2f.core.network.net.http.data.HttpRequest;
 import i2f.core.network.net.http.interfaces.IHttpRequestBodyHandler;
 import i2f.core.serialize.str.json.IJsonSerializer;
-import i2f.core.serialize.str.json.impl.Json2Processor;
+import i2f.core.serialize.str.json.impl.Json2Serializer;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,7 +20,7 @@ public class HttpJsonRequestBodyHandler implements IHttpRequestBodyHandler {
     protected IJsonSerializer processor;
 
     public HttpJsonRequestBodyHandler() {
-        processor = new Json2Processor();
+        processor = new Json2Serializer();
     }
 
     public HttpJsonRequestBodyHandler(IJsonSerializer processor) {

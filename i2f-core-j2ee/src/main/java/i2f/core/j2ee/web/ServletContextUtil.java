@@ -5,6 +5,7 @@ import i2f.core.check.CheckUtil;
 import i2f.core.container.collection.CollectionUtil;
 import i2f.core.io.file.FileUtil;
 import i2f.core.network.net.http.HttpHeaders;
+import i2f.core.type.str.Strings;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -100,23 +101,37 @@ public class ServletContextUtil {
         return request.getAttribute(key);
     }
 
-    public static String getUserAgent(HttpServletRequest request){
-        String userAgent=request.getHeader(HttpHeaders.UserAgent);
-        if(userAgent==null){
-            userAgent="";
+    public static String getUserAgent(HttpServletRequest request) {
+        String userAgent = request.getHeader(HttpHeaders.UserAgent);
+        if (userAgent == null) {
+            userAgent = "";
         }
         return userAgent;
     }
 
-    public static String getIp(HttpServletRequest request){
-        String ip=request.getHeader("x-forwarded-for");
-        if(ip==null || ip.length()==0 || "unknown".equalsIgnoreCase(ip)){
-            ip=request.getHeader("Proxy-Client-IP");
+    public static String getPossibleValue(String key, HttpServletRequest request) {
+        String ret = request.getHeader(key);
+        if (Strings.isEmpty(ret)) {
+            ret = request.getParameter(key);
         }
-        if(ip==null || ip.length()==0 || "unknown".equalsIgnoreCase(ip)){
-            ip=request.getHeader("WL-Proxy-Client-IP");
+        if (Strings.isEmpty(ret)) {
+            Object val = request.getAttribute(key);
+            if (val != null) {
+                ret = String.valueOf(val);
+            }
         }
-        if(ip==null || ip.length()==0 || "unknown".equalsIgnoreCase(ip)){
+        return ret;
+    }
+
+    public static String getIp(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip=request.getHeader("X-Real-IP");
         }
         if(ip==null || ip.length()==0 || "unknown".equalsIgnoreCase(ip)){

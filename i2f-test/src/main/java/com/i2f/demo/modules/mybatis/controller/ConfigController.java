@@ -3,8 +3,6 @@ package com.i2f.demo.modules.mybatis.controller;
 import com.i2f.demo.modules.mybatis.domain.ConfigDomain;
 import com.i2f.demo.modules.mybatis.mapper.ConfigMapper;
 import i2f.core.std.api.ApiResp;
-import i2f.springboot.secure.annotation.SecureParams;
-import i2f.springboot.secure.annotation.StandardApiResp;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,8 +28,6 @@ public class ConfigController {
     }
 
     @RequestMapping("std")
-    @StandardApiResp
-    @SecureParams(in = false)
     public Object getStd(ConfigDomain req){
         return configMapper.qryConfig(req);
     }

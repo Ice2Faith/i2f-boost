@@ -1,9 +1,9 @@
 package i2f.core.j2ee.web;
 
 import i2f.core.serialize.str.json.IJsonSerializer;
-import i2f.core.serialize.str.json.impl.Json2Processor;
+import i2f.core.serialize.str.json.impl.Json2Serializer;
 import i2f.core.serialize.str.xml.IXmlSerializer;
-import i2f.core.serialize.str.xml.impl.Xml2Processor;
+import i2f.core.serialize.str.xml.impl.Xml2Serializer;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
@@ -15,7 +15,7 @@ import java.util.Collection;
  */
 public class ServletResponseUtil {
     public static void respJson(HttpServletResponse response,Object obj) throws Exception {
-        IJsonSerializer processor = new Json2Processor();
+        IJsonSerializer processor = new Json2Serializer();
         respJson(response, obj,processor);
     }
 
@@ -32,7 +32,7 @@ public class ServletResponseUtil {
     }
 
     public static void respXml(HttpServletResponse response,Object obj) throws Exception {
-        IXmlSerializer processor = new Xml2Processor();
+        IXmlSerializer processor = new Xml2Serializer();
         respXml(response, obj,processor);
     }
 

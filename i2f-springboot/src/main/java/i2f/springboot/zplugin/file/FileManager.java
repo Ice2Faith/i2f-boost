@@ -1,6 +1,7 @@
 package i2f.springboot.zplugin.file;
 
 import i2f.core.io.stream.StreamUtil;
+import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -191,7 +192,7 @@ public class FileManager  {
     public static File writeMetaFile(String basePath,FileInfo dto) throws IOException {
         File metaFile=new File(basePath,dto.getServerName()+".meta");
         OutputStream fos=new FileOutputStream(metaFile);
-        fos.write(JacksonUtil.toJson(dto).getBytes("UTF-8"));
+        fos.write(JacksonJsonSerializer.INSTANCE.serialize(dto).getBytes("UTF-8"));
         fos.close();
         return metaFile;
     }
@@ -203,7 +204,7 @@ public class FileManager  {
             FileInputStream fis=new FileInputStream(metaFile);
             StreamUtil.streamCopy(fis,bos);
             String json=new String(bos.toByteArray(),"UTF-8");
-            return JacksonUtil.parseObj(json,FileInfo.class);
+            return (FileInfo) JacksonJsonSerializer.INSTANCE.deserialize(json, FileInfo.class);
         }
         return null;
     }

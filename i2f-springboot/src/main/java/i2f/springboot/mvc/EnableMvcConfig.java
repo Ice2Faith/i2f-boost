@@ -1,6 +1,6 @@
 package i2f.springboot.mvc;
 
-import i2f.spring.jackson.JacksonJsonSerializer;
+import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

@@ -6,7 +6,7 @@ import i2f.core.digest.Base64Obfuscator;
 import i2f.core.digest.RsaKey;
 import i2f.core.digest.StringSignature;
 import i2f.core.thread.NamingThreadFactory;
-import i2f.spring.jackson.JacksonJsonProcessor;
+import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.consts.SecureConsts;
 import i2f.springboot.secure.util.RsaUtil;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  */
 @ConditionalOnBean({
         SecureConfig.class,
-        JacksonJsonProcessor.class
+        JacksonJsonSerializer.class
 })
 @Slf4j
 @Data
@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 public class SecureTransfer implements InitializingBean {
 
     @Autowired
-    private JacksonJsonProcessor processor;
+    private JacksonJsonSerializer serializer;
 
     @Autowired
     private SecureConfig secureConfig;
@@ -152,7 +152,7 @@ public class SecureTransfer implements InitializingBean {
     }
 
     public String encrypt(Object obj, String aesKey) {
-        return AESUtil.encryptJsonAfterBase64(processor.serialize(obj), aesKey);
+        return AESUtil.encryptJsonAfterBase64(serializer.serialize(obj), aesKey);
     }
 
     public String encryptJson(String json, String aesKey) {

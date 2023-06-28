@@ -1,11 +1,14 @@
 package i2f.springboot.secure.util;
 
 
+import i2f.core.codec.CodecUtil;
 import i2f.core.digest.Base64Obfuscator;
 import i2f.core.digest.Base64Util;
 import i2f.core.digest.StringSignature;
-import i2f.core.str.CharsetUtil;
+import i2f.core.j2ee.web.ServletContextUtil;
+import i2f.core.reflection.reflect.Reflects;
 import i2f.spring.mapping.MappingUtil;
+import i2f.spring.matcher.MatcherUtils;
 import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.annotation.SecureParams;
 import i2f.springboot.secure.consts.SecureErrorCode;
@@ -28,7 +31,7 @@ import java.util.Set;
 public class SecureUtils {
 
     public static SecureParams getSecureAnnotation(Member member) {
-        return ReflectUtils.getMemberAnnotation(member, SecureParams.class);
+        return Reflects.annotations(member, SecureParams.class, true, false);
     }
 
     public static String combinePath(String prefix, String suffix, String separator) {
@@ -106,7 +109,7 @@ public class SecureUtils {
             ctrl = secureConfig.getDefaultControl();
         }
 
-        String value = RequestUtils.getPossibleValue(secureConfig.getHeaderName(), request);
+        String value = ServletContextUtil.getPossibleValue(secureConfig.getHeaderName(), request);
         if (!StringUtils.isEmpty(value)) {
             ctrl.in = true;
         }
@@ -158,7 +161,7 @@ public class SecureUtils {
     }
 
     public static SecureHeader parseSecureHeader(String key, String separator, HttpServletRequest request) {
-        String value = RequestUtils.getPossibleValue(key, request);
+        String value = ServletContextUtil.getPossibleValue(key, request);
         return decodeSecureHeader(value, separator);
     }
 
@@ -166,7 +169,7 @@ public class SecureUtils {
         if (StringUtils.isEmpty(str)) {
             throw new SecureException(SecureErrorCode.SECURE_HEADER_EMPTY, "空安全头");
         }
-        str = CharsetUtil.ofUtf8(Base64Util.decode(Base64Obfuscator.decode(str)));
+        str = CodecUtil.ofUtf8(Base64Util.decode(Base64Obfuscator.decode(str)));
         String[] arr = str.split(separator);
         if (arr.length < 4) {
             throw new SecureException(SecureErrorCode.SECURE_HEADER_STRUCTURE, "不正确的安全头结构");
@@ -201,7 +204,7 @@ public class SecureUtils {
         builder.append(separator);
         builder.append(header.rsaSign);
         String str = builder.toString();
-        return Base64Obfuscator.encode(Base64Util.encode(CharsetUtil.toUtf8(str)), true);
+        return Base64Obfuscator.encode(Base64Util.encode(CodecUtil.toUtf8(str)), true);
     }
 
     public static String makeSecureSign(String body, SecureHeader header) {
@@ -236,12 +239,12 @@ public class SecureUtils {
             throw new SecureException(SecureErrorCode.BAD_SIGN, "签名验证失败");
         }
         byte[] data = Base64Util.decodeUrl(Base64Obfuscator.decode(url));
-        String trueUrl = CharsetUtil.ofUtf8(data);
+        String trueUrl = CodecUtil.ofUtf8(data);
         return trueUrl;
     }
 
     public static String encodeEncTrueUrl(String trueUrl) {
-        String url = Base64Obfuscator.encode(Base64Util.encode(CharsetUtil.toUtf8(trueUrl)), false);
+        String url = Base64Obfuscator.encode(Base64Util.encode(CodecUtil.toUtf8(trueUrl)), false);
         String sign = StringSignature.sign(url);
         String text = Base64Obfuscator.encode(sign + ";" + url, false);
         try {

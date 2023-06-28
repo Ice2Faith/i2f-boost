@@ -1,6 +1,7 @@
 package i2f.extension.netty.http.extension;
 
-import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import i2f.extension.serialize.json.gson.GsonJsonSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
@@ -142,17 +143,14 @@ public abstract class AbstractHttpRequestHandler extends SimpleChannelInboundHan
      * 解析json数据（Content-Type = application/json）
      */
     private Map<String, Object> getJSONParams(FullHttpRequest fullHttpRequest) throws UnsupportedEncodingException {
-        Map<String, Object> params = new HashMap<String, Object>();
 
         ByteBuf content = fullHttpRequest.content();
         byte[] reqContent = new byte[content.readableBytes()];
         content.readBytes(reqContent);
         String strContent = new String(reqContent, "UTF-8");
 
-        JsonObject jsonObj= GsonUtil.formJson(strContent);
-        for (String key : jsonObj.keySet()) {
-            params.put(key, jsonObj.get(key));
-        }
+        Map<String, Object> params = GsonJsonSerializer.INSTANCE.deserialize(strContent, new TypeToken<Map<String, Object>>() {
+        });
 
         return params;
     }

@@ -2,8 +2,6 @@ package com.i2f.demo;
 
 
 import i2f.spring.mapping.MappingUtil;
-import i2f.spring.secret.web.SecretWebConfig;
-import i2f.spring.secret.web.TestWeb;
 import i2f.springboot.activity.EnableActivityConfig;
 import i2f.springboot.application.WarBootApplication;
 import i2f.springboot.asyn.EnableAsyncConfig;
@@ -49,9 +47,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
         SecurityAutoConfiguration.class
 })
 @Import({
-        MappingUtil.class,
-        SecretWebConfig.class,
-        TestWeb.class
+        MappingUtil.class
 })
 public class I2fTestApplication extends WarBootApplication {
 

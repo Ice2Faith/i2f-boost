@@ -150,4 +150,36 @@ public class BytesUtil {
         return buf.array();
     }
 
+    public static byte[] toBytes(double num) {
+        return toBytes(num, ByteOrder.BIG_ENDIAN);
+    }
+
+    public static byte[] toBytes(double num, ByteOrder order) {
+        ByteBuffer buf = ByteBuffer.allocate(Short.BYTES);
+        buf.order(order);
+        buf.putDouble(num);
+        return buf.array();
+    }
+
+    public static byte[] toBytes(float num) {
+        return toBytes(num, ByteOrder.BIG_ENDIAN);
+    }
+
+    public static byte[] toBytes(float num, ByteOrder order) {
+        ByteBuffer buf = ByteBuffer.allocate(Short.BYTES);
+        buf.order(order);
+        buf.putFloat(num);
+        return buf.array();
+    }
+
+    public static byte[] toBytes(char num) {
+        return toBytes(num, ByteOrder.BIG_ENDIAN);
+    }
+
+    public static byte[] toBytes(char num, ByteOrder order) {
+        ByteBuffer buf = ByteBuffer.allocate(Short.BYTES);
+        buf.order(order);
+        buf.putChar(num);
+        return buf.array();
+    }
 }
