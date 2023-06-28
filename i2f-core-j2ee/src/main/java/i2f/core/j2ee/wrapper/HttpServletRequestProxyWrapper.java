@@ -1,7 +1,4 @@
-package i2f.core.j2ee.web;
-
-import i2f.core.j2ee.wrapper.ByteArrayServletInputStream;
-import i2f.core.j2ee.wrapper.ByteArrayServletOutputStream;
+package i2f.core.j2ee.wrapper;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
