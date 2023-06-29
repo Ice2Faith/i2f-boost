@@ -1,27 +1,18 @@
-package i2f.springboot.secure.util;
+package i2f.springboot.secure.crypto;
 
 import i2f.core.codec.CodecUtil;
 import i2f.core.digest.Base64Util;
 import i2f.core.digest.RsaKey;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import i2f.core.security.jce.encrypt.std.asymmetric.AsymmetricEncryptor;
 
-import javax.crypto.Cipher;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.SecureRandom;
-import java.security.Security;
 
 /**
  * @author ltb
  * @date 2022/6/28 15:08
  * @desc
  */
-public class RsaUtil {
-    private static final BouncyCastleProvider provider = new BouncyCastleProvider();
-
-    public static void registryProvider() {
-        Security.addProvider(provider);
-    }
+public class AsymmetricUtil {
 
     public static RsaKey makeKeyPair() {
         return makeKeyPair(1024);
@@ -35,27 +26,8 @@ public class RsaUtil {
      */
     public static RsaKey makeKeyPair(int size) {
         try {
-            registryProvider();
-            SecureRandom rand = new SecureRandom();
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "BC");
-            generator.initialize(size, rand);
-            KeyPair keyPair = generator.generateKeyPair();
+            KeyPair keyPair = SecureProvider.asymmetricKeyPairSupplier.get(size);
             return new RsaKey(keyPair);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * 获取RSA
-     *
-     * @return
-     */
-    public static Cipher rsaCipher() {
-        try {
-            Security.addProvider(provider);
-            Cipher cipher = Cipher.getInstance("RSA/None/PKCS1Padding", "BC");
-            return cipher;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -70,9 +42,8 @@ public class RsaUtil {
      */
     public static byte[] privateKeyDecrypt(RsaKey key, byte[] data) {
         try {
-            Cipher cipher = rsaCipher();
-            cipher.init(Cipher.DECRYPT_MODE, key.privateKey());
-            return cipher.doFinal(data);
+            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get(key.getKeyPair());
+            return encryptor.privateDecrypt(data);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -87,9 +58,8 @@ public class RsaUtil {
      */
     public static byte[] privateKeyEncrypt(RsaKey key, byte[] data) {
         try {
-            Cipher cipher = rsaCipher();
-            cipher.init(Cipher.ENCRYPT_MODE, key.privateKey());
-            return cipher.doFinal(data);
+            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get(key.getKeyPair());
+            return encryptor.privateEncrypt(data);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -104,9 +74,8 @@ public class RsaUtil {
      */
     public static byte[] publicKeyDecrypt(RsaKey key, byte[] data) {
         try {
-            Cipher cipher = rsaCipher();
-            cipher.init(Cipher.DECRYPT_MODE, key.publicKey());
-            return cipher.doFinal(data);
+            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get(key.getKeyPair());
+            return encryptor.publicDecrypt(data);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -121,9 +90,8 @@ public class RsaUtil {
      */
     public static byte[] publicKeyEncrypt(RsaKey key, byte[] data) {
         try {
-            Cipher cipher = rsaCipher();
-            cipher.init(Cipher.ENCRYPT_MODE, key.publicKey());
-            return cipher.doFinal(data);
+            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get(key.getKeyPair());
+            return encryptor.publicEncrypt(data);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }

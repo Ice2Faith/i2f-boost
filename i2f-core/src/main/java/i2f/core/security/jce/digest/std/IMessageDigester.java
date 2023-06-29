@@ -28,6 +28,16 @@ public interface IMessageDigester extends IByteByteCodec, IStreamCodecEx {
         return CodecUtil.toHexString(bytes);
     }
 
+    default String mdsBase64(byte[] data) {
+        byte[] bytes = mds(data);
+        return CodecUtil.toBase64(bytes);
+    }
+
+    default String mdsBase64(InputStream is) {
+        byte[] bytes = mds(is);
+        return CodecUtil.toBase64(bytes);
+    }
+
     @Override
     default byte[] encode(byte[] data) {
         return mds(data);

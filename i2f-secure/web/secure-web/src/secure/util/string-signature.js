@@ -1,10 +1,8 @@
 /**
  * 字符串签名工具
  */
-import B64 from "./base64";
 const StringSignature={
     sign(text){
-        text=B64.encrypt(text);
         let num1=0x51;
         let num2=0x73;
         let num3=0x117;

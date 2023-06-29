@@ -10,12 +10,6 @@ logging:
 
 
 spring:
-  mvc:
-    servlet:
-      filter:
-        chain:
-          patterns: /**
-          filters: secureTransferFilter
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     locale: zh_CN

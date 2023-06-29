@@ -22,9 +22,13 @@ public class JacksonXmlSerializer extends AbsJacksonSerializer implements IXmlSe
         }
     }.get();
 
-    private XmlMapper mapper = new XmlMapper();
+    private ObjectMapper mapper = new XmlMapper();
 
     public JacksonXmlSerializer() {
+    }
+
+    public JacksonXmlSerializer(ObjectMapper mapper) {
+        this.mapper = mapper;
     }
 
     public JacksonXmlSerializer(XmlMapper mapper) {

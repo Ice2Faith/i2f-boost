@@ -4,7 +4,6 @@ package i2f.springboot.secure.util;
 import i2f.core.codec.CodecUtil;
 import i2f.core.digest.Base64Obfuscator;
 import i2f.core.digest.Base64Util;
-import i2f.core.digest.StringSignature;
 import i2f.core.j2ee.web.ServletContextUtil;
 import i2f.core.reflection.reflect.Reflects;
 import i2f.spring.mapping.MappingUtil;
@@ -12,6 +11,7 @@ import i2f.spring.matcher.MatcherUtils;
 import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.annotation.SecureParams;
 import i2f.springboot.secure.consts.SecureErrorCode;
+import i2f.springboot.secure.crypto.SignatureUtil;
 import i2f.springboot.secure.data.SecureCtrl;
 import i2f.springboot.secure.data.SecureHeader;
 import i2f.springboot.secure.exception.SecureException;
@@ -217,7 +217,7 @@ public class SecureUtils {
         builder.append(header.rsaSign);
         builder.append(body);
         String text = builder.toString();
-        String sign = StringSignature.sign(text);
+        String sign = SignatureUtil.sign(text);
         return sign;
     }
 
@@ -234,7 +234,7 @@ public class SecureUtils {
         }
         String sign = arr[0];
         String url = arr[1];
-        String usign = StringSignature.sign(url);
+        String usign = SignatureUtil.sign(url);
         if (!usign.equals(sign)) {
             throw new SecureException(SecureErrorCode.BAD_SIGN, "签名验证失败");
         }
@@ -245,7 +245,7 @@ public class SecureUtils {
 
     public static String encodeEncTrueUrl(String trueUrl) {
         String url = Base64Obfuscator.encode(Base64Util.encode(CodecUtil.toUtf8(trueUrl)), false);
-        String sign = StringSignature.sign(url);
+        String sign = SignatureUtil.sign(url);
         String text = Base64Obfuscator.encode(sign + ";" + url, false);
         try {
             return URLEncoder.encode(text, "UTF-8");

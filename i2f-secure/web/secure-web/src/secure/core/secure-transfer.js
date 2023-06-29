@@ -1,24 +1,22 @@
 /**
  * 核心处理逻辑类
  */
-import Random from "../util/random";
-import AES from "../util/aes";
-import Rsa from "../util/rsa";
 import Base64Obfuscator from "../util/base64-obfuscator";
 import SecureConsts from "../consts/secure-consts";
 import StringUtils from "../util/string-utils";
-import StringSignature from "../util/string-signature";
-import SecureConfig from "@/secure/secure-config";
+import SignatureUtil from "../crypto/SignatureUtil";
+import AsymmetricUtil from "../crypto/AsymmetricUtil";
+import SymmetricUtil from "../crypto/SymmetricUtil";
 
 const SecureTransfer = {
   // 获取安全请求头，参数：是否启用安全参数，是否编码URL
-  getSecureHeader(openSecureParams,openSecureUrl){
-    let ret={};
+  getSecureHeader(openSecureParams, openSecureUrl) {
+    let ret = {};
 
-    return this.getSecureHeaderInto(ret,openSecureParams,openSecureUrl);
+    return this.getSecureHeaderInto(ret, openSecureParams, openSecureUrl);
   },
   // 添加安全请求头到headers中，openSecureParams表示是否启用安全参数，openSecureUrl表示是否启用安全URL编码
-  getSecureHeaderInto(headers,openSecureParams,openSecureUrl){
+  getSecureHeaderInto(headers, openSecureParams, openSecureUrl) {
     headers[SecureConsts.SECURE_DATA_HEADER()]=SecureConsts.FLAG_ENABLE();
 
     if(openSecureParams){
@@ -45,7 +43,7 @@ const SecureTransfer = {
   },
   // 随机生成aes秘钥
   aesKeyGen(size) {
-    return AES.genKey(Random.nextLowerInt(SecureConfig.randomKeyBound) + "", size);
+    return SymmetricUtil.genKey(size);
   },
   // 随机生成16位aes秘钥
   aesKeyGen16() {
@@ -53,16 +51,16 @@ const SecureTransfer = {
   },
   // aes加密给定对象
   encrypt(obj, aesKey) {
-    return AES.encryptObj(obj, aesKey);
+    return SymmetricUtil.encryptObj(obj, aesKey);
   },
   // aes解密给定串为对象
   decrypt(bs64, aesKey) {
-    return AES.decryptObj(bs64, aesKey);
+    return SymmetricUtil.decryptObj(bs64, aesKey);
   },
   // 获取RSA公钥签名
   getRsaSign(){
-    let b464=this.loadRsaPubKey();
-    let rsaSign=StringSignature.sign(b464);
+    let b464 = this.loadRsaPubKey();
+    let rsaSign = SignatureUtil.sign(b464);
     return rsaSign;
   },
   // 获取安全请求头的值
@@ -71,7 +69,7 @@ const SecureTransfer = {
       return "null";
     }
     let pubKey = this.loadRsaPubKey();
-    let aesKeyTransfer = Rsa.publicKeyEncrypt(pubKey, aesKey);
+    let aesKeyTransfer = AsymmetricUtil.publicKeyEncrypt(pubKey, aesKey);
     aesKeyTransfer = Base64Obfuscator.encode(aesKeyTransfer, true);
     return aesKeyTransfer;
   },
@@ -84,7 +82,7 @@ const SecureTransfer = {
     aesKeyTransfer = aesKeyTransfer.trim();
     // 解除模糊之后使用RSA进行解密得到aes秘钥
     let aesKey = Base64Obfuscator.decode(aesKeyTransfer);
-    aesKey = Rsa.publicKeyDecrypt(pubKey, aesKey);
+    aesKey = AsymmetricUtil.publicKeyDecrypt(pubKey, aesKey);
     return aesKey;
   },
 

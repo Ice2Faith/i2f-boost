@@ -1,7 +1,6 @@
 package i2f.springboot.context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import i2f.spring.context.SpringUtil;
 import i2f.spring.environment.EnvironmentUtil;
 import i2f.spring.event.EventManager;
@@ -41,7 +40,7 @@ public class SpringContextConfig implements InitializingBean {
 
     @Bean
     public JacksonJsonSerializer jacksonJsonSerializer(ObjectMapper objectMapper) {
-        return new JacksonJsonSerializer((JsonMapper) objectMapper);
+        return new JacksonJsonSerializer(objectMapper);
     }
 
     @Override

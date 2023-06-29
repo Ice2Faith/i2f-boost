@@ -1,15 +1,15 @@
 package i2f.springboot.secure.core;
 
 
-import i2f.core.digest.AESUtil;
 import i2f.core.digest.Base64Obfuscator;
 import i2f.core.digest.RsaKey;
-import i2f.core.digest.StringSignature;
 import i2f.core.thread.NamingThreadFactory;
 import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.consts.SecureConsts;
-import i2f.springboot.secure.util.RsaUtil;
+import i2f.springboot.secure.crypto.AsymmetricUtil;
+import i2f.springboot.secure.crypto.SignatureUtil;
+import i2f.springboot.secure.crypto.SymmetricUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -94,7 +94,7 @@ public class SecureTransfer implements InitializingBean {
                 synchronized (SecureTransfer.this) {
                     log.debug("rsaKey update....");
                     histories.addFirst(rsaKey);
-                    rsaKey = RsaUtil.makeKeyPair(secureConfig.getRsaKeySize());
+                    rsaKey = AsymmetricUtil.makeKeyPair(secureConfig.getRsaKeySize());
                     if (histories.size() > secureConfig.getDynamicMaxHistoriesCount()) {
                         histories.removeLast();
                     }
@@ -113,7 +113,7 @@ public class SecureTransfer implements InitializingBean {
         keys.addAll(histories);
         for (RsaKey item : keys) {
             String b464 = item.publicKeyBase64();
-            String sg = StringSignature.sign(b464);
+            String sg = SignatureUtil.sign(b464);
             if (sg.equalsIgnoreCase(sign)) {
                 return item;
             }
@@ -124,7 +124,7 @@ public class SecureTransfer implements InitializingBean {
 
     public String getRsaSign() {
         String b464 = rsaKey.publicKeyBase64();
-        String rsaSign = StringSignature.sign(b464);
+        String rsaSign = SignatureUtil.sign(b464);
         return rsaSign;
     }
 
@@ -135,7 +135,7 @@ public class SecureTransfer implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         if (this.rsaKey == null) {
-            this.rsaKey = RsaUtil.makeKeyPair(secureConfig.getRsaKeySize());
+            this.rsaKey = AsymmetricUtil.makeKeyPair(secureConfig.getRsaKeySize());
         }
         restoreRsaKey();
         if (secureConfig.isEnableDynamicRsaKey()) {
@@ -144,7 +144,7 @@ public class SecureTransfer implements InitializingBean {
     }
 
     public String aesKeyGen(int size) {
-        return AESUtil.genKey(new Random().nextInt(secureConfig.getRandomKeyBound()) + "", size);
+        return SymmetricUtil.genKey(size);
     }
 
     public String aesKeyGen() {
@@ -152,19 +152,19 @@ public class SecureTransfer implements InitializingBean {
     }
 
     public String encrypt(Object obj, String aesKey) {
-        return AESUtil.encryptJsonAfterBase64(serializer.serialize(obj), aesKey);
+        return SymmetricUtil.encryptJsonAfterBase64(serializer.serialize(obj), aesKey);
     }
 
     public String encryptJson(String json, String aesKey) {
-        return AESUtil.encryptJsonAfterBase64(json, aesKey);
+        return SymmetricUtil.encryptJsonAfterBase64(json, aesKey);
     }
 
     public String encryptJsonBytes(byte[] json, String aesKey) {
-        return AESUtil.encryptJsonBytesAfterBase64(json, aesKey);
+        return SymmetricUtil.encryptJsonBytesAfterBase64(json, aesKey);
     }
 
     public String decrypt(String bs64, String aesKey) {
-        return AESUtil.decryptJsonBeforeBase64(bs64, aesKey);
+        return SymmetricUtil.decryptJsonBeforeBase64(bs64, aesKey);
     }
 
     public String getResponseSecureHeader(String aesKey) {
@@ -172,7 +172,7 @@ public class SecureTransfer implements InitializingBean {
             return "null";
         }
         // 使用RSA对aes秘钥加密并进行模糊
-        String aesKeyTransfer = RsaUtil.privateKeyEncryptBase64(rsaKey, aesKey);
+        String aesKeyTransfer = AsymmetricUtil.privateKeyEncryptBase64(rsaKey, aesKey);
         aesKeyTransfer = Base64Obfuscator.encode(aesKeyTransfer, true);
         return aesKeyTransfer;
     }
@@ -188,7 +188,7 @@ public class SecureTransfer implements InitializingBean {
         }
         // 解除模糊之后使用RSA进行解密得到aes秘钥
         String aesKey = Base64Obfuscator.decode(aesKeyTransfer);
-        aesKey = RsaUtil.privateKeyDecryptBase64(rsaKey, aesKey);
+        aesKey = AsymmetricUtil.privateKeyDecryptBase64(rsaKey, aesKey);
         return aesKey;
     }
 

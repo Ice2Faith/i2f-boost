@@ -1,7 +1,7 @@
 package text;
 
 import i2f.core.serialize.str.text.FormatTextSerializer;
-import i2f.spring.jackson.JacksonJsonSerializer;
+import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import model.TestBean;
 
 /**

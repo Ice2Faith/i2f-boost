@@ -27,11 +27,15 @@ public class JacksonJsonSerializer extends AbsJacksonSerializer implements IJson
     public JacksonJsonSerializer() {
     }
 
+    public JacksonJsonSerializer(ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
+
     public JacksonJsonSerializer(JsonMapper mapper) {
         this.mapper = mapper;
     }
 
-    private JsonMapper mapper = new JsonMapper();
+    private ObjectMapper mapper = new JsonMapper();
 
     @Override
     public ObjectMapper getMapper() {

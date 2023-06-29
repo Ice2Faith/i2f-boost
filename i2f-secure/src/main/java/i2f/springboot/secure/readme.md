@@ -613,3 +613,20 @@ const SecureConfig={
 
 export default SecureConfig
 ```
+
+## 拓展与变更
+- 默认情况下，使用RSA+AES+StringSignature实现安全传输
+- 同时，提供了快捷的可变方案
+- 在SecureProvider中，定义了这些方法的替代入口
+    - asymmetricEncryptor 指定非对称加密算法的实现
+    - symmetricEncryptor 指定对称加密算法的实现
+    - messageDigester 指定摘要签名算法的实现
+    - 同时，在后端配置中，都是以Supplier形式提供
+        - 并且需要提供响应算法的秘钥或密钥对生成器
+        - symmetricKeySupplier 对称加密秘钥生成器
+        - asymmetricKeyPairSupplier 非对称秘钥对生成器
+    - 在前端配种中，只需要实现即可，实现方法可以参考默认实现
+- 例如
+- 使用其他非对称加密算法替代RSA，例如ElGamal
+- 使用其他对称加密算法替代AES，例如DES，3Des
+- 使用其他签名摘要算法替代StringSignature，例如MD5,SHA1,SHA256,Hmac

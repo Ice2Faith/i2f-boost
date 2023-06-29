@@ -4,9 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper;
 
 public class JacksonCborSerializer extends AbsJacksonSerializer {
-    private CBORMapper mapper = new CBORMapper();
+    private ObjectMapper mapper = new CBORMapper();
 
     public JacksonCborSerializer() {
+    }
+
+    public JacksonCborSerializer(ObjectMapper mapper) {
+        this.mapper = mapper;
     }
 
     public JacksonCborSerializer(CBORMapper mapper) {

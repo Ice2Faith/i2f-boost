@@ -24,18 +24,22 @@ public enum DesType implements IEncryptType {
     /**
      * 无向量加密模式, 不足8位用0补足8位, 需代码给加密内容添加0
      */
-    ECB_NO_PADDING("DES/ECB/NoPadding",true,false),
+    ECB_NO_PADDING("DES/ECB/NoPadding", true, false),
     /**
      * 无向量加密模式, 不足8位用余位数补足8位
      */
-    ECB_PKCS5PADDING("DES/ECB/PKCS5Padding",false,false);
+    ECB_PKCS5PADDING("DES/ECB/PKCS5Padding", false, false),
+    /**
+     * 无向量加密模式
+     */
+    ECB_ISO10126PADDING("DES/ECB/ISO10126Padding", false, false);
 
 
     private String type;
     private boolean noPadding;
     private boolean requireVector;
 
-    private DesType(String type,boolean noPadding,boolean requireVector) {
+    private DesType(String type, boolean noPadding, boolean requireVector) {
         this.type = type;
         this.noPadding = noPadding;
         this.requireVector = requireVector;

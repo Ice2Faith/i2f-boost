@@ -7,9 +7,10 @@ import B64 from "../util/base64";
 import SecureHeader from "../data/secure-header";
 import StringUtils from "../util/string-utils";
 import SecureErrorCode from "../consts/secure-error-code";
-import StringSignature from "../util/string-signature";
 import SecureException from "../excception/secure-exception";
-const SecureUtils={
+import SignatureUtil from "../crypto/SignatureUtil";
+
+const SecureUtils = {
     typeOf(data) {
         return Object.prototype.toString.call(data).slice(8, -1).toLowerCase()
     },
@@ -68,7 +69,7 @@ const SecureUtils={
         text+=header.randomKey
         text+=header.rsaSign
         text+=body
-        let sign=StringSignature.sign(text)
+        let sign = SignatureUtil.sign(text)
         return sign
     },
     verifySecureHeader(body,header){
@@ -82,8 +83,8 @@ const SecureUtils={
             throw SecureException.newObj(SecureErrorCode.BAD_SECURE_REQUEST(),"不正确的URL请求")
         }
         let sign=arr[0]
-        let url=arr[1]
-        let usign=StringSignature.sign(url)
+        let url = arr[1]
+        let usign = SignatureUtil.sign(url)
         if(usign!=sign){
             throw SecureException.newObj(SecureErrorCode.BAD_SIGN(),"签名验证失败")
         }
@@ -91,9 +92,9 @@ const SecureUtils={
         return trueUrl
     },
     encodeEncTrueUrl(trueUrl){
-        let url=Base64Obfuscator.encode(B64.encrypt(trueUrl),false)
-        let sign=StringSignature.sign(url)
-        let text=Base64Obfuscator.encode(sign+';'+url,false)
+        let url = Base64Obfuscator.encode(B64.encrypt(trueUrl), false)
+        let sign = SignatureUtil.sign(url)
+        let text = Base64Obfuscator.encode(sign + ';' + url, false)
         return encodeURIComponent(text)
     }
 }

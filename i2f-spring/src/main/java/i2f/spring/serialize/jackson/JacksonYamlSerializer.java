@@ -4,9 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
 public class JacksonYamlSerializer extends AbsJacksonSerializer {
-    private YAMLMapper mapper = new YAMLMapper();
+    private ObjectMapper mapper = new YAMLMapper();
 
     public JacksonYamlSerializer() {
+    }
+
+    public JacksonYamlSerializer(ObjectMapper mapper) {
+        this.mapper = mapper;
     }
 
     public JacksonYamlSerializer(YAMLMapper mapper) {

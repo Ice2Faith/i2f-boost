@@ -8,11 +8,6 @@ package i2f.core.digest;
  */
 public class StringSignature {
     public static String sign(String text) {
-        try{
-            text= Base64Util.encode(text.getBytes("UTF-8"));
-        }catch(Exception e){
-
-        }
         int num1=0x51;
         int num2=0x73;
         int num3=0x117;
