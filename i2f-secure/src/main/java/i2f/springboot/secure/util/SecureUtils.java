@@ -7,7 +7,7 @@ import i2f.core.digest.Base64Util;
 import i2f.core.j2ee.web.ServletContextUtil;
 import i2f.core.reflection.reflect.Reflects;
 import i2f.spring.mapping.MappingUtil;
-import i2f.spring.matcher.MatcherUtils;
+import i2f.spring.matcher.MatcherUtil;
 import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.annotation.SecureParams;
 import i2f.springboot.secure.consts.SecureErrorCode;
@@ -136,7 +136,7 @@ public class SecureUtils {
         }
         Set<String> bothPattens = whiteList.getBothPattens();
         if (bothPattens != null && bothPattens.iterator().hasNext()) {
-            if (MatcherUtils.antUrlMatchedAny(requestUrl, bothPattens)) {
+            if (MatcherUtil.antUrlMatchedAny(requestUrl, bothPattens)) {
                 ctrl.in = false;
                 ctrl.out = false;
             }
@@ -144,7 +144,7 @@ public class SecureUtils {
         if (!ctrl.in) {
             Set<String> inPattens = whiteList.getInPattens();
             if (inPattens != null && inPattens.iterator().hasNext()) {
-                if (MatcherUtils.antUrlMatchedAny(requestUrl, inPattens)) {
+                if (MatcherUtil.antUrlMatchedAny(requestUrl, inPattens)) {
                     ctrl.in = false;
                 }
             }
@@ -152,7 +152,7 @@ public class SecureUtils {
         if (!ctrl.out) {
             Set<String> outPattens = whiteList.getOutPattens();
             if (outPattens != null && outPattens.iterator().hasNext()) {
-                if (MatcherUtils.antUrlMatchedAny(requestUrl, outPattens)) {
+                if (MatcherUtil.antUrlMatchedAny(requestUrl, outPattens)) {
                     ctrl.out = false;
                 }
             }

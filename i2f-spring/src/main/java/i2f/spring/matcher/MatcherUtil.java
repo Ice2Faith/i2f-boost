@@ -10,7 +10,7 @@ import java.util.Collection;
  * @date 2023/6/13 9:52
  * @desc
  */
-public class MatcherUtils {
+public class MatcherUtil {
     private static AntPathMatcher antUrlMatcher = new AntPathMatcher("/");
     private static AntPathMatcher antPkgMatcher = new AntPathMatcher(".");
 
