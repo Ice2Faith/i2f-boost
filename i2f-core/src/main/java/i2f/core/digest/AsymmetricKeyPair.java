@@ -18,15 +18,15 @@ import java.security.spec.X509EncodedKeySpec;
  */
 @Data
 @NoArgsConstructor
-public class RsaKey {
+public class AsymmetricKeyPair {
     private KeyPair keyPair;
 
-    public RsaKey(KeyPair keyPair) {
+    public AsymmetricKeyPair(KeyPair keyPair) {
         this.keyPair = keyPair;
     }
 
-    public RSAPublicKey publicKey(){
-        return (RSAPublicKey)keyPair.getPublic();
+    public RSAPublicKey publicKey() {
+        return (RSAPublicKey) keyPair.getPublic();
     }
 
     public RSAPrivateKey privateKey(){
@@ -69,7 +69,7 @@ public class RsaKey {
         return priKey;
     }
 
-    public static void saveRsaKey(RsaKey rsaKey, OutputStream os) throws IOException {
+    public static void saveAsymKey(AsymmetricKeyPair rsaKey, OutputStream os) throws IOException {
         String pubKey = rsaKey.publicKeyBase64();
         String priKey = rsaKey.privateKeyBase64();
         pubKey = Base64Obfuscator.encode(pubKey, true);
@@ -83,7 +83,7 @@ public class RsaKey {
         os.flush();
     }
 
-    public static RsaKey loadRsaKey(InputStream is) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+    public static AsymmetricKeyPair loadAsymKey(InputStream is) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         String pubKey = reader.readLine();
         String priKey = reader.readLine();
@@ -92,21 +92,21 @@ public class RsaKey {
         RSAPublicKey publicKey = parsePublicKeyBase64(pubKey);
         RSAPrivateKey privateKey = parsePrivateKeyBase64(priKey);
         KeyPair keyPair = new KeyPair(publicKey, privateKey);
-        return new RsaKey(keyPair);
+        return new AsymmetricKeyPair(keyPair);
     }
 
-    public static void saveRsaKey(RsaKey rsaKey,File file) throws IOException {
-        if(!file.getParentFile().exists()){
+    public static void saveAsymKey(AsymmetricKeyPair rsaKey, File file) throws IOException {
+        if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
-        FileOutputStream fos=new FileOutputStream(file);
-        saveRsaKey(rsaKey,fos);
+        FileOutputStream fos = new FileOutputStream(file);
+        saveAsymKey(rsaKey, fos);
         fos.close();
     }
 
-    public static RsaKey loadRsaKey(File file) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+    public static AsymmetricKeyPair loadAsymKey(File file) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
         FileInputStream fis = new FileInputStream(file);
-        RsaKey rsaKey = loadRsaKey(fis);
+        AsymmetricKeyPair rsaKey = loadAsymKey(fis);
         fis.close();
         return rsaKey;
     }

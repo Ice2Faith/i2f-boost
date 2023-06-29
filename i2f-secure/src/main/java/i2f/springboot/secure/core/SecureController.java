@@ -22,8 +22,8 @@ public class SecureController {
 
     @SecureParams(in = false, out = false)
     @PostMapping("key")
-    public String rsa() {
-        String pubKey = secureTransfer.getWebRsaPublicKey();
+    public String key() {
+        String pubKey = secureTransfer.getWebAsymPublicKey();
         return pubKey;
     }
 }

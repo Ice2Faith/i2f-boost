@@ -33,19 +33,19 @@ const SecureUtils = {
         var ret = SecureHeader.newObj();
         ret.sign=arr[0]
         ret.nonce=arr[1]
-        ret.randomKey=arr[2]
-        ret.rsaSign=arr[3]
-        if(StringUtils.isEmpty(ret.sign)){
-            throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_SIGN_EMPTY(),"空安全头签名")
+        ret.randomKey = arr[2]
+        ret.asymSign = arr[3]
+        if (StringUtils.isEmpty(ret.sign)) {
+            throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_SIGN_EMPTY(), "空安全头签名")
         }
-        if(StringUtils.isEmpty(ret.nonce)){
-            throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_NONCE_EMPTY(),"空安全头一次性标记")
+        if (StringUtils.isEmpty(ret.nonce)) {
+            throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_NONCE_EMPTY(), "空安全头一次性标记")
         }
-        if(StringUtils.isEmpty(ret.randomKey)){
-            throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_RANDOM_KEY_EMPTY(),"空安全头随机秘钥")
+        if (StringUtils.isEmpty(ret.randomKey)) {
+            throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_RANDOM_KEY_EMPTY(), "空安全头随机秘钥")
         }
-        if(StringUtils.isEmpty(ret.rsaSign)){
-            throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_RSA_SIGN_EMPTY(),"空安全头秘钥签名")
+        if (StringUtils.isEmpty(ret.asymSign)) {
+            throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_ASYM_SIGN_EMPTY(), "空安全头秘钥签名")
         }
         return ret
     },
@@ -56,8 +56,8 @@ const SecureUtils = {
         str+=header.nonce
         str+=separator
         str+=header.randomKey
-        str+=separator
-        str+=header.rsaSign
+        str += separator
+        str += header.asymSign
         return Base64Obfuscator.encode(B64.encrypt(str),true)
     },
     makeSecureSign(body,header){
@@ -66,9 +66,9 @@ const SecureUtils = {
         }
         let text=''
         text+=header.nonce
-        text+=header.randomKey
-        text+=header.rsaSign
-        text+=body
+        text += header.randomKey
+        text += header.asymSign
+        text += body
         let sign = SignatureUtil.sign(text)
         return sign
     },

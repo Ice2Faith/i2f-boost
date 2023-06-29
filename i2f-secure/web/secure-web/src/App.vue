@@ -30,8 +30,8 @@ export default {
         method: 'post'
       }).then(({data})=>{
         console.log('SECURE_KEY',data)
-        localStorage.setItem('SECURE_KEY',data)
-        SecureTransfer.saveRsaPubKey(data)
+        localStorage.setItem('SECURE_KEY', data)
+        SecureTransfer.saveAsymPubKey(data)
       })
     },
   }

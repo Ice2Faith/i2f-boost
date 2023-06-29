@@ -27,19 +27,19 @@ import java.util.Set;
 @Configuration
 @ConfigurationProperties(prefix = "i2f.springboot.config.secure")
 public class SecureConfig {
-    private String rsaStorePath = "../";
+    private String asymStorePath = "../";
 
     private String responseCharset = "UTF-8";
 
-    private int rsaKeySize = SecureConsts.RSA_KEY_SIZE_1024;
+    private int asymKeySize = SecureConsts.RSA_KEY_SIZE_1024;
 
-    private int aesKeySize = SecureConsts.AES_KEY_SIZE_128;
+    private int symmKeySize = SecureConsts.AES_KEY_SIZE_128;
 
     private int randomKeyBound = 8192;
 
     private int nonceTimeoutSeconds = 6 * 60;
 
-    private boolean enableDynamicRsaKey = true;
+    private boolean enableDynamicAsymKey = true;
 
     private long dynamicRefreshDelaySeconds = 6 * 60;
 

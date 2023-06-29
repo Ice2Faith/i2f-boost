@@ -3,7 +3,7 @@
  */
 import JSEncrypt from '../static/jsencrypt'
 
-const Rsa = {
+const RsaUtil = {
   publicKeyEncrypt(pubKey, text) {
     let chiper = new JSEncrypt();
     chiper.setKey(pubKey);
@@ -27,4 +27,4 @@ const Rsa = {
 };
 
 
-export default Rsa;
+export default RsaUtil;

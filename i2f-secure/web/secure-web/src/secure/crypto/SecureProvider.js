@@ -1,10 +1,10 @@
-import Rsa from "../util/rsa";
-import AES from "../util/aes";
-import StringSignature from "../util/string-signature";
+import RsaUtil from "../util/RsaUtil";
+import AesUtil from "../util/AesUtil";
+import Sha256Signature from "../util/sha256-signature";
 
 const SecureProvider = {
-    asymmetricEncryptor: Rsa,
-    symmetricEncryptor: AES,
-    messageDigester: StringSignature
+    asymmetricEncryptor: RsaUtil,
+    symmetricEncryptor: AesUtil,
+    messageDigester: Sha256Signature
 }
 export default SecureProvider;

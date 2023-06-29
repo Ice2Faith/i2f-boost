@@ -17,7 +17,7 @@ const SecureConsts={
     // 安全头的分隔符
     DEFAULT_HEADER_SEPARATOR: () => ";",
 
-    // 动态RSA公钥的响应头
+    // 动态asym公钥的响应头
     SECURE_DYNAMIC_KEY_HEADER:()=>"skey",
 
     // 安全Body加密标记头

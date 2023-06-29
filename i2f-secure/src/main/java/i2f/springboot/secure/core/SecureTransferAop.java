@@ -28,7 +28,7 @@ import java.lang.reflect.Parameter;
 /**
  * @author ltb
  * @date 2022/6/29 13:59
- * @desc RSA+AES解密的核心切面类
+ * @desc Asym+Symm解密的核心切面类
  */
 @ConditionalOnExpression("${i2f.springboot.config.secure.aop.enable:true}")
 @Slf4j

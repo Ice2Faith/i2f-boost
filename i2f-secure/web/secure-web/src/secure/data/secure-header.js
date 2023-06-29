@@ -8,14 +8,14 @@ const SecureHeader={
     nonce: null,
     // 随机秘钥
     randomKey: null,
-    // RSA公钥签名
-    rsaSign: null,
-    newObj:()=>{
+    // Asym公钥签名
+    asymSign: null,
+    newObj: () => {
         return {
             sign: null,
             nonce: null,
             randomKey: null,
-            rsaSign: null
+            asymSign: null
         }
     }
 }

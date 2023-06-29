@@ -5,21 +5,21 @@ i2f:
       secure:
         # 是否开启
         enable: true
-        # rsa秘钥的存储路径，默认../
-        rsa-store-path: ../
+        # asym秘钥的存储路径，默认../
+        asym-store-path: ../
         # 响应字符集，默认UTF-8
         responseCharset: 'UTF-8'
-        # RSA秘钥长度，默认1024，可选1024,2048
-        rsaKeySize: 1024
-        # AES秘钥长度，默认128，可选128,192,256
-        aesKeySize: 128
+        # Asym秘钥长度，默认1024，可选1024,2048
+        asymKeySize: 1024
+        # Symm秘钥长度，默认128，可选128,192,256
+        symmKeySize: 128
         # 随机秘钥生成的随机数的最大值，默认8192
         randomKeyBound: 8192
         # 一次性消息的保持时间秒数，默认6*60
         # 这段时间内重复出现的nonce将会被认为是重放请求被拦截
         nonceTimeoutSeconds: 360
-        # 是否启动动态RSA更新秘钥，默认true
-        enableDynamicRsaKey: true
+        # 是否启动动态Asym更新秘钥，默认true
+        enableDynamicAsymKey: true
         # 每次更新秘钥的时长秒数，默认6*60
         dynamicRefreshDelaySeconds: 360
         # 最多保留多少历史秘钥，默认5
@@ -28,7 +28,7 @@ i2f:
         headerName: sswh
         # 安全头格式的分隔符，默认;
         headerSeparator: ;
-        # 动态刷新RSA秘钥的响应头，默认skey
+        # 动态刷新Asym秘钥的响应头，默认skey
         dynamicKeyHeaderName: skey
         # URL加密的后端forward路径
         encUrlPath: /enc/
@@ -62,7 +62,7 @@ i2f:
           enable: true
         # 内置的API接口
         api:
-          # 是否开启默认的API响应RSA秘钥获取请求，默认true
+          # 是否开启默认的API响应Asym秘钥获取请求，默认true
           # 请求路径：/secure/key
           enable: true
         # 内置的URL请求路径转发接口
@@ -88,4 +88,3 @@ i2f:
           localDateFormat: yyyy-MM-dd
           # 定义LocalTime的格式化模式
           localTimeFormat: HH:mm:ss
-

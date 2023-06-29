@@ -15,7 +15,7 @@ import java.security.KeyPair;
  */
 public class BcRsaUtil {
 
-    public static RsaKey makeKeyPair() {
+    public static AsymmetricKeyPair makeKeyPair() {
         return makeKeyPair(1024);
     }
 
@@ -25,11 +25,11 @@ public class BcRsaUtil {
      * @param size
      * @return
      */
-    public static RsaKey makeKeyPair(int size) {
+    public static AsymmetricKeyPair makeKeyPair(int size) {
         try {
             BouncyCastleHolder.registry();
             KeyPair keyPair = CipherUtil.genKeyPair(BcRsaType.NONE_PKCS1PADDING, BouncyCastleHolder.PROVIDER_NAME, "".getBytes(), size, null);
-            return new RsaKey(keyPair);
+            return new AsymmetricKeyPair(keyPair);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -42,7 +42,7 @@ public class BcRsaUtil {
      * @param data
      * @return
      */
-    public static byte[] privateKeyDecrypt(RsaKey key, byte[] data) {
+    public static byte[] privateKeyDecrypt(AsymmetricKeyPair key, byte[] data) {
         try {
             BcRsaEncryptor encryptor = new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, key.publicKeyBytes(), key.privateKeyBytes());
             return encryptor.privateDecrypt(data);
@@ -58,7 +58,7 @@ public class BcRsaUtil {
      * @param data
      * @return
      */
-    public static byte[] privateKeyEncrypt(RsaKey key, byte[] data) {
+    public static byte[] privateKeyEncrypt(AsymmetricKeyPair key, byte[] data) {
         try {
             BcRsaEncryptor encryptor = new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, key.publicKeyBytes(), key.privateKeyBytes());
             return encryptor.privateEncrypt(data);
@@ -74,7 +74,7 @@ public class BcRsaUtil {
      * @param data
      * @return
      */
-    public static byte[] publicKeyDecrypt(RsaKey key, byte[] data) {
+    public static byte[] publicKeyDecrypt(AsymmetricKeyPair key, byte[] data) {
         try {
             BcRsaEncryptor encryptor = new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, key.publicKeyBytes(), key.privateKeyBytes());
             return encryptor.publicDecrypt(data);
@@ -90,7 +90,7 @@ public class BcRsaUtil {
      * @param data
      * @return
      */
-    public static byte[] publicKeyEncrypt(RsaKey key, byte[] data) {
+    public static byte[] publicKeyEncrypt(AsymmetricKeyPair key, byte[] data) {
         try {
             BcRsaEncryptor encryptor = new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, key.publicKeyBytes(), key.privateKeyBytes());
             return encryptor.publicEncrypt(data);
@@ -108,7 +108,7 @@ public class BcRsaUtil {
      * @param bs64
      * @return
      */
-    public static String privateKeyDecryptBase64(RsaKey key, String bs64) {
+    public static String privateKeyDecryptBase64(AsymmetricKeyPair key, String bs64) {
         byte[] enc = Base64Util.decode(bs64);
         byte[] dec = privateKeyDecrypt(key, enc);
         return CodecUtil.ofUtf8(dec);
@@ -122,7 +122,7 @@ public class BcRsaUtil {
      * @param text
      * @return
      */
-    public static String privateKeyEncryptBase64(RsaKey key, String text) {
+    public static String privateKeyEncryptBase64(AsymmetricKeyPair key, String text) {
         byte[] data = CodecUtil.toUtf8(text);
         byte[] enc = privateKeyEncrypt(key, data);
         return Base64Util.encode(enc);
@@ -136,7 +136,7 @@ public class BcRsaUtil {
      * @param bs64
      * @return
      */
-    public static String publicKeyDecryptBase64(RsaKey key, String bs64) {
+    public static String publicKeyDecryptBase64(AsymmetricKeyPair key, String bs64) {
         byte[] enc = Base64Util.decode(bs64);
         byte[] dec = publicKeyDecrypt(key, enc);
         return CodecUtil.ofUtf8(dec);
@@ -150,7 +150,7 @@ public class BcRsaUtil {
      * @param text
      * @return
      */
-    public static String publicKeyEncryptBase64(RsaKey key, String text) {
+    public static String publicKeyEncryptBase64(AsymmetricKeyPair key, String text) {
         byte[] data = CodecUtil.toUtf8(text);
         byte[] enc = publicKeyEncrypt(key, data);
         return Base64Util.encode(enc);

@@ -1,4 +1,9 @@
-# RSA+AES 安全网络传输方案使用指南
+# RSA+AES+SHA256 安全网络传输方案使用指南
+- Asym 是 Asymmetric 非对称加密的简写，默认实现是 RSA
+- Symm 是 Symmetric 对称加密的简写，默认实现是 AES
+- Md 是 Message Digest 消息摘要的简写，默认实现是 SHA256
+- 为了方便介绍，介绍中全部使用默认实现进行描述
+- 当然，这些实现，都可以方便的替换
 
 ---
 ## 简介
@@ -96,7 +101,7 @@ public Object param(@SecureParams String password){
 
 ## 如何获取与存储RSA公钥
 - 服务端提供一个接口提供给客户端调用
-- 接口返回内容从 SecureTransfer.getWebRsaPublicKey() 获取
+- 接口返回内容从 SecureTransfer.getWebAsymPublicKey() 获取
 - 可以如下定义：
 - 也可以通过配置i2f.springboot.config.secure.api.enable=true直接启用内置的SecureController提供接口secure/key
 
@@ -109,8 +114,8 @@ public class SecureController {
     private SecureTransfer secureTransfer;
 
     @RequestMapping("key")
-    public Object rsa(){
-        String pubKey= secureTransfer.getWebRsaPublicKey();
+    public Object key(){
+        String pubKey= secureTransfer.getWebAsymPublicKey();
         return pubKey;
     }
 }
@@ -124,7 +129,7 @@ this.$axios({
     url: 'secure/rsa',
     method: 'GET'
   }).then(({data})=>{
-    this.$secureTransfer.saveRsaPubKey(data);
+    this.$secureTransfer.saveAsymPubKey(data);
   })
 ```
 
@@ -149,22 +154,22 @@ export default {
     
   },
   created() {
-    this.initRsaContent()
+    this.initAsymContent()
     let _this=this
     window.rsaTimer=setInterval(function(){
-        _this.initRsaContent()
+        _this.initAsymContent()
     },5*60*1000)
   },
   destroyed() {
     clearInterval(window.rsaTimer)
   },
   methods:{
-    initRsaContent(){
+    initAsymContent(){
       this.$axios({
         url: 'secure/key',
         method: 'post'
       }).then(({data})=>{
-        SecureTransfer.saveRsaPubKey(data)
+        SecureTransfer.saveAsymPubKey(data)
       })
     },
   }
@@ -493,21 +498,21 @@ i2f:
       secure:
         # 是否开启
         enable: true
-        # rsa秘钥的存储路径，默认../
-        rsa-store-path: ../
+        # asym秘钥的存储路径，默认../
+        asym-store-path: ../
         # 响应字符集，默认UTF-8
         responseCharset: 'UTF-8'
-        # RSA秘钥长度，默认1024，可选1024,2048
-        rsaKeySize: 1024
-        # AES秘钥长度，默认128，可选128,192,256
-        aesKeySize: 128
+        # Asym秘钥长度，默认1024，可选1024,2048
+        asymKeySize: 1024
+        # Symm秘钥长度，默认128，可选128,192,256
+        symmKeySize: 128
         # 随机秘钥生成的随机数的最大值，默认8192
         randomKeyBound: 8192
         # 一次性消息的保持时间秒数，默认6*60
         # 这段时间内重复出现的nonce将会被认为是重放请求被拦截
         nonceTimeoutSeconds: 360
-        # 是否启动动态RSA更新秘钥，默认true
-        enableDynamicRsaKey: true
+        # 是否启动动态Asym更新秘钥，默认true
+        enableDynamicAsymKey: true
         # 每次更新秘钥的时长秒数，默认6*60
         dynamicRefreshDelaySeconds: 360
         # 最多保留多少历史秘钥，默认5
@@ -516,7 +521,7 @@ i2f:
         headerName: sswh
         # 安全头格式的分隔符，默认;
         headerSeparator: ;
-        # 动态刷新RSA秘钥的响应头，默认skey
+        # 动态刷新Asym秘钥的响应头，默认skey
         dynamicKeyHeaderName: skey
         # URL加密的后端forward路径
         encUrlPath: /enc/
@@ -550,7 +555,7 @@ i2f:
           enable: true
         # 内置的API接口
         api:
-          # 是否开启默认的API响应RSA秘钥获取请求，默认true
+          # 是否开启默认的API响应Asym秘钥获取请求，默认true
           # 请求路径：/secure/key
           enable: true
         # 内置的URL请求路径转发接口
@@ -576,7 +581,7 @@ i2f:
           localDateFormat: yyyy-MM-dd
           # 定义LocalTime的格式化模式
           localTimeFormat: HH:mm:ss
-
+          
 ```
 
 ## 前端配置详解
@@ -588,13 +593,13 @@ i2f:
 import SecureConsts from "./consts/secure-consts";
 
 const SecureConfig={
-   // AES秘钥长度，默认128，可选128,192,256
-   aesKeySize: SecureConsts.AES_KEY_SIZE_128(),
+   // Symm秘钥长度，默认128，可选128,192,256
+   symmKeySize: SecureConsts.AES_KEY_SIZE_128(),
    // 随机秘钥生成的随机数的最大值，默认8192
    randomKeyBound: 8192,
    // 用于存储安全头的请求头名称，默认sswh
    headerName: SecureConsts.DEFAULT_SECURE_HEADER_NAME(),
-   // 动态刷新RSA秘钥的响应头，默认skey
+   // 动态刷新Asym秘钥的响应头，默认skey
    dynamicKeyHeaderName: SecureConsts.SECURE_DYNAMIC_KEY_HEADER(),
    // 安全头格式的分隔符，默认;
    headerSeparator: SecureConsts.DEFAULT_HEADER_SEPARATOR(),

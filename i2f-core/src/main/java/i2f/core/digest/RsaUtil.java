@@ -17,11 +17,11 @@ public class RsaUtil {
     public static String CHAR_SET_NAME = "UTF-8";
     public static RsaType RSA_TYPE = RsaType.DEFAULT;
 
-    public static RsaKey genRsaKeyData() throws Exception {
+    public static AsymmetricKeyPair genRsaKeyData() throws Exception {
         return genRsaKeyData(DEFAULT_KEY_SIZE);
     }
 
-    public static RsaKey genRsaKeyData(int size) throws Exception {
+    public static AsymmetricKeyPair genRsaKeyData(int size) throws Exception {
         return getRsaKeyData(genRsaKeyPair(size));
     }
 
@@ -33,8 +33,8 @@ public class RsaUtil {
         return CipherUtil.genKeyPair(RSA_TYPE, null, "".getBytes(), size, null);
     }
 
-    public static RsaKey getRsaKeyData(KeyPair keyPair) {
-        return new RsaKey(keyPair);
+    public static AsymmetricKeyPair getRsaKeyData(KeyPair keyPair) {
+        return new AsymmetricKeyPair(keyPair);
     }
 
 
@@ -42,9 +42,9 @@ public class RsaUtil {
         byte[] result = new byte[data.length];
         int plen = 0;
         while (plen < data.length) {
-            int cplen=UPDATE_SIZE;
-            if(data.length-plen<UPDATE_SIZE){
-                cplen=data.length-plen;
+            int cplen = UPDATE_SIZE;
+            if (data.length - plen < UPDATE_SIZE) {
+                cplen = data.length - plen;
             }
             byte[] part=new byte[cplen];
             System.arraycopy(data,plen,part,0,cplen);
@@ -58,65 +58,69 @@ public class RsaUtil {
 
     /**
      * 私钥解密
+     *
      * @param key
      * @param data
      * @return
      */
-    public static byte[] privateKeyDecrypt(RsaKey key,byte[] data){
+    public static byte[] privateKeyDecrypt(AsymmetricKeyPair key, byte[] data) {
         try {
             RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.publicKeyBytes(), key.privateKeyBytes());
             Cipher cipher = encryptor.getCipher(false, true);
             return doCipherWorker(cipher, data);
-        }catch(Exception e){
-            throw new RuntimeException(e.getMessage(),e);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     /**
      * 私钥加密
+     *
      * @param key
      * @param data
      * @return
      */
-    public static byte[] privateKeyEncrypt(RsaKey key,byte[] data){
+    public static byte[] privateKeyEncrypt(AsymmetricKeyPair key, byte[] data) {
         try {
             RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.publicKeyBytes(), key.privateKeyBytes());
             Cipher cipher = encryptor.getCipher(true, true);
             return doCipherWorker(cipher, data);
-        }catch(Exception e){
-            throw new RuntimeException(e.getMessage(),e);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     /**
      * 公钥解密
+     *
      * @param key
      * @param data
      * @return
      */
-    public static byte[] publicKeyDecrypt(RsaKey key,byte[] data){
+    public static byte[] publicKeyDecrypt(AsymmetricKeyPair key, byte[] data) {
         try {
             RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.publicKeyBytes(), key.privateKeyBytes());
             Cipher cipher = encryptor.getCipher(false, false);
             return doCipherWorker(cipher, data);
-        }catch(Exception e){
-            throw new RuntimeException(e.getMessage(),e);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     /**
      * 公钥加密
+     *
      * @param key
      * @param data
      * @return
      */
-    public static byte[] publicKeyEncrypt(RsaKey key,byte[] data){
+    public static byte[] publicKeyEncrypt(AsymmetricKeyPair key, byte[] data) {
         try {
             RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.publicKeyBytes(), key.privateKeyBytes());
             Cipher cipher = encryptor.getCipher(true, false);
             return doCipherWorker(cipher, data);
-        }catch(Exception e){
-            throw new RuntimeException(e.getMessage(),e);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -124,24 +128,26 @@ public class RsaUtil {
     /**
      * 私钥，对输入base64解密为string字符串
      * 适用于使用JSON序列化的数据加密后使用base64传输
+     *
      * @param key
      * @param bs64
      * @return
      */
-    public static String privateKeyDecryptBase64(RsaKey key,String bs64){
-        byte[] enc= Base64Util.decode(bs64);
-        byte[] dec=privateKeyDecrypt(key,enc);
+    public static String privateKeyDecryptBase64(AsymmetricKeyPair key, String bs64) {
+        byte[] enc = Base64Util.decode(bs64);
+        byte[] dec = privateKeyDecrypt(key, enc);
         return Strings.ofUtf8(dec);
     }
 
     /**
      * 私钥，对输入的字符串加密为base64字符串
      * 适用于已经使用JSON序列化的数据进行加密后使用base64传输
+     *
      * @param key
      * @param text
      * @return
      */
-    public static String privateKeyEncryptBase64(RsaKey key,String text){
+    public static String privateKeyEncryptBase64(AsymmetricKeyPair key, String text) {
         byte[] data = Strings.toUtf8(text);
         byte[] enc = privateKeyEncrypt(key, data);
         return Base64Util.encode(enc);
@@ -150,24 +156,26 @@ public class RsaUtil {
     /**
      * 公钥，对输入base64解密为string字符串
      * 适用于使用JSON序列化的数据加密后使用base64传输
+     *
      * @param key
      * @param bs64
      * @return
      */
-    public static String publicKeyDecryptBase64(RsaKey key,String bs64){
-        byte[] enc=Base64Util.decode(bs64);
-        byte[] dec=publicKeyDecrypt(key,enc);
+    public static String publicKeyDecryptBase64(AsymmetricKeyPair key, String bs64) {
+        byte[] enc = Base64Util.decode(bs64);
+        byte[] dec = publicKeyDecrypt(key, enc);
         return Strings.ofUtf8(dec);
     }
 
     /**
      * 公钥，对输入的字符串加密为base64字符串
      * 适用于已经使用JSON序列化的数据进行加密后使用base64传输
+     *
      * @param key
      * @param text
      * @return
      */
-    public static String publicKeyEncryptBase64(RsaKey key,String text){
+    public static String publicKeyEncryptBase64(AsymmetricKeyPair key, String text) {
         byte[] data = Strings.toUtf8(text);
         byte[] enc = publicKeyEncrypt(key, data);
         return Base64Util.encode(enc);

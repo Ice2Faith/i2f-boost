@@ -19,71 +19,71 @@ const SecureTransfer = {
   getSecureHeaderInto(headers, openSecureParams, openSecureUrl) {
     headers[SecureConsts.SECURE_DATA_HEADER()]=SecureConsts.FLAG_ENABLE();
 
-    if(openSecureParams){
-      headers[SecureConsts.SECURE_PARAMS_HEADER()]=SecureConsts.FLAG_ENABLE();
+    if (openSecureParams) {
+      headers[SecureConsts.SECURE_PARAMS_HEADER()] = SecureConsts.FLAG_ENABLE();
     }
-    if(openSecureUrl){
-      headers[SecureConsts.SECURE_URL_HEADER()]=SecureConsts.FLAG_ENABLE();
+    if (openSecureUrl) {
+      headers[SecureConsts.SECURE_URL_HEADER()] = SecureConsts.FLAG_ENABLE();
     }
 
     return headers;
   },
-  // 存储rsa公钥的键名
-  RSA_PUBKEY_NAME() {
+  // 存储asym公钥的键名
+  ASYM_PUBKEY_NAME() {
     return "SECURE_PUB";
   },
-  // 保存rsa公钥
-  saveRsaPubKey(pubKey) {
-    return sessionStorage.setItem(this.RSA_PUBKEY_NAME(), pubKey);
+  // 保存asym公钥
+  saveAsymPubKey(pubKey) {
+    return sessionStorage.setItem(this.ASYM_PUBKEY_NAME(), pubKey);
   },
-  // 加载rsa公钥
-  loadRsaPubKey() {
-    let pubKey = sessionStorage.getItem(this.RSA_PUBKEY_NAME());
+  // 加载asym公钥
+  loadAsymPubKey() {
+    let pubKey = sessionStorage.getItem(this.ASYM_PUBKEY_NAME());
     return Base64Obfuscator.decode(pubKey);
   },
-  // 随机生成aes秘钥
-  aesKeyGen(size) {
+  // 随机生成symm秘钥
+  symmKeyGen(size) {
     return SymmetricUtil.genKey(size);
   },
-  // 随机生成16位aes秘钥
-  aesKeyGen16() {
-    return this.aesKeyGen(16);
+  // 随机生成16位symm秘钥
+  symmKeyGen16() {
+    return this.symmKeyGen(16);
   },
-  // aes加密给定对象
-  encrypt(obj, aesKey) {
-    return SymmetricUtil.encryptObj(obj, aesKey);
+  // symm加密给定对象
+  encrypt(obj, symmKey) {
+    return SymmetricUtil.encryptObj(obj, symmKey);
   },
-  // aes解密给定串为对象
-  decrypt(bs64, aesKey) {
-    return SymmetricUtil.decryptObj(bs64, aesKey);
+  // symm解密给定串为对象
+  decrypt(bs64, symmKey) {
+    return SymmetricUtil.decryptObj(bs64, symmKey);
   },
-  // 获取RSA公钥签名
-  getRsaSign(){
-    let b464 = this.loadRsaPubKey();
-    let rsaSign = SignatureUtil.sign(b464);
-    return rsaSign;
+  // 获取asym公钥签名
+  getAsymSign() {
+    let b464 = this.loadAsymPubKey();
+    let asymSign = SignatureUtil.sign(b464);
+    return asymSign;
   },
   // 获取安全请求头的值
-  getRequestSecureHeader(aesKey) {
-    if (StringUtils.isEmpty(aesKey)) {
+  getRequestSecureHeader(symmKey) {
+    if (StringUtils.isEmpty(symmKey)) {
       return "null";
     }
-    let pubKey = this.loadRsaPubKey();
-    let aesKeyTransfer = AsymmetricUtil.publicKeyEncrypt(pubKey, aesKey);
-    aesKeyTransfer = Base64Obfuscator.encode(aesKeyTransfer, true);
-    return aesKeyTransfer;
+    let pubKey = this.loadAsymPubKey();
+    let symmKeyTransfer = AsymmetricUtil.publicKeyEncrypt(pubKey, symmKey);
+    symmKeyTransfer = Base64Obfuscator.encode(symmKeyTransfer, true);
+    return symmKeyTransfer;
   },
   // 获取安全响应头中的值
-  getResponseSecureHeader(aesKeyTransfer) {
-    if (StringUtils.isEmpty(aesKeyTransfer)) {
+  getResponseSecureHeader(symmKeyTransfer) {
+    if (StringUtils.isEmpty(symmKeyTransfer)) {
       return null;
     }
-    let pubKey = this.loadRsaPubKey();
-    aesKeyTransfer = aesKeyTransfer.trim();
-    // 解除模糊之后使用RSA进行解密得到aes秘钥
-    let aesKey = Base64Obfuscator.decode(aesKeyTransfer);
-    aesKey = AsymmetricUtil.publicKeyDecrypt(pubKey, aesKey);
-    return aesKey;
+    let pubKey = this.loadAsymPubKey();
+    symmKeyTransfer = symmKeyTransfer.trim();
+    // 解除模糊之后使用asym进行解密得到symm秘钥
+    let symmKey = Base64Obfuscator.decode(symmKeyTransfer);
+    symmKey = AsymmetricUtil.publicKeyDecrypt(pubKey, symmKey);
+    return symmKey;
   },
 
 

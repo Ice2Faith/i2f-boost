@@ -14,5 +14,5 @@ public class SecureHeader {
     public String sign;
     public String nonce;
     public String randomKey;
-    public String rsaSign;
+    public String asymSign;
 }

@@ -96,11 +96,11 @@ const SecureTransferFilter = {
         if (!secureData && !secureParams) {
             return config
         }
-        let aesKey = SecureTransfer.aesKeyGen(SecureConfig.aesKeySize / 8);
+        let symmKey = SecureTransfer.symmKeyGen(SecureConfig.symmKeySize / 8);
         let requestHeader = SecureHeader.newObj()
         requestHeader.nonce = new Date().getTime().toString(16) + '' + Math.floor(Math.random() * 0x0fff).toString(16);
-        requestHeader.randomKey = SecureTransfer.getRequestSecureHeader(aesKey)
-        requestHeader.rsaSign = SecureTransfer.getRsaSign()
+        requestHeader.randomKey = SecureTransfer.getRequestSecureHeader(symmKey)
+        requestHeader.asymSign = SecureTransfer.getAsymSign()
         let signText = ''
         if (secureData) {
             if (config.data) {
@@ -112,7 +112,7 @@ const SecureTransferFilter = {
                         }
                     }
                 }
-                config.data = SecureTransfer.encrypt(config.data, aesKey);
+                config.data = SecureTransfer.encrypt(config.data, symmKey);
                 signText += config.data
             }
 
@@ -124,7 +124,7 @@ const SecureTransferFilter = {
             if (config.params) {
                 let paramText = qs.stringify(config.params)
                 config.params = {}
-                config.params[SecureConfig.parameterName] = SecureTransfer.encrypt(paramText, aesKey)
+                config.params[SecureConfig.parameterName] = SecureTransfer.encrypt(paramText, symmKey)
                 signText += config.params[SecureConfig.parameterName]
             }
         }
@@ -146,9 +146,9 @@ const SecureTransferFilter = {
         let skeyHeader = res.headers[SecureConsts.SECURE_DYNAMIC_KEY_HEADER()];
         if (!StringUtils.isEmpty(skeyHeader)) {
             if (SecureConfig.enableDebugLog) {
-                console.log('response:updateRsaPubKey:', res.config.url, skeyHeader)
+                console.log('response:updateAsymPubKey:', res.config.url, skeyHeader)
             }
-            SecureTransfer.saveRsaPubKey(skeyHeader);
+            SecureTransfer.saveAsymPubKey(skeyHeader);
         }
 
         let headerValue = res.headers[SecureConfig.headerName]
@@ -157,9 +157,9 @@ const SecureTransferFilter = {
         }
         let responseHeader = SecureUtils.parseSecureHeader(SecureConfig.headerName, SecureConfig.headerSeparator, res)
 
-        let aesKey = SecureTransfer.getResponseSecureHeader(responseHeader.randomKey);
+        let symmKey = SecureTransfer.getResponseSecureHeader(responseHeader.randomKey);
 
-        res.data = SecureTransfer.decrypt(res.data, aesKey);
+        res.data = SecureTransfer.decrypt(res.data, symmKey);
         if (SecureConfig.enableDebugLog) {
             console.log('response:afterSecureRes:', res.config.url, ObjectUtils.deepClone(res))
         }

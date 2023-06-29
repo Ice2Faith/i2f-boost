@@ -4,7 +4,7 @@
 import CryptoJS from 'crypto-js'
 import CodeUtil from "./CodeUtil";
 
-const AES = {
+const AesUtil = {
   genKey(size = 32) {
     return CodeUtil.makeCheckCode(size)
   },
@@ -20,4 +20,4 @@ const AES = {
     return CryptoJS.enc.Utf8.stringify(decrypt).toString();
   }
 }
-export default AES
+export default AesUtil

@@ -41,7 +41,7 @@ import java.util.concurrent.*;
 /**
  * @author ltb
  * @date 2022/6/29 13:59
- * @desc RSA+AES加密的核心过滤器
+ * @desc Asym+Symm加密的核心过滤器
  */
 @Slf4j
 @Component
@@ -210,14 +210,14 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                     throw new SecureException(SecureErrorCode.BAD_SIGN, "签名验证失败");
                 }
 
-                String aesKey = secureTransfer.getRequestSecureHeader(requestHeader.randomKey, requestHeader.rsaSign);
-                if (aesKey == null) {
+                String symmKey = secureTransfer.getRequestSecureHeader(requestHeader.randomKey, requestHeader.asymSign);
+                if (symmKey == null) {
                     throw new SecureException(SecureErrorCode.BAD_RANDOM_KEY, "随机秘钥无效或已失效，请重试！");
                 }
                 String replaceQueryString = null;
                 Map<String, List<String>> replaceParameterMap = null;
                 if (!StringUtils.isEmpty(srcSswp)) {
-                    String json = secureTransfer.decrypt(srcSswp, aesKey);
+                    String json = secureTransfer.decrypt(srcSswp, symmKey);
                     String ps = new ObjectMapper().readValue(json, String.class);
                     String[] arr = ps.split("&");
                     Map<String, List<String>> pmap = new HashMap<>();
@@ -240,7 +240,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                 }
                 if (srcText != null) {
                     log.debug("src body:" + srcText);
-                    String decryptText = secureTransfer.decrypt(srcText, aesKey);
+                    String decryptText = secureTransfer.decrypt(srcText, symmKey);
                     log.debug("decrypt body:" + decryptText);
                     // 将解密的数据重新包装
                     requestProxyWrapper = new HttpServletRequestProxyWrapper(request, decryptText.getBytes(request.getCharacterEncoding()));
@@ -300,12 +300,12 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                 nextResponse.setCharacterEncoding(secureConfig.getResponseCharset());
             }
 
-            // 每次生成随机aes加密秘钥
-            String aesKey = secureTransfer.aesKeyGen(secureConfig.getAesKeySize() / 8);
+            // 每次生成随机symm加密秘钥
+            String symmKey = secureTransfer.symmetricKeyGen(secureConfig.getSymmKeySize() / 8);
 
             SecureHeader responseHeader = new SecureHeader();
-            responseHeader.randomKey = secureTransfer.getResponseSecureHeader(aesKey);
-            responseHeader.rsaSign = secureTransfer.getRsaSign();
+            responseHeader.randomKey = secureTransfer.getResponseSecureHeader(symmKey);
+            responseHeader.asymSign = secureTransfer.getAsymSign();
             responseHeader.nonce = secureTransfer.makeNonce();
 
             String enData = null;
@@ -316,10 +316,10 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
             String strHeader = responseProxyWrapper.getHeader(SecureConsts.STRING_RETURN_HEADER);
             if (SecureConsts.FLAG_ENABLE.equals(strHeader)) {
                 String retStr = new String(edata, responseProxyWrapper.getCharacterEncoding());
-                enData = secureTransfer.encrypt(retStr, aesKey);
+                enData = secureTransfer.encrypt(retStr, symmKey);
             } else {
-                // 使用AES秘钥加密响应体
-                enData = secureTransfer.encryptJsonBytes(edata, aesKey);
+                // 使用Symm秘钥加密响应体
+                enData = secureTransfer.encryptJsonBytes(edata, symmKey);
             }
 
             responseHeader.sign = SecureUtils.makeSecureSign(enData, responseHeader);
@@ -338,8 +338,8 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
             String header = SecureUtils.encodeSecureHeader(responseHeader, secureConfig.getHeaderSeparator());
             response.setHeader(secureConfig.getHeaderName(), header);
             if (requestHeader != null) {
-                if (!responseHeader.rsaSign.equals(requestHeader.rsaSign)) {
-                    response.setHeader(SecureConsts.SECURE_DYNAMIC_KEY_HEADER, secureTransfer.getWebRsaPublicKey());
+                if (!responseHeader.asymSign.equals(requestHeader.asymSign)) {
+                    response.setHeader(SecureConsts.SECURE_DYNAMIC_KEY_HEADER, secureTransfer.getWebAsymPublicKey());
                 }
             }
             secureTransfer.setExposeHeader(response);

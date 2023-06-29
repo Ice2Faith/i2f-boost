@@ -178,7 +178,7 @@ public class SecureUtils {
         ret.sign = arr[0];
         ret.nonce = arr[1];
         ret.randomKey = arr[2];
-        ret.rsaSign = arr[3];
+        ret.asymSign = arr[3];
         if (StringUtils.isEmpty(ret.sign)) {
             throw new SecureException(SecureErrorCode.SECURE_HEADER_SIGN_EMPTY, "空安全头签名");
         }
@@ -188,8 +188,8 @@ public class SecureUtils {
         if (StringUtils.isEmpty(ret.randomKey)) {
             throw new SecureException(SecureErrorCode.SECURE_HEADER_RANDOM_KEY_EMPTY, "空安全头随机秘钥");
         }
-        if (StringUtils.isEmpty(ret.rsaSign)) {
-            throw new SecureException(SecureErrorCode.SECURE_HEADER_RSA_SIGN_EMPTY, "空安全头秘钥签名");
+        if (StringUtils.isEmpty(ret.asymSign)) {
+            throw new SecureException(SecureErrorCode.SECURE_HEADER_ASYM_SIGN_EMPTY, "空安全头秘钥签名");
         }
         return ret;
     }
@@ -202,7 +202,7 @@ public class SecureUtils {
         builder.append(separator);
         builder.append(header.randomKey);
         builder.append(separator);
-        builder.append(header.rsaSign);
+        builder.append(header.asymSign);
         String str = builder.toString();
         return Base64Obfuscator.encode(Base64Util.encode(CodecUtil.toUtf8(str)), true);
     }
@@ -214,7 +214,7 @@ public class SecureUtils {
         StringBuilder builder = new StringBuilder();
         builder.append(header.nonce);
         builder.append(header.randomKey);
-        builder.append(header.rsaSign);
+        builder.append(header.asymSign);
         builder.append(body);
         String text = builder.toString();
         String sign = SignatureUtil.sign(text);

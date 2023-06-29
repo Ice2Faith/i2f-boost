@@ -39,7 +39,7 @@ public interface SecureConsts {
 
     String ACCESS_CONTROL_EXPOSE_HEADERS = "Access-Control-Expose-Headers";
 
-    String RSA_KEY_FILE_NAME = "rsa.key";
+    String ASYM_KEY_FILE_NAME = "asymmetric.key";
 
     // 是否包含动态刷新的RSA公钥签名/公钥头
     String SECURE_DYNAMIC_KEY_HEADER = "skey";
