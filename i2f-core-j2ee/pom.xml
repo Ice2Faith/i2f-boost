@@ -22,6 +22,7 @@
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-core</artifactId>
             <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- i2f.web -->

@@ -54,18 +54,21 @@
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-core</artifactId>
             <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-core-j2ee</artifactId>
             <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-spring</artifactId>
             <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- i2f.web -->
@@ -81,6 +84,7 @@
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
             <version>3.3.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- i2f.file.excel.jexcel -->
@@ -88,6 +92,7 @@
             <groupId>org.jxls</groupId>
             <artifactId>jxls-jexcel</artifactId>
             <version>1.0.9</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- i2f.component.json.gson  -->
@@ -95,6 +100,7 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.8.2</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- i2f.component.json.fastjson  -->
@@ -102,6 +108,7 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.47</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- i2f.component.mybatis  -->
@@ -109,6 +116,7 @@
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
             <version>3.5.6</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- MySQL的jdbc驱动包 -->
@@ -116,6 +124,7 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.17</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- pagehelper 分页插件 -->
@@ -123,6 +132,7 @@
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>
             <version>1.3.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- i2f.component.aspectj -->
@@ -130,6 +140,7 @@
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
             <version>1.8.13</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- i2f.component.spring -->
@@ -137,16 +148,19 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring-version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <version>${spring-version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- i2f.component.redis -->
@@ -154,11 +168,13 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
             <version>2.3.5.RELEASE</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>2.7.3</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- i2f.component.email -->
@@ -166,11 +182,13 @@
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
             <version>1.1.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
             <version>1.6.2</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- QrCode -->
@@ -178,11 +196,13 @@
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
             <version>3.4.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
             <version>3.4.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- 阿里云云服务调用核心依赖 -->
@@ -190,6 +210,7 @@
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>
             <version>4.5.20</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
@@ -197,12 +218,14 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.13</version>
+            <scope>provided</scope>
         </dependency>
         <!-- multipart/form-data -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
             <version>4.5.3</version>
+            <scope>provided</scope>
         </dependency>
 
 
@@ -210,16 +233,19 @@
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>7.6.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <version>7.6.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
             <version>2.3.7.RELEASE</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- for excel ope -->
@@ -228,27 +254,32 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>4.1.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-scratchpad</artifactId>
             <version>4.1.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>4.1.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml-schemas</artifactId>
             <version>4.1.2</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
             <version>2.2.10</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz -->
@@ -256,6 +287,7 @@
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
             <version>2.3.2</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.alibaba.jstorm/jstorm-core -->
@@ -263,6 +295,7 @@
             <groupId>com.alibaba.jstorm</groupId>
             <artifactId>jstorm-core</artifactId>
             <version>2.2.1</version>
+            <scope>provided</scope>
             <exclusions> <!-- logback与slf4j版本不兼容问题时 -->
                 <exclusion>
                     <groupId>ch.qos.logback</groupId>
@@ -279,16 +312,19 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.26</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.2.3</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>1.2.3</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.dom4j/dom4j -->
@@ -296,6 +332,7 @@
             <groupId>org.dom4j</groupId>
             <artifactId>dom4j</artifactId>
             <version>2.1.3</version>
+            <scope>provided</scope>
         </dependency>
 
 
@@ -304,6 +341,7 @@
             <groupId>com.github.penggle</groupId>
             <artifactId>kaptcha</artifactId>
             <version>2.3.2</version>
+            <scope>provided</scope>
         </dependency>
 
 
@@ -311,6 +349,7 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>4.1.65.Final</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- sftp -->
@@ -319,6 +358,7 @@
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <version>0.1.55</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- ftp -->
@@ -327,6 +367,7 @@
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
             <version>3.6</version>
+            <scope>provided</scope>
         </dependency>
 
 
@@ -336,6 +377,7 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
             <version>3.2.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- generator -->
@@ -344,6 +386,7 @@
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity</artifactId>
             <version>1.7</version>
+            <scope>provided</scope>
         </dependency>
 
 
@@ -352,6 +395,7 @@
             <groupId>net.lingala.zip4j</groupId>
             <artifactId>zip4j</artifactId>
             <version>2.9.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- TAR -->
@@ -359,6 +403,7 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <version>1.21</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- swagger2-->
@@ -366,6 +411,7 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>2.9.2</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- swagger2-UI-->
@@ -373,6 +419,7 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>2.9.2</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- agent java byte code source api editor -->
@@ -381,6 +428,7 @@
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.28.0-GA</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- agent java byte code smail api editor -->
@@ -389,17 +437,20 @@
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
             <version>3.3.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- websocket -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- 提供动态刷新配置支持 -->
@@ -407,6 +458,7 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-context</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- zookeeper -->
@@ -414,6 +466,7 @@
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
             <version>3.6.3</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- zookeeper distribute lock -->
@@ -421,11 +474,13 @@
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-framework</artifactId>
             <version>4.0.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-recipes</artifactId>
             <version>4.0.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- gif -->
@@ -433,6 +488,7 @@
             <groupId>com.madgag</groupId>
             <artifactId>animated-gif-lib</artifactId>
             <version>1.4</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- minio -->
@@ -440,6 +496,7 @@
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
             <version>7.1.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- mongo-db -->
@@ -447,6 +504,7 @@
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <version>3.10.2</version>
+            <scope>provided</scope>
         </dependency>
 
 
@@ -455,27 +513,32 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-java</artifactId>
             <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-java_${flink.scala.version}</artifactId>
             <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-clients_${flink.scala.version}</artifactId>
             <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-core</artifactId>
             <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-runtime-web_${flink.scala.version}</artifactId>
             <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
 
 
@@ -483,35 +546,41 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-statebackend-rocksdb_${flink.scala.version}</artifactId>
             <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-kafka_${flink.scala.version}</artifactId>
             <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-jdbc_${flink.scala.version}</artifactId>
             <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-elasticsearch7_${flink.scala.version}</artifactId>
             <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-api-java-bridge_${flink.scala.version}</artifactId>
             <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-planner-blink_${flink.scala.version}</artifactId>
             <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- cron 表达式解析 -->
@@ -519,6 +588,7 @@
             <groupId>com.cronutils</groupId>
             <artifactId>cron-utils</artifactId>
             <version>9.1.5</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- word转pdf/png -->
@@ -535,12 +605,14 @@
             <groupId>com.documents4j</groupId>
             <artifactId>documents4j-local</artifactId>
             <version>1.1.10</version>
+            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.documents4j/documents4j-transformer-msoffice-word -->
         <dependency>
             <groupId>com.documents4j</groupId>
             <artifactId>documents4j-transformer-msoffice-word</artifactId>
             <version>1.1.10</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- excel转pdf/tiff -->

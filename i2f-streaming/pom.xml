@@ -15,11 +15,13 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-core</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
