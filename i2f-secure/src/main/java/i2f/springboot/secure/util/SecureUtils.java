@@ -171,14 +171,15 @@ public class SecureUtils {
         }
         str = CodecUtil.ofUtf8(Base64Util.decode(Base64Obfuscator.decode(str)));
         String[] arr = str.split(separator);
-        if (arr.length < 4) {
+        if (arr.length < 5) {
             throw new SecureException(SecureErrorCode.SECURE_HEADER_STRUCTURE, "不正确的安全头结构");
         }
         SecureHeader ret = new SecureHeader();
         ret.sign = arr[0];
         ret.nonce = arr[1];
         ret.randomKey = arr[2];
-        ret.asymSign = arr[3];
+        ret.serverAsymSign = arr[3];
+        ret.digital = arr[4];
         if (StringUtils.isEmpty(ret.sign)) {
             throw new SecureException(SecureErrorCode.SECURE_HEADER_SIGN_EMPTY, "空安全头签名");
         }
@@ -188,8 +189,11 @@ public class SecureUtils {
         if (StringUtils.isEmpty(ret.randomKey)) {
             throw new SecureException(SecureErrorCode.SECURE_HEADER_RANDOM_KEY_EMPTY, "空安全头随机秘钥");
         }
-        if (StringUtils.isEmpty(ret.asymSign)) {
+        if (StringUtils.isEmpty(ret.serverAsymSign)) {
             throw new SecureException(SecureErrorCode.SECURE_HEADER_ASYM_SIGN_EMPTY, "空安全头秘钥签名");
+        }
+        if (StringUtils.isEmpty(ret.digital)) {
+            throw new SecureException(SecureErrorCode.SECURE_HEADER_DIGITAL_EMPTY, "空安全头数字签名");
         }
         return ret;
     }
@@ -202,7 +206,9 @@ public class SecureUtils {
         builder.append(separator);
         builder.append(header.randomKey);
         builder.append(separator);
-        builder.append(header.asymSign);
+        builder.append(header.serverAsymSign);
+        builder.append(separator);
+        builder.append(header.digital);
         String str = builder.toString();
         return Base64Obfuscator.encode(Base64Util.encode(CodecUtil.toUtf8(str)), true);
     }
@@ -214,7 +220,7 @@ public class SecureUtils {
         StringBuilder builder = new StringBuilder();
         builder.append(header.nonce);
         builder.append(header.randomKey);
-        builder.append(header.asymSign);
+        builder.append(header.serverAsymSign);
         builder.append(body);
         String text = builder.toString();
         String sign = SignatureUtil.sign(text);

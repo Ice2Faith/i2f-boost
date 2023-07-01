@@ -27,14 +27,15 @@ const SecureUtils = {
         }
         str = B64.decrypt(Base64Obfuscator.decode(str))
         let arr = str.split(separator);
-        if(arr.length<4){
-            throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_STRUCTURE(),"不正确的安全头结构")
+        if (arr.length < 5) {
+            throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_STRUCTURE(), "不正确的安全头结构")
         }
         var ret = SecureHeader.newObj();
-        ret.sign=arr[0]
-        ret.nonce=arr[1]
+        ret.sign = arr[0]
+        ret.nonce = arr[1]
         ret.randomKey = arr[2]
-        ret.asymSign = arr[3]
+        ret.serverAsymSign = arr[3]
+        ret.digital = arr[4]
         if (StringUtils.isEmpty(ret.sign)) {
             throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_SIGN_EMPTY(), "空安全头签名")
         }
@@ -44,21 +45,26 @@ const SecureUtils = {
         if (StringUtils.isEmpty(ret.randomKey)) {
             throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_RANDOM_KEY_EMPTY(), "空安全头随机秘钥")
         }
-        if (StringUtils.isEmpty(ret.asymSign)) {
+        if (StringUtils.isEmpty(ret.serverAsymSign)) {
             throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_ASYM_SIGN_EMPTY(), "空安全头秘钥签名")
+        }
+        if (StringUtils.isEmpty(ret.digital)) {
+            throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_DIGITAL_EMPTY(), "空安全头数字签名");
         }
         return ret
     },
-    encodeSecureHeader(header,separator){
-        let str=''
-        str+=header.sign
-        str+=separator
-        str+=header.nonce
-        str+=separator
-        str+=header.randomKey
+    encodeSecureHeader(header,separator) {
+        let str = ''
+        str += header.sign
         str += separator
-        str += header.asymSign
-        return Base64Obfuscator.encode(B64.encrypt(str),true)
+        str += header.nonce
+        str += separator
+        str += header.randomKey
+        str += separator
+        str += header.serverAsymSign
+        str += separator
+        str += header.digital
+        return Base64Obfuscator.encode(B64.encrypt(str), true)
     },
     makeSecureSign(body,header){
         if(StringUtils.isEmpty(body)){
@@ -67,7 +73,7 @@ const SecureUtils = {
         let text=''
         text+=header.nonce
         text += header.randomKey
-        text += header.asymSign
+        text += header.serverAsymSign
         text += body
         let sign = SignatureUtil.sign(text)
         return sign

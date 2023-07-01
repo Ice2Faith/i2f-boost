@@ -210,7 +210,15 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                     throw new SecureException(SecureErrorCode.BAD_SIGN, "签名验证失败");
                 }
 
-                String symmKey = secureTransfer.getRequestSecureHeader(requestHeader.randomKey, requestHeader.asymSign);
+                String digital = secureTransfer.getRequestSecureHeader(requestHeader.digital, requestHeader.serverAsymSign);
+                if (digital == null) {
+                    throw new SecureException(SecureErrorCode.BAD_DIGITAL, "数字签名验证失败，请重试！");
+                }
+                if (!digital.equals(requestHeader.sign)) {
+                    throw new SecureException(SecureErrorCode.BAD_DIGITAL, "数字签名验证失败，请重试！");
+                }
+
+                String symmKey = secureTransfer.getRequestSecureHeader(requestHeader.randomKey, requestHeader.serverAsymSign);
                 if (symmKey == null) {
                     throw new SecureException(SecureErrorCode.BAD_RANDOM_KEY, "随机秘钥无效或已失效，请重试！");
                 }
@@ -305,7 +313,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
 
             SecureHeader responseHeader = new SecureHeader();
             responseHeader.randomKey = secureTransfer.getResponseSecureHeader(symmKey);
-            responseHeader.asymSign = secureTransfer.getAsymSign();
+            responseHeader.serverAsymSign = secureTransfer.getAsymSign();
             responseHeader.nonce = secureTransfer.makeNonce();
 
             String enData = null;
@@ -323,6 +331,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
             }
 
             responseHeader.sign = SecureUtils.makeSecureSign(enData, responseHeader);
+            responseHeader.digital = secureTransfer.getResponseSecureHeader(responseHeader.sign);
 
             // 写回数据体
             edata = enData.getBytes(responseProxyWrapper.getCharacterEncoding());
@@ -338,7 +347,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
             String header = SecureUtils.encodeSecureHeader(responseHeader, secureConfig.getHeaderSeparator());
             response.setHeader(secureConfig.getHeaderName(), header);
             if (requestHeader != null) {
-                if (!responseHeader.asymSign.equals(requestHeader.asymSign)) {
+                if (!responseHeader.serverAsymSign.equals(requestHeader.serverAsymSign)) {
                     response.setHeader(SecureConsts.SECURE_DYNAMIC_KEY_HEADER, secureTransfer.getWebAsymPublicKey());
                 }
             }

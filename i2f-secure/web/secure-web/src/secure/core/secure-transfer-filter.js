@@ -9,6 +9,8 @@ import SecureConsts from "../consts/secure-consts";
 import SecureHeader from "../data/secure-header";
 import ObjectUtils from "../util/ObjectUtils";
 import qs from 'qs'
+import SecureException from "@/secure/excception/secure-exception";
+import SecureErrorCode from "@/secure/consts/secure-error-code";
 
 const SecureTransferFilter = {
     getRequestContentType(config) {
@@ -100,7 +102,7 @@ const SecureTransferFilter = {
         let requestHeader = SecureHeader.newObj()
         requestHeader.nonce = new Date().getTime().toString(16) + '' + Math.floor(Math.random() * 0x0fff).toString(16);
         requestHeader.randomKey = SecureTransfer.getRequestSecureHeader(symmKey)
-        requestHeader.asymSign = SecureTransfer.getAsymSign()
+        requestHeader.serverAsymSign = SecureTransfer.getAsymSign()
         let signText = ''
         if (secureData) {
             if (config.data) {
@@ -116,9 +118,6 @@ const SecureTransferFilter = {
                 signText += config.data
             }
 
-            if (SecureConfig.enableDebugLog) {
-                console.log('request:secureHeader:', config.url, ObjectUtils.deepClone(requestHeader))
-            }
         }
         if (secureParams) {
             if (config.params) {
@@ -129,6 +128,10 @@ const SecureTransferFilter = {
             }
         }
         requestHeader.sign = SecureUtils.makeSecureSign(signText, requestHeader)
+        requestHeader.digital = SecureTransfer.getRequestSecureHeader(requestHeader.sign)
+        if (SecureConfig.enableDebugLog) {
+            console.log('request:secureHeader:', config.url, ObjectUtils.deepClone(requestHeader))
+        }
         config.headers[SecureConfig.headerName] = SecureUtils.encodeSecureHeader(requestHeader, SecureConfig.headerSeparator)
 
         if (SecureConfig.enableDebugLog) {
@@ -156,8 +159,22 @@ const SecureTransferFilter = {
             return res
         }
         let responseHeader = SecureUtils.parseSecureHeader(SecureConfig.headerName, SecureConfig.headerSeparator, res)
+        if (SecureConfig.enableDebugLog) {
+            console.log('response:secureHeader:', res.config.url, ObjectUtils.deepClone(responseHeader))
+        }
+
+        let digital = SecureTransfer.getResponseSecureHeader(responseHeader.digital);
+        if (digital == null) {
+            throw SecureException.newObj(SecureErrorCode.BAD_DIGITAL(), "数字签名验证失败，请重试！");
+        }
+        if (digital != responseHeader.sign) {
+            throw SecureException.newObj(SecureErrorCode.BAD_DIGITAL(), "数字签名验证失败，请重试！");
+        }
 
         let symmKey = SecureTransfer.getResponseSecureHeader(responseHeader.randomKey);
+        if (symmKey == null) {
+            throw SecureException.newObj(SecureErrorCode.BAD_RANDOM_KEY(), "随机秘钥无效或已失效，请重试！");
+        }
 
         res.data = SecureTransfer.decrypt(res.data, symmKey);
         if (SecureConfig.enableDebugLog) {
