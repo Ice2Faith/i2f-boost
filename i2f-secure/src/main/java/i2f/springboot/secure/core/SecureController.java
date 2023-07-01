@@ -26,4 +26,11 @@ public class SecureController {
         String pubKey = secureTransfer.getWebAsymPublicKey();
         return pubKey;
     }
+
+    @SecureParams(in = false, out = false)
+    @PostMapping("clientKey")
+    public String clientKey() {
+        String priKey = secureTransfer.getWebClientAsymPrivateKey();
+        return priKey;
+    }
 }

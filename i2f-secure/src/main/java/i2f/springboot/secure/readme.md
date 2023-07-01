@@ -8,7 +8,7 @@
 ---
 ## 简介
 - 方案说明
-    - 采用RSA+AES组合形式完成前后端交互的加解密过程
+    - 采用RSA+AES+SHA组合形式完成前后端交互的加解密过程
     - 同时进行nonce防重放攻击防御
     - 同时支持动态刷新RSA秘钥
 - 优势
@@ -26,13 +26,17 @@
     - 其他请求方式，因为不支持拦截器或者无感化
 - 总体流程
     - 客户端
-        - 登录后获取RSA公钥
+        - 登录后获取服务器RSA公钥
+        - 获取客户端自己的RSA私钥
     - 服务端
         - 项目启动后生成RSA公钥私钥
         - 公钥发送给登录成果的客户端
         - 私钥自己保存
+        - 客户端请求自己的私钥时，生成随机的客户端秘钥对
+        - 返回客户端私钥，保留客户端公钥
 - 发送数据
     - 客户端
+        - 随机生成一个nonce
         - 随机生成一个AES秘钥
         - 使用客户端的RSA公钥对AES秘钥加密，放入请求头sswh
         - 使用AES秘钥对请求体进行加密（也可以对其他部分加密，比如URL参数等）
@@ -61,6 +65,10 @@
         - 接口中直接使用即可
         - 特别的，如果这个接口的参数不再请求体中
         - 则使用@SecureParams注解作用在对应的参数上，AOP完成解密直接使用即可
+        - 由于客户端的秘钥对绑定问题
+        - 客户端还必须携带sswcas的客户端私钥签名
+        - 这样服务器才能确定客户端使用的秘钥对
+        - 才能正确的进行解密
 - 注意
     - 请求和响应中，不包含sswh则认为是不加密的
     - 如果实际数据时加密的，那将会失败，无法使用数据
@@ -68,6 +76,64 @@
     - 如果没有sswh,那么将会认为是非法的请求
     - 对于后端没有定义必须安全的接口
     - 收到带有sswh的请求之后，会进行解密，也就是说，这种情况下时可选的
+    
+## 伪代码流程
+
+- 服务器初始化过程
+
+```
+let serverKeyPair=生成服务器的RSA秘钥对
+```
+
+- 客户端初始化过程
+
+```
+let serverPublicKey=从服务器获取服务器的公钥serverPublicKey
+let clientPrivateKey=从服务器生成客户端秘钥对，并返回客户端私钥clientPrivateKey，服务器保留客户端公钥，这里实现客户端与客户端秘钥对的绑定
+```
+
+- 发送过程
+
+```
+let body=消息正文
+let aesKey=随机产生16字节的随机值
+let nonce=使用UUID生成随机值
+// AES加密消息体
+let encText=AES.encrypt(body,aesKey)
+// RSA加密aes秘钥
+let encAesKey=RSA.publicKeyEncrypt(aesKey,serverPublicKey)
+// 计算消息摘要
+let sign=SHA256.make(encText+encAesKey+nonce)
+// RSA计算数字签名
+let digital=RSA.privateKeyEncrypt(sign,clientPrivateKey)
+// 发送请求
+send(encText,encAesKey,nonce,sign,digital)
+```
+
+- 接受过程
+
+```
+// RSA解密数字签名
+let digSign=RSA.publicKeyDecrypt(sign,clientPublicKey)
+// 验证数字签名
+if(digSign != sign){
+	数字签名验证失败
+}
+// 计算消息摘要
+let reqSign=SHA256.make(encText+encAesKey+nonce)
+// 验证消息摘要
+if(reqSign != sign){
+	消息摘要验证失败
+}
+// 验证是否重放
+if(exists(nonce)){
+	重放请求验证失败
+}
+// 解密aes秘钥
+let aesKey=RSA.privateKeyDecrypt(encAesKey,serverPrivateKey)
+// 解密消息体
+let body=AES.decrypt(encText,aesKey)
+```
 
 ---
 ## 使用示例
@@ -113,10 +179,18 @@ public class SecureController {
     @Autowired
     private SecureTransfer secureTransfer;
 
-    @RequestMapping("key")
-    public Object key(){
-        String pubKey= secureTransfer.getWebAsymPublicKey();
+    @SecureParams(in = false, out = false)
+    @PostMapping("key")
+    public String key() {
+        String pubKey = secureTransfer.getWebAsymPublicKey();
         return pubKey;
+    }
+
+    @SecureParams(in = false, out = false)
+    @PostMapping("clientKey")
+    public String clientKey() {
+        String priKey = secureTransfer.getWebClientAsymPrivateKey();
+        return priKey;
     }
 }
 ```
@@ -126,10 +200,17 @@ public class SecureController {
 
 ```js
 this.$axios({
-    url: 'secure/rsa',
+    url: 'secure/key',
     method: 'GET'
   }).then(({data})=>{
     this.$secureTransfer.saveAsymPubKey(data);
+  })
+
+this.$axios({
+    url: 'secure/clientKey',
+    method: 'post'
+  }).then(({data})=>{
+    this.$secureTransfer.saveAsymPriKey(data)
   })
 ```
 
@@ -155,6 +236,7 @@ export default {
   },
   created() {
     this.initAsymContent()
+    this.initClientContent()
     let _this=this
     window.rsaTimer=setInterval(function(){
         _this.initAsymContent()
@@ -172,6 +254,15 @@ export default {
         SecureTransfer.saveAsymPubKey(data)
       })
     },
+    initClientContent(){
+      this.$axios({
+        url: 'secure/clientKey',
+        method: 'post'
+      }).then(({data})=>{
+        console.log('SECURE_KEY',data)
+        SecureTransfer.saveAsymPriKey(data)
+      })
+    }
   }
 }
 ```
@@ -601,6 +692,7 @@ const SecureConfig={
    headerName: SecureConsts.DEFAULT_SECURE_HEADER_NAME(),
    // 动态刷新Asym秘钥的响应头，默认skey
    dynamicKeyHeaderName: SecureConsts.SECURE_DYNAMIC_KEY_HEADER(),
+   clientAsymSignName: SecureConsts.DEFAULT_SECURE_CLIENT_ASYM_SIGN_NAME(),
    // 安全头格式的分隔符，默认;
    headerSeparator: SecureConsts.DEFAULT_HEADER_SEPARATOR(),
    // 指定在使用编码URL转发时的转发路径

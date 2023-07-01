@@ -14,26 +14,35 @@ export default {
     HelloWorld
   },
   created() {
-    this.initRsaContent()
-    let _this=this
-    window.rsaTimer=setInterval(function(){
-        _this.initRsaContent()
-    },5*60*1000)
+    this.initAsymContent()
+    this.initClientContent()
+    let _this = this
+    window.rsaTimer = setInterval(function () {
+      _this.initAsymContent()
+    }, 5 * 60 * 1000)
   },
   destroyed() {
     clearInterval(window.rsaTimer)
   },
-  methods:{
-    initRsaContent(){
+  methods: {
+    initAsymContent() {
       this.$axios({
         url: 'secure/key',
         method: 'post'
-      }).then(({data})=>{
-        console.log('SECURE_KEY',data)
-        localStorage.setItem('SECURE_KEY', data)
+      }).then(({data}) => {
+        console.log('SECURE_KEY', data)
         SecureTransfer.saveAsymPubKey(data)
       })
     },
+    initClientContent() {
+      this.$axios({
+        url: 'secure/clientKey',
+        method: 'post'
+      }).then(({data}) => {
+        console.log('SECURE_KEY', data)
+        SecureTransfer.saveAsymPriKey(data)
+      })
+    }
   }
 }
 </script>

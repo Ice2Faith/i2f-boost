@@ -60,6 +60,10 @@ const SecureTransferFilter = {
     // 也就是说，如果请求头中，这两个请求头不存在，或者值不为SECURE_HEADER_ENABLE，都将不会处理
     // 也就是手动处理，部分参数的情形
     requestFilter(config) {
+        if (SecureTransfer.existsAsymPriKey()) {
+            config.headers[SecureConfig.clientAsymSignName] = SecureTransfer.getAsymPriSign()
+        }
+
         if (config.data) {
             if (SecureUtils.typeOf(config.data) == 'formdata') {
                 config.headers['Content-Type'] = 'multipart/form-data'
@@ -128,7 +132,7 @@ const SecureTransferFilter = {
             }
         }
         requestHeader.sign = SecureUtils.makeSecureSign(signText, requestHeader)
-        requestHeader.digital = SecureTransfer.getRequestSecureHeader(requestHeader.sign)
+        requestHeader.digital = SecureTransfer.getRequestDigitalHeader(requestHeader.sign)
         if (SecureConfig.enableDebugLog) {
             console.log('request:secureHeader:', config.url, ObjectUtils.deepClone(requestHeader))
         }
@@ -163,7 +167,7 @@ const SecureTransferFilter = {
             console.log('response:secureHeader:', res.config.url, ObjectUtils.deepClone(responseHeader))
         }
 
-        let digital = SecureTransfer.getResponseSecureHeader(responseHeader.digital);
+        let digital = SecureTransfer.getResponseDigitalHeader(responseHeader.digital);
         if (digital == null) {
             throw SecureException.newObj(SecureErrorCode.BAD_DIGITAL(), "数字签名验证失败，请重试！");
         }

@@ -14,14 +14,16 @@ const SecureConsts={
 
     DEFAULT_SECURE_PARAMETER_NAME: () => "sswp",
 
+    DEFAULT_SECURE_CLIENT_ASYM_SIGN_NAME: () => "sswcas",
+
     // 安全头的分隔符
     DEFAULT_HEADER_SEPARATOR: () => ";",
 
     // 动态asym公钥的响应头
-    SECURE_DYNAMIC_KEY_HEADER:()=>"skey",
+    SECURE_DYNAMIC_KEY_HEADER: () => "skey",
 
     // 安全Body加密标记头
-    SECURE_DATA_HEADER:()=>"secure-data",
+    SECURE_DATA_HEADER: () => "secure-data",
 
     // 安全Param加密标记头
     SECURE_PARAMS_HEADER:()=>"secure-param",

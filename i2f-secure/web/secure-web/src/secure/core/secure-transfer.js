@@ -41,6 +41,22 @@ const SecureTransfer = {
     let pubKey = sessionStorage.getItem(this.ASYM_PUBKEY_NAME());
     return Base64Obfuscator.decode(pubKey);
   },
+  ASYM_PRIKEY_NAME() {
+    return "SECURE_PRI";
+  },
+  // 保存asym公钥
+  saveAsymPriKey(priKey) {
+    return sessionStorage.setItem(this.ASYM_PRIKEY_NAME(), priKey);
+  },
+  // 加载asym公钥
+  loadAsymPriKey() {
+    let priKey = sessionStorage.getItem(this.ASYM_PRIKEY_NAME());
+    return Base64Obfuscator.decode(priKey);
+  },
+  existsAsymPriKey() {
+    let priKey = sessionStorage.getItem(this.ASYM_PRIKEY_NAME());
+    return !StringUtils.isEmpty(priKey)
+  },
   // 随机生成symm秘钥
   symmKeyGen(size) {
     return SymmetricUtil.genKey(size);
@@ -63,6 +79,12 @@ const SecureTransfer = {
     let asymSign = SignatureUtil.sign(b464);
     return asymSign;
   },
+  // 获取asym公钥签名
+  getAsymPriSign() {
+    let b464 = this.loadAsymPriKey();
+    let asymSign = SignatureUtil.sign(b464);
+    return asymSign;
+  },
   // 获取安全请求头的值
   getRequestSecureHeader(symmKey) {
     if (StringUtils.isEmpty(symmKey)) {
@@ -73,8 +95,30 @@ const SecureTransfer = {
     symmKeyTransfer = Base64Obfuscator.encode(symmKeyTransfer, true);
     return symmKeyTransfer;
   },
+  // 获取安全请求头的值
+  getRequestDigitalHeader(symmKey) {
+    if (StringUtils.isEmpty(symmKey)) {
+      return "null";
+    }
+    let priKey = this.loadAsymPriKey();
+    let symmKeyTransfer = AsymmetricUtil.privateKeyEncrypt(priKey, symmKey);
+    symmKeyTransfer = Base64Obfuscator.encode(symmKeyTransfer, true);
+    return symmKeyTransfer;
+  },
   // 获取安全响应头中的值
   getResponseSecureHeader(symmKeyTransfer) {
+    if (StringUtils.isEmpty(symmKeyTransfer)) {
+      return null;
+    }
+    let priKey = this.loadAsymPriKey();
+    symmKeyTransfer = symmKeyTransfer.trim();
+    // 解除模糊之后使用asym进行解密得到symm秘钥
+    let symmKey = Base64Obfuscator.decode(symmKeyTransfer);
+    symmKey = AsymmetricUtil.privateKeyDecrypt(priKey, symmKey);
+    return symmKey;
+  },
+// 获取安全响应头中的值
+  getResponseDigitalHeader(symmKeyTransfer) {
     if (StringUtils.isEmpty(symmKeyTransfer)) {
       return null;
     }
@@ -85,7 +129,6 @@ const SecureTransfer = {
     symmKey = AsymmetricUtil.publicKeyDecrypt(pubKey, symmKey);
     return symmKey;
   },
-
 
 }
 

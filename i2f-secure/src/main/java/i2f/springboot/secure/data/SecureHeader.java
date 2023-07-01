@@ -31,8 +31,4 @@ public class SecureHeader {
      * 服务端非对称签名
      */
     public String serverAsymSign;
-    /**
-     * 客户端非对称签名
-     */
-    public String clientAsymSign;
 }

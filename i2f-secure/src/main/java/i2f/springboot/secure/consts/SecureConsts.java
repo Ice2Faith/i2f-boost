@@ -19,6 +19,9 @@ public interface SecureConsts {
     // secure sign web parameter
     String DEFAULT_SECURE_PARAMETER_NAME = "sswp";
 
+    // secure sign web client asym sign
+    String DEFAULT_SECURE_CLIENT_ASYM_SIGN_NAME = "sswcas";
+
     String FILTER_EXCEPTION_ATTR_KEY = "SECURE_FILTER_EXCEPTION";
 
     String FILTER_DECRYPT_HEADER = "SECURE_FILTER_DECRYPT";

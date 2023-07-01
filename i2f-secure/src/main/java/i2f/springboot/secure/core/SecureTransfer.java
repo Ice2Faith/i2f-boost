@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -50,6 +51,8 @@ public class SecureTransfer implements InitializingBean {
     private LinkedList<AsymmetricKeyPair> histories;
 
     private ScheduledExecutorService pool;
+
+    private ConcurrentHashMap<String, AsymmetricKeyPair> clientKeys = new ConcurrentHashMap<>();
 
 
     public File getAsymStoreFile() {
@@ -121,9 +124,14 @@ public class SecureTransfer implements InitializingBean {
         return null;
     }
 
-
     public String getAsymSign() {
         String b464 = asymKey.publicKeyBase64();
+        String asymSign = SignatureUtil.sign(b464);
+        return asymSign;
+    }
+
+    public String getAsymPriSign(AsymmetricKeyPair keyPair) {
+        String b464 = keyPair.privateKeyBase64();
         String asymSign = SignatureUtil.sign(b464);
         return asymSign;
     }
@@ -167,7 +175,18 @@ public class SecureTransfer implements InitializingBean {
         return SymmetricUtil.decryptJsonBeforeBase64(bs64, symmKey);
     }
 
-    public String getResponseSecureHeader(String symmKey) {
+    public String getResponseSecureHeader(String symmKey, String clientAsymSign) {
+        if (symmKey == null) {
+            return "null";
+        }
+        // 使用Asym对symm秘钥加密并进行模糊
+        AsymmetricKeyPair keyPair = clientKeys.get(clientAsymSign);
+        String symmKeyTransfer = AsymmetricUtil.publicKeyEncryptBase64(keyPair, symmKey);
+        symmKeyTransfer = Base64Obfuscator.encode(symmKeyTransfer, true);
+        return symmKeyTransfer;
+    }
+
+    public String getResponseDigitalHeader(String symmKey) {
         if (symmKey == null) {
             return "null";
         }
@@ -189,6 +208,21 @@ public class SecureTransfer implements InitializingBean {
         // 解除模糊之后使用Asym进行解密得到symm秘钥
         String symmKey = Base64Obfuscator.decode(symmKeyTransfer);
         symmKey = AsymmetricUtil.privateKeyDecryptBase64(asymKey, symmKey);
+        return symmKey;
+    }
+
+    public String getRequestDigitalHeader(String symmKeyTransfer, String asymSign) {
+        if (symmKeyTransfer == null) {
+            return symmKeyTransfer;
+        }
+        symmKeyTransfer = symmKeyTransfer.trim();
+        AsymmetricKeyPair asymKey = clientKeys.get(asymSign);
+        if (asymKey == null) {
+            return null;
+        }
+        // 解除模糊之后使用Asym进行解密得到symm秘钥
+        String symmKey = Base64Obfuscator.decode(symmKeyTransfer);
+        symmKey = AsymmetricUtil.publicKeyDecryptBase64(asymKey, symmKey);
         return symmKey;
     }
 
@@ -236,6 +270,16 @@ public class SecureTransfer implements InitializingBean {
     public String getWebAsymPublicKey() {
         String pubKey = Base64Obfuscator.encode(this.getAsymKey().publicKeyBase64(), true);
         return pubKey;
+    }
+
+    public String getWebClientAsymPrivateKey() {
+
+        AsymmetricKeyPair keyPair = AsymmetricUtil.makeKeyPair(secureConfig.getAsymKeySize());
+        String priKey = Base64Obfuscator.encode(keyPair.privateKeyBase64(), true);
+        String priSign = getAsymPriSign(keyPair);
+        clientKeys.put(priSign, keyPair);
+
+        return priKey;
     }
 
 }

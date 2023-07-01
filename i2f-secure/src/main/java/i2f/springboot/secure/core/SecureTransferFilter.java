@@ -131,7 +131,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
         log.debug("enter filter:" + requestUrl);
         // 尝试获取方法与安全注解
         SecureCtrl ctrl = SecureUtils.parseSecureCtrl(request, secureConfig, mappingUtil);
-
+        String clientAsymSign = ServletContextUtil.getPossibleValue(secureConfig.getClientAsymSignName(), request);
 
         boolean wrapEncResp = isEncUrl(request);
 
@@ -210,7 +210,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                     throw new SecureException(SecureErrorCode.BAD_SIGN, "签名验证失败");
                 }
 
-                String digital = secureTransfer.getRequestSecureHeader(requestHeader.digital, requestHeader.serverAsymSign);
+                String digital = secureTransfer.getRequestDigitalHeader(requestHeader.digital, clientAsymSign);
                 if (digital == null) {
                     throw new SecureException(SecureErrorCode.BAD_DIGITAL, "数字签名验证失败，请重试！");
                 }
@@ -312,7 +312,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
             String symmKey = secureTransfer.symmetricKeyGen(secureConfig.getSymmKeySize() / 8);
 
             SecureHeader responseHeader = new SecureHeader();
-            responseHeader.randomKey = secureTransfer.getResponseSecureHeader(symmKey);
+            responseHeader.randomKey = secureTransfer.getResponseSecureHeader(symmKey, clientAsymSign);
             responseHeader.serverAsymSign = secureTransfer.getAsymSign();
             responseHeader.nonce = secureTransfer.makeNonce();
 
@@ -331,7 +331,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
             }
 
             responseHeader.sign = SecureUtils.makeSecureSign(enData, responseHeader);
-            responseHeader.digital = secureTransfer.getResponseSecureHeader(responseHeader.sign);
+            responseHeader.digital = secureTransfer.getResponseDigitalHeader(responseHeader.sign);
 
             // 写回数据体
             edata = enData.getBytes(responseProxyWrapper.getCharacterEncoding());

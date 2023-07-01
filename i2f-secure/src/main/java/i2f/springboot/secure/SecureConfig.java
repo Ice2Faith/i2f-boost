@@ -51,9 +51,11 @@ public class SecureConfig {
 
     private String dynamicKeyHeaderName = SecureConsts.SECURE_DYNAMIC_KEY_HEADER;
 
+    private String clientAsymSignName = SecureConsts.DEFAULT_SECURE_CLIENT_ASYM_SIGN_NAME;
+
     private String encUrlPath = SecureConsts.DEFAULT_ENC_URL_PATH;
 
-    private String parameterName=SecureConsts.DEFAULT_SECURE_PARAMETER_NAME;
+    private String parameterName = SecureConsts.DEFAULT_SECURE_PARAMETER_NAME;
 
     private SecureCtrl defaultControl = new SecureCtrl(true, true);
 
