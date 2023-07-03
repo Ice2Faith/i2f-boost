@@ -9,8 +9,8 @@ import SecureConsts from "../consts/secure-consts";
 import SecureHeader from "../data/secure-header";
 import ObjectUtils from "../util/ObjectUtils";
 import qs from 'qs'
-import SecureException from "@/secure/excception/secure-exception";
-import SecureErrorCode from "@/secure/consts/secure-error-code";
+import SecureException from "../excception/secure-exception";
+import SecureErrorCode from "../consts/secure-error-code";
 
 const SecureTransferFilter = {
     getRequestContentType(config) {

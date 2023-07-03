@@ -1,5 +1,5 @@
 import SecureProvider from "./SecureProvider";
-import B64 from "@/secure/util/base64";
+import B64 from "../util/base64";
 
 const SignatureUtil = {
     sign(text) {
