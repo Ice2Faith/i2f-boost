@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,9 +60,11 @@ public class SecureTransfer implements InitializingBean {
 
     private ScheduledExecutorService pool;
 
+    // 一个IP仅有一个key可以使用，也就是会剔除老的key
     private ConcurrentHashMap<String, AsymmetricKeyPair> clientKeys = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Long> keyExpireMap = new ConcurrentHashMap<>();
-    private ReentrantLock lock=new ReentrantLock();
+    private ConcurrentHashMap<String, String> clientIpKeyMap = new ConcurrentHashMap<>();
+    private ReentrantLock lock = new ReentrantLock();
     private ScheduledExecutorService expirePool = Executors.newSingleThreadScheduledExecutor(new NamingThreadFactory("secure", "expire"));
 
     public File getClientsAsymStoreFile() {
@@ -79,6 +82,7 @@ public class SecureTransfer implements InitializingBean {
             String[] lines = str.split("\n");
             Map<String, Long> expireMap = new HashMap<>();
             Map<String, AsymmetricKeyPair> keyMap = new HashMap<>();
+            Map<String,String> ipMap=new HashMap<>();
             for (String line : lines) {
                 String[] arr = line.split("\\|");
                 if (arr.length < 1) {
@@ -95,6 +99,12 @@ public class SecureTransfer implements InitializingBean {
                     } catch (Exception e) {
                         log.warn("load clients asym key exception:" + e.getMessage() + " of " + e.getClass().getName());
                     }
+                }
+                if ("2".equals(type)) {
+                    if (arr.length < 3) {
+                        continue;
+                    }
+                    ipMap.put(arr[1], arr[2]);
                 }
                 if ("1".equals(type)) {
                     if (arr.length < 4) {
@@ -115,6 +125,7 @@ public class SecureTransfer implements InitializingBean {
             }
             keyExpireMap.putAll(expireMap);
             clientKeys.putAll(keyMap);
+            clientIpKeyMap.putAll(ipMap);
         } catch (Exception e) {
             log.warn("load clients asym key exception:" + e.getMessage() + " of " + e.getClass().getName());
         }
@@ -127,10 +138,14 @@ public class SecureTransfer implements InitializingBean {
             for (Map.Entry<String, Long> entry : keyExpireMap.entrySet()) {
                 builder.append("0").append("|").append(entry.getKey()).append("|").append(entry.getValue()).append("\n");
             }
+            for (Map.Entry<String, String> entry : clientIpKeyMap.entrySet()) {
+                builder.append("2").append("|").append(entry.getKey()).append("|").append(entry.getValue()).append("\n");
+            }
             for (Map.Entry<String, AsymmetricKeyPair> entry : clientKeys.entrySet()) {
                 AsymmetricKeyPair keyPair = entry.getValue();
                 builder.append("1").append("|").append(entry.getKey()).append("|").append(keyPair.publicKeyBase64()).append("|").append(keyPair.privateKeyBase64()).append("\n");
             }
+
             String str = builder.toString();
             StreamUtil.writeString(str, "UTF-8", storeFile);
         } catch (Exception e) {
@@ -224,40 +239,49 @@ public class SecureTransfer implements InitializingBean {
         return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
     }
 
-    public void scheduleExpireKeys(){
-        expirePool.scheduleWithFixedDelay(()->{
-            Set<String> rmSet=new HashSet<>();
-            long ts=System.currentTimeMillis();
+    public void scheduleExpireKeys() {
+        expirePool.scheduleWithFixedDelay(() -> {
+            Set<String> rmSet = new HashSet<>();
+            long ts = System.currentTimeMillis();
             lock.lock();
-            try{
+            try {
                 for (Map.Entry<String, Long> entry : keyExpireMap.entrySet()) {
-                    if(ts>entry.getValue()){
+                    if (ts > entry.getValue()) {
                         rmSet.add(entry.getKey());
                     }
                 }
                 for (String key : clientKeys.keySet()) {
-                    if(!keyExpireMap.containsKey(key)){
+                    if (!keyExpireMap.containsKey(key)) {
                         rmSet.add(key);
                     }
                 }
                 for (String key : keyExpireMap.keySet()) {
-                    if(!clientKeys.containsKey(key)){
+                    if (!clientKeys.containsKey(key)) {
                         rmSet.add(key);
                     }
                 }
-            }finally {
+                for (String key : rmSet) {
+                    keyExpireMap.remove(key);
+                    clientKeys.remove(key);
+                }
+            } finally {
                 lock.unlock();
             }
+            rmSet.clear();
+            for (Map.Entry<String, String> entry : clientIpKeyMap.entrySet()) {
+                if(!clientKeys.containsKey(entry.getValue())){
+                    rmSet.add(entry.getKey());
+                }
+            }
             for (String key : rmSet) {
-                keyExpireMap.remove(key);
-                clientKeys.remove(key);
+                clientIpKeyMap.remove(key);
             }
             saveClientsAsymKeys();
-        },0,secureConfig.getClientKeyExpirePoolDelaySeconds(),TimeUnit.SECONDS );
+        }, 0, secureConfig.getClientKeyExpirePoolDelaySeconds(), TimeUnit.SECONDS);
     }
 
-    public void refreshClientKeyExpire(String clientAsymSign){
-        keyExpireMap.put(clientAsymSign,System.currentTimeMillis()+TimeUnit.SECONDS.toMillis(secureConfig.getClientKeyExpireSeconds()));
+    public void refreshClientKeyExpire(String clientAsymSign) {
+        keyExpireMap.put(clientAsymSign, System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(secureConfig.getClientKeyExpireSeconds()));
     }
 
     @Override
@@ -402,16 +426,34 @@ public class SecureTransfer implements InitializingBean {
     public String getWebClientAsymPrivateKey(HttpServletRequest request) {
         AsymmetricKeyPair keyPair = AsymmetricUtil.makeKeyPair(secureConfig.getAsymKeySize());
 
+        String clientIp = ServletContextUtil.getIp(request);
+
+        String clientAsymSignOrigin = ServletContextUtil.getPossibleValue(secureConfig.getClientAsymSignName(), request);
+        if(StringUtils.isEmpty(clientAsymSignOrigin)){
+            clientAsymSignOrigin="";
+        }
+        String clientAsymSign=clientAsymSignOrigin;
+        if(secureConfig.isEnableClientIpBind()){
+            clientAsymSign=getClientAsymSignCacheKey(clientAsymSignOrigin,clientIp);
+        }
+
         String priSign = getAsymPriSign(keyPair);
         if (secureConfig.isEnableClientIpBind()) {
-            String clientIp = ServletContextUtil.getIp(request);
             priSign = getClientAsymSignCacheKey(priSign, clientIp);
         }
         lock.lock();
-        try{
+        try {
+            clientKeys.remove(clientAsymSign);
+            keyExpireMap.remove(clientAsymSign);
+            if (clientIpKeyMap.containsKey(clientIp)) {
+                String ckey = clientIpKeyMap.get(clientIp);
+                clientKeys.remove(ckey);
+                keyExpireMap.remove(ckey);
+            }
             clientKeys.put(priSign, keyPair);
+            clientIpKeyMap.put(clientIp,priSign);
             refreshClientKeyExpire(priSign);
-        }finally {
+        } finally {
             lock.unlock();
         }
         saveClientsAsymKeys();
