@@ -4,7 +4,6 @@ package i2f.springboot.secure.core;
 import i2f.core.codec.CodecUtil;
 import i2f.core.digest.AsymmetricKeyPair;
 import i2f.core.digest.Base64Obfuscator;
-import i2f.core.digest.Base64Util;
 import i2f.core.io.stream.StreamUtil;
 import i2f.core.j2ee.web.ServletContextUtil;
 import i2f.core.thread.NamingThreadFactory;
