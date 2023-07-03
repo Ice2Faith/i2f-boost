@@ -74,6 +74,7 @@ const SecureUtils = {
         text+=header.nonce
         text += header.randomKey
         text += header.serverAsymSign
+        text += header.clientAsymSign
         text += body
         let sign = SignatureUtil.sign(text)
         return sign

@@ -44,6 +44,8 @@ public interface SecureConsts {
 
     String ASYM_KEY_FILE_NAME = "asymmetric.key";
 
+    String ASYM_CLIENTS_KEY_FILE_NAME="clients-asym.key";
+
     // 是否包含动态刷新的RSA公钥签名/公钥头
     String SECURE_DYNAMIC_KEY_HEADER = "skey";
 

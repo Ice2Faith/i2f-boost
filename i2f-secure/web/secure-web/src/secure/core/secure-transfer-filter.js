@@ -131,6 +131,7 @@ const SecureTransferFilter = {
                 signText += config.params[SecureConfig.parameterName]
             }
         }
+        requestHeader.clientAsymSign=SecureTransfer.getAsymPriSign()
         requestHeader.sign = SecureUtils.makeSecureSign(signText, requestHeader)
         requestHeader.digital = SecureTransfer.getRequestDigitalHeader(requestHeader.sign)
         if (SecureConfig.enableDebugLog) {
@@ -163,8 +164,13 @@ const SecureTransferFilter = {
             return res
         }
         let responseHeader = SecureUtils.parseSecureHeader(SecureConfig.headerName, SecureConfig.headerSeparator, res)
+        responseHeader.clientAsymSign=SecureTransfer.getAsymPriSign()
         if (SecureConfig.enableDebugLog) {
             console.log('response:secureHeader:', res.config.url, ObjectUtils.deepClone(responseHeader))
+        }
+        let ok = SecureUtils.verifySecureHeader(res.data,responseHeader);
+        if (!ok) {
+            throw SecureException.newObj(SecureErrorCode.BAD_SIGN, "签名验证失败");
         }
 
         let digital = SecureTransfer.getResponseDigitalHeader(responseHeader.digital);

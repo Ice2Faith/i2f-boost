@@ -28,7 +28,9 @@ public class CipherUtil {
         }
         KeyGenerator kgen = KeyGenerator.getInstance(type.algorithmName());
         SecureRandom random = SecureRandom.getInstance(secureRandomAlgorithmName);
-        random.setSeed(secretBytes);
+        if(secretBytes!=null){
+            random.setSeed(secretBytes);
+        }
         kgen.init(genSecretLen, random);
         return kgen.generateKey();
     }
@@ -46,7 +48,9 @@ public class CipherUtil {
         }
         KeyGenerator kgen = KeyGenerator.getInstance(type.algorithmName());
         SecureRandom random = SecureRandom.getInstance(secureRandomAlgorithmName);
-        random.setSeed(vectorBytes);
+        if(vectorBytes!=null){
+            random.setSeed(vectorBytes);
+        }
         kgen.init(genVectorLen, random);
         IvParameterSpec iv = new IvParameterSpec(kgen.generateKey().getEncoded());
         return iv;
@@ -84,7 +88,9 @@ public class CipherUtil {
             keyPairGenerator = KeyPairGenerator.getInstance(type.algorithmName());
         }
         SecureRandom random = SecureRandom.getInstance(secureRandomAlgorithmName);
-        random.setSeed(secretBytes);
+        if(secretBytes!=null){
+            random.setSeed(secretBytes);
+        }
         keyPairGenerator.initialize(genSecretLen, random);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         return keyPair;

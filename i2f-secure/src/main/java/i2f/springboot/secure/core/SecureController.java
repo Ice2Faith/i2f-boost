@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author ltb
  * @date 2022/6/30 11:34
@@ -29,8 +31,8 @@ public class SecureController {
 
     @SecureParams(in = false, out = false)
     @PostMapping("clientKey")
-    public String clientKey() {
-        String priKey = secureTransfer.getWebClientAsymPrivateKey();
+    public String clientKey(HttpServletRequest request) {
+        String priKey = secureTransfer.getWebClientAsymPrivateKey(request);
         return priKey;
     }
 }

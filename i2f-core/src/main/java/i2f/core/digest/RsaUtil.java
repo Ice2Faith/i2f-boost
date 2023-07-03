@@ -30,7 +30,7 @@ public class RsaUtil {
     }
 
     public static KeyPair genRsaKeyPair(int size) throws Exception {
-        return CipherUtil.genKeyPair(RSA_TYPE, null, "".getBytes(), size, null);
+        return CipherUtil.genKeyPair(RSA_TYPE, null, null, size, null);
     }
 
     public static AsymmetricKeyPair getRsaKeyData(KeyPair keyPair) {

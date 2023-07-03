@@ -686,8 +686,6 @@ import SecureConsts from "./consts/secure-consts";
 const SecureConfig={
    // Symm秘钥长度，默认128，可选128,192,256
    symmKeySize: SecureConsts.AES_KEY_SIZE_128(),
-   // 随机秘钥生成的随机数的最大值，默认8192
-   randomKeyBound: 8192,
    // 用于存储安全头的请求头名称，默认sswh
    headerName: SecureConsts.DEFAULT_SECURE_HEADER_NAME(),
    // 动态刷新Asym秘钥的响应头，默认skey

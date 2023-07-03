@@ -19,14 +19,11 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -44,15 +41,15 @@ import java.util.concurrent.*;
  * @desc Asym+Symm加密的核心过滤器
  */
 @Slf4j
-@Component
-@Order(-1)
-@WebFilter(
-        urlPatterns = "/**",
-        dispatcherTypes = {
-                DispatcherType.REQUEST,
-                DispatcherType.FORWARD
-        }
-)
+//@Component
+//@Order(-1)
+//@WebFilter(
+//        urlPatterns = "/**",
+//        dispatcherTypes = {
+//                DispatcherType.REQUEST,
+//                DispatcherType.FORWARD
+//        }
+//)
 public class SecureTransferFilter implements Filter, InitializingBean, ApplicationContextAware {
 
     @Override
@@ -131,8 +128,22 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
         log.debug("enter filter:" + requestUrl);
         // 尝试获取方法与安全注解
         SecureCtrl ctrl = SecureUtils.parseSecureCtrl(request, secureConfig, mappingUtil);
-        String clientAsymSign = ServletContextUtil.getPossibleValue(secureConfig.getClientAsymSignName(), request);
 
+        // 如果是一次性头，并且一次性签名头都存在，则可以限制非正常的重放请求
+        // 正常的请求是客户端发起的，每一次一次性头都是不同的
+        // 然而，非正常的请求，可以进行重放请求达到目的
+        // 这样的请求，就会出现一次性头重复，存在相同的签名
+        String clientIp = ServletContextUtil.getIp(request);
+
+        String clientAsymSignOrigin = ServletContextUtil.getPossibleValue(secureConfig.getClientAsymSignName(), request);
+        if(StringUtils.isEmpty(clientAsymSignOrigin)){
+            clientAsymSignOrigin="";
+        }
+        String clientAsymSign=clientAsymSignOrigin;
+        if(secureConfig.isEnableClientIpBind()){
+            clientAsymSign=secureTransfer.getClientAsymSignCacheKey(clientAsymSignOrigin,clientIp);
+        }
+        secureTransfer.refreshClientKeyExpire(clientAsymSign);
         boolean wrapEncResp = isEncUrl(request);
 
         if (!ctrl.in && !ctrl.out && !wrapEncResp) {
@@ -160,12 +171,8 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
 
             try {
                 requestHeader = SecureUtils.parseSecureHeader(secureConfig.getHeaderName(), secureConfig.getHeaderSeparator(), request);
+                requestHeader.setClientAsymSign(clientAsymSignOrigin);
 
-                // 如果是一次性头，并且一次性签名头都存在，则可以限制非正常的重放请求
-                // 正常的请求是客户端发起的，每一次一次性头都是不同的
-                // 然而，非正常的请求，可以进行重放请求达到目的
-                // 这样的请求，就会出现一次性头重复，存在相同的签名
-                String clientIp = ServletContextUtil.getIp(request);
                 // 对于服务端而言，nonce从客户端发送过来，很难避免不同的客户端发送过来的nonce重复的问题
                 // 如果不进行客户端隔离，就会导致不少正常的请求被拦截为重放
                 // 因此需要结合客户端IP判定nonce
@@ -330,6 +337,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                 enData = secureTransfer.encryptJsonBytes(edata, symmKey);
             }
 
+            responseHeader.setClientAsymSign(clientAsymSignOrigin);
             responseHeader.sign = SecureUtils.makeSecureSign(enData, responseHeader);
             responseHeader.digital = secureTransfer.getResponseDigitalHeader(responseHeader.sign);
 

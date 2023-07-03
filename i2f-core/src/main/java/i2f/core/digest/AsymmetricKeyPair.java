@@ -49,14 +49,14 @@ public class AsymmetricKeyPair {
         return Base64Util.encode(privateKeyBytes());
     }
 
-    public static RSAPublicKey parsePublicKeyBase64(String bs64) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public static PublicKey parsePublicKeyBase64(String bs64) throws InvalidKeySpecException, NoSuchAlgorithmException {
         byte[] data = Base64Util.decode(bs64);
-        return (RSAPublicKey) getPublicKey(data);
+        return getPublicKey(data);
     }
 
-    public static RSAPrivateKey parsePrivateKeyBase64(String bs64) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public static PrivateKey parsePrivateKeyBase64(String bs64) throws InvalidKeySpecException, NoSuchAlgorithmException {
         byte[] data = Base64Util.decode(bs64);
-        return (RSAPrivateKey) getPrivateKey(data);
+        return getPrivateKey(data);
     }
 
     public static PublicKey getPublicKey(byte[] codes) throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -89,8 +89,8 @@ public class AsymmetricKeyPair {
         String priKey = reader.readLine();
         pubKey = Base64Obfuscator.decode(pubKey);
         priKey = Base64Obfuscator.decode(priKey);
-        RSAPublicKey publicKey = parsePublicKeyBase64(pubKey);
-        RSAPrivateKey privateKey = parsePrivateKeyBase64(priKey);
+        PublicKey publicKey = parsePublicKeyBase64(pubKey);
+        PrivateKey privateKey = parsePrivateKeyBase64(priKey);
         KeyPair keyPair = new KeyPair(publicKey, privateKey);
         return new AsymmetricKeyPair(keyPair);
     }

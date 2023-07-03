@@ -221,6 +221,7 @@ public class SecureUtils {
         builder.append(header.nonce);
         builder.append(header.randomKey);
         builder.append(header.serverAsymSign);
+        builder.append(header.clientAsymSign);
         builder.append(body);
         String text = builder.toString();
         String sign = SignatureUtil.sign(text);

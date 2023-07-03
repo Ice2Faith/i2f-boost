@@ -35,7 +35,7 @@ public class SecureProvider {
     public static BiSupplier<KeyPair, Integer> asymmetricKeyPairSupplier = (len) -> {
         try {
             BouncyCastleHolder.registry();
-            KeyPair keyPair = CipherUtil.genKeyPair(BcRsaType.NONE_PKCS1PADDING, BouncyCastleHolder.PROVIDER_NAME, "".getBytes(), len, null);
+            KeyPair keyPair = CipherUtil.genKeyPair(BcRsaType.NONE_PKCS1PADDING, BouncyCastleHolder.PROVIDER_NAME, null, len, null);
             return keyPair;
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage(), e);

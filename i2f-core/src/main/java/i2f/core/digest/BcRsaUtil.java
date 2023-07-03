@@ -28,7 +28,7 @@ public class BcRsaUtil {
     public static AsymmetricKeyPair makeKeyPair(int size) {
         try {
             BouncyCastleHolder.registry();
-            KeyPair keyPair = CipherUtil.genKeyPair(BcRsaType.NONE_PKCS1PADDING, BouncyCastleHolder.PROVIDER_NAME, "".getBytes(), size, null);
+            KeyPair keyPair = CipherUtil.genKeyPair(BcRsaType.NONE_PKCS1PADDING, BouncyCastleHolder.PROVIDER_NAME, null, size, null);
             return new AsymmetricKeyPair(keyPair);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);

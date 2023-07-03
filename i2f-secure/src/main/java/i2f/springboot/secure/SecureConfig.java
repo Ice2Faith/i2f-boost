@@ -35,8 +35,6 @@ public class SecureConfig {
 
     private int symmKeySize = SecureConsts.AES_KEY_SIZE_128;
 
-    private int randomKeyBound = 8192;
-
     private int nonceTimeoutSeconds = 6 * 60;
 
     private boolean enableDynamicAsymKey = true;
@@ -45,6 +43,10 @@ public class SecureConfig {
 
     private int dynamicMaxHistoriesCount = 5;
 
+    private long clientKeyExpireSeconds=30*60;
+
+    private long clientKeyExpirePoolDelaySeconds=3*60;
+
     private String headerName = SecureConsts.DEFAULT_SECURE_HEADER_NAME;
 
     private String headerSeparator = SecureConsts.DEFAULT_HEADER_SEPARATOR;
@@ -52,6 +54,8 @@ public class SecureConfig {
     private String dynamicKeyHeaderName = SecureConsts.SECURE_DYNAMIC_KEY_HEADER;
 
     private String clientAsymSignName = SecureConsts.DEFAULT_SECURE_CLIENT_ASYM_SIGN_NAME;
+
+    private boolean enableClientIpBind=true;
 
     private String encUrlPath = SecureConsts.DEFAULT_ENC_URL_PATH;
 
