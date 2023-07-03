@@ -91,46 +91,6 @@ public class LambdaFunctions {
         return getFunctionSerializedLambda(fn);
     }
 
-    public static <V1, V2, V3, V4, V5, V6> SerializedLambda getSerializedLambda(IConsumer6<V1, V2, V3, V4, V5, V6> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7> SerializedLambda getSerializedLambda(IConsumer7<V1, V2, V3, V4, V5, V6, V7> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8> SerializedLambda getSerializedLambda(IConsumer8<V1, V2, V3, V4, V5, V6, V7, V8> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9> SerializedLambda getSerializedLambda(IConsumer9<V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> SerializedLambda getSerializedLambda(IConsumer10<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> SerializedLambda getSerializedLambda(IConsumer11<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> SerializedLambda getSerializedLambda(IConsumer12<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> SerializedLambda getSerializedLambda(IConsumer13<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> SerializedLambda getSerializedLambda(IConsumer14<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> SerializedLambda getSerializedLambda(IConsumer15<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
     public static SerializedLambda getSerializedLambda(BoolConsumer fn) {
         return getFunctionSerializedLambda(fn);
     }
@@ -186,46 +146,6 @@ public class LambdaFunctions {
     }
 
     public static <R, V1, V2, V3, V4, V5> SerializedLambda getSerializedLambda(ISupplier5<R, V1, V2, V3, V4, V5> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6> SerializedLambda getSerializedLambda(ISupplier6<R, V1, V2, V3, V4, V5, V6> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7> SerializedLambda getSerializedLambda(ISupplier7<R, V1, V2, V3, V4, V5, V6, V7> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8> SerializedLambda getSerializedLambda(ISupplier8<R, V1, V2, V3, V4, V5, V6, V7, V8> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9> SerializedLambda getSerializedLambda(ISupplier9<R, V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> SerializedLambda getSerializedLambda(ISupplier10<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> SerializedLambda getSerializedLambda(ISupplier11<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> SerializedLambda getSerializedLambda(ISupplier12<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> SerializedLambda getSerializedLambda(ISupplier13<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> SerializedLambda getSerializedLambda(ISupplier14<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> SerializedLambda getSerializedLambda(ISupplier15<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> fn) {
         return getFunctionSerializedLambda(fn);
     }
 
@@ -343,46 +263,6 @@ public class LambdaFunctions {
         return getFunctionSerializedLambda(fn);
     }
 
-    public static <V1, V2, V3, V4, V5, V6> SerializedLambda getSerializedLambda(IThrConsumer6<V1, V2, V3, V4, V5, V6> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7> SerializedLambda getSerializedLambda(IThrConsumer7<V1, V2, V3, V4, V5, V6, V7> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8> SerializedLambda getSerializedLambda(IThrConsumer8<V1, V2, V3, V4, V5, V6, V7, V8> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9> SerializedLambda getSerializedLambda(IThrConsumer9<V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> SerializedLambda getSerializedLambda(IThrConsumer10<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> SerializedLambda getSerializedLambda(IThrConsumer11<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> SerializedLambda getSerializedLambda(IThrConsumer12<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> SerializedLambda getSerializedLambda(IThrConsumer13<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> SerializedLambda getSerializedLambda(IThrConsumer14<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> SerializedLambda getSerializedLambda(IThrConsumer15<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
     public static SerializedLambda getSerializedLambda(ThrBoolConsumer fn) {
         return getFunctionSerializedLambda(fn);
     }
@@ -438,46 +318,6 @@ public class LambdaFunctions {
     }
 
     public static <R, V1, V2, V3, V4, V5> SerializedLambda getSerializedLambda(IThrSupplier5<R, V1, V2, V3, V4, V5> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6> SerializedLambda getSerializedLambda(IThrSupplier6<R, V1, V2, V3, V4, V5, V6> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7> SerializedLambda getSerializedLambda(IThrSupplier7<R, V1, V2, V3, V4, V5, V6, V7> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8> SerializedLambda getSerializedLambda(IThrSupplier8<R, V1, V2, V3, V4, V5, V6, V7, V8> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9> SerializedLambda getSerializedLambda(IThrSupplier9<R, V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> SerializedLambda getSerializedLambda(IThrSupplier10<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> SerializedLambda getSerializedLambda(IThrSupplier11<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> SerializedLambda getSerializedLambda(IThrSupplier12<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> SerializedLambda getSerializedLambda(IThrSupplier13<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> SerializedLambda getSerializedLambda(IThrSupplier14<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> fn) {
-        return getFunctionSerializedLambda(fn);
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> SerializedLambda getSerializedLambda(IThrSupplier15<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> fn) {
         return getFunctionSerializedLambda(fn);
     }
 

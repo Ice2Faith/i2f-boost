@@ -431,9 +431,18 @@ public class SecureTransfer implements InitializingBean {
     }
 
     public String getWebClientAsymPrivateKey(HttpServletRequest request) {
-        AsymmetricKeyPair keyPair = AsymmetricUtil.makeKeyPair(secureConfig.getAsymKeySize());
+        AsymmetricKeyPair keyPair = null;
 
         String clientIp = ServletContextUtil.getIp(request);
+
+        if(clientIpKeyMap.containsKey(clientIp)){
+            String skey = clientIpKeyMap.get(clientIp);
+            keyPair = clientKeys.get(skey);
+        }
+
+        if(keyPair==null){
+            keyPair = AsymmetricUtil.makeKeyPair(secureConfig.getAsymKeySize());
+        }
 
         String clientAsymSignOrigin = ServletContextUtil.getPossibleValue(secureConfig.getClientAsymSignName(), request);
         if(StringUtils.isEmpty(clientAsymSignOrigin)){

@@ -240,46 +240,6 @@ public class Lambdas {
         return methodName(LambdaFunctions.getSerializedLambda(fn));
     }
 
-    public static <V1, V2, V3, V4, V5, V6> String methodName(IConsumer6<V1, V2, V3, V4, V5, V6> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7> String methodName(IConsumer7<V1, V2, V3, V4, V5, V6, V7> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8> String methodName(IConsumer8<V1, V2, V3, V4, V5, V6, V7, V8> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9> String methodName(IConsumer9<V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> String methodName(IConsumer10<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> String methodName(IConsumer11<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> String methodName(IConsumer12<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> String methodName(IConsumer13<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> String methodName(IConsumer14<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> String methodName(IConsumer15<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
     public static String methodName(BoolConsumer fn) {
         return methodName(LambdaFunctions.getSerializedLambda(fn));
     }
@@ -335,46 +295,6 @@ public class Lambdas {
     }
 
     public static <R, V1, V2, V3, V4, V5> String methodName(ISupplier5<R, V1, V2, V3, V4, V5> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6> String methodName(ISupplier6<R, V1, V2, V3, V4, V5, V6> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7> String methodName(ISupplier7<R, V1, V2, V3, V4, V5, V6, V7> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8> String methodName(ISupplier8<R, V1, V2, V3, V4, V5, V6, V7, V8> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9> String methodName(ISupplier9<R, V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> String methodName(ISupplier10<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> String methodName(ISupplier11<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> String methodName(ISupplier12<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> String methodName(ISupplier13<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> String methodName(ISupplier14<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> String methodName(ISupplier15<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> fn) {
         return methodName(LambdaFunctions.getSerializedLambda(fn));
     }
 

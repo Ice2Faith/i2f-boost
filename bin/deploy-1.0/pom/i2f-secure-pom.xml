@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>i2f-boost</artifactId>
+		<groupId>i2f.boost</groupId>
+		<version>1.0</version>
+	</parent>
+
+	<artifactId>i2f-secure</artifactId>
+
+	<name>i2f-secure</name>
+	<description>secure</description>
+
+	<properties>
+		<spring-boot.version>2.3.7.RELEASE</spring-boot.version>
+		<spring-cloud.version>Hoxton.SR12</spring-cloud.version>
+
+		<spring-version>5.2.4.RELEASE</spring-version>
+		<jackson-version>2.9.4</jackson-version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>i2f.boost</groupId>
+            <artifactId>i2f-core</artifactId>
+			<scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>i2f.boost</groupId>
+            <artifactId>i2f-core-j2ee</artifactId>
+			<scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>i2f.boost</groupId>
+            <artifactId>i2f-spring</artifactId>
+			<scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>i2f.boost</groupId>
+            <artifactId>i2f-springboot</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+			<scope>provided</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- 加密算法的BC实现，没有出口政策限制，可以使用更强的加密强度 -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.64</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- 增加了对国密SM系列算法的支持 -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15on</artifactId>
+			<version>1.64</version>
+			<scope>provided</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<!-- 指定资源路径，部分项目的xml写在java路径中，需要包含进来 -->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+					<include>**/*.json</include>
+					<include>**/*.ftl</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <archive>
+                        <!-- 去除maven描述信息 -->
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                    </archive>
+
+                    <includes>
+                        <include>**/*.class</include>
+                        <include>**/*.properties</include>
+                        <include>**/*.yaml</include>
+                        <include>**/*.yml</include>
+                        <include>**/*.xml</include>
+                        <include>**/*.html</include>
+                        <include>**/*.js</include>
+                        <include>**/*.css</include>
+                        <include>**/*.vue</include>
+                        <include>**/*.json</include>
+                        <include>**/*.md</include>
+                        <include>**/*.txt</include>
+                        <include>**/*.vm</include>
+                        <include>**/*.db</include>
+                    </includes>
+                </configuration>
+            </plugin>
+		</plugins>
+	</build>
+
+</project>

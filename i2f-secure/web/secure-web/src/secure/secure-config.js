@@ -21,9 +21,9 @@ const SecureConfig={
    // 在正式环境中，请禁用
    enableDebugLog: true,
    // 加密配置的白名单url
-   whileList:['/secure/key','/login'],
+   whileList:['/secure/key','/secure/clientKey'],
    // 加密URL的URL白名单
-   encWhiteList:['/secure/key','/login']
+   encWhiteList:['/login']
 }
 
 export default SecureConfig

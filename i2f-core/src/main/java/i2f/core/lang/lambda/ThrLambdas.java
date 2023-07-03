@@ -237,46 +237,6 @@ public class ThrLambdas {
         return methodName(LambdaFunctions.getSerializedLambda(fn));
     }
 
-    public static <V1, V2, V3, V4, V5, V6> String methodName(IThrConsumer6<V1, V2, V3, V4, V5, V6> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7> String methodName(IThrConsumer7<V1, V2, V3, V4, V5, V6, V7> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8> String methodName(IThrConsumer8<V1, V2, V3, V4, V5, V6, V7, V8> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9> String methodName(IThrConsumer9<V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> String methodName(IThrConsumer10<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> String methodName(IThrConsumer11<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> String methodName(IThrConsumer12<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> String methodName(IThrConsumer13<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> String methodName(IThrConsumer14<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> String methodName(IThrConsumer15<V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
     public static String methodName(ThrBoolConsumer fn) {
         return methodName(LambdaFunctions.getSerializedLambda(fn));
     }
@@ -332,46 +292,6 @@ public class ThrLambdas {
     }
 
     public static <R, V1, V2, V3, V4, V5> String methodName(IThrSupplier5<R, V1, V2, V3, V4, V5> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6> String methodName(IThrSupplier6<R, V1, V2, V3, V4, V5, V6> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7> String methodName(IThrSupplier7<R, V1, V2, V3, V4, V5, V6, V7> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8> String methodName(IThrSupplier8<R, V1, V2, V3, V4, V5, V6, V7, V8> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9> String methodName(IThrSupplier9<R, V1, V2, V3, V4, V5, V6, V7, V8, V9> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> String methodName(IThrSupplier10<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> String methodName(IThrSupplier11<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> String methodName(IThrSupplier12<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> String methodName(IThrSupplier13<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> String methodName(IThrSupplier14<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14> fn) {
-        return methodName(LambdaFunctions.getSerializedLambda(fn));
-    }
-
-    public static <R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> String methodName(IThrSupplier15<R, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> fn) {
         return methodName(LambdaFunctions.getSerializedLambda(fn));
     }
 

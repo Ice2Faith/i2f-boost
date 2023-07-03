@@ -29,6 +29,7 @@ copy ..\i2f-springcloud\target\i2f-springcloud-%I2F_VERSION%.jar %DEPLOY_PATH%
 copy ..\i2f-generator\target\i2f-generator-%I2F_VERSION%.jar %DEPLOY_PATH%
 copy ..\i2f-streaming\target\i2f-streaming-%I2F_VERSION%.jar %DEPLOY_PATH%
 copy ..\i2f-translate\target\i2f-translate-%I2F_VERSION%.jar %DEPLOY_PATH%
+copy ..\i2f-secure\target\i2f-secure-%I2F_VERSION%.jar %DEPLOY_PATH%
 copy ..\itl-ddiff\target\itl-ddiff.jar %DEPLOY_PATH%
 copy ..\itl-crypt\target\itl-crypt.jar %DEPLOY_PATH%
 
@@ -48,6 +49,7 @@ copy ..\i2f-springcloud\pom.xml %MAVEN_POM_PATH%\i2f-springcloud-pom.xml
 copy ..\i2f-generator\pom.xml %MAVEN_POM_PATH%\i2f-generator-pom.xml
 copy ..\i2f-streaming\pom.xml %MAVEN_POM_PATH%\i2f-streaming-pom.xml
 copy ..\i2f-translate\pom.xml %MAVEN_POM_PATH%\i2f-translate-pom.xml
+copy ..\i2f-secure\pom.xml %MAVEN_POM_PATH%\i2f-secure-pom.xml
 copy ..\itl-ddiff\pom.xml %MAVEN_POM_PATH%\itl-ddiff-pom.xml
 copy ..\itl-crypt\pom.xml %MAVEN_POM_PATH%\itl-crypt-pom.xml
 
