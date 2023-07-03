@@ -1,5 +1,6 @@
 package i2f.springboot.security;
 
+import i2f.springboot.security.impl.ISecurityConfigListener;
 import i2f.springboot.security.impl.JsonSupportUsernamePasswordAuthenticationFilter;
 import i2f.springboot.security.impl.LoginPasswordDecoder;
 import i2f.springboot.security.impl.UnAuthorizedHandler;
@@ -93,6 +94,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired(required = false)
     private LoginPasswordDecoder loginPasswordDecoder;
 
+    @Autowired(required = false)
+    private ISecurityConfigListener securityConfigListener;
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService)
@@ -107,6 +111,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
+        if(securityConfigListener!=null){
+            boolean next=securityConfigListener.onBeforeWebConfig(web,this);
+            if(!next){
+                return;
+            }
+        }
         if(ignoreList!=null && !"".equals(ignoreList)){
             web.ignoring()
                     .antMatchers(ignoreList.split(","));
@@ -114,10 +124,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         }else{
             super.configure(web);
         }
+        if(securityConfigListener!=null){
+            securityConfigListener.onAfterWebConfig(web,this);
+        }
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        if(securityConfigListener!=null){
+            boolean next=securityConfigListener.onBeforeHttpConfig(http,this);
+            if(!next){
+                return;
+            }
+        }
+
         // 配置跨域
         if(enableCors){
             http.cors();
@@ -259,6 +279,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             log.info("SecurityConfig customer token filter config.");
         }
 
+
         // 配置认证失败处理类
         if(unauthorizedHandler!=null){
             http.exceptionHandling()
@@ -266,6 +287,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             log.info("SecurityConfig customer unauthorized handler config.");
         }
 
+        if(securityConfigListener!=null){
+            securityConfigListener.onAfterHttpConfig(http,this);
+        }
 
         // 配置除了白名单的都需要鉴权
         http.authorizeRequests()

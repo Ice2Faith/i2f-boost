@@ -92,9 +92,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedissonLockAop {
 
-    @Pointcut("@annotation(RedisLock)" +
-            "|| @annotation(RedisReadLock)" +
-            "|| @annotation(RedisWriteLock)")
+    @Pointcut("@annotation(i2f.springboot.redisson.annotation.RedisLock)" +
+            "|| @annotation(i2f.springboot.redisson.annotation.RedisReadLock)" +
+            "|| @annotation(i2f.springboot.redisson.annotation.RedisWriteLock)")
     public void lockPointCut() {
     }
 

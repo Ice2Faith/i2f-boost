@@ -75,7 +75,7 @@ public class DynamicDataSourceConfig implements BeanFactoryAware {
         });
         log.info("DynamicDataSourceConfig DataSource config done.");
         //AbstractRoutingDataSource设置主从数据源
-        return new DynamicDataSource(beanFactory.getBean(DataSourceType.MASTER, DataSource.class),          dataSourceMap);
+        return new DynamicDataSource(beanFactory.getBean(DataSourceType.MASTER+"DataSource", DataSource.class),          dataSourceMap);
     }
 
     private void configDataSource(Map.Entry<String , Map<String,Object>> entry, HikariDataSource dataSource) {
