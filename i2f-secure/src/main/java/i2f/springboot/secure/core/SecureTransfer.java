@@ -1,8 +1,10 @@
 package i2f.springboot.secure.core;
 
 
+import i2f.core.codec.CodecUtil;
 import i2f.core.digest.AsymmetricKeyPair;
 import i2f.core.digest.Base64Obfuscator;
+import i2f.core.digest.Base64Util;
 import i2f.core.io.stream.StreamUtil;
 import i2f.core.j2ee.web.ServletContextUtil;
 import i2f.core.thread.NamingThreadFactory;
@@ -78,7 +80,9 @@ public class SecureTransfer implements InitializingBean {
             if (!storeFile.exists()) {
                 return;
             }
-            String str = StreamUtil.readString(storeFile, "UTF-8");
+            String enc = StreamUtil.readString(storeFile, "UTF-8");
+            String b64 = Base64Obfuscator.decode(enc);
+            String str=CodecUtil.ofUtf8(CodecUtil.ofBase64(b64));
             String[] lines = str.split("\n");
             Map<String, Long> expireMap = new HashMap<>();
             Map<String, AsymmetricKeyPair> keyMap = new HashMap<>();
@@ -147,7 +151,10 @@ public class SecureTransfer implements InitializingBean {
             }
 
             String str = builder.toString();
-            StreamUtil.writeString(str, "UTF-8", storeFile);
+            String b64 = CodecUtil.toBase64(CodecUtil.toUtf8(str));
+            String enc = Base64Obfuscator.encode(b64, false);
+
+            StreamUtil.writeString(enc, "UTF-8", storeFile);
         } catch (Exception e) {
             log.warn("save clients asym key exception:" + e.getMessage() + " of " + e.getClass().getName());
         }
