@@ -234,7 +234,9 @@ public class SecureUtils {
     }
 
     public static String decodeEncTrueUrl(String encodeUrl) {
-        String text = Base64Obfuscator.decode(encodeUrl);
+        String text=CodecUtil.ofUtf8(Base64Util.decode(encodeUrl));
+        text = Base64Obfuscator.decode(text);
+
         String[] arr = text.split(";");
         if (arr.length != 2) {
             throw new SecureException(SecureErrorCode.BAD_SECURE_REQUEST, "不正确的URL请求");
@@ -254,6 +256,7 @@ public class SecureUtils {
         String url = Base64Obfuscator.encode(Base64Util.encode(CodecUtil.toUtf8(trueUrl)), false);
         String sign = SignatureUtil.sign(url);
         String text = Base64Obfuscator.encode(sign + ";" + url, false);
+        text=Base64Util.encode(CodecUtil.toUtf8(text));
         try {
             return URLEncoder.encode(text, "UTF-8");
         } catch (Exception e) {

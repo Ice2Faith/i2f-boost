@@ -5,7 +5,9 @@ import i2f.core.j2ee.web.ServletContextUtil;
 import i2f.core.j2ee.wrapper.HttpServletRequestProxyWrapper;
 import i2f.core.j2ee.wrapper.HttpServletResponseProxyWrapper;
 import i2f.core.thread.NamingThreadFactory;
+import i2f.spring.jackson.JacksonSerializerConfig;
 import i2f.spring.mapping.MappingUtil;
+import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.consts.SecureConsts;
 import i2f.springboot.secure.consts.SecureErrorCode;
@@ -65,6 +67,9 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
 
     @Autowired
     private MappingUtil mappingUtil;
+
+    @Autowired
+    private JacksonJsonSerializer serializer;
 
     private ApplicationContext context;
 
@@ -207,6 +212,9 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
 
                 String signText = "";
                 if (srcText != null) {
+                    if(srcText.trim().startsWith("\"")){
+                        srcText = (String)serializer.deserialize(srcText, String.class);
+                    }
                     signText += srcText;
                 }
                 if (srcSswp != null) {

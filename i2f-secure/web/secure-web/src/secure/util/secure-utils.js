@@ -84,7 +84,8 @@ const SecureUtils = {
         return sign==header.sign
     },
     decodeEncTrueUrl(encodeUrl){
-        let text=Base64Obfuscator.decode(encodeUrl)
+        let text=B64.decrypt(text)
+        text=Base64Obfuscator.decode(encodeUrl)
         let arr=text.split(';')
         if(arr.length!=2){
             throw SecureException.newObj(SecureErrorCode.BAD_SECURE_REQUEST(),"不正确的URL请求")
@@ -102,6 +103,7 @@ const SecureUtils = {
         let url = Base64Obfuscator.encode(B64.encrypt(trueUrl), false)
         let sign = SignatureUtil.sign(url)
         let text = Base64Obfuscator.encode(sign + ';' + url, false)
+        text=B64.encrypt(text)
         return encodeURIComponent(text)
     }
 }
