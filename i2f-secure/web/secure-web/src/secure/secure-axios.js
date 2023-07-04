@@ -52,6 +52,7 @@ request.interceptors.response.use(res => {
     }
   },
   error => {
+    SecureTransferFilter.responseFilter(error.response)
     console.log('err' , error)
     let { message } = error;
     if (message == "Network Error") {

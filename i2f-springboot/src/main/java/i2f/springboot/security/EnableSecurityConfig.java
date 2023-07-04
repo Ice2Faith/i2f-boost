@@ -1,11 +1,8 @@
 package i2f.springboot.security;
 
-import i2f.springboot.security.def.DefaultUnAuthorizedHandler;
+import i2f.springboot.security.def.DefaultAuthorizeExceptionHandler;
 import i2f.springboot.security.def.DefaultUserDetailsService;
-import i2f.springboot.security.def.token.DefaultAuthenticationSuccessHandler;
-import i2f.springboot.security.def.token.DefaultAuthenticationTokenFilter;
-import i2f.springboot.security.def.token.DefaultLogoutSuccessHandler;
-import i2f.springboot.security.def.token.DefaultTokenHolder;
+import i2f.springboot.security.def.token.*;
 import i2f.springboot.security.impl.SecurityForwardController;
 import org.springframework.context.annotation.Import;
 
@@ -27,11 +24,12 @@ import java.lang.annotation.*;
 
         SecurityForwardController.class,
 
-        DefaultUnAuthorizedHandler.class,
+        DefaultAuthorizeExceptionHandler.class,
         DefaultAuthenticationTokenFilter.class,
         DefaultTokenHolder.class,
         DefaultUserDetailsService.class,
         DefaultAuthenticationSuccessHandler.class,
+        DefaultAuthenticationFailureHandler.class,
         DefaultLogoutSuccessHandler.class
 })
 public @interface EnableSecurityConfig {

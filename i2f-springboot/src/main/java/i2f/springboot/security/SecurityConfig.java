@@ -3,7 +3,7 @@ package i2f.springboot.security;
 import i2f.springboot.security.impl.ISecurityConfigListener;
 import i2f.springboot.security.impl.JsonSupportUsernamePasswordAuthenticationFilter;
 import i2f.springboot.security.impl.LoginPasswordDecoder;
-import i2f.springboot.security.impl.UnAuthorizedHandler;
+import i2f.springboot.security.impl.AuthorizeExceptionHandler;
 import i2f.springboot.security.impl.token.AuthenticationTokenFilter;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,8 +25,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
@@ -85,11 +87,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired(required = false)
     private AuthenticationTokenFilter authenticationTokenFilter;
 
-    @Autowired
-    private UnAuthorizedHandler unauthorizedHandler;
+    @Autowired(required = false)
+    private AuthorizeExceptionHandler authorizeExceptionHandler;
 
     @Autowired
     private AuthenticationSuccessHandler authenticationSuccessHandler;
+
+    @Autowired
+    private AuthenticationFailureHandler authenticationFailureHandler;
 
     @Autowired(required = false)
     private LoginPasswordDecoder loginPasswordDecoder;
@@ -226,13 +231,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             loginPassword="password";
         }
 
+
         if(enableFormLogin){
             // 配置登录URL
             http.formLogin()
                     .loginProcessingUrl(loginUrl)
                     .usernameParameter(loginUsername)
                     .passwordParameter(loginUsername)
-                    .successHandler(authenticationSuccessHandler);
+                    .successHandler(authenticationSuccessHandler)
+                    .failureHandler(authenticationFailureHandler);
             log.info("SecurityConfig customer config form-login config.");
         }else{
             // 禁用formLogin,也就不会再进入 UsernamePasswordAuthenticationFilter
@@ -245,12 +252,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 使用自定义方式时，需要注意参数需要自己补充进去
         if(enableJsonLogin){
             http.addFilterAt(new JsonSupportUsernamePasswordAuthenticationFilter()
-                    .buildAuthenticationManager(authenticationManagerBean())
-                    .buildAuthenticationSuccessHandler(authenticationSuccessHandler)
-                    .buildLoginPath(loginUrl)
-                    .buildParameterUsername(loginUsername)
-                    .buildParameterPassword(loginPassword)
-                    .buildLoginPasswordDecoder(loginPasswordDecoder),
+                            .buildAuthenticationManager(authenticationManagerBean())
+                            .buildAuthenticationSuccessHandler(authenticationSuccessHandler)
+                            .buildAuthenticationFailureHandler(authenticationFailureHandler)
+                            .buildLoginPath(loginUrl)
+                            .buildParameterUsername(loginUsername)
+                            .buildParameterPassword(loginPassword)
+                            .buildLoginPasswordDecoder(loginPasswordDecoder),
                     UsernamePasswordAuthenticationFilter.class);
             log.info("SecurityConfig customer json support username-password auth filter.");
         }
@@ -276,14 +284,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 配置token预解析认证过滤器
         if(authenticationTokenFilter!=null){
             http.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+            if(logoutSuccessHandler!=null){
+                http.addFilterBefore(authenticationTokenFilter, LogoutFilter.class);
+            }
             log.info("SecurityConfig customer token filter config.");
         }
 
 
         // 配置认证失败处理类
-        if(unauthorizedHandler!=null){
+        if(authorizeExceptionHandler !=null){
             http.exceptionHandling()
-                    .authenticationEntryPoint(unauthorizedHandler);
+                    .authenticationEntryPoint(authorizeExceptionHandler);
             log.info("SecurityConfig customer unauthorized handler config.");
         }
 

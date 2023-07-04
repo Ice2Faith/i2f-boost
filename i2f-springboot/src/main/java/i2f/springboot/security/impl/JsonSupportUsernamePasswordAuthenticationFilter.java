@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -50,6 +51,11 @@ public class JsonSupportUsernamePasswordAuthenticationFilter extends UsernamePas
 
     public JsonSupportUsernamePasswordAuthenticationFilter buildAuthenticationSuccessHandler(AuthenticationSuccessHandler handler){
         super.setAuthenticationSuccessHandler(handler);
+        return this;
+    }
+
+    public JsonSupportUsernamePasswordAuthenticationFilter buildAuthenticationFailureHandler(AuthenticationFailureHandler handler){
+        super.setAuthenticationFailureHandler(handler);
         return this;
     }
 

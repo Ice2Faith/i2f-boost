@@ -37,19 +37,18 @@ public class DefaultLogoutSuccessHandler implements LogoutSuccessHandler {
         String token=(String)request.getAttribute("token");
         if(enableSingleLogin){
             log.info("DefaultLogoutSuccessHandler single-login logout.");
-            UserDetails details=(UserDetails) authentication.getPrincipal();
+            UserDetails details=null;
+            if(authentication!=null){
+                details=(UserDetails) authentication.getPrincipal();
+            }
             if(details!=null) {
                 String username= details.getUsername();
                 log.info("DefaultLogoutSuccessHandler logout user:"+username+" with token:"+token);
                 // 单点登录时，移除旧token,不需要单点登录，则不用移除旧token
                 tokenHolder.removeSingleToken(username, token);
-            }else{
-                tokenHolder.removeToken(token);
             }
-        }else{
-            tokenHolder.removeToken(token);
         }
-
+        tokenHolder.removeToken(token);
         SecurityForwardUtil.forward(request,response, ApiResp.success(null,"ok"));
     }
 }

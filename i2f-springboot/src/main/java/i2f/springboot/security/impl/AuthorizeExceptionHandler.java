@@ -7,5 +7,5 @@ import org.springframework.security.web.AuthenticationEntryPoint;
  * @date 2022/4/7 10:26
  * @desc
  */
-public interface UnAuthorizedHandler extends AuthenticationEntryPoint {
+public interface AuthorizeExceptionHandler extends AuthenticationEntryPoint {
 }
