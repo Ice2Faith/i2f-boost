@@ -20,13 +20,15 @@ import java.util.*;
 @NoArgsConstructor
 @Remark("same as User,but provide serialize")
 public class SecurityUser implements UserDetails {
-    private String password;
-    private  String username;
-    private  Set<SecurityGrantedAuthority> authorities;
-    private  boolean accountNonExpired=true;
-    private  boolean accountNonLocked=true;
-    private  boolean credentialsNonExpired=true;
-    private  boolean enabled=true;
+    protected String password;
+    protected String username;
+    protected Set<SecurityGrantedAuthority> authorities;
+    protected boolean accountNonExpired=true;
+    protected boolean accountNonLocked=true;
+    protected boolean credentialsNonExpired=true;
+    protected boolean enabled=true;
+
+    protected Object tag;
 
     public SecurityUser(User user){
         this(user.getUsername(),user.getPassword(),user.isEnabled(),user.isAccountNonExpired(),user.isCredentialsNonExpired(),user.isAccountNonLocked(),user.getAuthorities());
