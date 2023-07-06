@@ -167,12 +167,18 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
             nextResponse = responseProxyWrapper;
         }
 
+        boolean freshClientContext=false;
+        boolean freshServerContext=false;
+
+        secureTransfer.setExposeHeader(response);
+
         String decryped = (String) request.getAttribute(SecureConsts.FILTER_DECRYPT_HEADER);
         SecureHeader requestHeader = null;
         if (ctrl.in && !SecureConsts.FLAG_ENABLE.equals(decryped)) {
             // 包装请求，使得能够再次消费，以进行解密处理
             HttpServletRequestProxyWrapper requestProxyWrapper = new HttpServletRequestProxyWrapper(request);
             nextRequest = requestProxyWrapper;
+
 
             try {
                 requestHeader = SecureUtils.parseSecureHeader(secureConfig.getHeaderName(), secureConfig.getHeaderSeparator(), request);
@@ -227,14 +233,17 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
 
                 String digital = secureTransfer.getRequestDigitalHeader(requestHeader.digital, clientAsymSign);
                 if (digital == null) {
+                    freshClientContext=true;
                     throw new SecureException(SecureErrorCode.BAD_DIGITAL, "数字签名验证失败，请重试！");
                 }
                 if (!digital.equals(requestHeader.sign)) {
+                    freshClientContext=true;
                     throw new SecureException(SecureErrorCode.BAD_DIGITAL, "数字签名验证失败，请重试！");
                 }
 
                 String symmKey = secureTransfer.getRequestSecureHeader(requestHeader.randomKey, requestHeader.serverAsymSign);
                 if (symmKey == null) {
+                    freshServerContext=true;
                     throw new SecureException(SecureErrorCode.BAD_RANDOM_KEY, "随机秘钥无效或已失效，请重试！");
                 }
                 String replaceQueryString = null;
@@ -279,6 +288,12 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                 log.error(e.getClass().getName(), e);
                 // 标记异常头，如果发生异常，标记后在AOP或者RequestAdvice中抛出异常，以进行ExceptionHandler处理
                 requestProxyWrapper.setAttribute(SecureConsts.FILTER_EXCEPTION_ATTR_KEY, e);
+                if(freshClientContext){
+                    response.setHeader(secureConfig.getClientKeyHeaderName(),secureTransfer.getWebClientAsymPrivateKey(request));
+                }
+                if(freshServerContext){
+                    response.setHeader(secureConfig.getDynamicKeyHeaderName(),secureTransfer.getWebAsymPublicKey());
+                }
             }
             log.debug("mark as decrypted.");
             requestProxyWrapper.setAttribute(SecureConsts.SECURE_HEADER_ATTR_KEY, requestHeader);
@@ -364,7 +379,9 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
             response.setHeader(secureConfig.getHeaderName(), header);
             if (requestHeader != null) {
                 if (!responseHeader.serverAsymSign.equals(requestHeader.serverAsymSign)) {
-                    response.setHeader(SecureConsts.SECURE_DYNAMIC_KEY_HEADER, secureTransfer.getWebAsymPublicKey());
+                    if(!freshServerContext){
+                        response.setHeader(secureConfig.getDynamicKeyHeaderName(), secureTransfer.getWebAsymPublicKey());
+                    }
                 }
             }
             secureTransfer.setExposeHeader(response);

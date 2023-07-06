@@ -21,6 +21,7 @@ const SecureConsts={
 
     // 动态asym公钥的响应头
     SECURE_DYNAMIC_KEY_HEADER: () => "skey",
+    SECURE_CLIENT_KEY_HEADER: () => "wkey",
 
     // 安全Body加密标记头
     SECURE_DATA_HEADER: () => "secure-data",

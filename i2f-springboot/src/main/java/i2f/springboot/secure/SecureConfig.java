@@ -52,6 +52,7 @@ public class SecureConfig {
     private String headerSeparator = SecureConsts.DEFAULT_HEADER_SEPARATOR;
 
     private String dynamicKeyHeaderName = SecureConsts.SECURE_DYNAMIC_KEY_HEADER;
+    private String clientKeyHeaderName = SecureConsts.SECURE_CLIENT_KEY_HEADER;
 
     private String clientAsymSignName = SecureConsts.DEFAULT_SECURE_CLIENT_ASYM_SIGN_NAME;
 

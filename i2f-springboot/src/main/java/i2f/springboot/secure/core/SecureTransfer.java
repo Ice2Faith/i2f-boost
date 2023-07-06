@@ -392,15 +392,16 @@ public class SecureTransfer implements InitializingBean {
 
         // 将随机Asym加密模糊之后的Symm秘钥放入响应头，并设置可访问权限
         Collection<String> oldHeaders = response.getHeaders(SecureConsts.ACCESS_CONTROL_EXPOSE_HEADERS);
-        List<String> headers = new ArrayList<>(oldHeaders);
+        Set<String> headers = new LinkedHashSet<>(oldHeaders);
         headers.add(secureConfig.getHeaderName());
         if (secureConfig.isEnableDynamicAsymKey()) {
             headers.add(secureConfig.getDynamicKeyHeaderName());
         }
+        headers.add(secureConfig.getClientKeyHeaderName());
         response.setHeader(SecureConsts.ACCESS_CONTROL_EXPOSE_HEADERS, toCommaDelimitedString(headers));
     }
 
-    public String toCommaDelimitedString(List<String> headerValues) {
+    public String toCommaDelimitedString(Collection<String> headerValues) {
         StringJoiner joiner = new StringJoiner(", ");
         Iterator<String> iterator = headerValues.iterator();
 

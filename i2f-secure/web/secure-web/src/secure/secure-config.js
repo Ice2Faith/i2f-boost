@@ -10,6 +10,7 @@ const SecureConfig={
    headerName: SecureConsts.DEFAULT_SECURE_HEADER_NAME(),
    // 动态刷新Asym秘钥的响应头，默认skey
    dynamicKeyHeaderName: SecureConsts.SECURE_DYNAMIC_KEY_HEADER(),
+   clientKeyHeaderName: SecureConsts.SECURE_CLIENT_KEY_HEADER(),
    clientAsymSignName: SecureConsts.DEFAULT_SECURE_CLIENT_ASYM_SIGN_NAME(),
    // 安全头格式的分隔符，默认;
    headerSeparator: SecureConsts.DEFAULT_HEADER_SEPARATOR(),

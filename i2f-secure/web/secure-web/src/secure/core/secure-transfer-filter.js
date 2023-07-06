@@ -151,12 +151,19 @@ const SecureTransferFilter = {
         if (SecureConfig.enableDebugLog) {
             console.log('response:beforeSecureRes:', res.config.url, ObjectUtils.deepClone(res))
         }
-        let skeyHeader = res.headers[SecureConsts.SECURE_DYNAMIC_KEY_HEADER()];
+        let skeyHeader = res.headers[SecureConfig.dynamicKeyHeaderName];
         if (!StringUtils.isEmpty(skeyHeader)) {
             if (SecureConfig.enableDebugLog) {
                 console.log('response:updateAsymPubKey:', res.config.url, skeyHeader)
             }
             SecureTransfer.saveAsymPubKey(skeyHeader);
+        }
+        let wkeyHeader = res.headers[SecureConfig.clientKeyHeaderName];
+        if (!StringUtils.isEmpty(wkeyHeader)) {
+            if (SecureConfig.enableDebugLog) {
+                console.log('response:updateAsymPriKey:', res.config.url, wkeyHeader)
+            }
+            SecureTransfer.saveAsymPriKey(wkeyHeader);
         }
 
         let headerValue = res.headers[SecureConfig.headerName]
