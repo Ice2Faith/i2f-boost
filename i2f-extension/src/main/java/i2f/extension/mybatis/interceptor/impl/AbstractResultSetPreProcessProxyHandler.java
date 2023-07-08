@@ -32,6 +32,9 @@ public abstract class AbstractResultSetPreProcessProxyHandler extends BasicResul
             return retVal;
         }
         Method method=findMapperMethod(ivkObj);
+        if(method==null){
+            return retVal;
+        }
         MybatisCamel ann=ReflectResolver.findElementAnnotation(method, MybatisCamel.class,true,false,false);
         if(ann==null || !ann.value()){
             return retVal;
@@ -67,6 +70,9 @@ public abstract class AbstractResultSetPreProcessProxyHandler extends BasicResul
             return null;
         }
         Method method=findMapperMethod(ivkObj);
+        if(method==null){
+            return null;
+        }
         MybatisCamel ann=ReflectResolver.findElementAnnotation(method, MybatisCamel.class,true,false,false);
         if(ann==null || !ann.value()){
             return null;

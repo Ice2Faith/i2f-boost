@@ -96,6 +96,7 @@ public class CamelKeyResultSetInterceptor extends AbstractMybatisInterceptor {
 - use case reference AbstractSqlLogStatementProxyHandler.class
 ```java
 Method method=findMapperMethod(ivkObj);
+// if some other framework enhance,maybe cloud not found
 MybatisLog ann= ReflectResolver.findElementAnnotation(method, MybatisLog.class,true,false,false);
 if(ann==null || !ann.value()){
     return null;

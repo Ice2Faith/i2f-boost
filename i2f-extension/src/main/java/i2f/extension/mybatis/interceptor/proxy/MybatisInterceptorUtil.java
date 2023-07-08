@@ -42,6 +42,24 @@ public class MybatisInterceptorUtil {
         Class clazz=ReflectResolver.getClazz(className);
         Set<Method> methods= ReflectResolver.findMethodsByName(clazz,methodName);
 
+        // enhancer find
+        String[] enhanceSpliters=new String[]{"_","$"};
+        if(!methods.iterator().hasNext()){
+            String originMethodName=methodName;
+            for(int i=0;i<enhanceSpliters.length;i++){
+                if(methodName.contains(enhanceSpliters[i])){
+                    idx=originMethodName.lastIndexOf(enhanceSpliters[i]);
+                    methodName=originMethodName.substring(0,idx);
+                }
+                methods=ReflectResolver.findMethodsByName(clazz,methodName);
+                if(methods.iterator().hasNext()){
+                   break;
+                }
+            }
+        }
+        if(!methods.iterator().hasNext()){
+            return Collections.emptySet();
+        }
         mappedIdMethodCache.put(id, Collections.unmodifiableSet(methods));
         return mappedIdMethodCache.get(id);
     }

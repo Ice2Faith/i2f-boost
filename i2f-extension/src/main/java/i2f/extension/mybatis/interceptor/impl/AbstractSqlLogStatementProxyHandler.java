@@ -70,6 +70,9 @@ public abstract class AbstractSqlLogStatementProxyHandler extends BasicStatement
             return null;
         }
         Method method=findMapperMethod(ivkObj);
+        if(method==null){
+            return null;
+        }
         MybatisLog ann= ReflectResolver.findElementAnnotation(method, MybatisLog.class,true,false,false);
         this.ann=ann;
         if(ann==null || !ann.value()){
