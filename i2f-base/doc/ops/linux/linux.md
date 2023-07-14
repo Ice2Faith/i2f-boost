@@ -1108,3 +1108,102 @@ fc-cache -fv
 fl-list
 ```
 
+## 安装阿里国内yum镜像源
+- 进入yum源路径
+```shell script
+cd /etc/yum.repos.d/
+```
+- 下载阿里源
+```shell script
+wget http://mirrors.aliyun.com/repo/Centos-7.repo
+```
+- 备份原始源
+```shell script
+mv CentOS-Base.repo CentOS-Base.repo.backup
+```
+- 替换为阿里源
+```shell script
+mv Centos-7.repo CentOS-Base.repo
+```
+- 清理源
+```shell script
+yum clean all
+```
+- 创建源
+```shell script
+yum makecache
+```
+- 更新源
+```shell script
+yum update && yum upgrade -y
+```
+
+## 编写服务-开机启动
+- 创建服务文件
+```shell script
+vi /etc/systemd/system/my-boot.service
+```
+- 编写服务内容
+```shell script
+[Unit]
+Description=/etc/my-boot.sh
+ConditionPathExists=/etc/my-boot.sh
+
+[Service]
+Type=forking
+ExecStart=/etc/my-boot.sh start
+TimeoutSec=0
+StandardOutput=tty
+RemainAfterExit=yes
+SysVStartPriority=99
+
+[Install]
+WantedBy=multi-user.target
+```
+- 注意几个点
+    - ExecStart 要执行的程序或者命令或者脚本
+    - ConditionPathExists 判断条件，这里要求这个文件要存在
+- 编写启动脚本内容
+```shell script
+vi /etc/my-boot.sh
+```
+- 编写内容
+    - 因为我们只是需要尝试启动我们的应用
+    - 因此nohup即可
+```shell script
+#!/bin/sh -e
+
+# here add your boot shell, such as
+# sh /root/boot.sh
+
+nohup sh /root/start.sh > /dev/null &
+
+
+exit 0
+```
+- 这个只是为了使用nohup
+    - 因此中间的一个shell脚本
+- 编写最终的启动脚本
+```shell script
+vi /root/start.sh
+```
+- 启动内容
+```shell script
+sleep 5
+
+ENV_PATH=/root/env
+
+cd $ENV_PATH
+cd kafka_2.12-3.3.1
+nohup ./start.sh > /dev/null  &
+```
+- 特别注意
+    - 因为这是系统启动
+    - 因此，最好建议先cd到目标应用所在路径
+    - 否则应用的路径不对，可能无法启动
+- 开启服务
+```shell script
+systemctl enable my-boot.service
+```
+- 其实就和正常服务一样使用即可
+- 其他服务管理就不再赘述

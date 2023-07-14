@@ -10,6 +10,7 @@
 - 安装openssh
 ```shell script
 yum install -y openssh
+yum -y install openssh-clients
 ```
 ## 配置免密
 - 免密登录
@@ -48,6 +49,16 @@ ssh-copy-id 用户@主机
 ssh-copy-id localhost
 ssh-copy-id 192.168.0.10
 ssh-copy-id root@192.168.0.11
+```
+- 如果出现使用不了ssh-copy-id的情况
+- 可以使用以下语句替换
+```shell script
+cat ~/.ssh/id_*.pub|ssh 用户@主机 'cat >> .ssh/authorized_keys'
+```
+- 注意，如果ssh端口不是默认22
+- 需要使用-p参数指定端口
+```shell script
+cat ~/.ssh/id_*.pub|ssh root@127.0.0.1 -p 2022 'cat >> .ssh/authorized_keys'
 ```
 ### 免密登录案例
 - 以下操作，都使用 root 用户操作
@@ -139,6 +150,15 @@ done
 ```shell script
 ./xsync /root/readme.md
 ```
+- 如果ssh不是默认22端口
+- 更改下此语句即可
+```shell script
+rsync -rvl -e 'ssh -p 2022' $pdir/$fname $user@$host:$pdir
+```
+- 如果找不到命令，请安装
+```shell script
+yum install rsync -y
+```
 
 ### 同时执行命令
 - 编写脚本
@@ -173,4 +193,9 @@ done
 - 使用方式
 ```shell script
 ./xcall free -h
+```
+- 如果ssh不是默认22端口
+- 更改下此语句即可
+```shell script
+ssh -p 2022 $user@$host $cmd
 ```
