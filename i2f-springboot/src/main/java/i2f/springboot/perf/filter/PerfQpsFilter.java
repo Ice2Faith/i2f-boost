@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -32,6 +33,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 @WebFilter(urlPatterns = "/**")
 public class PerfQpsFilter extends OncePerRequestFilter {
+    public static final String X_REAL_FORWARD_URL="X-REAL-FORWARD-URL";
+
     private ConcurrentHashMap<String, AtomicInteger> statisticMap = new ConcurrentHashMap<>();
     private ScheduledExecutorService pool = Executors.newScheduledThreadPool(3,new NamingThreadFactory("perf","qps"));
 
@@ -47,6 +50,13 @@ public class PerfQpsFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         String uri = request.getRequestURI();
+        Object realUrlAttr = request.getAttribute(X_REAL_FORWARD_URL);
+        if(realUrlAttr!=null){
+            String realUrl=String.valueOf(realUrlAttr);
+            if(!StringUtils.isEmpty(realUrl)){
+                uri=realUrl;
+            }
+        }
         String name = PerfStorage.QPS_PREFIX + uri;
         if (!statisticMap.containsKey(name)) {
             statisticMap.put(name, new AtomicInteger(0));

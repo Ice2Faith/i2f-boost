@@ -48,9 +48,9 @@ public class PerfController {
             key = key.substring(1);
         }
         key=key.toLowerCase();
-        for (String iter : PerfConfig.STORE.indexesMap.keySet()) {
-            String item=iter.toLowerCase();
-            if (item.contains(key)) {
+        for (String item : PerfConfig.STORE.indexesMap.keySet()) {
+            String iter=item.toLowerCase();
+            if (iter.contains(key)) {
                 if (!isNeg) {
                     ret.put(item, PerfConfig.STORE.indexesMap.get(item));
                 }

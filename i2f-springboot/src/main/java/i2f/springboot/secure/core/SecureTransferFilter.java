@@ -54,6 +54,8 @@ import java.util.concurrent.*;
 //)
 public class SecureTransferFilter implements Filter, InitializingBean, ApplicationContextAware {
 
+    public static final String X_REAL_FORWARD_URL="X-REAL-FORWARD-URL";
+
     @Override
     public void afterPropertiesSet() {
         log.info("SecureTransferFilter config done.");
@@ -101,6 +103,15 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
             encUrl = encUrl + "/";
         }
         boolean isEnc = uri.startsWith(encUrl);
+
+        if(isEnc) {
+            String encodeUrl=uri.substring(encUrl.length());
+            String trueUrl = SecureUtils.decodeEncTrueUrl(encodeUrl);
+            if (!trueUrl.startsWith("/")) {
+                trueUrl = "/" + trueUrl;
+            }
+            request.setAttribute(X_REAL_FORWARD_URL,trueUrl);
+        }
         return isEnc;
     }
 

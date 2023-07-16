@@ -234,6 +234,7 @@ public class SecureUtils {
     }
 
     public static String decodeEncTrueUrl(String encodeUrl) {
+        encodeUrl=CodecUtil.ofUrl(encodeUrl);
         String text=CodecUtil.ofUtf8(Base64Util.decode(encodeUrl));
         text = Base64Obfuscator.decode(text);
 

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -26,9 +27,18 @@ import java.io.IOException;
 @Component
 @WebFilter(urlPatterns = "/**")
 public class PerfResponseTimeFilter extends OncePerRequestFilter {
+    public static final String X_REAL_FORWARD_URL="X-REAL-FORWARD-URL";
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         String uri = request.getRequestURI();
+        Object realUrlAttr = request.getAttribute(X_REAL_FORWARD_URL);
+        if(realUrlAttr!=null){
+            String realUrl=String.valueOf(realUrlAttr);
+            if(!StringUtils.isEmpty(realUrl)){
+                uri=realUrl;
+            }
+        }
         String name = PerfStorage.RESPONSE_TIME_PREFIX + uri;
 
         long beginTime = System.currentTimeMillis();
