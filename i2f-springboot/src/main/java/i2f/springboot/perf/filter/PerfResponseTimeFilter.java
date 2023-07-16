@@ -1,8 +1,10 @@
 package i2f.springboot.perf.filter;
 
+import i2f.springboot.perf.PerfConfig;
 import i2f.springboot.perf.context.PerfStorage;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -18,11 +20,12 @@ import java.io.IOException;
  * @date 2023/6/8 8:52
  * @desc
  */
+@ConditionalOnExpression("${i2f.springboot.config.perf.collect.response-time.enable:true}")
 @Slf4j
 @Data
 @Component
 @WebFilter(urlPatterns = "/**")
-public class ResponseTimeFilter extends OncePerRequestFilter {
+public class PerfResponseTimeFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         String uri = request.getRequestURI();
@@ -34,7 +37,7 @@ public class ResponseTimeFilter extends OncePerRequestFilter {
         } finally {
             long endTime = System.currentTimeMillis();
             long useTime = endTime - beginTime;
-            PerfStorage.STORE.add(name, useTime);
+            PerfConfig.STORE.add(name, useTime);
         }
     }
 }

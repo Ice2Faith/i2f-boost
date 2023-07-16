@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2023/6/8 13:54
  * @desc
  */
-public class SpyRequestListener implements ServletRequestListener, PerfSpy {
+public class PerfRequestListener implements ServletRequestListener, PerfSpy {
 
     private AtomicInteger requestCount = new AtomicInteger(0);
 

@@ -1,8 +1,11 @@
 package i2f.springboot.perf.filter;
 
+import i2f.core.thread.NamingThreadFactory;
+import i2f.springboot.perf.PerfConfig;
 import i2f.springboot.perf.context.PerfStorage;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -23,19 +26,20 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2023/6/8 8:52
  * @desc
  */
+@ConditionalOnExpression("${i2f.springboot.config.perf.collect.qps.enable:true}")
 @Slf4j
 @Data
 @Component
 @WebFilter(urlPatterns = "/**")
-public class QpsFilter extends OncePerRequestFilter {
+public class PerfQpsFilter extends OncePerRequestFilter {
     private ConcurrentHashMap<String, AtomicInteger> statisticMap = new ConcurrentHashMap<>();
-    private ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService pool = Executors.newScheduledThreadPool(3,new NamingThreadFactory("perf","qps"));
 
     {
         pool.scheduleAtFixedRate(() -> {
             for (String name : statisticMap.keySet()) {
                 AtomicInteger value = statisticMap.get(name);
-                PerfStorage.STORE.add(name, value.getAndSet(0));
+                PerfConfig.STORE.add(name, value.getAndSet(0));
             }
         }, 0, 1, TimeUnit.SECONDS);
     }

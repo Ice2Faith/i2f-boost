@@ -2,6 +2,7 @@ package i2f.springboot.perf.exception;
 
 import i2f.springboot.perf.data.PerfIndex;
 import i2f.springboot.perf.spy.PerfMultiSpy;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -21,9 +22,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2023/6/8 17:57
  * @desc
  */
+@ConditionalOnExpression("${i2f.springboot.config.perf.collect.exception.enable:true}")
 @Order(-1)
 @Component
-public class ExceptionCountSpy implements HandlerExceptionResolver, PerfMultiSpy {
+public class PerfExceptionCountSpy implements HandlerExceptionResolver, PerfMultiSpy {
     private AtomicInteger exceptCount = new AtomicInteger(0);
     private AtomicInteger runtimeCount = new AtomicInteger(0);
     private AtomicInteger ioCount = new AtomicInteger(0);

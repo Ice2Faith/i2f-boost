@@ -33,8 +33,12 @@ public class PerfContext {
         lastModify = System.currentTimeMillis();
         data.add(item);
         count++;
-        if (count > maxCount) {
+        while (count > maxCount) {
             data.removeFirst();
+            count--;
+            if(count<=0){
+                break;
+            }
         }
     }
 }
