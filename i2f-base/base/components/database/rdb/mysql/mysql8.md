@@ -141,16 +141,16 @@ wget xxx
 ```
 - 得到包
 ```shell script
-mysql-8.0.30-linux-glibc2.17-x86_64-minimal.tar.xz
+mysql-8.0.32-linux-glibc2.12-x86_64.tar.xz
 ```
 - 解包
 ```shell script
-xz -d mysql-8.0.30-linux-glibc2.17-x86_64-minimal.tar.xz
-tar -xvf mysql-8.0.30-linux-glibc2.17-x86_64-minimal.tar
+xz -d mysql-8.0.32-linux-glibc2.12-x86_64.tar.xz
+tar -xvf mysql-8.0.32-linux-glibc2.12-x86_64.tar
 ```
 - 重命名
 ```shell script
-mv mysql-8.0.30-linux-glibc2.17-x86_64-minimal mysql-8.0.30
+mv mysql-8.0.32-linux-glibc2.12-x86_64 mysql-8.0.32
 ```
 - 创建用户组
 ```shell script
@@ -159,51 +159,45 @@ useradd -g mysql mysql
 ```
 - 创建数据存储目录
 ```shell script
-mkdir -p /opt/env/mysql/data
-mkdir -p /opt/env/mysql/logs
-mkdir -p /opt/env/mysql/log
-mkdir -p /opt/env/mysql/temp
+mkdir -p /opt/env/mysql8/conf
+mkdir -p /opt/env/mysql8/data
+mkdir -p /opt/env/mysql8/logs
+mkdir -p /opt/env/mysql8/log
+mkdir -p /opt/env/mysql8/temp
 ```
 - 更改目录所有者
 ```shell script
-chown -R mysql:mysql mysql-8.0.30
-chown -R mysql:mysql /opt/env/mysql
-chmod -R a+rwx mysql-8.0.30
-chmod -R a+rwx /opt/env/mysql
+chown -R mysql:mysql mysql-8.0.32
+chown -R mysql:mysql /opt/env/mysql8
+chmod -R a+rwx mysql-8.0.32
+chmod -R a+rwx /opt/env/mysql8
 ```
-- 初始化
-    - 注意，这一步最后会输出随机的密码
-    - 后面要使用，记得保存
-```shell script
-./mysqld --user=mysql --basedir=/home/env/mysql8/mysql-8.0.30 --datadir=/opt/env/mysql8/data --tmpdir=/opt/env/mysql8/temp --log-error=/opt/env/mysql8/logs/mysql.err --lower-case-table-names=1 --initialize```
 - 编辑配置文件
 ```shell script
-vi /etc/my.cnf
+vi /opt/env/mysql8/conf/my.cnf
 ```
 ```shell script
 [mysqld]
 bind-address=0.0.0.0
 port=3306
 user=mysql
-basedir=/home/env/mysql8/mysql-8.0.30
-datadir=/opt/env/mysql/data
-tmpdir=/opt/env/mysql/temp
+basedir=/home/env/mysql8/mysql-8.0.32
+datadir=/opt/env/mysql8/data
+tmpdir=/opt/env/mysql8/temp
 socket=/tmp/mysql.sock
-log-error=/opt/env/mysql/logs/mysql.err
-pid-file=/opt/env/mysql/mysql.pid
+log-error=/opt/env/mysql8/logs/mysql.err
+pid-file=/opt/env/mysql8/mysql.pid
 #character config
 character_set_server=utf8mb4
 collation-server=utf8mb4_general_ci
 symbolic-links=0
 explicit_defaults_for_timestamp=true
 
-skip-name-resolve
-
 # 开启 Binlog 并写明存放日志的位置
-#log_bin = /opt/env/mysql/log/binlog
+#log_bin = /opt/env/mysql8/log/binlog
 
 # 指定索引文件的位置
-#log_bin_index = /opt/env/mysql/log/mysql-bin.index
+#log_bin_index = /opt/env/mysql8/log/mysql-bin.index
 
 #删除超出这个变量保留期之前的全部日志被删除
 expire_logs_days = 14
@@ -218,19 +212,63 @@ max_connect_errors=500
 # 指定执行器数量
 innodb_buffer_pool_instances=4
 ```
-- 更改权限
+- 初始化
+    - 注意，这一步最后会输出随机的密码
+    - 后面要使用，记得保存
 ```shell script
-chmod a+rw /etc/my*
+./bin/mysqld --defaults-file=/opt/env/mysql8/conf/my.cnf --user=mysql --initialize
 ```
-- 添加服务到系统
+- 获取初始化密码
+    - 最后一行就是
 ```shell script
-cp -a ./support-files/mysql.server /etc/init.d/mysql
-chmod a+x /etc/init.d/mysql
-chkconfig --add mysql
+tail -300f /opt/env/mysql8/logs/mysql.err
+```
+- 编写启动脚本
+```shell script
+vi start.sh
+```
+```shell script
+#!/bin/sh -e
+
+cd /home/env/mysql8/mysql-8.0.32
+nohup ./bin/mysqld --defaults-file=/opt/env/mysql8/conf/my.cnf --user=mysql 2>&1 > mysql.log & echo $! > mysql.pid
 ```
 - 启动mysql
 ```shell script
-systemctl start mysql
+./start.sh
+```
+- 登录客户端
+```shell script
+./bin/mysql -u root -p
+```
+- 修改默认密码
+    - 这些和默认安装的一致
+    - 不再赘述
+- 添加服务到系统
+```shell script
+vi /etc/systemd/system/mysqld.service
+```
+```shell script
+[Unit]
+Description=MySQL Server
+Documentation=man:mysqld(8)
+After=network.target
+After=syslog.target
+
+[Service]
+Type=forking
+ExecStart=/home/env/mysql8/mysql-8.0.32/start.sh
+TimeoutSec=0
+StandardOutput=tty
+RemainAfterExit=yes
+SysVStartPriority=99
+
+[Install]
+WantedBy=multi-user.target
+```
+- 使能服务
+```shell script
+systemctl enable mysqld
 ```
 - 之后的初始化过程和rpm自动安装的过程一致
 - 不再赘述
