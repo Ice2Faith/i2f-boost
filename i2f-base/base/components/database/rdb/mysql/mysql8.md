@@ -363,3 +363,493 @@ innodb_buffer_pool_instances=4
 docker -ps
 ```
 
+# 主从配置
+- 主从，实际上就是一台主库+N个从库的配置
+- 同时从库也可以作为其他从库的主库，实现链式复制
+- 工作原理
+    - 主库开启binlog日志
+    - 从库指向主库，使用iothread从主库拉取binlog保存到本地的relaylog
+    - 从库使用SQLthread从relaylog执行日志，从而实现同步
+- 现在101作为主库，102作为从库
+## 主库配置
+- 修改配置文件
+    - 在[mysqld]节点下添加
+```shell script
+vi /etc/my.cnf
+```
+```shell script
+# 服务ID，在整个集群环境唯一即可，一般使用服务器IP即可
+server-id=101
+# 是否只读，1 只读，0 读写
+read-only=0
+# 启用binlog
+log_bin=/var/log/mysql/mysql-bin
+# 下面两项可以不配置，默认是所有库开启binlog
+# 忽略哪些库的binlog
+#binlog-ignore-db=mysql
+# 指定那些库需要进行binlog
+#binlog-do-db=test_db
+```
+- 重启mysql
+```shell script
+systemctl restart mysqld
+```
+- 登录客户端
+```shell script
+mysql -uroot -p
+```
+- 添加从库从主库读取binlog的用户
+```sql
+create user 'slave'@'%' identified with mysql_natice_password by 'xxx123456';
+```
+- 为用户赋权
+```sql
+grant replication slave on *.* to 'slave'@'%';
+```
+- 刷新权限
+```sql
+flush  privileges;
+```
+- 查看此时的binlog日志信息
+```shell script
+show master status\G
+```
+- 关注两个信息，从库需要使用
+    - file binlog 日志文件的文件名
+    - position binlog 日志的当前位置
+    - 假设值分别为：
+        - file: binlog.00001
+        - position: 500
+
+## 从库配置
+- 修改配置文件
+    - 在[mysqld]节点下添加
+```shell script
+vi /etc/my.cnf
+```
+```shell script
+# 服务ID，在整个集群环境唯一即可，一般使用服务器IP即可
+server-id=102
+# 是否只读，1 只读，0 读写
+read-only=1
+```
+- 重启mysql
+```shell script
+systemctl restart mysqld
+```
+- 登录客户端
+```shell script
+mysql -uroot -p
+```
+- 将从库指向主库
+```sql
+-- >= 8.0.23
+change replication source to source_host='192.168.1.101:3306',source_user='slave',source_password='xxx123456',source_log_file='binlog.00001',source_log_position=500;
+
+-- < 8.0.23
+change master to master_host='192.168.1.101:3306',master_user='slave',master_password='xxx123456',master_log_file='binlog.00001',master_log_position=500;
+```
+- 开启同步
+```sql
+-- >= 8.0.22
+start replica;
+
+-- < 8.0.22
+start slave;
+```
+- 查看同步状态
+```sql
+-- >= 8.0.22
+show replica status;
+
+-- < 8.0.22
+show slave status;
+```
+- 确认状态为YES即可
+
+# keepalived+mysql主从实现HA
+- 实现目标
+    - 当主库宕机之后，自动切换为从库提供服务
+    - 所以关键步骤如下
+    - 两台都开启binlog
+    - 当主库宕机后，设置从库为新的主库
+## 两台都配置
+- 修改配置文件
+    - 在[mysqld]节点下添加
+```shell script
+vi /etc/my.cnf
+```
+```shell script
+# 服务ID，在整个集群环境唯一即可，一般使用服务器IP即可
+# 注意两台机器的id要不一样
+server-id=101
+# 启用binlog
+log_bin=/var/log/mysql/mysql-bin
+# 日志的做多保存日期
+expire_logs_days = 10
+# 下面两项可以不配置，默认是所有库开启binlog
+# 忽略哪些库的binlog
+#binlog-ignore-db=mysql
+# 指定那些库需要进行binlog
+#binlog-do-db=test_db
+```
+- 重启mysql
+```shell script
+systemctl restart mysqld
+```
+- 登录客户端
+```shell script
+mysql -uroot -p
+```
+- 添加从库从主库读取binlog的用户
+```sql
+create user 'slave'@'%' identified with mysql_natice_password by 'xxx123456';
+```
+- 为用户赋权
+```sql
+grant replication slave on *.* to 'slave'@'%';
+```
+- 刷新权限
+```sql
+flush  privileges;
+```
+- 查看此时的binlog日志信息
+```shell script
+show master status\G
+```
+- 关注两个信息，从库需要使用
+    - file binlog 日志文件的文件名
+    - position binlog 日志的当前位置
+    - 假设值分别为：
+        - file: binlog.00001
+        - position: 500
+## 两台互相配置为从库
+- 登录客户端
+```shell script
+mysql -uroot -p
+```
+- 将从库指向主库
+    - 互相指向
+```sql
+-- >= 8.0.23
+change replication source to source_host='192.168.1.101:3306',source_user='slave',source_password='xxx123456',source_log_file='binlog.00001',source_log_position=500;
+
+-- < 8.0.23
+change master to master_host='192.168.1.101:3306',master_user='slave',master_password='xxx123456',master_log_file='binlog.00001',master_log_position=500;
+```
+- 开启同步
+```sql
+-- >= 8.0.22
+start replica;
+
+-- < 8.0.22
+start slave;
+```
+- 查看同步状态
+```sql
+-- >= 8.0.22
+show replica status;
+
+-- < 8.0.22
+show slave status;
+```
+- 确认状态为YES即可
+
+## 配置keepalived
+- 配置mysql的命令行免密验证
+```shell script
+mysql_config_editor set --login-path=local --user=root --port=3306 --password
+mysql_config_editor print --all
+```
+- 基础环境配置
+```shell script
+vi mysqlenv.sh
+```
+```shell script
+MYSQL=/usr/bin/mysql
+MYSQL_CMD="--login-path=local"
+#远端主机的IP地址，不同主机指向对方
+REMOTE_IP=192.168.1.101
+export mysql="$MYSQL $MYSQL_CMD "
+```
+- 检查mysql状态脚本
+```shell script
+vi mycheck.sh
+```
+```shell script
+#!/bin/sh
+
+##################################################
+#File Name  : mycheck.sh
+#Description: mysql is working MYSQL_OK is 1
+#             mysql is down MYSQL_OK is 0
+##################################################
+
+BASEPATH=/home/mysql
+LOGSPATH=$BASEPATH/logs
+source $BASEPATH/.mysqlenv。sh
+
+CHECK_TIME=3
+MYSQL_OK=1
+##################################################################
+function check_mysql_health (){
+  $mysql -e "show status;" >/dev/null 2>&1
+  if [ $? == 0 ] 
+  then 
+    MYSQL_OK=1
+  else
+    MYSQL_OK=0
+    #systemctl status keepalived
+ fi
+ return $MYSQL_OK
+}
+
+#check_mysql_helth
+while [ $CHECK_TIME -ne 0 ] #不等于
+do
+    let "CHECK_TIME -= 1"
+    check_mysql_health
+    if [ $MYSQL_OK = 1 ] ; then
+        CHECK_TIME=0
+        echo "$(date "+%Y-%m-%d %H:%M:%S") The scripts mycheck.sh is running ..." >> $LOGSPATH/mysql_switch.log
+        exit 0
+    fi
+    if [ $MYSQL_OK -eq 0 ] && [ $CHECK_TIME -eq 0 ] #等于
+    then
+        systemctl stop keepalived
+        echo "$(date "+%Y-%m-%d %H:%M:%S") The mycheck.sh, mysql is down, after switch..." >> $LOGSPATH/mysql_switch.log
+        exit 1
+    fi
+    sleep 1　　
+done
+```
+- 切换为主库
+```shell script
+vi mymaster.sh
+```
+```shell script
+#!/bin/sh
+
+##################################################
+#File Name  : mymaster.sh
+#Description: First determine whether synchronous
+#             replication is performed, and if no
+#             execution is completed, wait for 1
+#             minutes. Log logs and POS after
+#             switching, and record files synchronously.
+##################################################
+
+BASEPATH=/home/mysql
+LOGSPATH=$BASEPATH/logs
+source $BASEPATH/.mysqlenv.sh
+
+$mysql -e "show slave status\G" > $LOGSPATH/mysqlslave.states
+Master_Log_File=`cat $LOGSPATH/mysqlslave.states | grep -w Master_Log_File | awk -F": " '{print $2}'`
+Relay_Master_Log_File=`cat $LOGSPATH/mysqlslave.states | grep -w Relay_Master_Log_File | awk -F": " '{print $2}'`
+Read_Master_Log_Pos=`cat $LOGSPATH/mysqlslave.states | grep -w Read_Master_Log_Pos | awk -F": " '{print $2}'`
+Exec_Master_Log_Pos=`cat $LOGSPATH/mysqlslave.states | grep -w Exec_Master_Log_Pos | awk -F": " '{print $2}'`
+i=1
+
+while true
+do
+    if [ $Master_Log_File = $Relay_Master_Log_File ] && [ $Read_Master_Log_Pos -eq $Exec_Master_Log_Pos ];then
+        echo "$(date "+%Y-%m-%d %H:%M:%S") The mymaster.sh, slave sync ok... " >> $LOGSPATH/mysql_switch.log
+        break
+    else
+        sleep 1
+        if [ $i -gt 60 ];then
+            break
+        fi
+        continue
+        let i++
+    fi
+done
+
+$mysql -e "stop slave;"
+$mysql -e "set global innodb_support_xa=0;"
+$mysql -e "set global sync_binlog=0;"
+$mysql -e "set global innodb_flush_log_at_trx_commit=0;"
+$mysql -e "flush logs;GRANT ALL PRIVILEGES ON *.* TO 'replication'@'%' IDENTIFIED BY 'replication';flush privileges;"
+$mysql -e "show master status;" > $LOGSPATH/master_status_$(date "+%y%m%d-%H%M").txt
+
+# sync pos file
+/usr/bin/scp $LOGSPATH/master_status_$(date "+%y%m%d-%H%M").txt root@$REMOTE_IP:$BASEPATH/syncposfile/backup_master.status
+echo "$(date "+%Y-%m-%d %H:%M:%S") The mymaster.sh, Sync pos file sucess." >> $LOGSPATH/mysql_switch.log
+```
+- 切换为从库
+```shell script
+vi mybackup.sh
+```
+```shell script
+#!/bin/sh
+
+##################################################
+#File Name  : mybackup.sh
+#Description: Empty the slave configuration, retrieve
+#             the remote log file and Pos, and open
+#             the synchronization
+##################################################
+
+BASEPATH=/home/mysql
+LOGSPATH=$BASEPATH/logs
+source $BASEPATH/.mysqlenv.sh
+
+$mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'replication'@'%' IDENTIFIED BY 'replication';flush privileges;"
+$mysql -e "set global innodb_support_xa=0;"
+$mysql -e "set global sync_binlog=0;"
+$mysql -e "set global innodb_flush_log_at_trx_commit=0;"
+$mysql -e "flush logs;"
+$mysql -e "reset slave all;"
+
+if [ -f $BASEPATH/syncposfile/backup_master.status ];then
+        New_ReM_File=`cat $BASEPATH/syncposfile/backup_master.status | grep -v File |awk '{print $1}'`
+        New_ReM_Position=`cat $BASEPATH/syncposfile/backup_master.status | grep -v File |awk '{print $2}'`
+        echo "$(date "+%Y-%m-%d %H:%M:%S") This mybackup.sh, New_ReM_File:$New_ReM_File,New_ReM_Position:$New_ReM_Position" >> $LOGSPATH/mysql_switch.log
+        $mysql -e "change master to master_host='$REMOTE_IP',master_port=3306,master_user='replication',master_password='replication',master_log_file='$New_ReM_File',master_log_pos=$New_ReM_Position;"
+        $mysql -e "start slave;"
+        $mysql -e "show slave status\G;" > $LOGSPATH/slave_status_$(date "+%y%m%d-%H%M").txt
+        cat $LOGSPATH/slave_status_$(date "+%y%m%d-%H%M").txt >> $LOGSPATH/mysql_switch.log
+        rm -f $BASEPATH/syncposfile/backup_master.status
+else
+    echo "$(date "+%Y-%m-%d %H:%M:%S") The scripts mybackup.sh running error..." >> $LOGSPATH/mysql_switch.log
+fi
+```
+- 停止脚本
+```shell script
+vi mystop.sh
+```
+```shell script
+#!/bin/sh
+
+##################################################
+#File Name  : mystop.sh
+#Description: Set parameters to ensure that the data
+#             is not lost, and finally check to see
+#             if there are still write operations,
+#             the last 1 minutes to exit
+
+##################################################
+
+BASEPATH=/home/mysql
+LOGSPATH=$BASEPATH/logs
+source $BASEPATH/.mysqlenv.sh
+
+$mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'replication'@'%' IDENTIFIED BY 'replication';flush privileges;"
+$mysql -e "set global innodb_support_xa=1;"
+$mysql -e "set global sync_binlog=1;"
+$mysql -e "set global innodb_flush_log_at_trx_commit=1;"
+$mysql -e "show master status\G" > $LOGSPATH/mysqlmaster0.states
+M_File1=`cat $LOGSPATH/mysqlmaster0.states | awk -F': ' '/File/{print $2}'`
+M_Position1=`cat $LOGSPATH/mysqlmaster0.states | awk -F': ' '/Position/{print $2}'`
+sleep 2
+$mysql -e "show master status\G" > $LOGSPATH/mysqlmaster1.states
+M_File2=`cat $LOGSPATH/mysqlmaster1.states | awk -F': ' '/File/{print $2}'`
+M_Position2=`cat $LOGSPATH/mysqlmaster1.states | awk -F': ' '/Position/{print $2}'`
+
+i=1
+
+while true
+do
+    if [ $M_File1 = $M_File2 ] && [ $M_Position1 -eq $M_Position2 ];then
+        echo "$(date "+%Y-%m-%d %H:%M:%S") The mystop.sh, master sync ok.." >> $LOGSPATH/mysql_switch.log
+        exit 0
+    else
+        sleep 1
+        if [$i -gt 60 ];then
+            break
+        fi
+        continue
+        let i++
+    fi
+done
+echo "$(date "+%Y-%m-%d %H:%M:%S") The mystop.sh, master sync exceed one minutes..." >> $LOGSPATH/mysql_switch.log
+```
+- 主库的keepalived
+```shell script
+vi /etc/keepalived/keepalived.conf
+```
+```shell script
+global_defs {
+   router_id MySQL-HA
+} 
+
+vrrp_script check_run {
+    script "/home/mysql/mycheck.sh"
+    interval 10
+}
+
+vrrp_sync_group VG1 {
+    group {
+      VI_1
+    }
+}
+
+vrrp_instance VI_1 {
+    state MASTER
+    #state BACKUP
+    interface eth0 
+    virtual_router_id 100
+    priority 100
+    advert_int 1
+    #nopreempt
+    authentication {
+        auth_type PASS
+        auth_pass 123456
+    }
+    track_script {
+      check_run
+    }
+    notify_master /home/mysql/mymaster.sh
+    notify_backup /home/mysql/mybackup.sh
+    notify_stop /home/mysql/mystop.sh
+    
+    virtual_ipaddress {
+        192.168.1.100/24
+    }
+
+}
+```
+- 从库keepalived配置
+```shell script
+vi /etc/keepalived/keepalived.conf
+```
+```shell script
+global_defs {
+   router_id MySQL-HA
+} 
+
+vrrp_script check_run {
+    script "/home/mysql/mycheck.sh"
+    interval 10
+}
+
+vrrp_sync_group VG1 {
+    group {
+      VI_1
+    }
+}
+
+vrrp_instance VI_1 {
+    #state MASTER
+    state BACKUP
+    interface eth0 
+    virtual_router_id 100
+    priority 90
+    advert_int 1
+    #nopreempt
+    authentication {
+        auth_type PASS
+        auth_pass 123456
+    }
+    track_script {
+      check_run
+    }
+    notify_master /home/mysql/mymaster.sh
+    notify_backup /home/mysql/mybackup.sh
+    notify_stop /home/mysql/mystop.sh
+    
+    virtual_ipaddress {
+        192.168.1.100/24
+    }
+}
+```
