@@ -25,9 +25,27 @@
     <fileSets>
 
         <!-- 每一个fileSet做的工作都是将编译出来的target目录下的文件directory，按照一定规则输出到outputDirectory -->
-        <!-- 升级包常常包含多模块下其他依赖模块的依赖包 -->
+        <!-- 项目根目录下的情况，也就是和src目录同级 -->
         <fileSet>
             <directory>lib</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+                <include>*.j2</include>
+            </includes>
+        </fileSet>
+        <!-- 如果是模块的情况，也就是本项目是子模块，依赖使用父项目根目录下的 -->
+        <fileSet>
+            <directory>${project.basedir}/../lib</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+                <include>*.j2</include>
+            </includes>
+        </fileSet>
+        <!-- 如果将依赖放到resources/lib下面的情况 -->
+        <fileSet>
+            <directory>src/main/resources/lib</directory>
             <outputDirectory>lib</outputDirectory>
             <includes>
                 <include>*.jar</include>
