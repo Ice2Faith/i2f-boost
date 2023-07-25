@@ -110,9 +110,24 @@ vi start.sh
 ```shell script
 vi mongo.conf
 ```
+- 生成sslkey
+```shell script
+openssl rand -base64 128 > conf/mongo.key
+```
+- 更改权限
+```shell script
+chmod 600 conf/mongo.key
+```
+- 更改用户组
+    - 和启动时使用的用户组一致
+```shell script
+chown root:root conf/mongo.key
+```
 ```shell script
 # 复制集名称，名称自定义，整个集群一样就行
 replSet=mongo-cluster
+# sslkey配置
+keyFile=/home/env/mongodb-5.0.9/conf/mongo.key
 ```
 - 重启mongodb
 

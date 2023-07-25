@@ -335,21 +335,40 @@ skip-name-resolve
 # 设置为2时，表名和数据库名按声明存储，但以小写形式进行比较
 lower_case_table_names = 1
 
-# 最大连接数
-max_connections = 2000
-connect_timeout=20000
-max_connect_errors=500
-
-# Innodb缓存池大小
-innodb_buffer_pool_size = 4G
-
-# 表文件描述符的缓存大小
-table_open_cache_instances=2
-table_open_cache=2000
-table_definition_cache=2000
+# 最大连接数，连接配置
+max_connections=8192
+connect_timeout=30
+max_connect_errors=300
 
 # 指定执行器数量
 innodb_buffer_pool_instances=4
+
+# 指定最大请求包大小
+max_allowed_packet = 32M
+
+# 指定binlog的缓存大小
+binlog_cache_size = 64M
+
+# 指定排序使用的线程缓存大小
+sort_buffer_size = 64M
+
+# 指定进行连接操作的缓存大小
+join_buffer_size = 64M
+
+# 缓存的线程池大小
+thread_cache_size = 128
+
+# 指定rnd读取缓存大小
+read_rnd_buffer_size = 64M
+
+# 指定innodb缓存池大小
+innodb_buffer_pool_size = 16G
+
+# 指定innodb的并发线程数
+innodb_thread_concurrency = 128
+
+# 指定innodb的日志缓存大小
+innodb_log_buffer_size = 64M
 
 
 !includedir /etc/mysql/conf.d/
@@ -400,7 +419,7 @@ mysql -uroot -p
 ```
 - 添加从库从主库读取binlog的用户
 ```sql
-create user 'slave'@'%' identified with mysql_natice_password by 'xxx123456';
+create user 'slave'@'%' identified with mysql_native_password by 'xxx123456';
 ```
 - 为用户赋权
 ```sql
@@ -503,7 +522,7 @@ mysql -uroot -p
 ```
 - 添加从库从主库读取binlog的用户
 ```sql
-create user 'slave'@'%' identified with mysql_natice_password by 'xxx123456';
+create user 'slave'@'%' identified with mysql_native_password by 'xxx123456';
 ```
 - 为用户赋权
 ```sql
@@ -531,6 +550,9 @@ mysql -uroot -p
 - 将从库指向主库
     - 互相指向
 ```sql
+-- >=8.0.32
+change replication source to source_host='192.168.1.101:3306',source_user='slave',source_password='xxx123456',source_log_file='binlog.00001',source_log_pos=500;
+
 -- >= 8.0.23
 change replication source to source_host='192.168.1.101:3306',source_user='slave',source_password='xxx123456',source_log_file='binlog.00001',source_log_position=500;
 
@@ -853,3 +875,8 @@ vrrp_instance VI_1 {
     }
 }
 ```
+
+
+## 常见问题
+- 复制的mysql应用
+- 复制的mysql,必须删除${datadir}/auto.cnf 重新生成

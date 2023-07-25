@@ -1,5 +1,30 @@
 # linux 常用命令
 ---
+## 重启无法启动
+- 慎用命令
+    - 可能导致主机无法启动
+```shell script
+yum update
+```
+- 这条命令会升级软件包
+- 但是也会升级系统内核
+- 因此，如果升级了系统内核，可能出现多个系统引导项
+- 如果恰好，你的系统不支持新的系统内核或者出现兼容性问题
+- 那么，在你重启系统之后
+- 将会出现无法启动
+- 因为，第一个启动项默认是新的这个系统内核
+- 而这个系统内核又无法启动
+- 导致系统无法启动
+- 因此，为评估升级影响之前
+- 禁止或谨慎使用 update
+- 升级软件包，请使用
+    - 它只升级软件包，不升级系统内核
+```shell script
+yum upgrade -y
+```
+---------------------------------------------------------------------------------------
+
+---
 - 常见的参数
 ```shell script
 --help 查看命令的帮助
@@ -1068,6 +1093,74 @@ perf record -F 99 -a -g -- sleep 60
 perf report -n
 perf report -n --stdio
 ```
+- 磁盘读写速度
+```shell script
+# 写入速度（使用dd命令，测试到/opt/test这个路径所在磁盘的写入速度）
+time dd if=/dev/zero of=/opt/test/test.dbf bs=8k count=300000
+
+# 读取速度（使用dd命令，测试从/opt/test这个路径所在磁盘的读取速度）
+time dd if=/opt/test/test.dbf bs=8k count=300000 of=/dev/null
+```
+- iostat与df等命令的对应关系
+```shell script
+ll /dev/mapper/
+```
+
+## 定时任务
+- crontab
+- 是linux中以cron管理的定时调度
+- 在运维中，可以是用来做进程的存活性检测
+- 配合mail等命令，时间进程死亡检测与邮件告警
+- 查看crond服务的状态
+```shell script
+systemctl status crond
+```
+- 没有启动则启动
+```shell script
+systemctl start crond
+```
+- 编辑crontab
+```shell script
+crontab -e
+```
+- 编辑自己的定时任务
+- 一般就是写一个脚本
+```shell script
+*/10 * * * * root /home/env/mailx/ps-chk-mail.sh nginx nginx
+```
+- 一行就是一个定时任务
+- 格式如下
+```shell script
+[cron] [user] [command]
+```
+- 注意cron中，分别是：分 时 日 月 星期
+- 因此，示例中给出的就是，每10分钟用root用户执行后面的命令
+- 这个脚本的作用，就是检查指定的进程是否存活，不存活则发送邮件通知
+- 关于使用到的mail命令，查看 email.md
+- 下面给出这个脚本
+```shell script
+PsName=$1
+AppName=$2
+ServerName=`hostname`
+
+ThisName=`basename $0`
+
+echo $PsName for $AppName on $ServerName checking...
+
+PID=`ps -ef | grep -v grep| grep -v $ThisName | grep $PsName | awk '{print $2}'`
+if [[ -n "$PID" ]]; then
+      echo -e "\033[0;31m $PsName  process has running ... \033[0m"
+      exit 0
+fi
+
+
+# send email
+for sendto in user1@163.com user2@139.com user3@qq.com;
+do
+   echo ------------------- $sendto -------------------
+   echo "your application $AppName on $ServerName has died, witch ps-grep called $PsName, please check it" | mail -s "host $ServerName app $AppName process died" $sendto
+done
+```
 
 ## 安装字体
 - 在Linux中，通常只有拉丁字体
@@ -1148,7 +1241,7 @@ yum makecache
 ```
 - 更新源
 ```shell script
-yum update && yum upgrade -y
+yum upgrade -y
 ```
 
 ## 编写服务-开机启动
