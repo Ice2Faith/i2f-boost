@@ -1126,39 +1126,80 @@ crontab -e
 - 编辑自己的定时任务
 - 一般就是写一个脚本
 ```shell script
-*/10 * * * * root /home/env/mailx/ps-chk-mail.sh nginx nginx
+*/10 * * * * /home/env/mailx/ps-chk-mail.sh nginx nginx
 ```
 - 一行就是一个定时任务
 - 格式如下
 ```shell script
-[cron] [user] [command]
+[cron] [command]
 ```
 - 注意cron中，分别是：分 时 日 月 星期
-- 因此，示例中给出的就是，每10分钟用root用户执行后面的命令
+- 因此，示例中给出的就是，每10分钟执行后面的命令
 - 这个脚本的作用，就是检查指定的进程是否存活，不存活则发送邮件通知
 - 关于使用到的mail命令，查看 email.md
 - 下面给出这个脚本
 ```shell script
+#!/bin/bash
+
 PsName=$1
 AppName=$2
 ServerName=`hostname`
 
 ThisName=`basename $0`
+TimeNow=$(date "+%Y-%m-%d %H:%M:%S")
 
 echo $PsName for $AppName on $ServerName checking...
 
 PID=`ps -ef | grep -v grep| grep -v $ThisName | grep $PsName | awk '{print $2}'`
+
 if [[ -n "$PID" ]]; then
       echo -e "\033[0;31m $PsName  process has running ... \033[0m"
       exit 0
 fi
 
+PsResult=`ps -ef | grep -v grep| grep -v $ThisName | grep $PsName`
+TopResult=`top -c -b -n 1 | head -n 12`
+FreeResult=`free -h`
+DfResult=`df -h`
+IostatResult=`iostat -dmx`
+PingResult=`ping www.baidu.com -c 3`
+WhoResult=`who -ablu`
 
 # send email
 for sendto in user1@163.com user2@139.com user3@qq.com;
 do
-   echo ------------------- $sendto -------------------
-   echo "your application $AppName on $ServerName has died, witch ps-grep called $PsName, please check it" | mail -s "host $ServerName app $AppName process died" $sendto
+   echo ------------------- send alarm email to $sendto -------------------
+   echo -e "\
+your application [$AppName] on [$ServerName] has died at $TimeNow, witch ps-grep called [$PsName], please check it!
+
+ps output is:
+------------------------------------------------------------------
+$PsResult
+
+top output is:
+------------------------------------------------------------------
+$TopResult
+
+free output is:
+------------------------------------------------------------------
+$FreeResult
+
+df output is:
+------------------------------------------------------------------
+$DfResult
+
+iostat output is:
+------------------------------------------------------------------
+$IostatResult
+
+ping output is:
+------------------------------------------------------------------
+$PingResult
+
+who output is:
+------------------------------------------------------------------
+$WhoResult
+" | mail -s "[Alarm] host [$ServerName] app [$AppName] process died" $sendto
 done
 ```
 

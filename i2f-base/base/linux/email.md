@@ -30,5 +30,9 @@ EOF
 ```
 - 发送
 ```shell script
-echo "内容" | mail -s [标题] [接受账号，多个用逗号隔开]
+echo "内容" | mail -s [标题] [接受账号]
+```
+- 或者
+```shell script
+mail -s [标题] [接受账号] < [正文文件路径]
 ```
