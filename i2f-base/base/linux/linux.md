@@ -1164,6 +1164,7 @@ DfResult=`df -h`
 IostatResult=`iostat -dmx`
 PingResult=`ping www.baidu.com -c 3`
 WhoResult=`who -ablu`
+WResult=`w -ui`
 
 # send email
 for sendto in user1@163.com user2@139.com user3@qq.com;
@@ -1199,6 +1200,10 @@ $PingResult
 who output is:
 ------------------------------------------------------------------
 $WhoResult
+
+w output is:
+------------------------------------------------------------------
+$WResult
 " | mail -s "[Alarm] host [$ServerName] app [$AppName] process died" $sendto
 done
 ```
