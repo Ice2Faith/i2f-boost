@@ -31,19 +31,19 @@ public class TestMd5 {
     public static void showMds(String str) throws UnsupportedEncodingException {
         byte[] data=str.getBytes("UTF-8");
 
-        String md5= MessageDigestUtil.getMd5(data);
+        String md5= MessageDigestUtil.MD5.mdsBase64(data);
         System.out.println("MD5:"+md5);
 
-        String sha1=MessageDigestUtil.getSha1(data);
+        String sha1=MessageDigestUtil.SHA1.mdsBase64(data);
         System.out.println("SHA1:"+sha1);
 
-        String sha256=MessageDigestUtil.getSha256(data);
+        String sha256=MessageDigestUtil.SHA256.mdsBase64(data);
         System.out.println("SHA256:"+sha256);
 
-        String sha384=MessageDigestUtil.getSha384(data);
+        String sha384=MessageDigestUtil.SHA384.mdsBase64(data);
         System.out.println("SHA384:"+sha384);
 
-        String sha512=MessageDigestUtil.getSha512(data);
+        String sha512=MessageDigestUtil.SHA512.mdsBase64(data);
         System.out.println("SHA512:"+sha512);
     }
 
@@ -75,19 +75,19 @@ public class TestMd5 {
             try{
                 byte[] data=item.getBytes("UTF-8");
 
-                String md5= MessageDigestUtil.getMd5(data);
+                String md5= MessageDigestUtil.MD5.mdsBase64(data);
                 System.out.println("MD5:"+md5);
 
-                String sha1=MessageDigestUtil.getSha1(data);
+                String sha1=MessageDigestUtil.SHA1.mdsBase64(data);
                 System.out.println("SHA1:"+sha1);
 
-                String sha256=MessageDigestUtil.getSha256(data);
+                String sha256=MessageDigestUtil.SHA256.mdsBase64(data);
                 System.out.println("SHA256:"+sha256);
 
-                String sha384=MessageDigestUtil.getSha384(data);
+                String sha384=MessageDigestUtil.SHA384.mdsBase64(data);
                 System.out.println("SHA384:"+sha384);
 
-                String sha512=MessageDigestUtil.getSha512(data);
+                String sha512=MessageDigestUtil.SHA512.mdsBase64(data);
                 System.out.println("SHA512:"+sha512);
 
                 dao.execute("insert into message_digest_mapping(str,md5,sha1,sha256,sha384,sha512) values(?,?,?,?,?,?)",item,md5,sha1,sha256,sha384,sha512);

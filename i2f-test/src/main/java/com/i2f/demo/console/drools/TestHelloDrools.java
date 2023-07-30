@@ -1,10 +1,14 @@
 package com.i2f.demo.console.drools;
 
 import com.i2f.demo.console.drools.model.HelloDto;
+import i2f.core.io.stream.StreamUtil;
+import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
 /**
@@ -13,9 +17,31 @@ import java.util.Random;
  * @desc
  */
 public class TestHelloDrools {
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception {
 //        hello();
-        holder();
+//        holder();
+        drl();
+    }
+
+    public static void drl() throws IOException {
+        File dir=new File("D:\\IDEA_ROOT\\DevCenter\\i2f-boost\\i2f-test\\src\\main\\resources\\drools");
+        File drlFile=new File(dir,"Hello.drl");
+        String drl = StreamUtil.readString(drlFile, "UTF-8");
+        KieBase base = DroolsUtil.getBaseByDrl(drl);
+        Random rand=new Random();
+        for(int i=0;i<5;i++) {
+            System.out.println("---------------------------------------");
+
+            KieSession kieSession = base.newKieSession();
+            HelloDto bean = new HelloDto();
+            bean.setInput(rand.nextInt(50));
+            System.out.println("init:input="+bean.getInput()+",output="+bean.getOutput());
+
+            DefaultDroolsHolder.droolsFire(kieSession,bean);
+            System.out.println("result:input="+bean.getInput()+",output="+bean.getOutput());
+
+        }
+
     }
 
     public static void holder(){
