@@ -41,6 +41,36 @@
         </el-col>
     </el-row>
     <el-tabs v-model="activeTabName" @tab-click="handleTabClick">
+        <el-tab-pane label="主页-收藏" name="mainFav">
+            <el-row style="overflow:auto;width: 100%;height: calc(100vh - 125px)">
+                <el-row>
+                    <el-col v-for="(item,index) in tabs.mainFav.data" :span="4">
+                        <el-card shadow="never" style="width:100%;height:100%;">
+                            <el-image
+                                    style="width: 100%; height: 230px;"
+                                    :src="item.pic"
+                                    fit="cover"></el-image>
+                            <el-row type="flex" jusitify="justify" :gutter="20">
+                                <el-col>
+                                    <el-button type="primary" size="small" @click="playVideo(item,index)">播放</el-button>
+                                </el-col>
+                                <el-col>
+                                    <el-button type="primary" size="small" @click="addCollect(item,$event.currentTarget)">+</el-button>
+                                </el-col>
+                                <el-col>
+                                    <el-button type="success" size="small"
+                                               @click="downloadVideo(item,$event.currentTarget)">下载
+                                    </el-button>
+                                </el-col>
+                            </el-row>
+                        </el-card>
+                    </el-col>
+                </el-row>
+                <el-divider content-position="center" @click="loadMoreData($event.currentTarget)">加载更多</el-divider>
+            </el-row>
+
+        </el-tab-pane>
+
         <el-tab-pane label="首页-收藏" name="mineFav">
             <el-row style="overflow:auto;width: 100%;height: calc(100vh - 125px)">
                 <el-row>
@@ -395,6 +425,20 @@
                 pro_id: 0
             },
             tabs: {
+                mainFav: {
+                    url: 'http://81.70.181.238:80/fav/getList',
+                    route: (data) => data.data.list,
+                    play: {
+                        title: (item) => item.id,
+                        url: (item) => item.src,
+                        key: (item) => item.src,
+                    },
+                    data: [],
+                    query: {
+                        page: 1,
+                        limit: 30
+                    }
+                },
                 mineFav: {
                     url: 'http://81.70.213.11:80/you_fav/getList',
                     route: (data) => data.data.list,
@@ -404,7 +448,8 @@
                             let idx = Math.floor(Math.random() * app.streamLbList.length)
                             let host = app.streamLbList[idx]
                             return app.streamUrl.replace('LBHOST', host) + item.video_id
-                        }
+                        },
+                        key: (item) => item.video_id,
                     },
                     data: [],
                     query: {
@@ -418,6 +463,7 @@
                     play: {
                         title: (item) => item.id,
                         url: (item) => item.src,
+                        key: (item) => item.src,
                     },
                     data: [],
                     query: {
@@ -431,6 +477,7 @@
                     play: {
                         title: (item) => item.id,
                         url: (item) => item.src,
+                        key: (item) => item.src,
                     },
                     data: [],
                     query: {
@@ -447,7 +494,8 @@
                             let idx = Math.floor(Math.random() * app.streamLbList.length)
                             let host = app.streamLbList[idx]
                             return app.streamUrl.replace('LBHOST', host) + item.video_id
-                        }
+                        },
+                        key: (item) => item.video_id,
                     },
                     data: [],
                     query: {
@@ -465,7 +513,8 @@
                             let idx = Math.floor(Math.random() * app.streamLbList.length)
                             let host = app.streamLbList[idx]
                             return app.streamUrl.replace('LBHOST', host) + item.video_id
-                        }
+                        },
+                        key: (item) => item.video_id,
                     },
                     data: [],
                     query: {
@@ -482,7 +531,8 @@
                             let idx = Math.floor(Math.random() * app.streamLbList.length)
                             let host = app.streamLbList[idx]
                             return app.streamUrl.replace('LBHOST', host) + item.video_id
-                        }
+                        },
+                        key: (item) => item.video_id,
                     },
                     data: [],
                     query: {
@@ -499,7 +549,8 @@
                             let idx = Math.floor(Math.random() * app.streamLbList.length)
                             let host = app.streamLbList[idx]
                             return app.streamUrl.replace('LBHOST', host) + item.video_id
-                        }
+                        },
+                        key: (item) => item.video_id,
                     },
                     data: [],
                     query: {
@@ -512,6 +563,7 @@
                     play: {
                         title: (item) => item.title,
                         url: (item) => item.url,
+                        key: (item) => item.key,
                     },
                     data: [],
                 }
@@ -586,13 +638,18 @@
                 let title = tabMeta.play.title(item)
                 let url = tabMeta.play.url(item)
                 let pic = item.pic
+                let key=tabMeta.play.key(item)
                 dom.style.display='none'
-                this.tabs.collect.data.push({
-                    title,
-                    url,
-                    pic
-                })
-                this.updateCount()
+                let exItem = this.tabs.collect.data.find((item)=>item.key==key)
+                if(!exItem){
+                    this.tabs.collect.data.push({
+                        title,
+                        url,
+                        pic,
+                        key
+                    })
+                    this.updateCount()
+                }
             },
             deleteCollect(item,index){
                 this.tabs.collect.data.splice(index,1)
@@ -621,11 +678,16 @@
             copyAllUrls() {
                 let _this = this
                 let urlStr = '';
+                let keyMap={}
                 Object.keys(this.tabs).forEach(function (key) {
                     let tabMeta = _this.tabs[key]
                     tabMeta.data.forEach(function (item) {
-                        let url = tabMeta.play.url(item)
-                        urlStr += url + '\n';
+                        let ukey = tabMeta.play.key(item)
+                        if(!keyMap[ukey]){
+                            keyMap[ukey]=true
+                            let url = tabMeta.play.url(item)
+                            urlStr += url + '\n';
+                        }
                     })
                 })
                 this.doCopyAction(urlStr)

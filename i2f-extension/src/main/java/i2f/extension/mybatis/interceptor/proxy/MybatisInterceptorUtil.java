@@ -8,6 +8,7 @@ import org.apache.ibatis.plugin.Invocation;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,7 +44,7 @@ public class MybatisInterceptorUtil {
         Set<Method> methods= ReflectResolver.findMethodsByName(clazz,methodName);
 
         // enhancer find
-        String[] enhanceSpliters=new String[]{"_","$"};
+        String[] enhanceSpliters=new String[]{"_","$","!"};
         if(!methods.iterator().hasNext()){
             String originMethodName=methodName;
             for(int i=0;i<enhanceSpliters.length;i++){
@@ -65,6 +66,14 @@ public class MybatisInterceptorUtil {
     }
 
     public static Method getMappedMethod(MappedStatement stat){
-        return getMappedMethods(stat).iterator().next();
+        Set<Method> set = getMappedMethods(stat);
+        if(set==null){
+            return null;
+        }
+        Iterator<Method> iterator = set.iterator();
+        if(iterator.hasNext()) {
+            return iterator.next();
+        }
+        return null;
     }
 }
