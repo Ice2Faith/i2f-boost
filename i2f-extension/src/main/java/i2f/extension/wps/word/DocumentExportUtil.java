@@ -1,0 +1,91 @@
+package i2f.extension.wps.word;
+
+import com.aspose.words.SaveFormat;
+import i2f.extension.template.velocity.VelocityGenerator;
+import i2f.extension.wps.formats.word.DocumentUtil;
+import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author Ice2Faith
+ * @date 2023/5/25 14:24
+ * @desc
+ */
+public class DocumentExportUtil {
+
+    public static final String XS_TPL_IMG_PREFIX = "XSTPLIMG";
+
+    public static String getXsTplImgSpaceHoldString(int idx) {
+        return String.format(XS_TPL_IMG_PREFIX + "%04d", idx);
+    }
+
+    public static void renderXmlWordTemplate(InputStream xmlIs,
+                                             String charset,
+                                             Map<String, Object> params,
+                                             Map<Integer, File> xsTplImgFileMap,
+                                             int saveFormat,
+                                             OutputStream os) throws Exception {
+        if (StringUtils.isEmpty(charset)) {
+            charset = "UTF-8";
+        }
+        if (saveFormat <= 0) {
+            saveFormat = SaveFormat.DOCX;
+        }
+        String xmlWordContent = StreamUtils.copyToString(xmlIs, Charset.forName(charset));
+        String tpl = processXsTplImgParams(xmlWordContent, xsTplImgFileMap);
+        String out = VelocityGenerator.render(tpl, params);
+        ByteArrayInputStream bis = new ByteArrayInputStream(out.getBytes(charset));
+        DocumentUtil.convert(bis, saveFormat, os);
+        os.close();
+        xmlIs.close();
+    }
+
+    public static String processXsTplImgParams(String xmlWordContent, Map<Integer, File> xsTplImgFileMap) {
+        for (Map.Entry<Integer, File> entry : xsTplImgFileMap.entrySet()) {
+            Integer idx = entry.getKey();
+            File file = entry.getValue();
+            if (idx == null || idx < 0) {
+                continue;
+            }
+            if (!file.exists()) {
+                continue;
+            }
+            if (!file.isFile()) {
+                continue;
+            }
+            try {
+                String b64 = getFileAsBase64(file);
+                if (b64 == null) {
+                    continue;
+                }
+                String sh = getXsTplImgSpaceHoldString(idx);
+                xmlWordContent = xmlWordContent.replaceAll(sh, b64);
+            } catch (Exception e) {
+
+            }
+        }
+        return xmlWordContent;
+    }
+
+    public static String getFileAsBase64(File file) throws IOException {
+        if (file == null) {
+            return null;
+        }
+        if (!file.exists()) {
+            return null;
+        }
+        if (!file.isFile()) {
+            return null;
+        }
+        byte[] imgBytes = StreamUtils.copyToByteArray(new FileInputStream(file));
+        String b64 = Base64.getEncoder().encodeToString(imgBytes);
+        return b64;
+    }
+
+}
