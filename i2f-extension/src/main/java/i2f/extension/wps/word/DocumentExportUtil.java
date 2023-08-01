@@ -25,6 +25,17 @@ public class DocumentExportUtil {
         return String.format(XS_TPL_IMG_PREFIX + "%04d", idx);
     }
 
+    /**
+     * 将xml格式的word文档渲染导出为指定的格式
+     * xsTplImgFileMap 中，key就是 XSTPLIMG%04d 的索引，value就是图片文件
+     * @param xmlIs xml文档的输入流
+     * @param charset 文档的字符集
+     * @param params 渲染的参数
+     * @param xsTplImgFileMap 图片的索引-图片文件映射
+     * @param saveFormat 保存格式，是 com.aspose.words.SaveFormat 中定义的常量
+     * @param os 输出流，输出结果
+     * @throws Exception
+     */
     public static void renderXmlWordTemplate(InputStream xmlIs,
                                              String charset,
                                              Map<String, Object> params,
