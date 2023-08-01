@@ -1,7 +1,7 @@
 package i2f.extension.wps.excel.easyexcel.style.core;
 
-import com.alibaba.excel.metadata.CellData;
 import com.alibaba.excel.metadata.Head;
+import com.alibaba.excel.metadata.data.WriteCellData;
 import com.alibaba.excel.util.StyleUtil;
 import com.alibaba.excel.write.handler.CellWriteHandler;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
@@ -73,12 +73,12 @@ public class AnnotatedCellWriteHandler implements CellWriteHandler {
     }
 
     @Override
-    public void afterCellDataConverted(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, CellData cellData, Cell cell, Head head, Integer integer, Boolean aBoolean) {
+    public void afterCellDataConverted(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, WriteCellData<?> cellData, Cell cell, Head head, Integer integer, Boolean aBoolean) {
 
     }
 
     @Override
-    public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<CellData> list, Cell cell, Head head, Integer integer, Boolean aBoolean) {
+    public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<WriteCellData<?>> list, Cell cell, Head head, Integer integer, Boolean aBoolean) {
 
         try {
             excelStyleApplyDelegate(writeSheetHolder, writeTableHolder, list, cell, head, integer, aBoolean);
@@ -87,7 +87,7 @@ public class AnnotatedCellWriteHandler implements CellWriteHandler {
         }
     }
 
-    protected void excelStyleApplyDelegate(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<CellData> list, Cell cell, Head head, Integer integer, Boolean aBoolean) {
+    protected void excelStyleApplyDelegate(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<WriteCellData<?>> list, Cell cell, Head head, Integer integer, Boolean aBoolean) {
         Sheet sheet = writeSheetHolder.getSheet();
         Workbook workbook = sheet.getWorkbook();
 
@@ -99,7 +99,7 @@ public class AnnotatedCellWriteHandler implements CellWriteHandler {
         if (sheetRowStyle != null && !rowStyleInited.contains(rowIdx)) {
             WriteCellStyle style = invokeExcelStyleMethod(sheetRowStyle, cell, sheet, workbook);
             if (style != null) {
-                CellStyle cellStyle = StyleUtil.buildHeadCellStyle(workbook, style);
+                CellStyle cellStyle = StyleUtil.buildCellStyle(workbook, null,style);
                 sheet.getRow(rowIdx).setRowStyle(cellStyle);
                 rowStyleInited.add(rowIdx);
             }
@@ -110,7 +110,7 @@ public class AnnotatedCellWriteHandler implements CellWriteHandler {
         if (sheetColStyle != null && !colStyleInited.contains(colIdx)) {
             WriteCellStyle style = invokeExcelStyleMethod(sheetColStyle, cell, sheet, workbook);
             if (style != null) {
-                CellStyle cellStyle = StyleUtil.buildHeadCellStyle(workbook, style);
+                CellStyle cellStyle = StyleUtil.buildCellStyle(workbook,null, style);
                 sheet.setDefaultColumnStyle(colIdx, cellStyle);
                 colStyleInited.add(colIdx);
             }
@@ -125,7 +125,7 @@ public class AnnotatedCellWriteHandler implements CellWriteHandler {
                 resolveSpelExpression(writeCellStyle);
                 WriteCellStyle style = invokeExcelStyleMethod(writeCellStyle, cell, sheet, workbook);
                 if (style != null) {
-                    CellStyle cellStyle = StyleUtil.buildHeadCellStyle(workbook, style);
+                    CellStyle cellStyle = StyleUtil.buildCellStyle(workbook,null, style);
                     cell.setCellStyle(cellStyle);
                 }
                 annotationExcelStyleCellAfterProcess(writeCellStyle, cell, sheet, workbook);

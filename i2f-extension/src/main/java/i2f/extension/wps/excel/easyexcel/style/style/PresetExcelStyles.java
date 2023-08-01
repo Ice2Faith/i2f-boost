@@ -128,7 +128,7 @@ public class PresetExcelStyles {
 
         WriteCellStyle fontColor = cellColorFont(IndexedColors.BLUE, null, (short) 11, false, true, true, null);
 
-        CellStyle cellStyle = StyleUtil.buildHeadCellStyle(workbook, fontColor);
+        CellStyle cellStyle = StyleUtil.buildCellStyle(workbook,null, fontColor);
         cell.setCellStyle(cellStyle);
     }
 
