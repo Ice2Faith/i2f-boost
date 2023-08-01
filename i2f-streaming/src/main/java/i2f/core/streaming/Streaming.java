@@ -206,6 +206,8 @@ public interface Streaming<E> {
 
     E[] array(E[] arr);
 
+    <K,V> Map<K,V> asMap(Function<E,K> keyer,Function<E,V> valuer);
+
     <R, A> R collect(Collector<E, A, R> collector);
 
     String stringify(Function<E, Object> mapper, Object open, Object separator, Object close);

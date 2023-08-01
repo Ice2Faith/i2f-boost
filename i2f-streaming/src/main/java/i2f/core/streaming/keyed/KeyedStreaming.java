@@ -242,6 +242,8 @@ public interface KeyedStreaming<K, E> {
 
     Streaming<KeyedData<K, E[]>> array(E[] arr);
 
+    <MK,MV> Streaming<KeyedData<K, Map<MK,MV>>> asMap(Function<E, MK> keyer, Function<E, MV> valuer);
+
     <R, A> Streaming<KeyedData<K, R>> collect(Collector<E, A, R> collector);
 
     Streaming<KeyedData<K, String>> stringify(Function<E, Object> mapper, Object open, Object separator, Object close);

@@ -1146,6 +1146,11 @@ public class AbsKeyedStreaming<K, E> implements KeyedStreaming<K, E> {
     }
 
     @Override
+    public <MK, MV> Streaming<KeyedData<K, Map<MK, MV>>> asMap(Function<E, MK> keyer, Function<E, MV> valuer) {
+        return sink(SinkWrappers.asMap(keyer,valuer));
+    }
+
+    @Override
     public <R, A> Streaming<KeyedData<K, R>> collect(Collector<E, A, R> collector) {
         return sink(SinkWrappers.collect(collector));
     }

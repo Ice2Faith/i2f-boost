@@ -26,17 +26,7 @@ import java.util.function.Function;
  */
 public class TestStreaming {
     public static void main(String[] args) {
-        try {
-            for (int i = 0; i < 10; i++) {
-                Thread.sleep(TimeUnit.SECONDS.toMillis(5));
-
-                test();
-                System.out.println("\n\n\n\n\n\n*********************************************\n\n\n\n\n\n");
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }
+        test7();
     }
 
 
@@ -413,4 +403,17 @@ public class TestStreaming {
 
     }
 
+    public static void test7(){
+        try {
+            for (int i = 0; i < 10; i++) {
+                Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+
+                test();
+                System.out.println("\n\n\n\n\n\n*********************************************\n\n\n\n\n\n");
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+    }
 }

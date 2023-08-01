@@ -430,6 +430,11 @@ public class AbsStreaming<E> implements Streaming<E> {
     }
 
     @Override
+    public <K, V> Map<K, V> asMap(Function<E, K> keyer, Function<E, V> valuer) {
+        return sink(SinkWrappers.asMap(keyer,valuer));
+    }
+
+    @Override
     public <R, A> R collect(Collector<E, A, R> collector) {
         return sink(SinkWrappers.collect(collector));
     }

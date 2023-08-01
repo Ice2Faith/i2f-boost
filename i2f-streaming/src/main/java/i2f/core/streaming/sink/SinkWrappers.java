@@ -299,6 +299,25 @@ public class SinkWrappers {
         };
     }
 
+    public static <K, E, V> StreamingSinkWrapper<E, Map<K,V>> asMap(Function<E, K> keyer, Function<E, V> valuer) {
+        return new StreamingSinkWrapper<E, Map<K,V>>() {
+            @Override
+            public Map<K,V> sink(Iterator<E> iterator) {
+                Map<K,V> ret=new LinkedHashMap<>();
+                while (iterator.hasNext()) {
+                    E val = iterator.next();
+                    K k = keyer.apply(val);
+                    if(k==null){
+                        continue;
+                    }
+                    V v = valuer.apply(val);
+                    ret.put(k,v);
+                }
+                return ret;
+            }
+        };
+    }
+
     public static <R, A, E> StreamingSinkWrapper<E, R> collect(Collector<E, A, R> collector) {
         return new StreamingSinkWrapper<E, R>() {
             @Override
@@ -569,6 +588,8 @@ public class SinkWrappers {
         }
         return null;
     }
+
+
 
 
     public static class AggregateRecursiveTask<E, OUT> extends RecursiveTask<OUT> {
