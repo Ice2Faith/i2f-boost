@@ -1,7 +1,6 @@
 package i2f.springboot.limit.annotations;
 
 import i2f.springboot.limit.consts.LimitType;
-import i2f.springboot.log.consts.LogLevel;
 
 import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
