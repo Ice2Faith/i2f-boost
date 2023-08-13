@@ -16,12 +16,6 @@
     <modules>
         <module>i2f-base</module>
 
-        <!-- 仅依赖jdk1.8,javase，提供标准定义，不提供实现 -->
-        <module>i2f-std</module>
-
-        <!-- 仅依赖jdk1.8,javase，提供std的jdk实现 -->
-        <module>i2f-std-jdk</module>
-
         <!-- 仅依赖jdk1.8,javase -->
         <module>i2f-core</module>
 
@@ -87,18 +81,6 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
                 <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>i2f.boost</groupId>
-                <artifactId>i2f-std</artifactId>
-                <version>${i2f.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>i2f.boost</groupId>
-                <artifactId>i2f-std-jdk</artifactId>
-                <version>${i2f.version}</version>
             </dependency>
 
             <dependency>
