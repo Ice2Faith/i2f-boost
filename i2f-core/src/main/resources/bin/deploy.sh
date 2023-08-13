@@ -20,7 +20,9 @@ function upgrade(){
 	else
 		echo -e "upgrade by package : \033[0;34m ${_p_pkg} \033[0m ... "
 		_p_now=$(date "+%Y%m%d%H%M%S")
-		_p_bakFile=${_p_name}.tar.gz.${_p_now}
+		_p_bakDir=backup.${_p_name}
+                mkdir -p ${_p_bakDir}
+                _p_bakFile=${_p_bakDir}/${_p_name}.tar.gz.${_p_now}
 		echo -e "backup current version to \033[0;34m ../${_p_bakFile} \033[0m ..."
 		tar -czvf ${_p_bakFile} ${_p_name}  --exclude=logs --exclude=*.log > /dev/null
 		echo -e "release package \033[0;34m ../${_p_pkg} \033[0m ..."
@@ -47,7 +49,9 @@ function cover(){
 	else
 		echo -e "cover by package : \033[0;34m ${_p_pkg} \033[0m ... "
 		_p_now=$(date "+%Y%m%d%H%M%S")
-		_p_bakFile=${_p_name}.tar.gz.${_p_now}
+	        _p_bakDir=backup.${_p_name}
+                mkdir -p ${_p_bakDir}
+                _p_bakFile=${_p_bakDir}/${_p_name}.tar.gz.${_p_now}
 		echo -e "backup current version to \033[0;34m ../${_p_bakFile} \033[0m ..."
 		tar -czvf ${_p_bakFile} ${_p_name}  --exclude=logs --exclude=*.log > /dev/null
 		echo -e "release package \033[0;34m ../${_p_pkg} \033[0m ..."
@@ -84,7 +88,9 @@ function pick(){
 		echo -e "pick package not like \033[0;34m ${_p_pkgName} \033[0m"
 	else
 		_p_now=$(date "+%Y%m%d%H%M%S")
-		_p_bakFile=${_p_name}.tar.gz.${_p_now}
+		_p_bakDir=backup.${_p_name}
+                mkdir -p ${_p_bakDir}
+                _p_bakFile=${_p_bakDir}/${_p_name}.tar.gz.${_p_now}
 		echo -e "backup current version to \033[0;34m ../${_p_bakFile} \033[0m ..."
 		tar -czvf ${_p_bakFile} ${_p_name} --exclude=logs --exclude=*.log > /dev/null
 
