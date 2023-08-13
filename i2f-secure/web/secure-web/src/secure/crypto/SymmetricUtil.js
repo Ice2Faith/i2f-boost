@@ -2,7 +2,7 @@ import B64 from '../util/base64'
 import SecureProvider from './SecureProvider'
 
 const SymmetricUtil = {
-  genKey(size) {
+  genKey (size) {
     return SecureProvider.symmetricEncryptor.genKey(size)
   },
   encrypt: function (data, key) {

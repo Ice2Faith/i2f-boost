@@ -26,7 +26,7 @@ const SecureConfig = {
   // 在正式环境中，请禁用
   enableDebugLog: process.env.NODE_ENV != 'prod',
   // 加密配置的白名单url
-  whileList: ['/secure/key', '/secure/clientKey'],
+  whileList: ['/secure/key', '/secure/clientKey', '/secure/swapKey'],
   // 加密URL的URL白名单
   encWhiteList: ['/login', '/logout']
 }

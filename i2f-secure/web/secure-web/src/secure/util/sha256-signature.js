@@ -1,7 +1,7 @@
 import CryptoJS from 'crypto-js'
 
 const Sha256Signature = {
-  sign(text) {
+  sign (text) {
     return CryptoJS.SHA256(text).toString(CryptoJS.enc.Hex).toUpperCase()
   }
 }

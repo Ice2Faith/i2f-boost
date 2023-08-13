@@ -1,12 +1,12 @@
 const SecureCallback = {
-    callPubKey: () => {
+  callPubKey: () => {
 
-    },
-    callPriKey: () => {
+  },
+  callPriKey: () => {
 
-    },
-    callSwapKey: () => {
+  },
+  callSwapKey: () => {
 
-    }
+  }
 }
 export default SecureCallback

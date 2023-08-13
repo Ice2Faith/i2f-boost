@@ -11,17 +11,17 @@ import SecureException from '../excception/secure-exception'
 import SignatureUtil from '../crypto/SignatureUtil'
 
 const SecureUtils = {
-  typeOf(data) {
+  typeOf (data) {
     return Object.prototype.toString.call(data).slice(8, -1).toLowerCase()
   },
-  parseSecureHeader(key, separator, res) {
+  parseSecureHeader (key, separator, res) {
     const value = this.getPossibleValue(res)
     return this.decodeSecureHeader(value, separator)
   },
-  getPossibleValue(res) {
+  getPossibleValue (res) {
     return res.headers[SecureConfig.headerName]
   },
-  decodeSecureHeader(str, separator) {
+  decodeSecureHeader (str, separator) {
     if (StringUtils.isEmpty(str)) {
       throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_EMPTY(), '空安全头')
     }
@@ -53,7 +53,7 @@ const SecureUtils = {
     }
     return ret
   },
-  encodeSecureHeader(header, separator) {
+  encodeSecureHeader (header, separator) {
     let str = ''
     str += header.sign
     str += separator
@@ -66,7 +66,7 @@ const SecureUtils = {
     str += header.digital
     return Base64Obfuscator.encode(B64.encrypt(str), true)
   },
-  makeSecureSign(body, header) {
+  makeSecureSign (body, header) {
     if (StringUtils.isEmpty(body)) {
       body = ''
     }
@@ -79,11 +79,11 @@ const SecureUtils = {
     const sign = SignatureUtil.sign(text)
     return sign
   },
-  verifySecureHeader(body, header) {
+  verifySecureHeader (body, header) {
     const sign = this.makeSecureSign(body, header)
     return sign == header.sign
   },
-  decodeEncTrueUrl(encodeUrl) {
+  decodeEncTrueUrl (encodeUrl) {
     let text = B64.decrypt(text)
     text = Base64Obfuscator.decode(encodeUrl)
     const arr = text.split(';')
@@ -99,7 +99,7 @@ const SecureUtils = {
     const trueUrl = B64.decrypt(Base64Obfuscator.decode(url))
     return trueUrl
   },
-  encodeEncTrueUrl(trueUrl) {
+  encodeEncTrueUrl (trueUrl) {
     const url = Base64Obfuscator.encode(B64.encrypt(trueUrl), false)
     const sign = SignatureUtil.sign(url)
     let text = Base64Obfuscator.encode(sign + ';' + url, false)

@@ -1,7 +1,7 @@
 import Random from './random'
 
 const CodeUtil = {
-  makeCheckCode(len, onlyNumber = false) {
+  makeCheckCode (len, onlyNumber = false) {
     let ret = ''
     let bounce = 10 + 26 + 26
     if (onlyNumber) {

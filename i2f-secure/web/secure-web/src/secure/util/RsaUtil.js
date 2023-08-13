@@ -3,10 +3,10 @@
  */
 import JSEncrypt from '../static/jsencrypt'
 import jsrsasign from 'jsrsasign'
-import AsymmetricKeyPair from "../data/AsymmetricKeyPair";
+import AsymmetricKeyPair from '../data/AsymmetricKeyPair'
 
 const RsaUtil = {
-  genKeyPair(size = 1024) {
+  genKeyPair (size = 1024) {
     if (!size || size <= 0) {
       size = 1024
     }
@@ -15,7 +15,7 @@ const RsaUtil = {
     const privateKey = this.keyInflater(jsrsasign.KEYUTIL.getPEM(rsaKeypair.prvKeyObj, 'PKCS1PRV')) // 获取私钥
     return AsymmetricKeyPair.newObj(publicKey, privateKey)
   },
-  keyInflater(str) {
+  keyInflater (str) {
     const arr = str.split('\n')
     let ret = ''
     for (let i = 1; i < arr.length - 2; i++) {
@@ -23,22 +23,22 @@ const RsaUtil = {
     }
     return ret
   },
-  publicKeyEncrypt(pubKey, text) {
+  publicKeyEncrypt (pubKey, text) {
     const chiper = new JSEncrypt()
     chiper.setKey(pubKey)
     return chiper.encrypt(text, false)
   },
-  publicKeyDecrypt(pubKey, text) {
+  publicKeyDecrypt (pubKey, text) {
     const chiper = new JSEncrypt()
     chiper.setKey(pubKey)
     return chiper.decrypt(text, false)
   },
-  privateKeyEncrypt(priKey, text) {
+  privateKeyEncrypt (priKey, text) {
     const chiper = new JSEncrypt()
     chiper.setKey(priKey)
     return chiper.encrypt(text, true)
   },
-  privateKeyDecrypt(priKey, text) {
+  privateKeyDecrypt (priKey, text) {
     const chiper = new JSEncrypt()
     chiper.setKey(priKey)
     return chiper.decrypt(text, true)

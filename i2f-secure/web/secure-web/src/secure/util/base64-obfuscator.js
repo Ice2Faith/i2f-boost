@@ -4,10 +4,10 @@
 import Random from './random'
 
 const Base64Obfuscator = {
-  OBF_PREFIX() {
+  OBF_PREFIX () {
     return '$.'
   },
-  encode(bs4, prefix) {
+  encode (bs4, prefix) {
     let builder = ''
     if (prefix) {
       builder += this.OBF_PREFIX()
@@ -36,7 +36,7 @@ const Base64Obfuscator = {
     }
     return builder
   },
-  decode(sob) {
+  decode (sob) {
     let str = sob
     if (sob.startsWith(this.OBF_PREFIX())) {
       str = sob.substring(this.OBF_PREFIX().length)

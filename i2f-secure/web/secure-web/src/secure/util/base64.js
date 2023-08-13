@@ -1,7 +1,7 @@
 /**
  * Base64工具
  */
-import {Base64} from 'js-base64'
+import { Base64 } from 'js-base64'
 
 const B64 = {
   encrypt: function (data) {
