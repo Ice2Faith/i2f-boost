@@ -1,33 +1,34 @@
 /**
  * 自动加解密的核心过滤器
  */
-import SecureConfig from "../secure-config";
-import SecureTransfer from "./secure-transfer";
-import StringUtils from "../util/string-utils";
-import SecureUtils from "../util/secure-utils";
-import SecureConsts from "../consts/secure-consts";
-import SecureHeader from "../data/secure-header";
-import ObjectUtils from "../util/ObjectUtils";
+import SecureConfig from '../secure-config'
+import SecureTransfer from './secure-transfer'
+import StringUtils from '../util/string-utils'
+import SecureUtils from '../util/secure-utils'
+import SecureConsts from '../consts/secure-consts'
+import SecureHeader from '../data/secure-header'
+import ObjectUtils from '../util/ObjectUtils'
 import qs from 'qs'
-import SecureException from "../excception/secure-exception";
-import SecureErrorCode from "../consts/secure-error-code";
+import SecureException from '../excception/secure-exception'
+import SecureErrorCode from '../consts/secure-error-code'
+import SecureCallback from './secure-callback'
 
 const SecureTransferFilter = {
     getRequestContentType(config) {
         let contentType = null
-        let method = config.method
+        const method = config.method
         if (contentType == null) {
             Object.keys(config.headers).forEach((key) => {
-                let lkey = key.toLowerCase()
+                const lkey = key.toLowerCase()
                 if (lkey == 'content-type') {
                     contentType = config.headers[key]
                 }
             })
         }
         if (contentType == null) {
-            let methodHeader = config.headers[method]
+            const methodHeader = config.headers[method]
             Object.keys(methodHeader).forEach((key) => {
-                let lkey = key.toLowerCase()
+                const lkey = key.toLowerCase()
                 if (lkey == 'content-type') {
                     contentType = methodHeader[key]
                 }
@@ -60,10 +61,12 @@ const SecureTransferFilter = {
     // 也就是说，如果请求头中，这两个请求头不存在，或者值不为SECURE_HEADER_ENABLE，都将不会处理
     // 也就是手动处理，部分参数的情形
     requestFilter(config) {
-        if (SecureTransfer.existsAsymPriKey()) {
-            config.headers[SecureConfig.clientAsymSignName] = SecureTransfer.getAsymPriSign()
+        config.secure = {
+            url: config.url
         }
-
+        if (SecureTransfer.existsAsymSlfPubKeySign()) {
+            config.headers[SecureConfig.clientAsymSignName] = SecureTransfer.getAsymSlfPubSign()
+        }
         if (config.data) {
             if (SecureUtils.typeOf(config.data) == 'formdata') {
                 config.headers['Content-Type'] = 'multipart/form-data'
@@ -71,17 +74,17 @@ const SecureTransferFilter = {
         }
         let contentType = this.getRequestContentType(config)
         if (StringUtils.isEmpty(contentType)) {
-            contentType = ""
+            contentType = ''
         }
         contentType = contentType.toLowerCase()
-        if (contentType.indexOf("multipart/form-data") >= 0) {
+        if (contentType.indexOf('multipart/form-data') >= 0) {
             return config
         }
         if (this.isInWhiteList(config.url, SecureConfig.whileList)) {
             return config
         }
         if (SecureConfig.enableDebugLog) {
-            console.log('request:beforeSecureConfig:', config.url, ObjectUtils.deepClone(config))
+            console.log('request:beforeSecureConfig:', (config.secure.url || config.url), ObjectUtils.deepClone(config))
         }
         if (config.headers[SecureConsts.SECURE_URL_HEADER()] === SecureConsts.FLAG_ENABLE()) {
             delete config.headers[SecureConsts.SECURE_URL_HEADER()]
@@ -102,104 +105,158 @@ const SecureTransferFilter = {
         if (!secureData && !secureParams) {
             return config
         }
-        let symmKey = SecureTransfer.symmKeyGen(SecureConfig.symmKeySize / 8);
-        let requestHeader = SecureHeader.newObj()
-        requestHeader.nonce = new Date().getTime().toString(16) + '' + Math.floor(Math.random() * 0x0fff).toString(16);
+        const symmKey = SecureTransfer.symmKeyGen(SecureConfig.symmKeySize / 8)
+        const requestHeader = SecureHeader.newObj()
+        requestHeader.nonce = new Date().getTime().toString(16) + '' + Math.floor(Math.random() * 0x0fff).toString(16)
         requestHeader.randomKey = SecureTransfer.getRequestSecureHeader(symmKey)
-        requestHeader.serverAsymSign = SecureTransfer.getAsymSign()
+        requestHeader.serverAsymSign = SecureTransfer.getAsymOthPubSign()
         let signText = ''
         if (secureData) {
             if (config.data) {
-                let method = config.method
+                const method = config.method
                 if (method == 'put' || method == 'post') {
                     if (!StringUtils.isEmpty(contentType)) {
-                        if (contentType.indexOf("application/x-www-form-urlencoded") >= 0) {
+                        if (contentType.indexOf('application/x-www-form-urlencoded') >= 0) {
                             config.data = qs.stringify(config.data)
                         }
                     }
                 }
-                config.data = SecureTransfer.encrypt(config.data, symmKey);
+                config.data = SecureTransfer.encrypt(config.data, symmKey)
                 signText += config.data
             }
-
         }
         if (secureParams) {
             if (config.params) {
-                let paramText = qs.stringify(config.params)
+                const paramText = qs.stringify(config.params)
                 config.params = {}
                 config.params[SecureConfig.parameterName] = SecureTransfer.encrypt(paramText, symmKey)
                 signText += config.params[SecureConfig.parameterName]
             }
         }
-        requestHeader.clientAsymSign=SecureTransfer.getAsymPriSign()
+        requestHeader.clientAsymSign = SecureTransfer.getAsymSlfPubSign()
         requestHeader.sign = SecureUtils.makeSecureSign(signText, requestHeader)
         requestHeader.digital = SecureTransfer.getRequestDigitalHeader(requestHeader.sign)
         if (SecureConfig.enableDebugLog) {
-            console.log('request:secureHeader:', config.url, ObjectUtils.deepClone(requestHeader))
+            console.log('request:secureHeader:', (config.secure.url || config.url), ObjectUtils.deepClone(requestHeader))
         }
         config.headers[SecureConfig.headerName] = SecureUtils.encodeSecureHeader(requestHeader, SecureConfig.headerSeparator)
 
         if (SecureConfig.enableDebugLog) {
-            console.log('request:afterSecureConfig:', config.url, ObjectUtils.deepClone(config))
+            console.log('request:afterSecureConfig:', (config.secure.url || config.url), ObjectUtils.deepClone(config))
         }
-        return config;
+        return config
     },
     // 响应解密过滤，res需要包含headers和data
     // 分别表示响应头和响应体
     // 当响应头中存在SECURE_DATA_HEADER时，将会自动解密响应体
     responseFilter(res) {
-        if (SecureConfig.enableDebugLog) {
-            console.log('response:beforeSecureRes:', res.config.url, ObjectUtils.deepClone(res))
+        if (res == null || res == undefined) {
+            return
         }
-        let skeyHeader = res.headers[SecureConfig.dynamicKeyHeaderName];
+        if (SecureConfig.enableDebugLog) {
+            console.log('response:beforeSecureRes:', (res.config.secure.url || res.config.url), ObjectUtils.deepClone(res))
+        }
+        const skeyHeader = res.headers[SecureConfig.dynamicKeyHeaderName]
         if (!StringUtils.isEmpty(skeyHeader)) {
             if (SecureConfig.enableDebugLog) {
-                console.log('response:updateAsymPubKey:', res.config.url, skeyHeader)
+                console.log('response:updateAsymPubKey:', (res.config.secure.url || res.config.url), skeyHeader)
             }
-            SecureTransfer.saveAsymPubKey(skeyHeader);
+            SecureTransfer.saveAsymOthPubKey(skeyHeader)
         }
-        let wkeyHeader = res.headers[SecureConfig.clientKeyHeaderName];
+        const wkeyHeader = res.headers[SecureConfig.clientKeyHeaderName]
         if (!StringUtils.isEmpty(wkeyHeader)) {
             if (SecureConfig.enableDebugLog) {
-                console.log('response:updateAsymPriKey:', res.config.url, wkeyHeader)
+                console.log('response:updateAsymPriKey:', (res.config.secure.url || res.config.url), wkeyHeader)
             }
-            SecureTransfer.saveAsymPriKey(wkeyHeader);
+            SecureTransfer.saveAsymSlfPriKey(wkeyHeader)
         }
 
-        let headerValue = res.headers[SecureConfig.headerName]
+        const headerValue = res.headers[SecureConfig.headerName]
         if (StringUtils.isEmpty(headerValue)) {
             return res
         }
-        let responseHeader = SecureUtils.parseSecureHeader(SecureConfig.headerName, SecureConfig.headerSeparator, res)
-        responseHeader.clientAsymSign=SecureTransfer.getAsymPriSign()
+        const responseHeader = SecureUtils.parseSecureHeader(SecureConfig.headerName, SecureConfig.headerSeparator, res)
+        responseHeader.clientAsymSign = SecureTransfer.getAsymSlfPubSign()
         if (SecureConfig.enableDebugLog) {
-            console.log('response:secureHeader:', res.config.url, ObjectUtils.deepClone(responseHeader))
+            console.log('response:secureHeader:', (res.config.secure.url || res.config.url), ObjectUtils.deepClone(responseHeader))
         }
-        let ok = SecureUtils.verifySecureHeader(res.data,responseHeader);
+        const callbackFlags = {
+            pubKey: false,
+            priKey: false,
+            swapKey: false
+        }
+        const ok = SecureUtils.verifySecureHeader(res.data, responseHeader)
         if (!ok) {
-            throw SecureException.newObj(SecureErrorCode.BAD_SIGN, "签名验证失败");
+            if (SecureConfig.enableSwapAsymKey) {
+                if (SecureCallback.callSwapKey && !callbackFlags.swapKey) {
+                    SecureCallback.callSwapKey()
+                    callbackFlags.swapKey = true
+                }
+            } else {
+                if (SecureCallback.callPubKey && !callbackFlags.pubKey) {
+                    SecureCallback.callPubKey()
+                    callbackFlags.pubKey = true
+                }
+                if (SecureCallback.callPriKey && !callbackFlags.priKey) {
+                    SecureCallback.callPriKey()
+                    callbackFlags.priKey = true
+                }
+            }
+            throw SecureException.newObj(SecureErrorCode.BAD_SIGN, '签名验证失败')
         }
 
-        let digital = SecureTransfer.getResponseDigitalHeader(responseHeader.digital);
+        const digital = SecureTransfer.getResponseDigitalHeader(responseHeader.digital)
         if (digital == null) {
-            throw SecureException.newObj(SecureErrorCode.BAD_DIGITAL(), "数字签名验证失败，请重试！");
+            if (SecureConfig.enableSwapAsymKey) {
+                if (SecureCallback.callSwapKey && !callbackFlags.swapKey) {
+                    SecureCallback.callSwapKey()
+                    callbackFlags.swapKey = true
+                }
+            } else {
+                if (SecureCallback.callPubKey && !callbackFlags.pubKey) {
+                    SecureCallback.callPubKey()
+                    callbackFlags.pubKey = true
+                }
+            }
+            throw SecureException.newObj(SecureErrorCode.BAD_DIGITAL(), '数字签名验证失败，请重试！')
         }
         if (digital != responseHeader.sign) {
-            throw SecureException.newObj(SecureErrorCode.BAD_DIGITAL(), "数字签名验证失败，请重试！");
+            if (SecureConfig.enableSwapAsymKey) {
+                if (SecureCallback.callSwapKey && !callbackFlags.swapKey) {
+                    SecureCallback.callSwapKey()
+                    callbackFlags.swapKey = true
+                }
+            } else {
+                if (SecureCallback.callPubKey && !callbackFlags.pubKey) {
+                    SecureCallback.callPubKey()
+                    callbackFlags.pubKey = true
+                }
+            }
+            throw SecureException.newObj(SecureErrorCode.BAD_DIGITAL(), '数字签名验证失败，请重试！')
         }
 
-        let symmKey = SecureTransfer.getResponseSecureHeader(responseHeader.randomKey);
+        const symmKey = SecureTransfer.getResponseSecureHeader(responseHeader.randomKey)
         if (symmKey == null) {
-            throw SecureException.newObj(SecureErrorCode.BAD_RANDOM_KEY(), "随机秘钥无效或已失效，请重试！");
+            if (SecureConfig.enableSwapAsymKey) {
+                if (SecureCallback.callSwapKey && !callbackFlags.swapKey) {
+                    SecureCallback.callSwapKey()
+                    callbackFlags.swapKey = true
+                }
+            } else {
+                if (SecureCallback.callPriKey && !callbackFlags.priKey) {
+                    SecureCallback.callPriKey()
+                    callbackFlags.priKey = true
+                }
+            }
+            throw SecureException.newObj(SecureErrorCode.BAD_RANDOM_KEY(), '随机秘钥无效或已失效，请重试！')
         }
 
-        res.data = SecureTransfer.decrypt(res.data, symmKey);
+        res.data = SecureTransfer.decrypt(res.data, symmKey)
         if (SecureConfig.enableDebugLog) {
-            console.log('response:afterSecureRes:', res.config.url, ObjectUtils.deepClone(res))
+            console.log('response:afterSecureRes:', (res.config.secure.url || res.config.url), ObjectUtils.deepClone(res))
         }
-        return res;
-    },
+        return res
+    }
 }
 
-
-export default SecureTransferFilter;
+export default SecureTransferFilter

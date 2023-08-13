@@ -22,6 +22,8 @@ public interface SecureConsts {
     // secure sign web client asym sign
     String DEFAULT_SECURE_CLIENT_ASYM_SIGN_NAME = "sswcas";
 
+    // 客户端秘钥对的获取策略，是否是本地生成交换策略
+    boolean DEFAULT_SECURE_SWAP_ASYM_KEY = true;
 
     String FILTER_EXCEPTION_ATTR_KEY = "SECURE_FILTER_EXCEPTION";
 

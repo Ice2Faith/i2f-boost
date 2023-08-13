@@ -24,7 +24,7 @@ import java.util.function.Supplier;
  * @desc
  */
 public class SecureProvider {
-    public static BiSupplier<AsymmetricEncryptor, KeyPair> asymmetricEncryptorSupplier = (keyPair) -> new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, keyPair.getPublic().getEncoded(), keyPair.getPrivate().getEncoded());
+    public static BiSupplier<AsymmetricEncryptor, KeyPair> asymmetricEncryptorSupplier = (keyPair) -> new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, keyPair);
 
     public static BiSupplier<SymmetricEncryptor, byte[]> symmetricEncryptorSupplier = (secretBytes) -> new AesEncryptor(AesType.ECB_ISO10126PADDING, secretBytes);
 

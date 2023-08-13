@@ -56,7 +56,10 @@ public class SecureConfig {
 
     private String clientAsymSignName = SecureConsts.DEFAULT_SECURE_CLIENT_ASYM_SIGN_NAME;
 
-    private boolean enableClientIpBind=true;
+    // 客户端秘钥对的获取策略，是否是本地生成交换策略
+    private boolean enableSwapAsymKey = SecureConsts.DEFAULT_SECURE_SWAP_ASYM_KEY;
+
+    private boolean enableClientIpBind = true;
 
     private String encUrlPath = SecureConsts.DEFAULT_ENC_URL_PATH;
 

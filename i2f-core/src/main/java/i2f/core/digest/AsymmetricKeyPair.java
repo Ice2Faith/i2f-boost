@@ -1,12 +1,11 @@
 package i2f.core.digest;
 
+import i2f.core.check.CheckUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.*;
 import java.security.*;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -25,48 +24,86 @@ public class AsymmetricKeyPair {
         this.keyPair = keyPair;
     }
 
-    public RSAPublicKey publicKey() {
-        return (RSAPublicKey) keyPair.getPublic();
-    }
-
-    public RSAPrivateKey privateKey(){
-        return (RSAPrivateKey)keyPair.getPrivate();
-    }
-
-    public byte[] publicKeyBytes(){
-        return publicKey().getEncoded();
-    }
-
-    public byte[] privateKeyBytes(){
-        return privateKey().getEncoded();
-    }
-
-    public String publicKeyBase64(){
-        return Base64Util.encode(publicKeyBytes());
-    }
-
-    public String privateKeyBase64(){
-        return Base64Util.encode(privateKeyBytes());
+    public AsymmetricKeyPair(PublicKey publicKey, PrivateKey privateKey) {
+        this(new KeyPair(publicKey, privateKey));
     }
 
     public static PublicKey parsePublicKeyBase64(String bs64) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        if (CheckUtil.isEmptyStr(bs64)) {
+            return null;
+        }
         byte[] data = Base64Util.decode(bs64);
         return getPublicKey(data);
     }
 
     public static PrivateKey parsePrivateKeyBase64(String bs64) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        if (CheckUtil.isEmptyStr(bs64)) {
+            return null;
+        }
         byte[] data = Base64Util.decode(bs64);
         return getPrivateKey(data);
     }
 
     public static PublicKey getPublicKey(byte[] codes) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        if (codes == null || codes.length == 0) {
+            return null;
+        }
         PublicKey pubKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(codes));
         return pubKey;
     }
 
     public static PrivateKey getPrivateKey(byte[] codes) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        if (codes == null || codes.length == 0) {
+            return null;
+        }
         PrivateKey priKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(codes));
         return priKey;
+    }
+
+    public PublicKey publicKey() {
+        if (keyPair == null) {
+            return null;
+        }
+        return keyPair.getPublic();
+    }
+
+    public PrivateKey privateKey() {
+        if (keyPair == null) {
+            return null;
+        }
+        return keyPair.getPrivate();
+    }
+
+    public byte[] publicKeyBytes() {
+        PublicKey key = publicKey();
+        if (key == null) {
+            return new byte[0];
+        }
+        return key.getEncoded();
+    }
+
+    public byte[] privateKeyBytes() {
+        PrivateKey key = privateKey();
+        if (key == null) {
+            return new byte[0];
+        }
+        return key.getEncoded();
+    }
+
+    public String publicKeyBase64() {
+        byte[] bytes = publicKeyBytes();
+        if (bytes == null || bytes.length == 0) {
+            return "";
+        }
+        return Base64Util.encode(bytes);
+    }
+
+    public String privateKeyBase64() {
+        byte[] bytes = privateKeyBytes();
+        if (bytes == null || bytes.length == 0) {
+            return "";
+        }
+        return Base64Util.encode(bytes);
     }
 
     public static void saveAsymKey(AsymmetricKeyPair rsaKey, OutputStream os) throws IOException {

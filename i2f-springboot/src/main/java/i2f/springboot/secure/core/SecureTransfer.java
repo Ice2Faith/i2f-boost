@@ -6,6 +6,7 @@ import i2f.core.digest.AsymmetricKeyPair;
 import i2f.core.digest.Base64Obfuscator;
 import i2f.core.io.stream.StreamUtil;
 import i2f.core.j2ee.web.ServletContextUtil;
+import i2f.core.security.jce.bc.BouncyCastleHolder;
 import i2f.core.thread.NamingThreadFactory;
 import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import i2f.springboot.secure.SecureConfig;
@@ -91,14 +92,14 @@ public class SecureTransfer implements InitializingBean {
                 if (arr.length < 1) {
                     continue;
                 }
-                String type = arr[0];
+                String type = arr[0].trim();
                 if ("0".equals(type)) {
                     if (arr.length < 3) {
                         continue;
                     }
                     try {
-                        long ts = Long.parseLong(arr[2]);
-                        expireMap.put(arr[1], ts);
+                        long ts = Long.parseLong(arr[2].trim());
+                        expireMap.put(arr[1].trim(), ts);
                     } catch (Exception e) {
                         log.warn("load clients asym key exception:" + e.getMessage() + " of " + e.getClass().getName());
                     }
@@ -107,16 +108,16 @@ public class SecureTransfer implements InitializingBean {
                     if (arr.length < 3) {
                         continue;
                     }
-                    ipMap.put(arr[1], arr[2]);
+                    ipMap.put(arr[1].trim(), arr[2].trim());
                 }
                 if ("1".equals(type)) {
                     if (arr.length < 4) {
                         continue;
                     }
                     try {
-                        String k = arr[1];
-                        String pubk = arr[2];
-                        String prik = arr[3];
+                        String k = arr[1].trim();
+                        String pubk = arr[2].trim();
+                        String prik = arr[3].trim();
                         PublicKey publicKey = AsymmetricKeyPair.parsePublicKeyBase64(pubk);
                         PrivateKey privateKey = AsymmetricKeyPair.parsePrivateKeyBase64(prik);
                         AsymmetricKeyPair keyPair = new AsymmetricKeyPair(new KeyPair(publicKey, privateKey));
@@ -139,14 +140,14 @@ public class SecureTransfer implements InitializingBean {
             File storeFile = getClientsAsymStoreFile();
             StringBuilder builder = new StringBuilder();
             for (Map.Entry<String, Long> entry : keyExpireMap.entrySet()) {
-                builder.append("0").append("|").append(entry.getKey()).append("|").append(entry.getValue()).append("\n");
+                builder.append("0").append(" | ").append(entry.getKey()).append(" | ").append(entry.getValue()).append("\n");
             }
             for (Map.Entry<String, String> entry : clientIpKeyMap.entrySet()) {
-                builder.append("2").append("|").append(entry.getKey()).append("|").append(entry.getValue()).append("\n");
+                builder.append("2").append(" | ").append(entry.getKey()).append(" | ").append(entry.getValue()).append("\n");
             }
             for (Map.Entry<String, AsymmetricKeyPair> entry : clientKeys.entrySet()) {
                 AsymmetricKeyPair keyPair = entry.getValue();
-                builder.append("1").append("|").append(entry.getKey()).append("|").append(keyPair.publicKeyBase64()).append("|").append(keyPair.privateKeyBase64()).append("\n");
+                builder.append("1").append(" | ").append(entry.getKey()).append(" | ").append(keyPair.publicKeyBase64()).append(" | ").append(keyPair.privateKeyBase64()).append("\n");
             }
 
             String str = builder.toString();
@@ -160,13 +161,13 @@ public class SecureTransfer implements InitializingBean {
     }
 
 
-    public File getAsymStoreFile() {
+    public File getSlfAsymStoreFile() {
         File file = new File(secureConfig.getAsymStorePath(), SecureConsts.ASYM_KEY_FILE_NAME);
         return file;
     }
 
-    public void loadAsymKey() {
-        File file = getAsymStoreFile();
+    public void loadSlfAsymKey() {
+        File file = getSlfAsymStoreFile();
         log.info("asymKey store file:" + file.getAbsolutePath());
         if (file.exists()) {
             try {
@@ -178,8 +179,8 @@ public class SecureTransfer implements InitializingBean {
         }
     }
 
-    public void saveAsymKey() {
-        File file = getAsymStoreFile();
+    public void saveSlfAsymKey() {
+        File file = getSlfAsymStoreFile();
         log.info("asym store file:" + file.getAbsolutePath());
         try {
             AsymmetricKeyPair.saveAsymKey(asymKey, file);
@@ -188,12 +189,12 @@ public class SecureTransfer implements InitializingBean {
         }
     }
 
-    public void restoreAsymKey() {
-        loadAsymKey();
-        saveAsymKey();
+    public void restoreSlfAsymKey() {
+        loadSlfAsymKey();
+        saveSlfAsymKey();
     }
 
-    public void scheduleAsymUpdate() {
+    public void scheduleSlfAsymUpdate() {
         histories = new LinkedList<>();
         pool = Executors.newSingleThreadScheduledExecutor(new NamingThreadFactory("secure", "refresh"));
         pool.scheduleAtFixedRate(new Runnable() {
@@ -206,13 +207,13 @@ public class SecureTransfer implements InitializingBean {
                     if (histories.size() > secureConfig.getDynamicMaxHistoriesCount()) {
                         histories.removeLast();
                     }
-                    saveAsymKey();
+                    saveSlfAsymKey();
                 }
             }
         }, secureConfig.getDynamicRefreshDelaySeconds(), secureConfig.getDynamicRefreshDelaySeconds(), TimeUnit.SECONDS);
     }
 
-    public AsymmetricKeyPair findAsymKey(String sign) {
+    public AsymmetricKeyPair findSlfAsymKey(String sign) {
         if (!secureConfig.isEnableDynamicAsymKey()) {
             return asymKey;
         }
@@ -229,8 +230,12 @@ public class SecureTransfer implements InitializingBean {
         return null;
     }
 
-    public String getAsymSign() {
-        String b464 = asymKey.publicKeyBase64();
+    public String getSlfAsymSign() {
+        return getAsymPubSign(asymKey);
+    }
+
+    public String getAsymPubSign(AsymmetricKeyPair keyPair) {
+        String b464 = keyPair.publicKeyBase64();
         String asymSign = SignatureUtil.sign(b464);
         return asymSign;
     }
@@ -292,13 +297,13 @@ public class SecureTransfer implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        loadAsymKey();
+        loadSlfAsymKey();
         if (this.asymKey == null) {
             this.asymKey = AsymmetricUtil.makeKeyPair(secureConfig.getAsymKeySize());
         }
-        restoreAsymKey();
+        restoreSlfAsymKey();
         if (secureConfig.isEnableDynamicAsymKey()) {
-            scheduleAsymUpdate();
+            scheduleSlfAsymUpdate();
         }
         loadClientsAsymKeys();
         scheduleExpireKeys();
@@ -343,8 +348,9 @@ public class SecureTransfer implements InitializingBean {
         if (symmKey == null) {
             return "null";
         }
+        AsymmetricKeyPair keyPair = asymKey;
         // 使用Asym对symm秘钥加密并进行模糊
-        String symmKeyTransfer = AsymmetricUtil.privateKeyEncryptBase64(asymKey, symmKey);
+        String symmKeyTransfer = AsymmetricUtil.privateKeyEncryptBase64(keyPair, symmKey);
         symmKeyTransfer = Base64Obfuscator.encode(symmKeyTransfer, true);
         return symmKeyTransfer;
     }
@@ -354,7 +360,7 @@ public class SecureTransfer implements InitializingBean {
             return symmKeyTransfer;
         }
         symmKeyTransfer = symmKeyTransfer.trim();
-        AsymmetricKeyPair asymKey = findAsymKey(asymSign);
+        AsymmetricKeyPair asymKey = findSlfAsymKey(asymSign);
         if (asymKey == null) {
             return null;
         }
@@ -454,17 +460,18 @@ public class SecureTransfer implements InitializingBean {
         }
 
         String clientAsymSignOrigin = ServletContextUtil.getPossibleValue(secureConfig.getClientAsymSignName(), request);
-        if(StringUtils.isEmpty(clientAsymSignOrigin)){
-            clientAsymSignOrigin="";
+        if (StringUtils.isEmpty(clientAsymSignOrigin)) {
+            clientAsymSignOrigin = "";
         }
-        String clientAsymSign=clientAsymSignOrigin;
-        if(secureConfig.isEnableClientIpBind()){
-            clientAsymSign=getClientAsymSignCacheKey(clientAsymSignOrigin,clientIp);
+        String clientAsymSign = clientAsymSignOrigin;
+        if (secureConfig.isEnableClientIpBind()) {
+            clientAsymSign = getClientAsymSignCacheKey(clientAsymSignOrigin, clientIp);
         }
 
-        String priSign = getAsymPriSign(keyPair);
+        String pubSign = getAsymPubSign(keyPair);
+        String clientPubSign = pubSign;
         if (secureConfig.isEnableClientIpBind()) {
-            priSign = getClientAsymSignCacheKey(priSign, clientIp);
+            pubSign = getClientAsymSignCacheKey(pubSign, clientIp);
         }
         lock.lock();
         try {
@@ -475,16 +482,62 @@ public class SecureTransfer implements InitializingBean {
                 clientKeys.remove(ckey);
                 keyExpireMap.remove(ckey);
             }
-            clientKeys.put(priSign, keyPair);
-            clientIpKeyMap.put(clientIp,priSign);
-            refreshClientKeyExpire(priSign);
+            clientKeys.put(pubSign, keyPair);
+            clientIpKeyMap.put(clientIp, pubSign);
+            refreshClientKeyExpire(pubSign);
         } finally {
             lock.unlock();
         }
         saveClientsAsymKeys();
 
         String priKey = Base64Obfuscator.encode(keyPair.privateKeyBase64(), true);
-        return priKey;
+        return clientPubSign + secureConfig.getHeaderSeparator() + priKey;
     }
 
+    public String getWebAsymPublicKeyAndSwap(HttpServletRequest request, String clientKey) throws Exception {
+        String clientKeyB64 = Base64Obfuscator.decode(clientKey);
+        BouncyCastleHolder.registry();
+        PublicKey publicKey = AsymmetricKeyPair.parsePublicKeyBase64(clientKeyB64);
+
+        AsymmetricKeyPair keyPair = null;
+        if (publicKey != null) {
+            keyPair = new AsymmetricKeyPair(publicKey, null);
+        }
+
+        String clientIp = ServletContextUtil.getIp(request);
+
+
+        String clientAsymSignOrigin = ServletContextUtil.getPossibleValue(secureConfig.getClientAsymSignName(), request);
+        if (StringUtils.isEmpty(clientAsymSignOrigin)) {
+            clientAsymSignOrigin = "";
+        }
+        String clientAsymSign = clientAsymSignOrigin;
+        if (secureConfig.isEnableClientIpBind()) {
+            clientAsymSign = getClientAsymSignCacheKey(clientAsymSignOrigin, clientIp);
+        }
+
+        String pubSign = getAsymPubSign(keyPair);
+        if (secureConfig.isEnableClientIpBind()) {
+            pubSign = getClientAsymSignCacheKey(pubSign, clientIp);
+        }
+        lock.lock();
+        try {
+            clientKeys.remove(clientAsymSign);
+            keyExpireMap.remove(clientAsymSign);
+            if (clientIpKeyMap.containsKey(clientIp)) {
+                String ckey = clientIpKeyMap.get(clientIp);
+                clientKeys.remove(ckey);
+                keyExpireMap.remove(ckey);
+            }
+            clientKeys.put(pubSign, keyPair);
+            clientIpKeyMap.put(clientIp, pubSign);
+            refreshClientKeyExpire(pubSign);
+        } finally {
+            lock.unlock();
+        }
+        saveClientsAsymKeys();
+
+        String pubKey = Base64Obfuscator.encode(this.getAsymKey().publicKeyBase64(), true);
+        return pubKey;
+    }
 }

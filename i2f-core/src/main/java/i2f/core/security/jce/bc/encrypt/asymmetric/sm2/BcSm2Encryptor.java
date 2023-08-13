@@ -5,10 +5,7 @@ import i2f.core.security.jce.encrypt.CipherUtil;
 import i2f.core.security.jce.encrypt.std.asymmetric.basic.BasicAsymmetricEncryptor;
 
 import javax.crypto.Cipher;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -30,6 +27,22 @@ public class BcSm2Encryptor extends BasicAsymmetricEncryptor {
 
     public BcSm2Encryptor(BcSm2Type type, byte[] publicBytes, byte[] privateBytes) {
         super(type, publicBytes, privateBytes);
+    }
+
+    public BcSm2Encryptor(PublicKey publicKey, PrivateKey privateKey) {
+        super(BcSm2Type.DEFAULT, publicKey, privateKey);
+    }
+
+    public BcSm2Encryptor(BcSm2Type type, PublicKey publicKey, PrivateKey privateKey) {
+        super(type, publicKey, privateKey);
+    }
+
+    public BcSm2Encryptor(KeyPair keyPair) {
+        this(keyPair.getPublic(), keyPair.getPrivate());
+    }
+
+    public BcSm2Encryptor(BcSm2Type type, KeyPair keyPair) {
+        super(type, keyPair);
     }
 
     @Override

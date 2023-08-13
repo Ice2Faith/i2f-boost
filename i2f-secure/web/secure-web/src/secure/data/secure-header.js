@@ -1,7 +1,7 @@
 /**
  * 请求头sswh的解码组成部分
  */
-const SecureHeader={
+const SecureHeader = {
     // 签名
     sign: null,
     // 一次性消息

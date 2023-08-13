@@ -2,9 +2,9 @@
  * 字符串工具
  * @type {{isEmpty(*=): *}}
  */
-const StringUtils={
-    isEmpty(str){
-        return str==null || str==undefined||str==''
+const StringUtils = {
+    isEmpty(str) {
+        return str == null || str == undefined || str == ''
     }
 }
 

@@ -24,12 +24,20 @@ public class RsaEncryptor extends BasicAsymmetricEncryptor {
         super(type, publicBytes, privateBytes);
     }
 
+    public RsaEncryptor(PublicKey publicKey, PrivateKey privateKey) {
+        super(RsaType.ECB_PKCS1PADDING, publicKey, privateKey);
+    }
+
+    public RsaEncryptor(RsaType type, PublicKey publicKey, PrivateKey privateKey) {
+        super(type, publicKey, privateKey);
+    }
+
     public RsaEncryptor(KeyPair keyPair) {
-        this(keyPair.getPublic().getEncoded(), keyPair.getPrivate().getEncoded());
+        this(keyPair.getPublic(), keyPair.getPrivate());
     }
 
     public RsaEncryptor(RsaType type, KeyPair keyPair) {
-        this(type, keyPair.getPublic().getEncoded(), keyPair.getPrivate().getEncoded());
+        super(type, keyPair);
     }
 
     @Override

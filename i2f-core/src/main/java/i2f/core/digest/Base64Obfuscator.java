@@ -1,5 +1,7 @@
 package i2f.core.digest;
 
+import i2f.core.check.CheckUtil;
+
 import java.util.Random;
 
 /**
@@ -10,17 +12,20 @@ import java.util.Random;
  */
 public class Base64Obfuscator {
     public static final String OBF_PREFIX ="$.";
-    public static String encode(String bs4,boolean prefix){
-        Random random=new Random();
+    public static String encode(String bs4,boolean prefix) {
+        if (CheckUtil.isEmptyStr(bs4)) {
+            return bs4;
+        }
+        Random random = new Random();
         StringBuilder builder = new StringBuilder();
-        if(prefix){
+        if (prefix) {
             builder.append(OBF_PREFIX);
         }
-        int jpc= (bs4.length()+random.nextInt(31))%10;
-        builder.append((char)('0'+jpc));
-        for(int p=0;p<jpc;p++){
-            int ird=random.nextInt(16);
-            if(ird<10){
+        int jpc = (bs4.length() + random.nextInt(31)) % 10;
+        builder.append((char) ('0' + jpc));
+        for (int p = 0; p < jpc; p++) {
+            int ird = random.nextInt(16);
+            if (ird < 10) {
                 builder.append((char)('0'+ird));
             }else{
                 builder.append((char)('A'+(ird-10)));
@@ -40,17 +45,20 @@ public class Base64Obfuscator {
         }
         return builder.toString();
     }
-    public static String decode(String sob){
-        String str=sob;
-        if(sob.startsWith(OBF_PREFIX)){
-            str=sob.substring(OBF_PREFIX.length());
+    public static String decode(String sob) {
+        if (CheckUtil.isEmptyStr(sob)) {
+            return sob;
+        }
+        String str = sob;
+        if (sob.startsWith(OBF_PREFIX)) {
+            str = sob.substring(OBF_PREFIX.length());
         }
         StringBuilder builder = new StringBuilder();
-        int jpc = str.charAt(0)-'0';
-        str=str.substring(1+jpc);
-        jpc=jpc%2+3;
-        int i=0;
-        while(i<str.length()){
+        int jpc = str.charAt(0) - '0';
+        str = str.substring(1 + jpc);
+        jpc = jpc % 2 + 3;
+        int i = 0;
+        while (i < str.length()) {
             if(i%jpc==0 && str.charAt(i)!='='){
                 i++;
                 continue;

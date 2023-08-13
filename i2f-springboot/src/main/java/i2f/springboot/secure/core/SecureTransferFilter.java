@@ -5,7 +5,6 @@ import i2f.core.j2ee.web.ServletContextUtil;
 import i2f.core.j2ee.wrapper.HttpServletRequestProxyWrapper;
 import i2f.core.j2ee.wrapper.HttpServletResponseProxyWrapper;
 import i2f.core.thread.NamingThreadFactory;
-import i2f.spring.jackson.JacksonSerializerConfig;
 import i2f.spring.mapping.MappingUtil;
 import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import i2f.springboot.secure.SecureConfig;
@@ -354,7 +353,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
 
             SecureHeader responseHeader = new SecureHeader();
             responseHeader.randomKey = secureTransfer.getResponseSecureHeader(symmKey, clientAsymSign);
-            responseHeader.serverAsymSign = secureTransfer.getAsymSign();
+            responseHeader.serverAsymSign = secureTransfer.getSlfAsymSign();
             responseHeader.nonce = secureTransfer.makeNonce();
 
             String enData = null;

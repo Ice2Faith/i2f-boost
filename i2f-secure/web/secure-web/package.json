@@ -12,7 +12,8 @@
     "axios": "0.21.0",
     "js-base64": "^3.6.1",
     "crypto-js": "^4.1.1",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "jsrsasign": "^10.8.6"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

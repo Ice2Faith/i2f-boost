@@ -2,6 +2,8 @@
 - Asym 是 Asymmetric 非对称加密的简写，默认实现是 RSA
 - Symm 是 Symmetric 对称加密的简写，默认实现是 AES
 - Md 是 Message Digest 消息摘要的简写，默认实现是 SHA256
+- Slf 是 self 自身的简写，对应的就是服务器或者客户端自身
+- Oth 是 other 他人的简写，对应的就是相对的对方
 - 为了方便介绍，介绍中全部使用默认实现进行描述
 - 当然，这些实现，都可以方便的替换
 
@@ -28,12 +30,24 @@
     - 客户端
         - 登录后获取服务器RSA公钥
         - 获取客户端自己的RSA私钥
+            - 如果客户端能够生成RSA秘钥对
+                - 生成自己的秘钥对
+                - 则直接和服务器进行交换公钥即可
+            - 如果客户端不能够生成RSA秘钥对
+                - 则可以从服务端生成一个私钥返回（不推荐）
+                - 同时公钥将会保留在服务端进行后续的数据交流
     - 服务端
         - 项目启动后生成RSA公钥私钥
-        - 公钥发送给登录成果的客户端
+        - 公钥发送给连接初始化的客户端
         - 私钥自己保存
-        - 客户端请求自己的私钥时，生成随机的客户端秘钥对
-        - 返回客户端私钥，保留客户端公钥
+        - 客户端的秘钥处理
+            - 客户端能够生成RSA秘钥对
+                - 客户端生成自己的RSA秘钥对
+                - 将自己的公钥发送秘钥交换请求
+                - 得到服务端的公钥
+            - 客户端不能够生成RSA秘钥对
+                - 客户端请求自己的私钥时，生成随机的客户端秘钥对
+                - 返回客户端私钥，保留客户端公钥
 - 发送数据
     - 客户端
         - 随机生成一个nonce
@@ -168,16 +182,23 @@ public Object param(@SecureParams String password){
 ## 如何获取与存储RSA公钥
 - 服务端提供一个接口提供给客户端调用
 - 接口返回内容从 SecureTransfer.getWebAsymPublicKey() 获取
+    - 当使用秘钥交换时，使用 secureTransfer.getWebAsymPublicKeyAndSwap(request,clientKey) 交换获取
 - 可以如下定义：
-- 也可以通过配置i2f.springboot.config.secure.api.enable=true直接启用内置的SecureController提供接口secure/key
+- 也可以通过配置i2f.springboot.config.secure.api.enable=true直接启用
+    - 内置的SecureController提供接口secure/key
+    - 交换秘钥时，则使用接口 secure/swapKey
 
 ```java
+@ConditionalOnExpression("${i2f.springboot.config.secure.api.enable:true}")
 @RestController
 @RequestMapping("secure")
 public class SecureController {
 
     @Autowired
     private SecureTransfer secureTransfer;
+
+    @Autowired
+    private SecureConfig secureConfig;
 
     @SecureParams(in = false, out = false)
     @PostMapping("key")
@@ -188,9 +209,19 @@ public class SecureController {
 
     @SecureParams(in = false, out = false)
     @PostMapping("clientKey")
-    public String clientKey() {
-        String priKey = secureTransfer.getWebClientAsymPrivateKey();
+    public String clientKey(HttpServletRequest request) {
+        if(secureConfig.isEnableSwapAsymKey()){
+            throw new SecureException(SecureErrorCode.BAD_SECURE_REQUEST,"服务端不允许请求秘钥策略");
+        }
+        String priKey = secureTransfer.getWebClientAsymPrivateKey(request);
         return priKey;
+    }
+
+    @SecureParams(in = false, out = false)
+    @PostMapping("swapKey")
+    public String swapKey(HttpServletRequest request, @RequestBody String clientKey) throws Exception {
+        String pubKey = secureTransfer.getWebAsymPublicKeyAndSwap(request,clientKey);
+        return pubKey;
     }
 }
 ```
@@ -201,16 +232,28 @@ public class SecureController {
 ```js
 this.$axios({
     url: 'secure/key',
-    method: 'GET'
-  }).then(({data})=>{
-    this.$secureTransfer.saveAsymPubKey(data);
+    method: 'post'
+  }).then(({data}) => {
+    SecureTransfer.saveAsymOthPubKey(data)
   })
 
 this.$axios({
     url: 'secure/clientKey',
     method: 'post'
-  }).then(({data})=>{
-    this.$secureTransfer.saveAsymPriKey(data)
+  }).then(({data}) => {
+    SecureTransfer.saveAsymSlfPriKey(data)
+  })
+```
+
+- 交换秘钥的方式
+
+```shell script
+this.$axios({
+    url: 'secure/swapKey',
+    method: 'post',
+    data: SecureTransfer.loadWebAsymSlfPubKey()
+  }).then(({data}) => {
+    SecureTransfer.saveAsymOthPubKey(data)
   })
 ```
 
@@ -221,6 +264,9 @@ this.$axios({
     - 在Vue主体实例创建时调用获取RSA公钥
     - 如果后端配置了动态刷新RSA，则建议使用定时器进行定时刷新
     - 否则可能出现请求失败，后端无法解密情况
+    - 同时，为 SecureCallback 绑定对应的回调函数
+    - 这样在请求响应错误时，能够自动进行对应的秘钥交换或者秘钥更新
+    - 避免刷新页面来刷新秘钥
 
 ```bash
 App.vue
@@ -228,6 +274,8 @@ App.vue
 
 ```js
 import SecureTransfer from "@/secure/core/secure-transfer";
+import SecureCallback from '@/secure/core/secure-callback'
+import SecureConfig from "@/secure/secure-config";
 
 export default {
   name: 'App',
@@ -235,32 +283,54 @@ export default {
     
   },
   created() {
-    this.initAsymContent()
-    this.initClientContent()
-    let _this=this
-    window.rsaTimer=setInterval(function(){
-        _this.initAsymContent()
-    },5*60*1000)
+    if(SecureConfig.enableSwapAsymKey){
+      this.swapAsymKey()
+      SecureCallback.callSwapKey = this.swapAsymKey
+      let _this = this
+      window.rsaTimer = setInterval(function () {
+        _this.swapAsymKey()
+      }, 5 * 60 * 1000)
+    }else{
+      this.initAsymOthPubKey()
+      this.initAsymSlfPriKey()
+      SecureCallback.callPubKey = this.initAsymOthPubKey
+      SecureCallback.callPriKey = this.initAsymSlfPriKey
+      let _this = this
+      window.rsaTimer = setInterval(function () {
+        _this.initAsymPubKey()
+      }, 5 * 60 * 1000)
+    }
   },
   destroyed() {
     clearInterval(window.rsaTimer)
   },
-  methods:{
-    initAsymContent(){
+  methods: {
+    swapAsymKey(){
+      this.$axios({
+        url: 'secure/swapKey',
+        method: 'post',
+        data: SecureTransfer.loadWebAsymSlfPubKey()
+      }).then(({data}) => {
+        console.log('SECURE_KEY', data)
+        SecureTransfer.saveAsymOthPubKey(data)
+      })
+    },
+    initAsymOthPubKey() {
       this.$axios({
         url: 'secure/key',
         method: 'post'
-      }).then(({data})=>{
-        SecureTransfer.saveAsymPubKey(data)
+      }).then(({data}) => {
+        console.log('SECURE_KEY', data)
+        SecureTransfer.saveAsymOthPubKey(data)
       })
     },
-    initClientContent(){
+    initAsymSlfPriKey() {
       this.$axios({
         url: 'secure/clientKey',
         method: 'post'
-      }).then(({data})=>{
-        console.log('SECURE_KEY',data)
-        SecureTransfer.saveAsymPriKey(data)
+      }).then(({data}) => {
+        console.log('SECURE_KEY', data)
+        SecureTransfer.saveAsymSlfPriKey(data)
       })
     }
   }
@@ -315,9 +385,10 @@ export default {
     "axios": "0.21.0",
     "js-base64": "^3.6.1",
     "crypto-js": "^4.1.1",
-    "vue": "^2.5.2",
-    "vue-router": "^3.0.1"
-},
+    "jsrsasign": "^10.8.6",
+    "vue": "^2.6.14",
+    "vue-router": "^3.0.1",
+  },
 ```
 
 - 保存package.json之后，进入自己的项目路径
@@ -444,6 +515,7 @@ request.interceptors.response.use(res => {
     }
   },
   error => {
+    SecureTransferFilter.responseFilter(error.response)
     console.log('err' , error)
     return Promise.reject(error)
   }
@@ -476,7 +548,7 @@ secure/util/rsa.js
 // 注释掉webpack引入方式
 // import JSEncrypt from '../static/jsencrypt'
 
-const Rsa = {
+const RsaUtil = {
     ...
 ```
 
@@ -608,6 +680,8 @@ i2f:
         dynamicRefreshDelaySeconds: 360
         # 最多保留多少历史秘钥，默认5
         dynamicMaxHistoriesCount: 5
+        # 客户端秘钥对的获取策略，是否是本地生成交换策略，默认true
+        enableSwapAsymKey: true
         # 用于存储安全头的请求头名称，默认sswh
         headerName: sswh
         # 安全头格式的分隔符，默认;
@@ -672,7 +746,7 @@ i2f:
           localDateFormat: yyyy-MM-dd
           # 定义LocalTime的格式化模式
           localTimeFormat: HH:mm:ss
-          
+
 ```
 
 ## 前端配置详解
@@ -681,32 +755,38 @@ i2f:
 /**
  * 主配置
  */
-import SecureConsts from "./consts/secure-consts";
+import SecureConsts from './consts/secure-consts'
 
-const SecureConfig={
-   // Symm秘钥长度，默认128，可选128,192,256
-   symmKeySize: SecureConsts.AES_KEY_SIZE_128(),
-   // 用于存储安全头的请求头名称，默认sswh
-   headerName: SecureConsts.DEFAULT_SECURE_HEADER_NAME(),
-   // 动态刷新Asym秘钥的响应头，默认skey
-   dynamicKeyHeaderName: SecureConsts.SECURE_DYNAMIC_KEY_HEADER(),
-   clientAsymSignName: SecureConsts.DEFAULT_SECURE_CLIENT_ASYM_SIGN_NAME(),
-   // 安全头格式的分隔符，默认;
-   headerSeparator: SecureConsts.DEFAULT_HEADER_SEPARATOR(),
-   // 指定在使用编码URL转发时的转发路径
-   encUrlPath: SecureConsts.ENC_URL_PATH(),
-   // 安全URL参数的参数名称
-   parameterName:SecureConsts.DEFAULT_SECURE_PARAMETER_NAME(),
-   // 是否开启详细日志
-   // 在正式环境中，请禁用
-   enableDebugLog: true,
-   // 加密配置的白名单url
-   whileList:['/secure/key','/login'],
-   // 加密URL的URL白名单
-   encWhiteList:['/secure/key','/login']
+const SecureConfig = {
+  // Asymm秘钥长度，默认1024，可选1024,2048
+  asymKeySize : SecureConsts.RSA_KEY_SIZE_1024(),
+  // Symm秘钥长度，默认128，可选128,192,256
+  symmKeySize: SecureConsts.AES_KEY_SIZE_128(),
+  // 用于存储安全头的请求头名称，默认sswh
+  headerName: SecureConsts.DEFAULT_SECURE_HEADER_NAME(),
+  // 动态刷新Asym秘钥的响应头，默认skey
+  dynamicKeyHeaderName: SecureConsts.SECURE_DYNAMIC_KEY_HEADER(),
+  clientKeyHeaderName: SecureConsts.SECURE_CLIENT_KEY_HEADER(),
+  clientAsymSignName: SecureConsts.DEFAULT_SECURE_CLIENT_ASYM_SIGN_NAME(),
+  // 安全头格式的分隔符，默认;
+  headerSeparator: SecureConsts.DEFAULT_HEADER_SEPARATOR(),
+  // 指定在使用编码URL转发时的转发路径
+  encUrlPath: SecureConsts.ENC_URL_PATH(),
+  // 安全URL参数的参数名称
+  parameterName: SecureConsts.DEFAULT_SECURE_PARAMETER_NAME(),
+  // 客户端秘钥对的获取策略，是否是本地生成交换策略
+  enableSwapAsymKey: SecureConsts.DEFAULT_SECURE_SWAP_ASYM_KEY(),
+  // 是否开启详细日志
+  // 在正式环境中，请禁用
+  enableDebugLog: process.env.NODE_ENV != 'prod',
+  // 加密配置的白名单url
+  whileList: ['/secure/key', '/secure/clientKey'],
+  // 加密URL的URL白名单
+  encWhiteList: ['/login', '/logout']
 }
 
 export default SecureConfig
+
 ```
 
 ## 拓展与变更
@@ -723,5 +803,7 @@ export default SecureConfig
     - 在前端配种中，只需要实现即可，实现方法可以参考默认实现
 - 例如
 - 使用其他非对称加密算法替代RSA，例如ElGamal
+    - 特别注意，算法需要支持签名和验签，也就是私钥加密公钥解密模式
+    - 一般的非对称加密算法，都是公钥加密私钥解密的
 - 使用其他对称加密算法替代AES，例如DES，3Des
 - 使用其他签名摘要算法替代StringSignature，例如MD5,SHA1,SHA256,Hmac

@@ -6,6 +6,9 @@ import i2f.core.security.jce.encrypt.std.asymmetric.AsymmetricEncryptor;
 import i2f.core.security.jce.encrypt.std.asymmetric.IAsymmetricCipherProvider;
 
 import javax.crypto.Cipher;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 /**
  * @author Ice2Faith
@@ -22,6 +25,28 @@ public abstract class BasicAsymmetricEncryptor implements AsymmetricEncryptor, I
         this.type = type;
         this.publicBytes = publicBytes;
         this.privateBytes = privateBytes;
+    }
+
+    public BasicAsymmetricEncryptor(IEncryptType type, KeyPair keyPair) {
+        this.type = type;
+        if (keyPair != null) {
+            if (keyPair.getPublic() != null) {
+                this.publicBytes = keyPair.getPublic().getEncoded();
+            }
+            if (keyPair.getPrivate() != null) {
+                this.privateBytes = keyPair.getPrivate().getEncoded();
+            }
+        }
+    }
+
+    public BasicAsymmetricEncryptor(IEncryptType type, PublicKey publicKey, PrivateKey privateKey) {
+        this.type = type;
+        if (publicKey != null) {
+            this.publicBytes = publicKey.getEncoded();
+        }
+        if (privateKey != null) {
+            this.privateBytes = privateKey.getEncoded();
+        }
     }
 
     @Override

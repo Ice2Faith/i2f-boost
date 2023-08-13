@@ -1,7 +1,6 @@
 package i2f.core.log.core;
 
 import i2f.core.log.data.LogDto;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -10,7 +9,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @date 2023/8/2 9:04
  * @desc
  */
-@Slf4j
 public class LogDispatcher  {
     private static AtomicBoolean shutdown=new AtomicBoolean(false);
     static{

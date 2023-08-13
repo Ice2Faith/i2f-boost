@@ -6,10 +6,7 @@ import i2f.core.security.jce.encrypt.CipherWorker;
 import i2f.core.security.jce.encrypt.std.asymmetric.basic.BasicAsymmetricEncryptor;
 
 import javax.crypto.Cipher;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -31,6 +28,22 @@ public class BcRsaEncryptor extends BasicAsymmetricEncryptor {
 
     public BcRsaEncryptor(BcRsaType type, byte[] publicBytes, byte[] privateBytes) {
         super(type, publicBytes, privateBytes);
+    }
+
+    public BcRsaEncryptor(PublicKey publicKey, PrivateKey privateKey) {
+        super(BcRsaType.ECB_PKCS1PADDING, publicKey, privateKey);
+    }
+
+    public BcRsaEncryptor(BcRsaType type, PublicKey publicKey, PrivateKey privateKey) {
+        super(type, publicKey, privateKey);
+    }
+
+    public BcRsaEncryptor(KeyPair keyPair) {
+        this(keyPair.getPublic(), keyPair.getPrivate());
+    }
+
+    public BcRsaEncryptor(BcRsaType type, KeyPair keyPair) {
+        super(type, keyPair);
     }
 
     @Override

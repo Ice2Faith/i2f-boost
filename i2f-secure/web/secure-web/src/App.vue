@@ -7,6 +7,8 @@
 <script>
 import HelloWorld from './components/HelloWorld.vue'
 import SecureTransfer from "@/secure/core/secure-transfer";
+import SecureCallback from '@/secure/core/secure-callback'
+import SecureConfig from "@/secure/secure-config";
 
 export default {
   name: 'App',
@@ -14,33 +16,54 @@ export default {
     HelloWorld
   },
   created() {
-    this.initAsymContent()
-    this.initClientContent()
-    let _this = this
-    window.rsaTimer = setInterval(function () {
-      _this.initAsymContent()
-    }, 5 * 60 * 1000)
+    if (SecureConfig.enableSwapAsymKey) {
+      this.swapAsymKey()
+      SecureCallback.callSwapKey = this.swapAsymKey
+      let _this = this
+      window.rsaTimer = setInterval(function () {
+        _this.swapAsymKey()
+      }, 5 * 60 * 1000)
+    } else {
+      this.initAsymOthPubKey()
+      this.initAsymSlfPriKey()
+      SecureCallback.callPubKey = this.initAsymOthPubKey
+      SecureCallback.callPriKey = this.initAsymSlfPriKey
+      let _this = this
+      window.rsaTimer = setInterval(function () {
+        _this.initAsymPubKey()
+      }, 5 * 60 * 1000)
+    }
   },
   destroyed() {
     clearInterval(window.rsaTimer)
   },
   methods: {
-    initAsymContent() {
+    swapAsymKey() {
+      this.$axios({
+        url: 'secure/swapKey',
+        method: 'post',
+        data: SecureTransfer.loadWebAsymSlfPubKey()
+      }).then(({data}) => {
+        console.log('SECURE_KEY', data)
+        SecureTransfer.saveAsymOthPubKey(data)
+      })
+    },
+    initAsymOthPubKey() {
       this.$axios({
         url: 'secure/key',
         method: 'post'
       }).then(({data}) => {
         console.log('SECURE_KEY', data)
-        SecureTransfer.saveAsymPubKey(data)
+        SecureTransfer.saveAsymOthPubKey(data)
       })
     },
-    initClientContent() {
+    initAsymSlfPriKey() {
       this.$axios({
         url: 'secure/clientKey',
         method: 'post'
       }).then(({data}) => {
         console.log('SECURE_KEY', data)
-        SecureTransfer.saveAsymPriKey(data)
+        SecureTransfer.saveAsymSlfPriKey(data)
       })
     }
   }
