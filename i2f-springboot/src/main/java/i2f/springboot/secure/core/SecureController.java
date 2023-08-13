@@ -1,5 +1,6 @@
 package i2f.springboot.secure.core;
 
+import i2f.core.data.Pair;
 import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.annotation.SecureParams;
 import i2f.springboot.secure.consts.SecureErrorCode;
@@ -48,8 +49,8 @@ public class SecureController {
 
     @SecureParams(in = false, out = false)
     @PostMapping("swapKey")
-    public String swapKey(HttpServletRequest request, @RequestBody String clientKey) throws Exception {
-        String pubKey = secureTransfer.getWebAsymPublicKeyAndSwap(request, clientKey);
+    public String swapKey(HttpServletRequest request, @RequestBody Pair<String,Object> pair) throws Exception {
+        String pubKey = secureTransfer.getWebAsymPublicKeyAndSwap(request, pair.key);
         return pubKey;
     }
 }

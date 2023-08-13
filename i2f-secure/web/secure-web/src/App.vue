@@ -42,7 +42,9 @@ export default {
       this.$axios({
         url: 'secure/swapKey',
         method: 'post',
-        data: SecureTransfer.loadWebAsymSlfPubKey()
+        data: {
+          key: SecureTransfer.loadWebAsymSlfPubKey()
+        }
       }).then(({data}) => {
         console.log('SECURE_KEY', data)
         SecureTransfer.saveAsymOthPubKey(data)

@@ -251,8 +251,11 @@ this.$axios({
 this.$axios({
     url: 'secure/swapKey',
     method: 'post',
-    data: SecureTransfer.loadWebAsymSlfPubKey()
+    data: {
+      key: SecureTransfer.loadWebAsymSlfPubKey()
+    }
   }).then(({data}) => {
+    console.log('SECURE_KEY', data)
     SecureTransfer.saveAsymOthPubKey(data)
   })
 ```
@@ -307,13 +310,15 @@ export default {
   methods: {
     swapAsymKey(){
       this.$axios({
-        url: 'secure/swapKey',
-        method: 'post',
-        data: SecureTransfer.loadWebAsymSlfPubKey()
-      }).then(({data}) => {
-        console.log('SECURE_KEY', data)
-        SecureTransfer.saveAsymOthPubKey(data)
-      })
+          url: 'secure/swapKey',
+          method: 'post',
+          data: {
+            key: SecureTransfer.loadWebAsymSlfPubKey()
+          }
+        }).then(({data}) => {
+          console.log('SECURE_KEY', data)
+          SecureTransfer.saveAsymOthPubKey(data)
+        })
     },
     initAsymOthPubKey() {
       this.$axios({
@@ -487,6 +492,21 @@ request.interceptors.request.use(config => {
 }, error => {
   console.log(error)
   Promise.reject(error)
+})
+```
+
+- 如果想要针对全局的请求都进行加密处理
+- 则可以在拦截器中配置
+- 这样配置之后，在 SecureConfig 中通过白名单配置的方式去除白名单即可
+
+```js
+// 定义请求拦截
+BaseRequest.interceptors.request.use(config => {
+
+  SecureTransfer.getSecureHeaderInto(config.headers, true, true)
+  SecureTransferFilter.requestFilter(config)
+
+  return config
 })
 ```
 
@@ -759,7 +779,7 @@ import SecureConsts from './consts/secure-consts'
 
 const SecureConfig = {
   // Asymm秘钥长度，默认1024，可选1024,2048
-  asymKeySize : SecureConsts.RSA_KEY_SIZE_1024(),
+  asymKeySize: SecureConsts.RSA_KEY_SIZE_1024(),
   // Symm秘钥长度，默认128，可选128,192,256
   symmKeySize: SecureConsts.AES_KEY_SIZE_128(),
   // 用于存储安全头的请求头名称，默认sswh
@@ -780,7 +800,7 @@ const SecureConfig = {
   // 在正式环境中，请禁用
   enableDebugLog: process.env.NODE_ENV != 'prod',
   // 加密配置的白名单url
-  whileList: ['/secure/key', '/secure/clientKey'],
+  whileList: ['/secure/key', '/secure/clientKey', '/secure/swapKey'],
   // 加密URL的URL白名单
   encWhiteList: ['/login', '/logout']
 }

@@ -16,7 +16,6 @@
     <modules>
         <module>i2f-base</module>
 
-
         <!-- 仅依赖jdk1.8,javase -->
         <module>i2f-core</module>
 
@@ -62,6 +61,7 @@
         <module>i2f-liteflow</module>
 
         <module>i2f-secure</module>
+
     </modules>
 
     <properties>
