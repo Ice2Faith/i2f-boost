@@ -26,6 +26,9 @@ import java.util.Map;
  */
 public class JsonSupportUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+    public static final String AUTH_ATTR_KEY_USERNAME = "X-Auth-Username";
+    public static final String AUTH_ATTR_KEY_PASSWORD = "X-Auth-Password";
+
     private LoginPasswordDecoder passwordDecoder;
 
     private BeforeLoginChecker beforeLoginChecker;
@@ -109,6 +112,8 @@ public class JsonSupportUsernamePasswordAuthenticationFilter extends UsernamePas
                     });
                     username = String.valueOf(json.get(getUsernameParameter()));
                     password = String.valueOf(json.get(getPasswordParameter()));
+                    request.setAttribute(AUTH_ATTR_KEY_USERNAME, username);
+                    request.setAttribute(AUTH_ATTR_KEY_PASSWORD, password);
                     if (beforeLoginChecker != null) {
                         beforeLoginChecker.onJsonLogin(username, password, json, request);
                     }
@@ -126,6 +131,8 @@ public class JsonSupportUsernamePasswordAuthenticationFilter extends UsernamePas
                 // 普通form提交的登录表单
                 username = this.obtainUsername(request);
                 password = this.obtainPassword(request);
+                request.setAttribute(AUTH_ATTR_KEY_USERNAME, username);
+                request.setAttribute(AUTH_ATTR_KEY_PASSWORD, password);
                 try {
                     if (beforeLoginChecker != null) {
                         beforeLoginChecker.onFormLogin(username, password, request);
