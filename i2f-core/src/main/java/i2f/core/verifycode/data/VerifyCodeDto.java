@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
  */
 @Data
 public class VerifyCodeDto {
+    private String question;
     private BufferedImage img;
     private String result;
 }
