@@ -18,15 +18,27 @@ public class VerifyCodeQuestionDto {
     private String question;
     private String base64;
     private String code;
+    public static final String URL_IMG_PREFIX = "data:image/*;base64,";
+    private int width;
+    private int height;
 
     public static VerifyCodeQuestionDto make(VerifyCodeDto dto, String code) throws IOException {
+        return make(dto, code, true);
+    }
+
+    public static VerifyCodeQuestionDto make(VerifyCodeDto dto, String code, boolean withPrefix) throws IOException {
         VerifyCodeQuestionDto ret = new VerifyCodeQuestionDto();
         ret.setQuestion(dto.getQuestion());
         BufferedImage img = dto.getImg();
+        ret.setWidth(img.getWidth());
+        ret.setHeight(img.getHeight());
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ImageIO.write(img, "png", bos);
         byte[] bytes = bos.toByteArray();
         String bs64 = Base64.getEncoder().encodeToString(bytes);
+        if (withPrefix) {
+            bs64 = URL_IMG_PREFIX + bs64;
+        }
         ret.setBase64(bs64);
         ret.setCode(code);
         return ret;

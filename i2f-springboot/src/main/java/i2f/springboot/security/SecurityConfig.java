@@ -1,9 +1,6 @@
 package i2f.springboot.security;
 
-import i2f.springboot.security.impl.ISecurityConfigListener;
-import i2f.springboot.security.impl.JsonSupportUsernamePasswordAuthenticationFilter;
-import i2f.springboot.security.impl.LoginPasswordDecoder;
-import i2f.springboot.security.impl.AuthorizeExceptionHandler;
+import i2f.springboot.security.impl.*;
 import i2f.springboot.security.impl.token.AuthenticationTokenFilter;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,26 +38,26 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 @Slf4j
 @Data
 @NoArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true,jsr250Enabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @Configuration
 @ControllerAdvice
 @ConfigurationProperties(prefix = "i2f.springboot.config.security")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${i2f.springboot.config.security.csrf.enable:false}")
-    private boolean enableCsrf=false;
+    private boolean enableCsrf = false;
 
     @Value("${i2f.springboot.config.security.cors.enable:true}")
-    private boolean enableCors=true;
+    private boolean enableCors = true;
 
     @Value("${i2f.springboot.config.security.form-login.enable:true}")
-    private boolean enableFormLogin=true;
+    private boolean enableFormLogin = true;
 
     @Value("${i2f.springboot.config.security.http-basic.enable:false}")
-    private boolean enableHttpBasic=false;
+    private boolean enableHttpBasic = false;
 
     @Value("${i2f.springboot.config.security.login-json.enable:true}")
-    private boolean enableJsonLogin=true;
+    private boolean enableJsonLogin = true;
 
     private String ignoreList;
     private String anonymousList;
@@ -100,6 +97,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private LoginPasswordDecoder loginPasswordDecoder;
 
     @Autowired(required = false)
+    private BeforeLoginChecker beforeLoginChecker;
+
+    @Autowired(required = false)
     private ISecurityConfigListener securityConfigListener;
 
     @Override
@@ -116,123 +116,123 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        if(securityConfigListener!=null){
-            boolean next=securityConfigListener.onBeforeWebConfig(web,this);
-            if(!next){
+        if (securityConfigListener != null) {
+            boolean next = securityConfigListener.onBeforeWebConfig(web, this);
+            if (!next) {
                 return;
             }
         }
-        if(ignoreList!=null && !"".equals(ignoreList)){
+        if (ignoreList != null && !"".equals(ignoreList)) {
             web.ignoring()
                     .antMatchers(ignoreList.split(","));
-            log.info("SecurityConfig ignore list:"+ignoreList);
-        }else{
+            log.info("SecurityConfig ignore list:" + ignoreList);
+        } else {
             super.configure(web);
         }
-        if(securityConfigListener!=null){
-            securityConfigListener.onAfterWebConfig(web,this);
+        if (securityConfigListener != null) {
+            securityConfigListener.onAfterWebConfig(web, this);
         }
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        if(securityConfigListener!=null){
-            boolean next=securityConfigListener.onBeforeHttpConfig(http,this);
-            if(!next){
+        if (securityConfigListener != null) {
+            boolean next = securityConfigListener.onBeforeHttpConfig(http, this);
+            if (!next) {
                 return;
             }
         }
 
         // 配置跨域
-        if(enableCors){
+        if (enableCors) {
             http.cors();
             log.info("SecurityConfig enable cors.");
-        }else{
+        } else {
             http.cors().disable();
             log.info("SecurityConfig disabled cors.");
         }
         // 配置csrf
-        if(enableCsrf){
+        if (enableCsrf) {
             http.csrf();
             log.info("SecurityConfig enable csrf.");
-        }else{
+        } else {
             http.csrf().disable();
             log.info("SecurityConfig disable csrf.");
         }
 
         // 配置httpBasic
-        if(enableHttpBasic){
+        if (enableHttpBasic) {
             http.httpBasic();
             log.info("SecurityConfig enable http-basic.");
-        }else{
+        } else {
             http.httpBasic().disable();
             log.info("SecurityConfig disable http-basic.");
         }
 
-        if(staticResourceList==null){
-            staticResourceList="/**/*.html,/**/*.css,/**/*.js,/**/*.png,/**/*.jpg,/**/*.jpeg,/**/*.ttf,/**/*.woff,/**/*.woff2";
+        if (staticResourceList == null) {
+            staticResourceList = "/**/*.html,/**/*.css,/**/*.js,/**/*.png,/**/*.jpg,/**/*.jpeg,/**/*.ttf,/**/*.woff,/**/*.woff2";
             log.info("SecurityConfig default static resource config.");
         }
 
         // 配置静态资源访问
-        if(staticResourceList!=null && !"".equals(staticResourceList)){
+        if (staticResourceList != null && !"".equals(staticResourceList)) {
             http.authorizeRequests()
                     .antMatchers(HttpMethod.GET,
                             staticResourceList.split(","))
                     .permitAll();
-            log.info("SecurityConfig static resource config:"+staticResourceList);
+            log.info("SecurityConfig static resource config:" + staticResourceList);
         }
 
         // 配置用户定义匿名访问白名单
-        if(anonymousList!=null && !"".equals(anonymousList)){
+        if (anonymousList != null && !"".equals(anonymousList)) {
             http.authorizeRequests()
                     .antMatchers(anonymousList.split(",")).anonymous();
-            log.info("SecurityConfig customer anonymous list:"+anonymousList);
+            log.info("SecurityConfig customer anonymous list:" + anonymousList);
         }
 
         // 配置用户定义完全访问白名单
-        if(permitAllList!=null && !"".equals(permitAllList)){
+        if (permitAllList != null && !"".equals(permitAllList)) {
             http.authorizeRequests()
                     .antMatchers(permitAllList.split(",")).permitAll();
-            log.info("SecurityConfig customer permit-all list:"+permitAllList);
+            log.info("SecurityConfig customer permit-all list:" + permitAllList);
         }
 
         // 配置用户自定义Session管理方式
-        if(sessionCreationPolicy!=null && !"".equals(sessionCreationPolicy)){
-            SessionCreationPolicy policy=SessionCreationPolicy.STATELESS;
-            sessionCreationPolicy=sessionCreationPolicy.toUpperCase().trim();
-            if(String.valueOf(SessionCreationPolicy.STATELESS).equals(sessionCreationPolicy)){
-                policy=SessionCreationPolicy.STATELESS;
-            }else if(String.valueOf(SessionCreationPolicy.ALWAYS).equals(sessionCreationPolicy)){
-                policy=SessionCreationPolicy.ALWAYS;
-            }else if(String.valueOf(SessionCreationPolicy.NEVER).equals(sessionCreationPolicy)){
-                policy=SessionCreationPolicy.NEVER;
-            }else if(String.valueOf(SessionCreationPolicy.IF_REQUIRED).equals(sessionCreationPolicy)){
-                policy=SessionCreationPolicy.IF_REQUIRED;
+        if (sessionCreationPolicy != null && !"".equals(sessionCreationPolicy)) {
+            SessionCreationPolicy policy = SessionCreationPolicy.STATELESS;
+            sessionCreationPolicy = sessionCreationPolicy.toUpperCase().trim();
+            if (String.valueOf(SessionCreationPolicy.STATELESS).equals(sessionCreationPolicy)) {
+                policy = SessionCreationPolicy.STATELESS;
+            } else if (String.valueOf(SessionCreationPolicy.ALWAYS).equals(sessionCreationPolicy)) {
+                policy = SessionCreationPolicy.ALWAYS;
+            } else if (String.valueOf(SessionCreationPolicy.NEVER).equals(sessionCreationPolicy)) {
+                policy = SessionCreationPolicy.NEVER;
+            } else if (String.valueOf(SessionCreationPolicy.IF_REQUIRED).equals(sessionCreationPolicy)) {
+                policy = SessionCreationPolicy.IF_REQUIRED;
             }
             http.sessionManagement()
                     .sessionCreationPolicy(policy);
-            log.info("SecurityConfig customer session policy:"+policy);
-        }else{
+            log.info("SecurityConfig customer session policy:" + policy);
+        } else {
             // 配置默认无状态Session方式
             http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-            log.info("SecurityConfig default session policy:"+SessionCreationPolicy.STATELESS);
+            log.info("SecurityConfig default session policy:" + SessionCreationPolicy.STATELESS);
         }
 
-        if(loginUrl==null || "".equals(loginUrl)){
-            loginUrl="/login";
+        if (loginUrl == null || "".equals(loginUrl)) {
+            loginUrl = "/login";
         }
 
-        if(loginUsername==null || "".equals(loginUsername)){
-            loginUsername="username";
+        if (loginUsername == null || "".equals(loginUsername)) {
+            loginUsername = "username";
         }
 
-        if(loginPassword==null || "".equals(loginPassword)){
-            loginPassword="password";
+        if (loginPassword == null || "".equals(loginPassword)) {
+            loginPassword = "password";
         }
 
 
-        if(enableFormLogin){
+        if (enableFormLogin) {
             // 配置登录URL
             http.formLogin()
                     .loginProcessingUrl(loginUrl)
@@ -241,7 +241,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .successHandler(authenticationSuccessHandler)
                     .failureHandler(authenticationFailureHandler);
             log.info("SecurityConfig customer config form-login config.");
-        }else{
+        } else {
             // 禁用formLogin,也就不会再进入 UsernamePasswordAuthenticationFilter
             http.formLogin()
                     .disable();
@@ -250,7 +250,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // 配置支持JSON方式提交的表单,替换默认方式
         // 使用自定义方式时，需要注意参数需要自己补充进去
-        if(enableJsonLogin){
+        if (enableJsonLogin) {
             http.addFilterAt(new JsonSupportUsernamePasswordAuthenticationFilter()
                             .buildAuthenticationManager(authenticationManagerBean())
                             .buildAuthenticationSuccessHandler(authenticationSuccessHandler)
@@ -258,7 +258,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                             .buildLoginPath(loginUrl)
                             .buildParameterUsername(loginUsername)
                             .buildParameterPassword(loginPassword)
-                            .buildLoginPasswordDecoder(loginPasswordDecoder),
+                            .buildLoginPasswordDecoder(loginPasswordDecoder)
+                            .buildBeforeLoginChecker(beforeLoginChecker)
+                    ,
                     UsernamePasswordAuthenticationFilter.class);
             log.info("SecurityConfig customer json support username-password auth filter.");
         }
@@ -268,23 +270,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(loginUrl)
                 .anonymous();
 
-        if(logoutUrl==null || "".equals(logoutUrl)){
-            logoutUrl="/logout";
+        if (logoutUrl == null || "".equals(logoutUrl)) {
+            logoutUrl = "/logout";
         }
 
         // 配置登出处理器
         http.logout()
                 .logoutUrl(logoutUrl);
-        if(logoutSuccessHandler!=null){
+        if (logoutSuccessHandler != null) {
             http.logout()
                     .logoutSuccessHandler(logoutSuccessHandler);
             log.info("SecurityConfig customer logout success handler.");
         }
 
         // 配置token预解析认证过滤器
-        if(authenticationTokenFilter!=null){
+        if (authenticationTokenFilter != null) {
             http.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-            if(logoutSuccessHandler!=null){
+            if (logoutSuccessHandler != null) {
                 http.addFilterBefore(authenticationTokenFilter, LogoutFilter.class);
             }
             log.info("SecurityConfig customer token filter config.");
@@ -292,14 +294,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
         // 配置认证失败处理类
-        if(authorizeExceptionHandler !=null){
+        if (authorizeExceptionHandler != null) {
             http.exceptionHandling()
                     .authenticationEntryPoint(authorizeExceptionHandler);
             log.info("SecurityConfig customer unauthorized handler config.");
         }
 
-        if(securityConfigListener!=null){
-            securityConfigListener.onAfterHttpConfig(http,this);
+        if (securityConfigListener != null) {
+            securityConfigListener.onAfterHttpConfig(http, this);
         }
 
         // 配置除了白名单的都需要鉴权

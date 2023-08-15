@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "i2f.springboot.config.verifycode")
 public class VerifyCodeConfig {
-    private String cacheKeyPrefix = "VC:";
+    private String cacheKeyPrefix = "verifycode:";
     private long expireSeconds = 60;
+    private boolean ignoreCase = true;
 }

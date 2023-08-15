@@ -66,6 +66,11 @@ public class VerifyCodeContext implements ApplicationContextAware {
             return false;
         }
         String rs = String.valueOf(result);
+        if (config.isIgnoreCase()) {
+            if (rs.equalsIgnoreCase(dto.getResult())) {
+                return true;
+            }
+        }
         if (rs.equals(dto.getResult())) {
             return true;
         }
