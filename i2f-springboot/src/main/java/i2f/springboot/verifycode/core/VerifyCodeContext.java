@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -46,21 +47,23 @@ public class VerifyCodeContext implements ApplicationContextAware {
         VerifyCodeDto dto = generator.generate(0, 0, null);
 
         String uuid = UUID.randomUUID().toString().replaceAll("-", "").toLowerCase();
-        String code = config.getCacheKeyPrefix() + uuid;
+        String code = uuid;
 
-        cache.set(code, dto.getResult(), config.getExpireSeconds(), TimeUnit.SECONDS);
+        String cacheKey = config.getCacheKeyPrefix() + uuid;
+        cache.set(cacheKey, dto.getResult(), config.getExpireSeconds(), TimeUnit.SECONDS);
 
         return VerifyCodeQuestionDto.make(dto, code);
     }
 
     public boolean verify(VerifyCodeAnswerDto dto) {
-        if (dto.getCode() == null) {
+        if (StringUtils.isEmpty(dto.getCode())) {
             return false;
         }
         if (dto.getResult() == null) {
             return false;
         }
-        Object result = cache.get(dto.getCode());
+        String cacheKey = config.getCacheKeyPrefix() + dto.getCode();
+        Object result = cache.get(cacheKey);
         cache.remove(dto.getCode());
         if (result == null) {
             return false;

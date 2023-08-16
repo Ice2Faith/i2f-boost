@@ -3,11 +3,11 @@ package i2f.springboot.security.def.token;
 import i2f.core.network.net.http.HttpStatus;
 import i2f.core.std.api.ApiResp;
 import i2f.springboot.security.SecurityForwardUtil;
+import i2f.springboot.security.exception.BoostAuthenticationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
@@ -32,7 +32,11 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
     }
 
     public void onUnAuthoried(int statusCode,String requestUri,HttpServletRequest request,HttpServletResponse response,AuthenticationException ex) throws IOException, ServletException {
-        log.info("DefaultAuthenticationFailureHandler 401 authorize failure:"+requestUri+" : "+ex.getMessage(),ex);
-        SecurityForwardUtil.forward(request,response,ApiResp.resp(statusCode,"request resource authorize failure,reject access.",null));
+        log.info("DefaultAuthenticationFailureHandler 401 authorize failure:" + requestUri + " : " + ex.getMessage(), ex);
+        String msg = "request resource authorize failure,reject access.";
+        if (ex instanceof BoostAuthenticationException) {
+            msg = ex.getMessage();
+        }
+        SecurityForwardUtil.forward(request, response, ex, ApiResp.resp(statusCode, msg, null));
     }
 }

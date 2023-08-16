@@ -14,15 +14,29 @@ import java.io.IOException;
  * @desc
  */
 public class SecurityForwardUtil {
-    public static final String X_API_RESP_KEY="x-api-resp";
-    public static final String X_FORWARD_PATH="/security/response";
+    public static final String X_API_RESP_KEY = "x-api-resp";
+    public static final String X_FORWARD_PATH = "/security/response";
+    public static final String X_API_EXCEPTION_KEY = "x-api-exception";
 
     public static void forward(HttpServletRequest request, HttpServletResponse response, ApiResp resp) throws ServletException, IOException {
         request.setAttribute(X_API_RESP_KEY, resp);
-        ServletContextUtil.forward(request,response,X_FORWARD_PATH);
+        ServletContextUtil.forward(request, response, X_FORWARD_PATH);
     }
 
-    public static ApiResp getResp(HttpServletRequest request){
-        return (ApiResp)request.getAttribute(X_API_RESP_KEY);
+    public static void forward(HttpServletRequest request, HttpServletResponse response, Throwable ex, ApiResp resp) throws ServletException, IOException {
+        request.setAttribute(X_API_RESP_KEY, resp);
+        if (ex != null) {
+            request.setAttribute(X_API_EXCEPTION_KEY, ex);
+        }
+        ServletContextUtil.forward(request, response, X_FORWARD_PATH);
     }
+
+    public static ApiResp getResp(HttpServletRequest request) {
+        return (ApiResp) request.getAttribute(X_API_RESP_KEY);
+    }
+
+    public static Throwable getException(HttpServletRequest request) {
+        return (Throwable) request.getAttribute(X_API_EXCEPTION_KEY);
+    }
+
 }

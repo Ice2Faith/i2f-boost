@@ -120,8 +120,6 @@ public class JsonSupportUsernamePasswordAuthenticationFilter extends UsernamePas
                 } catch (Exception e) {
                     if (e instanceof AuthenticationException) {
                         throw (AuthenticationException) e;
-                    } else if (e instanceof RuntimeException) {
-                        throw (RuntimeException) e;
                     } else {
                         throw new BadCredentialsException(e.getMessage(), e);
                     }
@@ -140,8 +138,6 @@ public class JsonSupportUsernamePasswordAuthenticationFilter extends UsernamePas
                 } catch (Exception e) {
                     if (e instanceof AuthenticationException) {
                         throw (AuthenticationException) e;
-                    } else if (e instanceof RuntimeException) {
-                        throw (RuntimeException) e;
                     } else {
                         throw new BadCredentialsException(e.getMessage(), e);
                     }

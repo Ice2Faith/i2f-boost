@@ -3,6 +3,7 @@ package i2f.springboot.security.impl;
 import i2f.core.network.net.http.HttpStatus;
 import i2f.core.std.api.ApiResp;
 import i2f.springboot.security.SecurityForwardUtil;
+import i2f.springboot.security.exception.BoostAuthenticationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -41,13 +42,21 @@ public class AbstractAuthorizeExceptionHandler implements AuthorizeExceptionHand
     }
 
     public void onAuthoriedError(int statusCode, String requestUri, HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) throws IOException, ServletException {
-        log.info("AbstractAuthorizeExceptionHandler 500 authorize error:"+requestUri+" : "+ex.getMessage(),ex);
-        SecurityForwardUtil.forward(request,response,ApiResp.resp(statusCode,"request resource authorize failure,internal error.",null));
+        log.info("AbstractAuthorizeExceptionHandler 500 authorize error:" + requestUri + " : " + ex.getMessage(), ex);
+        String msg = "request resource authorize failure,internal error.";
+        if (ex instanceof BoostAuthenticationException) {
+            msg = ex.getMessage();
+        }
+        SecurityForwardUtil.forward(request, response, ex, ApiResp.resp(statusCode, msg, null));
     }
 
     public void onAuthoriedFailure(int statusCode, String requestUri, HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) throws IOException, ServletException {
-        log.info("AbstractAuthorizeExceptionHandler "+statusCode+" authorize failure:"+requestUri+" : "+ex.getMessage(),ex);
-        SecurityForwardUtil.forward(request,response,ApiResp.resp(statusCode,"request resource authorize failure,reject access.",null));
+        log.info("AbstractAuthorizeExceptionHandler " + statusCode + " authorize failure:" + requestUri + " : " + ex.getMessage(), ex);
+        String msg = "request resource authorize failure,reject access.";
+        if (ex instanceof BoostAuthenticationException) {
+            msg = ex.getMessage();
+        }
+        SecurityForwardUtil.forward(request, response, ex, ApiResp.resp(statusCode, msg, null));
     }
 
 }

@@ -1,7 +1,7 @@
 package i2f.springboot.verifycode.adapter;
 
-import i2f.core.exception.BoostException;
 import i2f.core.verifycode.data.VerifyCodeAnswerDto;
+import i2f.springboot.security.exception.BoostAuthenticationException;
 import i2f.springboot.security.impl.BeforeLoginChecker;
 import i2f.springboot.verifycode.core.VerifyCodeContext;
 import lombok.Data;
@@ -45,17 +45,17 @@ public class VerifyCodeBeforeLoginChecker implements BeforeLoginChecker {
 
     public void verifyVerifyCode(Object code, Object result) {
         if (code == null) {
-            throw new BoostException("无效的验证码请求");
+            throw new BoostAuthenticationException("无效的验证码请求");
         }
         if (result == null) {
-            throw new BoostException("请填写验证码");
+            throw new BoostAuthenticationException("请填写验证码");
         }
         VerifyCodeAnswerDto dto = new VerifyCodeAnswerDto();
         dto.setCode(String.valueOf(code));
         dto.setResult(String.valueOf(result));
         boolean ok = verifyCodeContext.verify(dto);
         if (!ok) {
-            throw new BoostException("验证码验证失败，请刷新验证码后重试");
+            throw new BoostAuthenticationException("验证码验证失败，请刷新验证码后重试");
         }
     }
 }
