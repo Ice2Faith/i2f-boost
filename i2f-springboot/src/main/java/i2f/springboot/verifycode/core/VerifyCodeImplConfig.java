@@ -1,8 +1,6 @@
 package i2f.springboot.verifycode.core;
 
-import i2f.core.verifycode.impl.ArtTextVerifyCodeGenerator;
-import i2f.core.verifycode.impl.PointNumberArthmVerifyCodeGenerator;
-import i2f.core.verifycode.impl.PolarArthmVerifyCodeGenerator;
+import i2f.core.verifycode.impl.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,5 +36,29 @@ public class VerifyCodeImplConfig {
     @Bean
     public PointNumberArthmVerifyCodeGenerator pointNumberArthmVerifyCodeGenerator() {
         return new PointNumberArthmVerifyCodeGenerator();
+    }
+
+    @ConditionalOnExpression("${i2f.springboot.config.verifycode.impl.liner-marker.enable:true}")
+    @Bean
+    public LinerMarkerVerifyCodeGenerator linerMarkerVerifyCodeGenerator() {
+        return new LinerMarkerVerifyCodeGenerator();
+    }
+
+    @ConditionalOnExpression("${i2f.springboot.config.verifycode.impl.matrix-marker.enable:true}")
+    @Bean
+    public MatrixMarkerVerifyCodeGenerator matrixMarkerVerifyCodeGenerator() {
+        return new MatrixMarkerVerifyCodeGenerator();
+    }
+
+    @ConditionalOnExpression("${i2f.springboot.config.verifycode.impl.multi-liner-marker.enable:true}")
+    @Bean
+    public MultiLinerMarkerVerifyCodeGenerator multiLinerMarkerVerifyCodeGenerator() {
+        return new MultiLinerMarkerVerifyCodeGenerator();
+    }
+
+    @ConditionalOnExpression("${i2f.springboot.config.verifycode.impl.multi-matrix-marker.enable:true}")
+    @Bean
+    public MultiMatrixMarkerVerifyCodeGenerator multiMatrixMarkerVerifyCodeGenerator() {
+        return new MultiMatrixMarkerVerifyCodeGenerator();
     }
 }
