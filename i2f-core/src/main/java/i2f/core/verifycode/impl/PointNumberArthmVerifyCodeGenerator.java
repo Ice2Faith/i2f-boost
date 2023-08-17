@@ -2,8 +2,8 @@ package i2f.core.verifycode.impl;
 
 import i2f.core.verifycode.core.GraphicsUtil;
 import i2f.core.verifycode.core.MathUtil;
-import i2f.core.verifycode.data.VerifyCodeDto;
-import i2f.core.verifycode.std.IVerifyCodeGenerator;
+import i2f.core.verifycode.data.VerifyCodeStdDto;
+import i2f.core.verifycode.std.AbsTextVerifyCodeGenerator;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -16,15 +16,15 @@ import java.util.Map;
  * @date 2023/8/14 20:35
  * @desc
  */
-public class PointNumberArthmVerifyCodeGenerator implements IVerifyCodeGenerator {
+public class PointNumberArthmVerifyCodeGenerator extends AbsTextVerifyCodeGenerator {
 
     public static final String PARAM_SPLIT_COUNT = "splitCount";
     public static final String PARAM_BOUND_NUMBER = "boundNumber";
 
     public static final int DEFAULT_SPLIT_COUNT = 15;
     public static final int DEFAULT_BOUND_NUMBER = 100;
-    public static final int DEFAULT_WIDTH = 320;
-    public static final int DEFAULT_HEIGHT = 320;
+    public static final int DEFAULT_WIDTH = 480;
+    public static final int DEFAULT_HEIGHT = 480;
 
     public static String makeCode(int len, boolean numberOnly) {
 
@@ -48,8 +48,8 @@ public class PointNumberArthmVerifyCodeGenerator implements IVerifyCodeGenerator
     }
 
     @Override
-    public VerifyCodeDto generate(int width, int height, Map<String, Object> params) {
-        VerifyCodeDto ret = new VerifyCodeDto();
+    public VerifyCodeStdDto<String> generateInner(int width, int height, Map<String, Object> params) {
+        VerifyCodeStdDto<String> ret = new VerifyCodeStdDto<>();
 
         if (width <= 0) {
             width = DEFAULT_WIDTH;

@@ -10,5 +10,7 @@ import java.util.Map;
  * @desc
  */
 public interface IVerifyCodeGenerator {
-    VerifyCodeDto generate(int width, int height, Map<String,Object> params);
+    VerifyCodeDto generate(int width, int height, Map<String, Object> params);
+
+    boolean verify(String result, String answer);
 }
