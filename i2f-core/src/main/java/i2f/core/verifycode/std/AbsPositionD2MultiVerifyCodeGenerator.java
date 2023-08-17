@@ -13,13 +13,13 @@ import java.util.Map;
 /**
  * @author Ice2Faith
  * @date 2023/8/17 15:54
- * @desc 适用于一维相似数值比较，默认按照百分比进行
+ * @desc 适用于一维相似数值比较，默认按照百分比进行，针对多值
  * 因此要求result的只隶属区间[0,100]
  * 为什么使用百分比？
  * 因为，图片一旦经过缩放
  * 则使用坐标会产生很大的问题
  * 适用类型：
- * 点击符号的位置（仅X轴）
+ * 按顺序点击符号的位置（仅X轴）
  */
 public abstract class AbsPositionD2MultiVerifyCodeGenerator implements IVerifyCodeGenerator {
 
@@ -27,7 +27,7 @@ public abstract class AbsPositionD2MultiVerifyCodeGenerator implements IVerifyCo
     public VerifyCodeDto generate(int width, int height, Map<String, Object> params) {
         VerifyCodeStdDto<List<Point>> dto = generateInner(width, height, params);
         VerifyCodeDto ret = new VerifyCodeDto();
-        ret.setType(VerifyCodeType.D1.code());
+        ret.setType(VerifyCodeType.D1_MULTI.code());
         ret.setImg(dto.getImg());
         ret.setQuestion(dto.getQuestion());
         StringBuilder result = new StringBuilder();
