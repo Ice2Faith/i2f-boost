@@ -24,6 +24,7 @@ public abstract class AbsPositionD1VerifyCodeGenerator implements IVerifyCodeGen
         VerifyCodeStdDto<Double> dto = generateInner(width, height, params);
         VerifyCodeDto ret = new VerifyCodeDto();
         ret.setType(VerifyCodeType.D1.code());
+        ret.setCount(dto.getCount());
         ret.setImg(dto.getImg());
         ret.setQuestion(dto.getQuestion());
         ret.setResult(String.format("%.2f", dto.getResult()));

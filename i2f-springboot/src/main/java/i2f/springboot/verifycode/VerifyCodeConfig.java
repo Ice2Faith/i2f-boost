@@ -21,5 +21,4 @@ import org.springframework.context.annotation.Configuration;
 public class VerifyCodeConfig {
     private String cacheKeyPrefix = "verifycode:";
     private long expireSeconds = 60;
-    private boolean ignoreCase = true;
 }

@@ -1,9 +1,10 @@
 package i2f.core.verifycode.impl;
 
+import i2f.core.graphics.d2.Point;
 import i2f.core.verifycode.core.GraphicsUtil;
 import i2f.core.verifycode.core.MathUtil;
 import i2f.core.verifycode.data.VerifyCodeStdDto;
-import i2f.core.verifycode.std.AbsPositionD1VerifyCodeGenerator;
+import i2f.core.verifycode.std.AbsPositionD2MultiVerifyCodeGenerator;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -16,28 +17,29 @@ import java.util.function.Supplier;
  * @date 2023/8/14 20:35
  * @desc
  */
-public class LinerMarkerVerifyCodeGenerator extends AbsPositionD1VerifyCodeGenerator {
+public class MultiMatrixMarkerVerifyCodeGenerator extends AbsPositionD2MultiVerifyCodeGenerator {
 
     public static final String PARAM_SPLIT_COUNT = "splitCount";
-    public static final String PARAM_BOUND_NUMBER = "boundNumber";
+    public static final String PARAM_VERIFY_COUNT = "verifyCount";
 
-    public static final int DEFAULT_SPLIT_COUNT = 10;
+    public static final int DEFAULT_SPLIT_COUNT = 30;
+    public static final int DEFAULT_VERIFY_COUNT = 3;
 
     public static final int DEFAULT_WIDTH = 480;
-    public static final int DEFAULT_HEIGHT = 120;
+    public static final int DEFAULT_HEIGHT = 480;
 
     private Supplier<String> markerSupplier = () -> String.valueOf(MathUtil.RANDOM.nextInt(100));
 
-    public LinerMarkerVerifyCodeGenerator() {
+    public MultiMatrixMarkerVerifyCodeGenerator() {
     }
 
-    public LinerMarkerVerifyCodeGenerator(Supplier<String> markerSupplier) {
+    public MultiMatrixMarkerVerifyCodeGenerator(Supplier<String> markerSupplier) {
         this.markerSupplier = markerSupplier;
     }
 
     @Override
-    public VerifyCodeStdDto<Double> generateInner(int width, int height, Map<String, Object> params) {
-        VerifyCodeStdDto<Double> ret = new VerifyCodeStdDto<Double>();
+    public VerifyCodeStdDto<List<Point>> generateInner(int width, int height, Map<String, Object> params) {
+        VerifyCodeStdDto<List<Point>> ret = new VerifyCodeStdDto<>();
 
         if (width <= 0) {
             width = DEFAULT_WIDTH;
@@ -47,11 +49,18 @@ public class LinerMarkerVerifyCodeGenerator extends AbsPositionD1VerifyCodeGener
         }
 
         int splitCount = DEFAULT_SPLIT_COUNT;
+        int verifyCount = DEFAULT_VERIFY_COUNT;
         if (params != null) {
             if (params.containsKey(PARAM_SPLIT_COUNT)) {
                 Integer val = (Integer) params.get(PARAM_SPLIT_COUNT);
                 if (val != null && val > 0) {
                     splitCount = val;
+                }
+            }
+            if (params.containsKey(PARAM_VERIFY_COUNT)) {
+                Integer val = (Integer) params.get(PARAM_VERIFY_COUNT);
+                if (val != null && val > 0) {
+                    verifyCount = val;
                 }
             }
         }
@@ -67,7 +76,15 @@ public class LinerMarkerVerifyCodeGenerator extends AbsPositionD1VerifyCodeGener
 
         List<String> numbers = new ArrayList<>(numbersSet);
         splitCount = numbers.size();
-        int targetIndex = MathUtil.RANDOM.nextInt(splitCount);
+
+        verifyCount = verifyCount + MathUtil.RANDOM.nextInt(2);
+        Set<Integer> targetIndexSet = new LinkedHashSet<>();
+        for (int i = 0; i < verifyCount; i++) {
+            targetIndexSet.add(MathUtil.RANDOM.nextInt(splitCount));
+        }
+
+        List<Integer> targetIndexes = new ArrayList<>(targetIndexSet);
+        verifyCount = targetIndexes.size();
 
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 
@@ -83,13 +100,12 @@ public class LinerMarkerVerifyCodeGenerator extends AbsPositionD1VerifyCodeGener
         g.setFont(font);
 
 
-        int targetPosX = 0;
-        int stepWidth = width / splitCount;
+        List<Point> targetPoints = new ArrayList<>();
         for (int i = 0; i < splitCount; i++) {
             String text = numbers.get(i) + "";
 
-            int posX = stepWidth * i;
-            int posY = height / 2;
+            int posX = MathUtil.RANDOM.nextInt(width);
+            int posY = MathUtil.RANDOM.nextInt(width);
 
             g.setColor(new Color(MathUtil.RANDOM.nextInt(200), MathUtil.RANDOM.nextInt(200), MathUtil.RANDOM.nextInt(200)));
             GraphicsUtil.drawCenterString(g, text, posX, posY, (trans, gdi) -> {
@@ -100,8 +116,8 @@ public class LinerMarkerVerifyCodeGenerator extends AbsPositionD1VerifyCodeGener
                 trans.translate(0, (MathUtil.RANDOM.nextDouble() - 0.5) * fh);
             });
 
-            if (targetIndex == i) {
-                targetPosX = posX;
+            if (targetIndexes.contains(i)) {
+                targetPoints.add(new Point(posX, posY));
             }
         }
 
@@ -120,8 +136,19 @@ public class LinerMarkerVerifyCodeGenerator extends AbsPositionD1VerifyCodeGener
             }
         }
 
-        double result = targetPosX * 100.0 / width;
-        ret.setQuestion("请点击[" + numbers.get(targetIndex) + "]所在的位置");
+        StringBuilder builder = new StringBuilder();
+        List<Point> result = new ArrayList<>();
+        for (int i = 0; i < verifyCount; i++) {
+            Point p = targetPoints.get(i);
+            result.add(new Point(p.getX() * 100.0 / width, p.getY() * 100.0 / height));
+            builder.append(",").append(numbers.get(targetIndexes.get(i)));
+        }
+        String str = builder.toString();
+        if (!"".equals(str)) {
+            str = str.substring(1);
+        }
+        ret.setCount(verifyCount);
+        ret.setQuestion("请按顺序点击[" + str + "]所在的位置");
         ret.setImg(img);
         ret.setResult(result);
         return ret;

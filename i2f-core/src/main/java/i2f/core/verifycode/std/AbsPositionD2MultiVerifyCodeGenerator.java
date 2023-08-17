@@ -28,6 +28,7 @@ public abstract class AbsPositionD2MultiVerifyCodeGenerator implements IVerifyCo
         VerifyCodeStdDto<List<Point>> dto = generateInner(width, height, params);
         VerifyCodeDto ret = new VerifyCodeDto();
         ret.setType(VerifyCodeType.D1_MULTI.code());
+        ret.setCount(dto.getCount());
         ret.setImg(dto.getImg());
         ret.setQuestion(dto.getQuestion());
         StringBuilder result = new StringBuilder();

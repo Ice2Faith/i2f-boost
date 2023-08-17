@@ -21,6 +21,8 @@ public class VerifyCodeQuestionDto {
     public static final String URL_IMG_PREFIX = "data:image/*;base64,";
     private int width;
     private int height;
+    private int type;
+    private int count;
 
     public static VerifyCodeQuestionDto make(VerifyCodeDto dto, String code) throws IOException {
         return make(dto, code, true);
@@ -32,6 +34,8 @@ public class VerifyCodeQuestionDto {
         BufferedImage img = dto.getImg();
         ret.setWidth(img.getWidth());
         ret.setHeight(img.getHeight());
+        ret.setType(dto.getType());
+        ret.setCount(dto.getCount());
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ImageIO.write(img, "png", bos);
         byte[] bytes = bos.toByteArray();

@@ -21,6 +21,7 @@ public abstract class AbsTextVerifyCodeGenerator implements IVerifyCodeGenerator
         VerifyCodeStdDto<String> dto = generateInner(width, height, params);
         VerifyCodeDto ret = new VerifyCodeDto();
         ret.setType(VerifyCodeType.INPUT.code());
+        ret.setCount(dto.getCount());
         ret.setImg(dto.getImg());
         ret.setQuestion(dto.getQuestion());
         ret.setResult(dto.getResult());

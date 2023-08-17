@@ -46,11 +46,13 @@ public class VerifyCodeContext implements ApplicationContextAware {
         IVerifyCodeGenerator generator = generatorList.get(idx);
         VerifyCodeDto dto = generator.generate(0, 0, null);
 
+        String name = generator.getClass().getName();
+        String hash = String.format("%x", name.hashCode());
         String uuid = UUID.randomUUID().toString().replaceAll("-", "").toLowerCase();
         String code = uuid;
 
         String cacheKey = config.getCacheKeyPrefix() + uuid;
-        cache.set(cacheKey, dto.getResult(), config.getExpireSeconds(), TimeUnit.SECONDS);
+        cache.set(cacheKey, hash + "#" + dto.getResult(), config.getExpireSeconds(), TimeUnit.SECONDS);
 
         return VerifyCodeQuestionDto.make(dto, code);
     }
@@ -69,13 +71,17 @@ public class VerifyCodeContext implements ApplicationContextAware {
             return false;
         }
         String rs = String.valueOf(result);
-        if (config.isIgnoreCase()) {
-            if (rs.equalsIgnoreCase(dto.getResult())) {
-                return true;
+        String[] arr = rs.split("#", 2);
+        String hash = arr[0];
+        String cmp = arr[1];
+
+        Map<String, IVerifyCodeGenerator> beans = getBeans(IVerifyCodeGenerator.class);
+        for (IVerifyCodeGenerator generator : beans.values()) {
+            String name = generator.getClass().getName();
+            String gh = String.format("%x", name.hashCode());
+            if (gh.equals(hash)) {
+                return generator.verify(cmp, dto.getResult());
             }
-        }
-        if (rs.equals(dto.getResult())) {
-            return true;
         }
 
         return false;

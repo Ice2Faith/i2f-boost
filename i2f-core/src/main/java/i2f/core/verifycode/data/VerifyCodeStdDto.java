@@ -1,5 +1,6 @@
 package i2f.core.verifycode.data;
 
+import i2f.core.verifycode.consts.VerifyCodeType;
 import lombok.Data;
 
 import java.awt.image.BufferedImage;
@@ -14,5 +15,6 @@ public class VerifyCodeStdDto<T> {
     private String question;
     private BufferedImage img;
     private T result;
-    private int type;
+    private int type = VerifyCodeType.INPUT.code();
+    private int count = 0;
 }

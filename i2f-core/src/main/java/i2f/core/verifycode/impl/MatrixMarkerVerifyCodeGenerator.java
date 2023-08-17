@@ -23,7 +23,6 @@ public class MatrixMarkerVerifyCodeGenerator extends AbsPositionD2VerifyCodeGene
     public static final String PARAM_BOUND_NUMBER = "boundNumber";
 
     public static final int DEFAULT_SPLIT_COUNT = 30;
-    public static final int DEFAULT_BOUND_NUMBER = 100;
 
     public static final int DEFAULT_WIDTH = 480;
     public static final int DEFAULT_HEIGHT = 480;
@@ -49,6 +48,14 @@ public class MatrixMarkerVerifyCodeGenerator extends AbsPositionD2VerifyCodeGene
         }
 
         int splitCount = DEFAULT_SPLIT_COUNT;
+        if (params != null) {
+            if (params.containsKey(PARAM_SPLIT_COUNT)) {
+                Integer val = (Integer) params.get(PARAM_SPLIT_COUNT);
+                if (val != null && val > 0) {
+                    splitCount = val;
+                }
+            }
+        }
 
         int dynamicCount = (int) ((MathUtil.RANDOM.nextDouble() * 0.5) * splitCount);
         dynamicCount = Math.min(dynamicCount, 20);
