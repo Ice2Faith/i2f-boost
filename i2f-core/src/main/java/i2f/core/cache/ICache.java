@@ -10,6 +10,8 @@ public interface ICache<K, V> {
 
     void expire(K key, long expireTime, TimeUnit expireUnit);
 
+    Long getExpire(K key, TimeUnit expireUnit);
+
     V get(K key);
 
     boolean exists(K key);

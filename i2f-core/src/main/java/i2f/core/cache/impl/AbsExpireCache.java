@@ -53,5 +53,14 @@ public abstract class AbsExpireCache<K, V> implements ICache<K, V> {
         }, expireTime, expireUnit);
     }
 
+    @Override
+    public Long getExpire(K key, TimeUnit expireUnit) {
+        Long ts = this._expire.get(key);
+        if (ts == null) {
+            return null;
+        }
+        long dts = ts - System.currentTimeMillis();
+        return expireUnit.convert(dts, TimeUnit.MILLISECONDS);
+    }
 
 }

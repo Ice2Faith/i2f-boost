@@ -58,6 +58,11 @@ public class RedisCache<V> implements ICache<String, V> {
     }
 
     @Override
+    public Long getExpire(String key, TimeUnit expireUnit) {
+        return redisTemplate.getExpire(redisKey(key), expireUnit);
+    }
+
+    @Override
     public V get(String key) {
         return (V) redisTemplate.opsForValue().get(redisKey(key));
     }
