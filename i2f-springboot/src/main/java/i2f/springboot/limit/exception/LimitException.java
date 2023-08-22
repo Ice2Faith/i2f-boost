@@ -1,5 +1,6 @@
 package i2f.springboot.limit.exception;
 
+import i2f.core.exception.BoostException;
 import i2f.springboot.limit.consts.LimitType;
 
 /**
@@ -7,15 +8,16 @@ import i2f.springboot.limit.consts.LimitType;
  * @date 2023/8/3 10:07
  * @desc
  */
-public class LimitException extends RuntimeException {
+public class LimitException extends BoostException {
     private LimitType type;
+
     public LimitException(LimitType type) {
-        this.type=type;
+        this.type = type;
     }
 
-    public LimitException(LimitType type,String message) {
+    public LimitException(LimitType type, String message) {
         super(message);
-        this.type=type;
+        this.type = type;
     }
 
     public LimitException(LimitType type,String message, Throwable cause) {

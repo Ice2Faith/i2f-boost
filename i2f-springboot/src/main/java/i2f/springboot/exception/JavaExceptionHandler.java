@@ -9,6 +9,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.SocketException;
@@ -295,25 +296,31 @@ public class JavaExceptionHandler {
 
     @ExceptionHandler(SyncFailedException.class)
     public ApiResp<String> illegalThreadStateEx(SyncFailedException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"同步失败异常");
+        log.error(e.getClass().getName(), e);
+        return ApiResp.error(500, "同步失败异常");
     }
 
     @ExceptionHandler(ArrayIndexOutOfBoundsException.class)
-    public ApiResp<String> arrayIndexOutOfBoundsEx(ArrayIndexOutOfBoundsException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"数组越界异常");
+    public ApiResp<String> arrayIndexOutOfBoundsEx(ArrayIndexOutOfBoundsException e) {
+        log.error(e.getClass().getName(), e);
+        return ApiResp.error(500, "数组越界异常");
+    }
+
+    @ExceptionHandler(UndeclaredThrowableException.class)
+    public ApiResp<String> undeclaredThrowableEx(UndeclaredThrowableException e) {
+        log.error(e.getClass().getName(), e);
+        return ApiResp.error(500, "内部未声明异常");
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ApiResp<String> runtimeEx(RuntimeException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"系统运行异常");
+    public ApiResp<String> runtimeEx(RuntimeException e) {
+        log.error(e.getClass().getName(), e);
+        return ApiResp.error(500, "系统运行异常");
     }
 
     @ExceptionHandler(Exception.class)
-    public ApiResp<String> ex(Exception e){
-        log.error(e.getClass().getName(),e);
+    public ApiResp<String> ex(Exception e) {
+        log.error(e.getClass().getName(), e);
         return ApiResp.error(500,"系统异常");
     }
 

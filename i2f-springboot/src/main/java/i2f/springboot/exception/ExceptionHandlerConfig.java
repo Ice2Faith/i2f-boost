@@ -19,7 +19,10 @@ import org.springframework.context.annotation.Import;
 @ConfigurationProperties(prefix = "i2f.springboot.config.exception")
 @Import({
         JavaExceptionHandler.class,
-        RegistryExceptionHandler.class
+        RegistryExceptionHandler.class,
+        BoostExceptionHandler.class,
+        ServletExceptionHandler.class,
+        SpringMvcExceptionHandler.class
 })
 public class ExceptionHandlerConfig {
 }
