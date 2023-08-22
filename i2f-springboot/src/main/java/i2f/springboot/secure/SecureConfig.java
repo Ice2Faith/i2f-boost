@@ -37,15 +37,18 @@ public class SecureConfig {
 
     private int nonceTimeoutSeconds = 6 * 60;
 
+    private boolean enableNonceTimestampAllowDiff = true;
+    private int nonceTimestampAllowDiffSeconds = 10 * 60;
+
     private boolean enableDynamicAsymKey = true;
 
     private long dynamicRefreshDelaySeconds = 6 * 60;
 
     private int dynamicMaxHistoriesCount = 5;
 
-    private long clientKeyExpireSeconds=30*60;
+    private long clientKeyExpireSeconds = 30 * 60;
 
-    private long clientKeyExpirePoolDelaySeconds=3*60;
+    private long clientKeyExpirePoolDelaySeconds = 3 * 60;
 
     private String headerName = SecureConsts.DEFAULT_SECURE_HEADER_NAME;
 

@@ -1,10 +1,10 @@
 package i2f.springboot.secure.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import i2f.core.cache.ICache;
 import i2f.core.j2ee.web.ServletContextUtil;
 import i2f.core.j2ee.wrapper.HttpServletRequestProxyWrapper;
 import i2f.core.j2ee.wrapper.HttpServletResponseProxyWrapper;
-import i2f.core.thread.NamingThreadFactory;
 import i2f.spring.mapping.MappingUtil;
 import i2f.spring.serialize.jackson.JacksonJsonSerializer;
 import i2f.springboot.secure.SecureConfig;
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author ltb
@@ -79,8 +79,9 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
         this.context = applicationContext;
     }
 
-    private ConcurrentMap<String, Long> nonceCache = new ConcurrentHashMap<>();
-    private ScheduledExecutorService pool = Executors.newScheduledThreadPool(30, new NamingThreadFactory("secure", "nonce"));
+    public static final String NONCE_CACHE_KEY_PREFIX = "secure:nonce:";
+    @Autowired
+    private ICache<String, Object> cache;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
@@ -149,14 +150,17 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
         // 然而，非正常的请求，可以进行重放请求达到目的
         // 这样的请求，就会出现一次性头重复，存在相同的签名
         String clientIp = ServletContextUtil.getIp(request);
+        if (clientIp != null) {
+            clientIp = clientIp.replaceAll(":", "-");
+        }
 
         String clientAsymSignOrigin = ServletContextUtil.getPossibleValue(secureConfig.getClientAsymSignName(), request);
-        if(StringUtils.isEmpty(clientAsymSignOrigin)){
-            clientAsymSignOrigin="";
+        if (StringUtils.isEmpty(clientAsymSignOrigin)) {
+            clientAsymSignOrigin = "";
         }
-        String clientAsymSign=clientAsymSignOrigin;
-        if(secureConfig.isEnableClientIpBind()){
-            clientAsymSign=secureTransfer.getClientAsymSignCacheKey(clientAsymSignOrigin,clientIp);
+        String clientAsymSign = clientAsymSignOrigin;
+        if (secureConfig.isEnableClientIpBind()) {
+            clientAsymSign = secureTransfer.getClientAsymSignCacheKey(clientAsymSignOrigin, clientIp);
         }
         secureTransfer.refreshClientKeyExpire(clientAsymSign);
         boolean wrapEncResp = isEncUrl(request);
@@ -197,22 +201,32 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                 // 对于服务端而言，nonce从客户端发送过来，很难避免不同的客户端发送过来的nonce重复的问题
                 // 如果不进行客户端隔离，就会导致不少正常的请求被拦截为重放
                 // 因此需要结合客户端IP判定nonce
-                String cacheNonce = clientIp + ":" + requestHeader.nonce;
-                if (nonceCache.containsKey(cacheNonce)) {
+                String cacheNonce = NONCE_CACHE_KEY_PREFIX + clientIp + ":" + requestHeader.nonce;
+                if (cache.exists(cacheNonce)) {
                     throw new SecureException(SecureErrorCode.BAD_NONCE, "不允许重放请求");
                 }
-
-                nonceCache.put(cacheNonce, 1L);
-
-                // 这里定时消除一个时间窗口内的重放请求
-                // 更好的实现方式时使用redis，避免一个时间窗口内出现大量请求
-                // 导致map和pool宕机
-                pool.schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        nonceCache.remove(cacheNonce);
+                // 检查请求的时效性，允许与服务器之间存在一定时间范围的时间戳差距，超过此差距，则认为请求不合法
+                // 也就是防止，将以前的合法请求，放在之后的时间进行重放
+                // 案例就是，把昨天的请求，今天又拿来请求，如果只校验nonce
+                // 则这样的请求那就是合法的，但是结合时间戳之后，这样的请求便是唯一的
+                if (secureConfig.isEnableNonceTimestampAllowDiff()) {
+                    try {
+                        String[] arr = requestHeader.nonce.split("-");
+                        if (arr.length > 1) {
+                            long sts = Long.parseLong(arr[0], 16);
+                            long dts = Math.abs(System.currentTimeMillis() - sts);
+                            if ((dts / 1000) > secureConfig.getNonceTimestampAllowDiffSeconds()) {
+                                throw new SecureException(SecureErrorCode.BAD_NONCE, "请求时效性检查失败");
+                            }
+                        }
+                    } catch (Exception e) {
+                        if (e instanceof SecureException) {
+                            throw e;
+                        }
                     }
-                }, secureConfig.getNonceTimeoutSeconds(), TimeUnit.SECONDS);
+                }
+
+                cache.set(cacheNonce, "1", secureConfig.getNonceTimeoutSeconds(), TimeUnit.SECONDS);
 
 
                 byte[] bytes = requestProxyWrapper.getBodyBytes();
@@ -298,8 +312,12 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                 log.error(e.getClass().getName(), e);
                 // 标记异常头，如果发生异常，标记后在AOP或者RequestAdvice中抛出异常，以进行ExceptionHandler处理
                 requestProxyWrapper.setAttribute(SecureConsts.FILTER_EXCEPTION_ATTR_KEY, e);
-                if(freshClientContext){
-                    response.setHeader(secureConfig.getClientKeyHeaderName(),secureTransfer.getWebClientAsymPrivateKey(request));
+                if(freshClientContext) {
+                    if (secureConfig.isEnableSwapAsymKey()) {
+                        response.setHeader(secureConfig.getClientKeyHeaderName(), SecureConsts.FLAG_ENABLE);
+                    } else {
+                        response.setHeader(secureConfig.getClientKeyHeaderName(), secureTransfer.getWebClientAsymPrivateKey(request));
+                    }
                 }
                 if(freshServerContext){
                     response.setHeader(secureConfig.getDynamicKeyHeaderName(),secureTransfer.getWebAsymPublicKey());

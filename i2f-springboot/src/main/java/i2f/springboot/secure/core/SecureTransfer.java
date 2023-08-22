@@ -1,10 +1,9 @@
 package i2f.springboot.secure.core;
 
 
-import i2f.core.codec.CodecUtil;
+import i2f.core.cache.ICache;
 import i2f.core.digest.AsymmetricKeyPair;
 import i2f.core.digest.Base64Obfuscator;
-import i2f.core.io.stream.StreamUtil;
 import i2f.core.j2ee.web.ServletContextUtil;
 import i2f.core.security.jce.bc.BouncyCastleHolder;
 import i2f.core.thread.NamingThreadFactory;
@@ -25,12 +24,11 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.security.KeyPair;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -56,109 +54,26 @@ public class SecureTransfer implements InitializingBean {
     @Autowired
     private SecureConfig secureConfig;
 
-    private AsymmetricKeyPair asymKey;
+    public static final String SECURE_KEY_PREFIX = "secure:key:";
+    public static final String SECURE_SLF_CURR_KEY = SECURE_KEY_PREFIX + "slf:current";
+    public static final String SECURE_SLF_HIS_KEY_PREFIX = SECURE_KEY_PREFIX + "slf:history:";
+    public static final String SECURE_CLI_KEY_PREFIX = SECURE_KEY_PREFIX + "cli:key:";
+    public static final String SECURE_CLI_KEY_IP_BIND_PREFIX = SECURE_KEY_PREFIX + "cli:ip:";
+    @Autowired
+    private ICache<String, Object> cache;
 
-    private LinkedList<AsymmetricKeyPair> histories;
 
     private ScheduledExecutorService pool;
 
     // 一个IP仅有一个key可以使用，也就是会剔除老的key
-    private ConcurrentHashMap<String, AsymmetricKeyPair> clientKeys = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, Long> keyExpireMap = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, String> clientIpKeyMap = new ConcurrentHashMap<>();
+
     private ReentrantLock lock = new ReentrantLock();
-    private ScheduledExecutorService expirePool = Executors.newSingleThreadScheduledExecutor(new NamingThreadFactory("secure", "expire"));
 
     public File getClientsAsymStoreFile() {
         File file = new File(secureConfig.getAsymStorePath(), SecureConsts.ASYM_CLIENTS_KEY_FILE_NAME);
         return file;
     }
 
-    public void loadClientsAsymKeys() {
-        try {
-            File storeFile = getClientsAsymStoreFile();
-            if (!storeFile.exists()) {
-                return;
-            }
-            String enc = StreamUtil.readString(storeFile, "UTF-8");
-            String b64 = Base64Obfuscator.decode(enc);
-            String str=CodecUtil.ofUtf8(CodecUtil.ofBase64(b64));
-            String[] lines = str.split("\n");
-            Map<String, Long> expireMap = new HashMap<>();
-            Map<String, AsymmetricKeyPair> keyMap = new HashMap<>();
-            Map<String,String> ipMap=new HashMap<>();
-            for (String line : lines) {
-                String[] arr = line.split("\\|");
-                if (arr.length < 1) {
-                    continue;
-                }
-                String type = arr[0].trim();
-                if ("0".equals(type)) {
-                    if (arr.length < 3) {
-                        continue;
-                    }
-                    try {
-                        long ts = Long.parseLong(arr[2].trim());
-                        expireMap.put(arr[1].trim(), ts);
-                    } catch (Exception e) {
-                        log.warn("load clients asym key exception:" + e.getMessage() + " of " + e.getClass().getName());
-                    }
-                }
-                if ("2".equals(type)) {
-                    if (arr.length < 3) {
-                        continue;
-                    }
-                    ipMap.put(arr[1].trim(), arr[2].trim());
-                }
-                if ("1".equals(type)) {
-                    if (arr.length < 4) {
-                        continue;
-                    }
-                    try {
-                        String k = arr[1].trim();
-                        String pubk = arr[2].trim();
-                        String prik = arr[3].trim();
-                        PublicKey publicKey = AsymmetricKeyPair.parsePublicKeyBase64(pubk);
-                        PrivateKey privateKey = AsymmetricKeyPair.parsePrivateKeyBase64(prik);
-                        AsymmetricKeyPair keyPair = new AsymmetricKeyPair(new KeyPair(publicKey, privateKey));
-                        keyMap.put(k, keyPair);
-                    } catch (Exception e) {
-                        log.warn("load clients asym key exception:" + e.getMessage() + " of " + e.getClass().getName());
-                    }
-                }
-            }
-            keyExpireMap.putAll(expireMap);
-            clientKeys.putAll(keyMap);
-            clientIpKeyMap.putAll(ipMap);
-        } catch (Exception e) {
-            log.warn("load clients asym key exception:" + e.getMessage() + " of " + e.getClass().getName());
-        }
-    }
-
-    public void saveClientsAsymKeys() {
-        try {
-            File storeFile = getClientsAsymStoreFile();
-            StringBuilder builder = new StringBuilder();
-            for (Map.Entry<String, Long> entry : keyExpireMap.entrySet()) {
-                builder.append("0").append(" | ").append(entry.getKey()).append(" | ").append(entry.getValue()).append("\n");
-            }
-            for (Map.Entry<String, String> entry : clientIpKeyMap.entrySet()) {
-                builder.append("2").append(" | ").append(entry.getKey()).append(" | ").append(entry.getValue()).append("\n");
-            }
-            for (Map.Entry<String, AsymmetricKeyPair> entry : clientKeys.entrySet()) {
-                AsymmetricKeyPair keyPair = entry.getValue();
-                builder.append("1").append(" | ").append(entry.getKey()).append(" | ").append(keyPair.publicKeyBase64()).append(" | ").append(keyPair.privateKeyBase64()).append("\n");
-            }
-
-            String str = builder.toString();
-            String b64 = CodecUtil.toBase64(CodecUtil.toUtf8(str));
-            String enc = Base64Obfuscator.encode(b64, false);
-
-            StreamUtil.writeString(enc, "UTF-8", storeFile);
-        } catch (Exception e) {
-            log.warn("save clients asym key exception:" + e.getMessage() + " of " + e.getClass().getName());
-        }
-    }
 
 
     public File getSlfAsymStoreFile() {
@@ -166,72 +81,78 @@ public class SecureTransfer implements InitializingBean {
         return file;
     }
 
-    public void loadSlfAsymKey() {
-        File file = getSlfAsymStoreFile();
-        log.info("asymKey store file:" + file.getAbsolutePath());
-        if (file.exists()) {
-            try {
-                asymKey = AsymmetricKeyPair.loadAsymKey(file);
-                log.info("find stored asym key.");
-            } catch (Exception e) {
-                log.warn("load asym key exception:" + e.getMessage() + " of " + e.getClass().getName());
-            }
-        }
-    }
-
-    public void saveSlfAsymKey() {
-        File file = getSlfAsymStoreFile();
-        log.info("asym store file:" + file.getAbsolutePath());
-        try {
-            AsymmetricKeyPair.saveAsymKey(asymKey, file);
-        } catch (Exception e) {
-            log.warn("save asym key exception:" + e.getMessage() + " of " + e.getClass().getName());
-        }
-    }
-
-    public void restoreSlfAsymKey() {
-        loadSlfAsymKey();
-        saveSlfAsymKey();
-    }
-
     public void scheduleSlfAsymUpdate() {
-        histories = new LinkedList<>();
         pool = Executors.newSingleThreadScheduledExecutor(new NamingThreadFactory("secure", "refresh"));
         pool.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 synchronized (SecureTransfer.this) {
                     log.debug("asymKey update....");
-                    histories.addFirst(asymKey);
-                    asymKey = AsymmetricUtil.makeKeyPair(secureConfig.getAsymKeySize());
-                    if (histories.size() > secureConfig.getDynamicMaxHistoriesCount()) {
-                        histories.removeLast();
-                    }
-                    saveSlfAsymKey();
+                    AsymmetricKeyPair oldKey = currentSlfKey();
+                    String oldSign = getAsymPubSign(oldKey);
+                    cache.set(SECURE_SLF_HIS_KEY_PREFIX + oldSign, stringifyKeyPair(oldKey),
+                            secureConfig.getDynamicRefreshDelaySeconds() * secureConfig.getDynamicMaxHistoriesCount(),
+                            TimeUnit.SECONDS);
+
+
+                    AsymmetricKeyPair key = AsymmetricUtil.makeKeyPair(secureConfig.getAsymKeySize());
+                    cache.set(SECURE_SLF_CURR_KEY, stringifyKeyPair(key));
                 }
             }
         }, secureConfig.getDynamicRefreshDelaySeconds(), secureConfig.getDynamicRefreshDelaySeconds(), TimeUnit.SECONDS);
     }
 
+    public String stringifyKeyPair(AsymmetricKeyPair pair) {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            AsymmetricKeyPair.saveAsymKey(pair, bos);
+            bos.close();
+            String str = new String(bos.toByteArray());
+            return str;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    public AsymmetricKeyPair parseKeyPair(String str) {
+        try {
+            ByteArrayInputStream bis = new ByteArrayInputStream(str.getBytes());
+            AsymmetricKeyPair ret = AsymmetricKeyPair.loadAsymKey(bis);
+            return ret;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    public AsymmetricKeyPair currentSlfKey() {
+        Object obj = cache.get(SECURE_SLF_CURR_KEY);
+        if (obj != null) {
+            String str = String.valueOf(obj);
+            return parseKeyPair(str);
+        }
+        return null;
+    }
+
     public AsymmetricKeyPair findSlfAsymKey(String sign) {
         if (!secureConfig.isEnableDynamicAsymKey()) {
-            return asymKey;
+            return currentSlfKey();
         }
-        List<AsymmetricKeyPair> keys = new ArrayList<>();
-        keys.add(asymKey);
-        keys.addAll(histories);
-        for (AsymmetricKeyPair item : keys) {
-            String b464 = item.publicKeyBase64();
-            String sg = SignatureUtil.sign(b464);
-            if (sg.equalsIgnoreCase(sign)) {
-                return item;
-            }
+        String slfSign = getSlfAsymSign();
+        if (slfSign.equals(sign)) {
+            return currentSlfKey();
+        }
+        Object obj = cache.get(SECURE_SLF_HIS_KEY_PREFIX + sign);
+        if (obj != null) {
+            String str = String.valueOf(obj);
+            return parseKeyPair(str);
         }
         return null;
     }
 
     public String getSlfAsymSign() {
-        return getAsymPubSign(asymKey);
+        return getAsymPubSign(currentSlfKey());
     }
 
     public String getAsymPubSign(AsymmetricKeyPair keyPair) {
@@ -247,66 +168,24 @@ public class SecureTransfer implements InitializingBean {
     }
 
     public String makeNonce() {
-        return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+        return String.format("%x", System.currentTimeMillis()) + "-" + UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
     }
 
-    public void scheduleExpireKeys() {
-        expirePool.scheduleWithFixedDelay(() -> {
-            Set<String> rmSet = new HashSet<>();
-            long ts = System.currentTimeMillis();
-            lock.lock();
-            try {
-                for (Map.Entry<String, Long> entry : keyExpireMap.entrySet()) {
-                    if (ts > entry.getValue()) {
-                        rmSet.add(entry.getKey());
-                    }
-                }
-                for (String key : clientKeys.keySet()) {
-                    if (!keyExpireMap.containsKey(key)) {
-                        rmSet.add(key);
-                    }
-                }
-                for (String key : keyExpireMap.keySet()) {
-                    if (!clientKeys.containsKey(key)) {
-                        rmSet.add(key);
-                    }
-                }
-                for (String key : rmSet) {
-                    keyExpireMap.remove(key);
-                    clientKeys.remove(key);
-                }
-            } finally {
-                lock.unlock();
-            }
-            rmSet.clear();
-            for (Map.Entry<String, String> entry : clientIpKeyMap.entrySet()) {
-                if(!clientKeys.containsKey(entry.getValue())){
-                    rmSet.add(entry.getKey());
-                }
-            }
-            for (String key : rmSet) {
-                clientIpKeyMap.remove(key);
-            }
-            saveClientsAsymKeys();
-        }, 0, secureConfig.getClientKeyExpirePoolDelaySeconds(), TimeUnit.SECONDS);
-    }
 
     public void refreshClientKeyExpire(String clientAsymSign) {
-        keyExpireMap.put(clientAsymSign, System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(secureConfig.getClientKeyExpireSeconds()));
+        cache.expire(SECURE_CLI_KEY_PREFIX + clientAsymSign, secureConfig.getClientKeyExpireSeconds(), TimeUnit.SECONDS);
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        loadSlfAsymKey();
-        if (this.asymKey == null) {
-            this.asymKey = AsymmetricUtil.makeKeyPair(secureConfig.getAsymKeySize());
+        AsymmetricKeyPair key = currentSlfKey();
+        if (key == null) {
+            key = AsymmetricUtil.makeKeyPair(secureConfig.getAsymKeySize());
+            cache.set(SECURE_SLF_CURR_KEY, stringifyKeyPair(key));
         }
-        restoreSlfAsymKey();
         if (secureConfig.isEnableDynamicAsymKey()) {
             scheduleSlfAsymUpdate();
         }
-        loadClientsAsymKeys();
-        scheduleExpireKeys();
     }
 
     public String symmetricKeyGen(int size) {
@@ -333,12 +212,21 @@ public class SecureTransfer implements InitializingBean {
         return SymmetricUtil.decryptJsonBeforeBase64(bs64, symmKey);
     }
 
+    public AsymmetricKeyPair clientKeyPair(String clientAsymSign) {
+        Object obj = cache.get(SECURE_CLI_KEY_PREFIX + clientAsymSign);
+        if (obj != null) {
+            String str = String.valueOf(obj);
+            return parseKeyPair(str);
+        }
+        return null;
+    }
+
     public String getResponseSecureHeader(String symmKey, String clientAsymSign) {
         if (symmKey == null) {
             return "null";
         }
         // 使用Asym对symm秘钥加密并进行模糊
-        AsymmetricKeyPair keyPair = clientKeys.get(clientAsymSign);
+        AsymmetricKeyPair keyPair = clientKeyPair(clientAsymSign);
         String symmKeyTransfer = AsymmetricUtil.publicKeyEncryptBase64(keyPair, symmKey);
         symmKeyTransfer = Base64Obfuscator.encode(symmKeyTransfer, true);
         return symmKeyTransfer;
@@ -348,7 +236,7 @@ public class SecureTransfer implements InitializingBean {
         if (symmKey == null) {
             return "null";
         }
-        AsymmetricKeyPair keyPair = asymKey;
+        AsymmetricKeyPair keyPair = currentSlfKey();
         // 使用Asym对symm秘钥加密并进行模糊
         String symmKeyTransfer = AsymmetricUtil.privateKeyEncryptBase64(keyPair, symmKey);
         symmKeyTransfer = Base64Obfuscator.encode(symmKeyTransfer, true);
@@ -375,7 +263,7 @@ public class SecureTransfer implements InitializingBean {
             return symmKeyTransfer;
         }
         symmKeyTransfer = symmKeyTransfer.trim();
-        AsymmetricKeyPair asymKey = clientKeys.get(asymSign);
+        AsymmetricKeyPair asymKey = clientKeyPair(asymSign);
         if (asymKey == null) {
             return null;
         }
@@ -437,25 +325,34 @@ public class SecureTransfer implements InitializingBean {
      * @return
      */
     public String getWebAsymPublicKey() {
-        String pubKey = Base64Obfuscator.encode(this.getAsymKey().publicKeyBase64(), true);
+        String pubKey = Base64Obfuscator.encode(currentSlfKey().publicKeyBase64(), true);
         return pubKey;
     }
 
     public String getClientAsymSignCacheKey(String priSign, String clientIp) {
-        return clientIp + ";" + priSign;
+        if (clientIp != null) {
+            clientIp = clientIp.replaceAll(":", "-");
+        }
+        return clientIp + ":" + priSign;
     }
 
     public String getWebClientAsymPrivateKey(HttpServletRequest request) {
         AsymmetricKeyPair keyPair = null;
 
         String clientIp = ServletContextUtil.getIp(request);
-
-        if(clientIpKeyMap.containsKey(clientIp)){
-            String skey = clientIpKeyMap.get(clientIp);
-            keyPair = clientKeys.get(skey);
+        if (clientIp != null) {
+            clientIp = clientIp.replaceAll(":", "-");
         }
 
-        if(keyPair==null){
+        if (clientIp != null) {
+            Object obj = cache.get(SECURE_CLI_KEY_IP_BIND_PREFIX + clientIp);
+            if (obj != null) {
+                String skey = String.valueOf(obj);
+                keyPair = clientKeyPair(skey);
+            }
+        }
+
+        if (keyPair == null) {
             keyPair = AsymmetricUtil.makeKeyPair(secureConfig.getAsymKeySize());
         }
 
@@ -475,20 +372,20 @@ public class SecureTransfer implements InitializingBean {
         }
         lock.lock();
         try {
-            clientKeys.remove(clientAsymSign);
-            keyExpireMap.remove(clientAsymSign);
-            if (clientIpKeyMap.containsKey(clientIp)) {
-                String ckey = clientIpKeyMap.get(clientIp);
-                clientKeys.remove(ckey);
-                keyExpireMap.remove(ckey);
+            cache.remove(SECURE_CLI_KEY_PREFIX + clientAsymSign);
+
+            Object obj = cache.get(SECURE_CLI_KEY_IP_BIND_PREFIX + clientIp);
+            if (obj != null) {
+                String ckey = String.valueOf(obj);
+                cache.remove(SECURE_CLI_KEY_PREFIX + ckey);
             }
-            clientKeys.put(pubSign, keyPair);
-            clientIpKeyMap.put(clientIp, pubSign);
-            refreshClientKeyExpire(pubSign);
+            cache.remove(SECURE_CLI_KEY_IP_BIND_PREFIX + clientIp);
+
+            cache.set(SECURE_CLI_KEY_PREFIX + pubSign, stringifyKeyPair(keyPair), secureConfig.getClientKeyExpireSeconds(), TimeUnit.SECONDS);
+            cache.set(SECURE_CLI_KEY_IP_BIND_PREFIX + clientIp, pubSign);
         } finally {
             lock.unlock();
         }
-        saveClientsAsymKeys();
 
         String priKey = Base64Obfuscator.encode(keyPair.privateKeyBase64(), true);
         return clientPubSign + secureConfig.getHeaderSeparator() + priKey;
@@ -505,7 +402,9 @@ public class SecureTransfer implements InitializingBean {
         }
 
         String clientIp = ServletContextUtil.getIp(request);
-
+        if (clientIp != null) {
+            clientIp = clientIp.replaceAll(":", "-");
+        }
 
         String clientAsymSignOrigin = ServletContextUtil.getPossibleValue(secureConfig.getClientAsymSignName(), request);
         if (StringUtils.isEmpty(clientAsymSignOrigin)) {
@@ -522,22 +421,22 @@ public class SecureTransfer implements InitializingBean {
         }
         lock.lock();
         try {
-            clientKeys.remove(clientAsymSign);
-            keyExpireMap.remove(clientAsymSign);
-            if (clientIpKeyMap.containsKey(clientIp)) {
-                String ckey = clientIpKeyMap.get(clientIp);
-                clientKeys.remove(ckey);
-                keyExpireMap.remove(ckey);
+            cache.remove(SECURE_CLI_KEY_PREFIX + clientAsymSign);
+
+            Object obj = cache.get(SECURE_CLI_KEY_IP_BIND_PREFIX + clientIp);
+            if (obj != null) {
+                String ckey = String.valueOf(obj);
+                cache.remove(SECURE_CLI_KEY_PREFIX + ckey);
             }
-            clientKeys.put(pubSign, keyPair);
-            clientIpKeyMap.put(clientIp, pubSign);
-            refreshClientKeyExpire(pubSign);
+            cache.remove(SECURE_CLI_KEY_IP_BIND_PREFIX + clientIp);
+
+            cache.set(SECURE_CLI_KEY_PREFIX + pubSign, stringifyKeyPair(keyPair), secureConfig.getClientKeyExpireSeconds(), TimeUnit.SECONDS);
+            cache.set(SECURE_CLI_KEY_IP_BIND_PREFIX + clientIp, pubSign);
         } finally {
             lock.unlock();
         }
-        saveClientsAsymKeys();
 
-        String pubKey = Base64Obfuscator.encode(this.getAsymKey().publicKeyBase64(), true);
+        String pubKey = Base64Obfuscator.encode(currentSlfKey().publicKeyBase64(), true);
         return pubKey;
     }
 }
