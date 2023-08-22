@@ -1,6 +1,8 @@
 package i2f.springboot.secure;
 
 
+import i2f.core.cache.ICache;
+import i2f.core.cache.impl.mem.MemCache;
 import i2f.springboot.secure.consts.SecureConsts;
 import i2f.springboot.secure.core.SecureTransferFilter;
 import i2f.springboot.secure.data.SecureCtrl;
@@ -9,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -94,4 +97,11 @@ public class SecureConfig {
         registrationBean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.FORWARD);
         return registrationBean;
     }
+
+    @ConditionalOnMissingBean(ICache.class)
+    @Bean
+    public ICache<String, Object> cache() {
+        return new MemCache<>("secure-cache");
+    }
+
 }

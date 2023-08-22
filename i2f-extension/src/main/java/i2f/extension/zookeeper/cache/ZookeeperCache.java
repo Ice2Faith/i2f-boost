@@ -68,6 +68,11 @@ public class ZookeeperCache implements ICache<String, Object> {
     }
 
     @Override
+    public Long getExpire(String key, TimeUnit expireUnit) {
+        return null;
+    }
+
+    @Override
     public void remove(String key) {
         String path = getPath(key);
         manager.remove(path);
