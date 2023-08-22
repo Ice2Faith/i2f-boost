@@ -2,6 +2,8 @@ package i2f.springboot.security;
 
 import i2f.springboot.security.def.DefaultAuthorizeExceptionHandler;
 import i2f.springboot.security.def.DefaultUserDetailsService;
+import i2f.springboot.security.def.guarder.LoginGuarderConfig;
+import i2f.springboot.security.def.guarder.LoginLockBeforeLoginChecker;
 import i2f.springboot.security.def.token.*;
 import i2f.springboot.security.impl.SecurityForwardController;
 import org.springframework.context.annotation.Import;
@@ -17,12 +19,15 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import({
-        SecurityConfig.class,PasswordEncoderConfig.class,
+        SecurityConfig.class, PasswordEncoderConfig.class,
         SecurityExceptionHandler.class,
 
         DisableSecurityConfig.class,
 
         SecurityForwardController.class,
+
+        LoginGuarderConfig.class,
+        LoginLockBeforeLoginChecker.class,
 
         DefaultAuthorizeExceptionHandler.class,
         DefaultAuthenticationTokenFilter.class,

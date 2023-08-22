@@ -2,6 +2,7 @@ package i2f.springboot.security.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -17,6 +18,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -31,7 +33,7 @@ public class JsonSupportUsernamePasswordAuthenticationFilter extends UsernamePas
 
     private LoginPasswordDecoder passwordDecoder;
 
-    private BeforeLoginChecker beforeLoginChecker;
+    private ApplicationContext applicationContext;
 
     public JsonSupportUsernamePasswordAuthenticationFilter() {
 
@@ -86,8 +88,8 @@ public class JsonSupportUsernamePasswordAuthenticationFilter extends UsernamePas
         return this;
     }
 
-    public JsonSupportUsernamePasswordAuthenticationFilter buildBeforeLoginChecker(BeforeLoginChecker checker) {
-        this.beforeLoginChecker = checker;
+    public JsonSupportUsernamePasswordAuthenticationFilter buildApplicationContext(ApplicationContext context) {
+        this.applicationContext = context;
         return this;
     }
 
@@ -99,6 +101,12 @@ public class JsonSupportUsernamePasswordAuthenticationFilter extends UsernamePas
         } else {
             String username = null;
             String password = null;
+
+            Map<String, BeforeLoginChecker> beansMap = new HashMap<>();
+            String[] beanNames = applicationContext.getBeanNamesForType(BeforeLoginChecker.class);
+            for (String beanName : beanNames) {
+                beansMap.put(beanName, (BeforeLoginChecker) applicationContext.getBean(beanName));
+            }
 
 
             String contentType = request.getContentType();
@@ -114,8 +122,8 @@ public class JsonSupportUsernamePasswordAuthenticationFilter extends UsernamePas
                     password = String.valueOf(json.get(getPasswordParameter()));
                     request.setAttribute(AUTH_ATTR_KEY_USERNAME, username);
                     request.setAttribute(AUTH_ATTR_KEY_PASSWORD, password);
-                    if (beforeLoginChecker != null) {
-                        beforeLoginChecker.onJsonLogin(username, password, json, request);
+                    for (BeforeLoginChecker checker : beansMap.values()) {
+                        checker.onJsonLogin(username, password, json, request);
                     }
                 } catch (Exception e) {
                     if (e instanceof AuthenticationException) {
@@ -132,8 +140,8 @@ public class JsonSupportUsernamePasswordAuthenticationFilter extends UsernamePas
                 request.setAttribute(AUTH_ATTR_KEY_USERNAME, username);
                 request.setAttribute(AUTH_ATTR_KEY_PASSWORD, password);
                 try {
-                    if (beforeLoginChecker != null) {
-                        beforeLoginChecker.onFormLogin(username, password, request);
+                    for (BeforeLoginChecker checker : beansMap.values()) {
+                        checker.onFormLogin(username, password, request);
                     }
                 } catch (Exception e) {
                     if (e instanceof AuthenticationException) {

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -95,9 +97,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired(required = false)
     private LoginPasswordDecoder loginPasswordDecoder;
-
-    @Autowired(required = false)
-    private BeforeLoginChecker beforeLoginChecker;
 
     @Autowired(required = false)
     private ISecurityConfigListener securityConfigListener;
@@ -259,7 +258,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                             .buildParameterUsername(loginUsername)
                             .buildParameterPassword(loginPassword)
                             .buildLoginPasswordDecoder(loginPasswordDecoder)
-                            .buildBeforeLoginChecker(beforeLoginChecker)
+                            .buildApplicationContext(getApplicationContext())
                     ,
                     UsernamePasswordAuthenticationFilter.class);
             log.info("SecurityConfig customer json support username-password auth filter.");

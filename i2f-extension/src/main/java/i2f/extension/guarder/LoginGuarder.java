@@ -2,8 +2,6 @@ package i2f.extension.guarder;
 
 import i2f.core.cache.ICache;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
@@ -16,7 +14,6 @@ import java.util.concurrent.TimeUnit;
  * @desc
  */
 @Data
-@Component
 public class LoginGuarder {
 
     public static final String LOCK_USERNAME_PREFIX = "login:guarder:lock:username:";
@@ -29,8 +26,12 @@ public class LoginGuarder {
     private boolean enableIpGuarder = true;
     private int ipFailureCount = 30;
     private int ipLockedSeconds = 30 * 60;
-    @Autowired
+
     private ICache<String, Object> cache;
+
+    public LoginGuarder(ICache<String, Object> cache) {
+        this.cache = cache;
+    }
 
     public static String getIp(HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");
