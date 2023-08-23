@@ -30,10 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -352,12 +349,34 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
         // 加密响应体
         byte[] edata = responseProxyWrapper.getBodyBytes();
 
+        // 处理直接下载型接口，推荐还是使用白名单
+        // 小文件可以在这里进行自动处理
+        // 如果是大文件下载，这里可是内存包装
+        // 使用白名单，避免OOM
+        boolean specificResponseBody = false;
+        Collection<String> headerNames = responseProxyWrapper.getHeaderNames();
+        for (String item : headerNames) {
+            if (item == null || "".equals(item)) {
+                continue;
+            }
+            String str = item.toLowerCase().trim();
+            if ("content-disposition".equals(str)) {
+                String header = responseProxyWrapper.getHeader(item);
+                if (header != null && !"".equals(header)) {
+                    specificResponseBody = true;
+                    break;
+                }
+            }
+        }
+
+
         String requireResp = (String) request.getAttribute(SecureConsts.SECURE_REQUIRE_RESPONSE);
         String encryped = (String) request.getAttribute(SecureConsts.FILTER_ENCRYPT_HEADER);
         // 只有响应头包含加密头时，才加密请求
         if ((ctrl.out || SecureConsts.FLAG_ENABLE.equals(requireResp))
                 && edata.length > 0
-                && !SecureConsts.FLAG_ENABLE.equals(encryped)) {
+                && !SecureConsts.FLAG_ENABLE.equals(encryped)
+                && !specificResponseBody) {
             log.debug("find response secure.");
 
             if (!StringUtils.isEmpty(secureConfig.getResponseCharset())) {

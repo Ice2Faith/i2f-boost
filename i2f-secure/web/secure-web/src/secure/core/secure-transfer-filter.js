@@ -61,6 +61,16 @@ const SecureTransferFilter = {
   // 也就是说，如果请求头中，这两个请求头不存在，或者值不为SECURE_HEADER_ENABLE，都将不会处理
   // 也就是手动处理，部分参数的情形
   requestFilter (config) {
+    if (config.url.indexOf('?') >= 0) {
+      // regular query string
+      let url = config.url
+      let arr = url.split('?', 2)
+      if (arr.length >= 2 && arr[1] != '') {
+        let obj = qs.parse(arr[1])
+        config.params = Object.assign({}, obj, config.params)
+        config.url = arr[0]
+      }
+    }
     config.secure = {
       url: config.url
     }
