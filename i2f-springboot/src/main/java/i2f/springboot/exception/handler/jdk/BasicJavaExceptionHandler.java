@@ -1,15 +1,14 @@
-package i2f.springboot.exception;
+package i2f.springboot.exception.handler.jdk;
 
 import i2f.core.std.api.ApiResp;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.SocketException;
@@ -18,62 +17,37 @@ import java.rmi.RemoteException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLDataException;
-import java.sql.SQLException;
 import java.sql.SQLSyntaxErrorException;
 import java.sql.SQLTimeoutException;
-import java.text.ParseException;
-import java.time.DateTimeException;
 import java.time.format.DateTimeParseException;
 import java.util.IllegalFormatException;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @author ltb
  * @date 2022/7/3 20:22
  * @desc
  */
+@ConditionalOnExpression("${i2f.springboot.config.exception.java.enable:true}")
+@Order(BasicJavaExceptionHandler.ORDER)
 @Slf4j
 @RestControllerAdvice
-public class JavaExceptionHandler {
+public class BasicJavaExceptionHandler {
+    public static final int ORDER = 8979;
 
     @ExceptionHandler(FileNotFoundException.class)
-    public ApiResp<String> fileNotFoundEx(FileNotFoundException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"文件找不到");
-    }
-
-    @ExceptionHandler(IOException.class)
-    public ApiResp<String> ioEx(IOException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"输入输出异常");
-    }
-
-    @ExceptionHandler(NullPointerException.class)
-    public ApiResp<String> nullPointerEx(NullPointerException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"空指针异常");
+    public ApiResp<String> fileNotFoundEx(FileNotFoundException e) {
+        log.error(e.getClass().getName(), e);
+        return ApiResp.error(500, "文件找不到");
     }
 
     @ExceptionHandler(ClassNotFoundException.class)
-    public ApiResp<String> classNotFoundEx(ClassNotFoundException e){
-        log.error(e.getClass().getName(),e);
+    public ApiResp<String> classNotFoundEx(ClassNotFoundException e) {
+        log.error(e.getClass().getName(), e);
         return ApiResp.error(500,"类丢失异常");
-    }
-
-    @ExceptionHandler(IndexOutOfBoundsException.class)
-    public ApiResp<String> indexOutOfBoundsEx(IndexOutOfBoundsException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"越界异常");
     }
 
     @ExceptionHandler(ConnectException.class)
     public ApiResp<String> connectEx(ConnectException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"数据库异常");
-    }
-
-    @ExceptionHandler(SQLException.class)
-    public ApiResp<String> sqlEx(SQLException e){
         log.error(e.getClass().getName(),e);
         return ApiResp.error(500,"数据库异常");
     }
@@ -96,12 +70,6 @@ public class JavaExceptionHandler {
         return ApiResp.error(500,"数据库语法错误异常");
     }
 
-    @ExceptionHandler(DateTimeException.class)
-    public ApiResp<String> dateTimeEx(DateTimeException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"时间异常");
-    }
-
     @ExceptionHandler(DateTimeParseException.class)
     public ApiResp<String> dateTimeParseEx(DateTimeParseException e){
         log.error(e.getClass().getName(),e);
@@ -112,12 +80,6 @@ public class JavaExceptionHandler {
     public ApiResp<String> numberFormatEx(NumberFormatException e){
         log.error(e.getClass().getName(),e);
         return ApiResp.error(500,"数值格式异常");
-    }
-
-    @ExceptionHandler(ParseException.class)
-    public ApiResp<String> parseEx(ParseException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"解析异常");
     }
 
     @ExceptionHandler(MalformedURLException.class)
@@ -162,28 +124,10 @@ public class JavaExceptionHandler {
         return ApiResp.error(500,"无方法异常");
     }
 
-    @ExceptionHandler(ArithmeticException.class)
-    public ApiResp<String> arithmeticEx(ArithmeticException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"算术异常");
-    }
-
     @ExceptionHandler(NoSuchAlgorithmException.class)
     public ApiResp<String> arithmeticEx(NoSuchAlgorithmException e){
         log.error(e.getClass().getName(),e);
         return ApiResp.error(500,"算法缺失异常");
-    }
-
-    @ExceptionHandler(ClassCastException.class)
-    public ApiResp<String> classCastEx(ClassCastException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"类转型异常");
-    }
-
-    @ExceptionHandler(UnsupportedOperationException.class)
-    public ApiResp<String> unsupportedOperationEx(UnsupportedOperationException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"不支持的操作异常");
     }
 
     @ExceptionHandler(UnsupportedEncodingException.class)
@@ -204,22 +148,10 @@ public class JavaExceptionHandler {
         return ApiResp.error(500,"套接字超时异常");
     }
 
-    @ExceptionHandler(TimeoutException.class)
-    public ApiResp<String> timeoutEx(TimeoutException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"超时异常");
-    }
-
     @ExceptionHandler(EOFException.class)
     public ApiResp<String> eofEx(EOFException e){
         log.error(e.getClass().getName(),e);
         return ApiResp.error(500,"文件终结异常");
-    }
-
-    @ExceptionHandler(SecurityException.class)
-    public ApiResp<String> securityEx(SecurityException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"安全异常");
     }
 
     @ExceptionHandler(IllegalAccessException.class)
@@ -228,34 +160,10 @@ public class JavaExceptionHandler {
         return ApiResp.error(500,"非法访问异常");
     }
 
-    @ExceptionHandler(IllegalStateException.class)
-    public ApiResp<String> illegalStateEx(IllegalStateException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"非法状态异常");
-    }
-
     @ExceptionHandler(IllegalFormatException.class)
     public ApiResp<String> illegalFormatEx(IllegalFormatException e){
         log.error(e.getClass().getName(),e);
         return ApiResp.error(500,"非法格式化异常");
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ApiResp<String> illegalArgumentEx(IllegalArgumentException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"非法参数异常");
-    }
-
-    @ExceptionHandler(IllegalBlockSizeException.class)
-    public ApiResp<String> illegalBlockSizeEx(IllegalBlockSizeException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"非法块大小异常");
-    }
-
-    @ExceptionHandler(InterruptedException.class)
-    public ApiResp<String> interruptedEx(InterruptedException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"中断异常");
     }
 
     @ExceptionHandler(InvalidClassException.class)
@@ -270,22 +178,10 @@ public class JavaExceptionHandler {
         return ApiResp.error(500,"非法秘钥异常");
     }
 
-    @ExceptionHandler(BadPaddingException.class)
-    public ApiResp<String> badPaddingEx(BadPaddingException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"错误填充异常");
-    }
-
     @ExceptionHandler(NotSerializableException.class)
     public ApiResp<String> notSerializableEx(NotSerializableException e){
         log.error(e.getClass().getName(),e);
         return ApiResp.error(500,"不可序列化异常");
-    }
-
-    @ExceptionHandler(CloneNotSupportedException.class)
-    public ApiResp<String> cloneNotSupportedEx(CloneNotSupportedException e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"不可克隆异常");
     }
 
     @ExceptionHandler(IllegalThreadStateException.class)
@@ -306,27 +202,4 @@ public class JavaExceptionHandler {
         return ApiResp.error(500, "数组越界异常");
     }
 
-    @ExceptionHandler(UndeclaredThrowableException.class)
-    public ApiResp<String> undeclaredThrowableEx(UndeclaredThrowableException e) {
-        log.error(e.getClass().getName(), e);
-        return ApiResp.error(500, "内部未声明异常");
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ApiResp<String> runtimeEx(RuntimeException e) {
-        log.error(e.getClass().getName(), e);
-        return ApiResp.error(500, "系统运行异常");
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ApiResp<String> ex(Exception e) {
-        log.error(e.getClass().getName(), e);
-        return ApiResp.error(500,"系统异常");
-    }
-
-    @ExceptionHandler(Throwable.class)
-    public ApiResp<String> thr(Throwable e){
-        log.error(e.getClass().getName(),e);
-        return ApiResp.error(500,"抛出异常");
-    }
 }

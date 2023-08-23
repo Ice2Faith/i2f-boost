@@ -1,8 +1,10 @@
-package i2f.springboot.exception;
+package i2f.springboot.exception.handler.ext;
 
 import i2f.core.std.api.ApiResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.*;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingRequestCookieException;
@@ -19,10 +21,13 @@ import org.springframework.web.servlet.NoHandlerFoundException;
  * @date 2022/7/3 20:22
  * @desc
  */
+@ConditionalOnExpression("${i2f.springboot.config.exception.springmvc.enable:true}")
+@Order(SpringMvcExceptionHandler.ORDER)
 @ConditionalOnClass(DispatcherServlet.class)
 @Slf4j
 @RestControllerAdvice
 public class SpringMvcExceptionHandler {
+    public static final int ORDER = 5999;
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ApiResp<String> noHandlerFoundEx(NoHandlerFoundException e) {
