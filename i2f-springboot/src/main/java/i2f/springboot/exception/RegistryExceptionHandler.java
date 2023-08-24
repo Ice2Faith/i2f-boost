@@ -4,7 +4,9 @@ import i2f.core.std.api.ApiResp;
 import i2f.spring.environment.EnvironmentUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.EnvironmentAware;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,9 +20,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @date 2022/7/3 21:27
  * @desc
  */
+@ConditionalOnExpression("${i2f.springboot.config.exception.registry.enable:false}")
+@Order(RegistryExceptionHandler.ORDER)
 @Slf4j
 @RestControllerAdvice
 public class RegistryExceptionHandler implements InitializingBean, EnvironmentAware {
+    public static final int ORDER = 1999;
 
     // 注册项规范：
     // REGISTRY_EXCEPTION_PREFIX.{order}.{full-exception-class-name}={code},{msg}
