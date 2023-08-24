@@ -61,4 +61,10 @@ public class VerifyCodeImplConfig {
     public MultiMatrixMarkerVerifyCodeGenerator multiMatrixMarkerVerifyCodeGenerator() {
         return new MultiMatrixMarkerVerifyCodeGenerator();
     }
+
+    @ConditionalOnExpression("${i2f.springboot.config.verifycode.impl.math-calc.enable:true}")
+    @Bean
+    public MathCalcVerifyCodeGenerator mathCalcVerifyCodeGenerator() {
+        return new MathCalcVerifyCodeGenerator();
+    }
 }

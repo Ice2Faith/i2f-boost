@@ -1,7 +1,7 @@
 package test.verifycode;
 
 import i2f.core.verifycode.data.VerifyCodeDto;
-import i2f.core.verifycode.impl.MultiMatrixMarkerVerifyCodeGenerator;
+import i2f.core.verifycode.impl.MathCalcVerifyCodeGenerator;
 import i2f.core.verifycode.std.IVerifyCodeGenerator;
 
 import javax.imageio.ImageIO;
@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class TestVerifyCode {
     public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
-        IVerifyCodeGenerator generator = new MultiMatrixMarkerVerifyCodeGenerator();
+        IVerifyCodeGenerator generator = new MathCalcVerifyCodeGenerator();
 
         VerifyCodeDto dto = generator.generate(0, 0, null);
         System.out.println("问题：" + dto.getQuestion());
