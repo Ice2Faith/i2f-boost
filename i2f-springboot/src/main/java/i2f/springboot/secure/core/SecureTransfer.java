@@ -48,21 +48,17 @@ import java.util.concurrent.locks.ReentrantLock;
 @Component
 public class SecureTransfer implements InitializingBean {
 
-    @Autowired
-    private JacksonJsonSerializer serializer;
-
-    @Autowired
-    private SecureConfig secureConfig;
-
     public static final String SECURE_KEY_PREFIX = "secure:key:";
     public static final String SECURE_SLF_CURR_KEY = SECURE_KEY_PREFIX + "slf:current";
     public static final String SECURE_SLF_HIS_KEY_PREFIX = SECURE_KEY_PREFIX + "slf:history:";
     public static final String SECURE_CLI_KEY_PREFIX = SECURE_KEY_PREFIX + "cli:key:";
     public static final String SECURE_CLI_KEY_IP_BIND_PREFIX = SECURE_KEY_PREFIX + "cli:ip:";
     @Autowired
+    private JacksonJsonSerializer serializer;
+    @Autowired
+    private SecureConfig secureConfig;
+    @Autowired
     private ICache<String, Object> cache;
-
-
     private ScheduledExecutorService pool;
 
     // 一个IP仅有一个key可以使用，也就是会剔除老的key
@@ -75,11 +71,11 @@ public class SecureTransfer implements InitializingBean {
     }
 
 
-
     public File getSlfAsymStoreFile() {
         File file = new File(secureConfig.getAsymStorePath(), SecureConsts.ASYM_KEY_FILE_NAME);
         return file;
     }
+
 
     public void scheduleSlfAsymUpdate() {
         pool = Executors.newSingleThreadScheduledExecutor(new NamingThreadFactory("secure", "refresh"));
@@ -290,8 +286,8 @@ public class SecureTransfer implements InitializingBean {
         for (String header : oldHeaders) {
             String[] arr = header.split(",");
             for (String item : arr) {
-                String str=item.trim();
-                if(!StringUtils.isEmpty(str)){
+                String str = item.trim();
+                if (!StringUtils.isEmpty(str)) {
                     headers.add(str);
                 }
             }

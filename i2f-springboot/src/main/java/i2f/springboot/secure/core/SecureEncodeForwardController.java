@@ -1,9 +1,11 @@
 package i2f.springboot.secure.core;
 
 
+import i2f.springboot.secure.SecureConfig;
 import i2f.springboot.secure.util.SecureUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +20,7 @@ import java.io.IOException;
  * @author ltb
  * @date 2021/10/8
  */
+@ConditionalOnBean(SecureConfig.class)
 @ConditionalOnExpression("${i2f.springboot.config.secure.enc-url-forward.enable:true}")
 @Slf4j
 @Controller

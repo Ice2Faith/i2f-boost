@@ -86,7 +86,7 @@ public class SecureConfig {
     @Autowired
     private AutowireCapableBeanFactory autowireCapableBeanFactory;
 
-    @Bean
+//    @Bean
     public FilterRegistrationBean<SecureTransferFilter> filterFilterRegistrationBean() {
         SecureTransferFilter filter = new SecureTransferFilter();
         autowireCapableBeanFactory.autowireBean(filter);

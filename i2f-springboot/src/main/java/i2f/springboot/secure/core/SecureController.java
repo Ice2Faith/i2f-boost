@@ -6,6 +6,7 @@ import i2f.springboot.secure.annotation.SecureParams;
 import i2f.springboot.secure.consts.SecureErrorCode;
 import i2f.springboot.secure.exception.SecureException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
  * @date 2022/6/30 11:34
  * @desc
  */
+@ConditionalOnBean(SecureConfig.class)
 @ConditionalOnExpression("${i2f.springboot.config.secure.api.enable:true}")
 @RestController
 @RequestMapping("secure")
@@ -49,7 +51,7 @@ public class SecureController {
 
     @SecureParams(in = false, out = false)
     @PostMapping("swapKey")
-    public String swapKey(HttpServletRequest request, @RequestBody Pair<String,Object> pair) throws Exception {
+    public String swapKey(HttpServletRequest request, @RequestBody Pair<String, Object> pair) throws Exception {
         String pubKey = secureTransfer.getWebAsymPublicKeyAndSwap(request, pair.key);
         return pubKey;
     }

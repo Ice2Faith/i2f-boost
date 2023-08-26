@@ -45,11 +45,17 @@ const SecureTransferFilter = {
     }
     for (let i = 0; i < whiteList.length; i++) {
       let wurl = whiteList[i]
-      if (!wurl.startsWith('/')) {
-        wurl = '/' + wurl
-      }
-      if (url == wurl) {
-        return true
+      if (wurl.test) {
+        if (wurl.test(url)) {
+          return true
+        }
+      } else {
+        if (!wurl.startsWith('/')) {
+          wurl = '/' + wurl
+        }
+        if (url == wurl) {
+          return true
+        }
       }
     }
     return false
@@ -61,12 +67,15 @@ const SecureTransferFilter = {
   // 也就是说，如果请求头中，这两个请求头不存在，或者值不为SECURE_HEADER_ENABLE，都将不会处理
   // 也就是手动处理，部分参数的情形
   requestFilter (config) {
+    if (SecureConfig.enable == false) {
+      return config
+    }
     if (config.url.indexOf('?') >= 0) {
       // regular query string
-      let url = config.url
-      let arr = url.split('?', 2)
+      const url = config.url
+      const arr = url.split('?', 2)
       if (arr.length >= 2 && arr[1] != '') {
-        let obj = qs.parse(arr[1])
+        const obj = qs.parse(arr[1])
         config.params = Object.assign({}, obj, config.params)
         config.url = arr[0]
       }
@@ -160,6 +169,9 @@ const SecureTransferFilter = {
   // 分别表示响应头和响应体
   // 当响应头中存在SECURE_DATA_HEADER时，将会自动解密响应体
   responseFilter (res) {
+    if (SecureConfig.enable == false) {
+      return res
+    }
     if (res == null || res == undefined) {
       return
     }

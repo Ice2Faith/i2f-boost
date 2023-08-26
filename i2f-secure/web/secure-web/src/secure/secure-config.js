@@ -4,6 +4,7 @@
 import SecureConsts from './consts/secure-consts'
 
 const SecureConfig = {
+  enable: true,
   // Asymm秘钥长度，默认1024，可选1024,2048
   asymKeySize: SecureConsts.RSA_KEY_SIZE_1024(),
   // Symm秘钥长度，默认128，可选128,192,256
@@ -25,10 +26,11 @@ const SecureConfig = {
   // 是否开启详细日志
   // 在正式环境中，请禁用
   enableDebugLog: process.env.NODE_ENV != 'prod',
+  // 支持两种模式：1 字符串模式，完全匹配；2 正则表达式模式，需要是正则表达式
   // 加密配置的白名单url
   whileList: ['/secure/key', '/secure/clientKey', '/secure/swapKey'],
   // 加密URL的URL白名单
-  encWhiteList: ['/login', '/logout']
+  encWhiteList: ['/login', '/logout', /^\/download\/.*$/]
 }
 
 export default SecureConfig

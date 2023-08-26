@@ -141,7 +141,7 @@ public class SecureUtils {
                 ctrl.out = false;
             }
         }
-        if (!ctrl.in) {
+        if (ctrl.in) {
             Set<String> inPattens = whiteList.getInPattens();
             if (inPattens != null && inPattens.iterator().hasNext()) {
                 if (MatcherUtil.antUrlMatchedAny(requestUrl, inPattens)) {
@@ -149,7 +149,7 @@ public class SecureUtils {
                 }
             }
         }
-        if (!ctrl.out) {
+        if (ctrl.out) {
             Set<String> outPattens = whiteList.getOutPattens();
             if (outPattens != null && outPattens.iterator().hasNext()) {
                 if (MatcherUtil.antUrlMatchedAny(requestUrl, outPattens)) {
@@ -234,8 +234,8 @@ public class SecureUtils {
     }
 
     public static String decodeEncTrueUrl(String encodeUrl) {
-        encodeUrl=CodecUtil.ofUrl(encodeUrl);
-        String text=CodecUtil.ofUtf8(Base64Util.decode(encodeUrl));
+        encodeUrl = CodecUtil.ofUrl(encodeUrl);
+        String text = CodecUtil.ofUtf8(Base64Util.decode(encodeUrl));
         text = Base64Obfuscator.decode(text);
 
         String[] arr = text.split(";");
@@ -257,7 +257,7 @@ public class SecureUtils {
         String url = Base64Obfuscator.encode(Base64Util.encode(CodecUtil.toUtf8(trueUrl)), false);
         String sign = SignatureUtil.sign(url);
         String text = Base64Obfuscator.encode(sign + ";" + url, false);
-        text=Base64Util.encode(CodecUtil.toUtf8(text));
+        text = Base64Util.encode(CodecUtil.toUtf8(text));
         try {
             return URLEncoder.encode(text, "UTF-8");
         } catch (Exception e) {

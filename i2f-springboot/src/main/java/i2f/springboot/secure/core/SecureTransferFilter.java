@@ -18,13 +18,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -38,25 +42,21 @@ import java.util.concurrent.TimeUnit;
  * @date 2022/6/29 13:59
  * @desc Asym+Symm加密的核心过滤器
  */
+@ConditionalOnBean(SecureConfig.class)
 @Slf4j
-//@Component
-//@Order(-1)
-//@WebFilter(
-//        urlPatterns = "/**",
-//        dispatcherTypes = {
-//                DispatcherType.REQUEST,
-//                DispatcherType.FORWARD
-//        }
-//)
+@Component
+@Order(-1)
+@WebFilter(
+        urlPatterns = "/**",
+        dispatcherTypes = {
+                DispatcherType.REQUEST,
+                DispatcherType.FORWARD
+        }
+)
 public class SecureTransferFilter implements Filter, InitializingBean, ApplicationContextAware {
 
-    public static final String X_REAL_FORWARD_URL="X-REAL-FORWARD-URL";
-
-    @Override
-    public void afterPropertiesSet() {
-        log.info("SecureTransferFilter config done.");
-    }
-
+    public static final String X_REAL_FORWARD_URL = "X-REAL-FORWARD-URL";
+    public static final String NONCE_CACHE_KEY_PREFIX = "secure:nonce:";
     @Autowired
     private SecureTransfer secureTransfer;
 
@@ -70,15 +70,18 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
     private JacksonJsonSerializer serializer;
 
     private ApplicationContext context;
+    @Autowired
+    private ICache<String, Object> cache;
+
+    @Override
+    public void afterPropertiesSet() {
+        log.info("SecureTransferFilter config done.");
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.context = applicationContext;
     }
-
-    public static final String NONCE_CACHE_KEY_PREFIX = "secure:nonce:";
-    @Autowired
-    private ICache<String, Object> cache;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
@@ -101,13 +104,13 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
         }
         boolean isEnc = uri.startsWith(encUrl);
 
-        if(isEnc) {
-            String encodeUrl=uri.substring(encUrl.length());
+        if (isEnc) {
+            String encodeUrl = uri.substring(encUrl.length());
             String trueUrl = SecureUtils.decodeEncTrueUrl(encodeUrl);
             if (!trueUrl.startsWith("/")) {
                 trueUrl = "/" + trueUrl;
             }
-            request.setAttribute(X_REAL_FORWARD_URL,trueUrl);
+            request.setAttribute(X_REAL_FORWARD_URL, trueUrl);
         }
         return isEnc;
     }
@@ -178,8 +181,8 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
             nextResponse = responseProxyWrapper;
         }
 
-        boolean freshClientContext=false;
-        boolean freshServerContext=false;
+        boolean freshClientContext = false;
+        boolean freshServerContext = false;
 
         secureTransfer.setExposeHeader(response);
 
@@ -239,8 +242,8 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
 
                 String signText = "";
                 if (srcText != null) {
-                    if(srcText.trim().startsWith("\"")){
-                        srcText = (String)serializer.deserialize(srcText, String.class);
+                    if (srcText.trim().startsWith("\"")) {
+                        srcText = (String) serializer.deserialize(srcText, String.class);
                     }
                     signText += srcText;
                 }
@@ -254,17 +257,17 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
 
                 String digital = secureTransfer.getRequestDigitalHeader(requestHeader.digital, clientAsymSign);
                 if (digital == null) {
-                    freshClientContext=true;
+                    freshClientContext = true;
                     throw new SecureException(SecureErrorCode.BAD_DIGITAL, "数字签名验证失败，请重试！");
                 }
                 if (!digital.equals(requestHeader.sign)) {
-                    freshClientContext=true;
+                    freshClientContext = true;
                     throw new SecureException(SecureErrorCode.BAD_DIGITAL, "数字签名验证失败，请重试！");
                 }
 
                 String symmKey = secureTransfer.getRequestSecureHeader(requestHeader.randomKey, requestHeader.serverAsymSign);
                 if (symmKey == null) {
-                    freshServerContext=true;
+                    freshServerContext = true;
                     throw new SecureException(SecureErrorCode.BAD_RANDOM_KEY, "随机秘钥无效或已失效，请重试！");
                 }
                 String replaceQueryString = null;
@@ -309,15 +312,15 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                 log.error(e.getClass().getName(), e);
                 // 标记异常头，如果发生异常，标记后在AOP或者RequestAdvice中抛出异常，以进行ExceptionHandler处理
                 requestProxyWrapper.setAttribute(SecureConsts.FILTER_EXCEPTION_ATTR_KEY, e);
-                if(freshClientContext) {
+                if (freshClientContext) {
                     if (secureConfig.isEnableSwapAsymKey()) {
                         response.setHeader(secureConfig.getClientKeyHeaderName(), SecureConsts.FLAG_ENABLE);
                     } else {
                         response.setHeader(secureConfig.getClientKeyHeaderName(), secureTransfer.getWebClientAsymPrivateKey(request));
                     }
                 }
-                if(freshServerContext){
-                    response.setHeader(secureConfig.getDynamicKeyHeaderName(),secureTransfer.getWebAsymPublicKey());
+                if (freshServerContext) {
+                    response.setHeader(secureConfig.getDynamicKeyHeaderName(), secureTransfer.getWebAsymPublicKey());
                 }
             }
             log.debug("mark as decrypted.");
@@ -426,7 +429,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
             response.setHeader(secureConfig.getHeaderName(), header);
             if (requestHeader != null) {
                 if (!responseHeader.serverAsymSign.equals(requestHeader.serverAsymSign)) {
-                    if(!freshServerContext){
+                    if (!freshServerContext) {
                         response.setHeader(secureConfig.getDynamicKeyHeaderName(), secureTransfer.getWebAsymPublicKey());
                     }
                 }
