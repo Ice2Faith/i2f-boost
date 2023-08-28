@@ -1,13 +1,12 @@
 package i2f.core.j2ee.firewall.util;
 
 
-import i2f.core.j2ee.firewall.exception.CrLfXssFirewallException;
-import i2f.core.j2ee.firewall.exception.FileSuffixFirewallException;
-import i2f.core.j2ee.firewall.exception.FirewallException;
-import i2f.core.j2ee.firewall.exception.UrlInjectFirewallException;
+import i2f.core.j2ee.firewall.context.FirewallContext;
+import i2f.core.j2ee.firewall.exception.*;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Set;
 
 /**
  * @author Ice2Faith
@@ -21,7 +20,7 @@ public class FirewallUtils {
             return;
         }
         value = value.toLowerCase();
-        char[] badChars = {'\r', '\n'};
+        char[] badChars = FirewallContext.DEFAULT_BAD_CRLF_CHARS;
         for (char ch : badChars) {
             String str = ch + "";
             assertCrLfXss(errorMsg, value, str);
@@ -61,14 +60,18 @@ public class FirewallUtils {
     }
 
 
-    public static void assertUrlInject(String errorMsg, String value) {
+    public static void assertUrlInject(String errorMsg, String value, boolean filePath) {
         if (value == null || "".equals(value)) {
             return;
         }
         value = value.toLowerCase();
+        if (filePath) {
+            value = value.replaceAll("\\\\", "/");
+        }
+
 
         // bad chars
-        char[] badChars = {';', '\\', '\r', '\n', '%', '?', '$', '<', '>', '|', '&', '\'', '"', '{', '}', '!', (char) 0};
+        char[] badChars = FirewallContext.DEFAULT_BAD_URL_CHARS;
         for (char ch : badChars) {
             String str = ch + "";
             assertUrl(errorMsg, value, str);
@@ -93,7 +96,7 @@ public class FirewallUtils {
             }
         }
         // bad strs
-        String[] badStrs = {"./", "../", "//"};
+        String[] badStrs = FirewallContext.DEFAULT_BAD_URL_STRS;
         for (String item : badStrs) {
             String str = item;
             assertUrl(errorMsg, value, str);
@@ -136,7 +139,7 @@ public class FirewallUtils {
         if (!isFilePart) {
             return;
         }
-        assertUrlInject("content disposition", fileName);
+        assertUrlInject("content disposition", fileName, true);
     }
 
     public static String parseContentDispositionFileName(String value) {
@@ -148,7 +151,7 @@ public class FirewallUtils {
         for (String item : arr) {
             String name = item.trim();
             if (name.startsWith("filename=")) {
-                fileName = name.substring("filename=".length(), name.length());
+                fileName = name.substring("filename=".length());
                 fileName = fileName.trim();
                 if (fileName.startsWith("\"")) {
                     fileName = fileName.substring(1);
@@ -166,6 +169,7 @@ public class FirewallUtils {
         if (filePath == null || "".equals(filePath)) {
             return;
         }
+        filePath = filePath.replaceAll("\\\\", "/");
         String[] charsets = {"", "UTF-8", "GBK", "ISO-8859-1"};
         for (String charset : charsets) {
             String fileName = filePath;
@@ -197,19 +201,7 @@ public class FirewallUtils {
 
     private static void assertMatchedFilename(String errorMsg, String name) {
         // bad filenames
-        String[] badFilenames = {
-                // linux
-                "passwd", "shadow", "group", "hosts", "crontab", "fstab", "sudoers", "shells", "sysctl.conf", "ld.so.preload",
-                "host.conf", "hostname", "resolv.conf",
-                "sshd_config", "id_rsa", "id_rsa.pub", "authorized_keys", "identity", "identity.pub",
-                ".bashrc", "profile", "root",
-                // windows
-                "sam", "system", "ntuser.dat", "pagefile.sys", "hiberfil.sys", "boot.ini", "win.ini", "msdos.sys", "user.dat",
-                "explorer.exe", "cmd.exe", "regedit.exe", "notepad.exe", "winver.exe", "rundll32.exe",
-                // common
-                "password", "password.txt", "pwd.txt", "passwd.txt", "httpd.conf", "nginx.conf", "config.xml", "ssl.conf",
-                "user.myd", "redis.conf",
-        };
+        Set<String> badFilenames = FirewallContext.getBadFilenames();
         if (name != null && !"".equalsIgnoreCase(name)) {
             for (String badName : badFilenames) {
                 if (badName.equalsIgnoreCase(name)) {
@@ -221,13 +213,7 @@ public class FirewallUtils {
 
     private static void assertFileSuffix(String errorMsg, String suffix) {
         // bad suffixes
-        String[] badSuffixes = {
-                ".java", ".class", ".jar", ".war", ".yml", ".yaml", ".properties", ".xml",
-                ".py", ".php", ".jsp", ".jsf",
-                ".log", ".error", ".err", ".warn", ".info",
-                ".conf", ".cfg", ".ini", ".json", ".cnf", ".inc", ".config",
-                ".sh", ".bat", ".cmd", ".ps", ".exe", ".elf", ".so", ".lib", ".o",
-        };
+        Set<String> badSuffixes = FirewallContext.getBadSuffixes();
 
         if (suffix != null && !"".equalsIgnoreCase(suffix)) {
             for (String badSuffix : badSuffixes) {
@@ -236,5 +222,61 @@ public class FirewallUtils {
                 }
             }
         }
+    }
+
+    public static void assertHttpMethod(String errorMsg, String method) {
+        if ("trace".equalsIgnoreCase(method)) {
+            throw new HttpMethodFirewallException(errorMsg + ", " + "bad http method [" + method + "]");
+        }
+    }
+
+
+    public static void assertPossiblePathParameter(String errorMsg, String parameterValue) {
+        char[] pathSeparators = {'/', '\\'};
+        if (parameterValue == null || "".equals(parameterValue)) {
+            return;
+        }
+        boolean isPath = false;
+        for (char ch : pathSeparators) {
+            String str = ch + "";
+            if (parameterValue.contains(str)) {
+                isPath = true;
+                break;
+            }
+            str = String.format("%%%x", (int) ch).toLowerCase();
+            if (parameterValue.contains(str)) {
+                isPath = true;
+                break;
+            }
+            str = String.format("%%%02x", (int) ch).toLowerCase();
+            if (parameterValue.contains(str)) {
+                isPath = true;
+                break;
+            }
+            str = String.format("0x%x", (int) ch).toLowerCase();
+            if (parameterValue.contains(str)) {
+                isPath = true;
+                break;
+            }
+            str = String.format("0x%02x", (int) ch).toLowerCase();
+            if (parameterValue.contains(str)) {
+                isPath = true;
+                break;
+            }
+            str = ("\\u" + Integer.toHexString((int) ch)).toLowerCase();
+            if (parameterValue.contains(str)) {
+                isPath = true;
+                break;
+            }
+            str = String.format("\\u%04x", (int) ch).toLowerCase();
+            if (parameterValue.contains(str)) {
+                isPath = true;
+                break;
+            }
+        }
+        if (!isPath) {
+            return;
+        }
+        assertUrlInject(errorMsg, parameterValue, true);
     }
 }
