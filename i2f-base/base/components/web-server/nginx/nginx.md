@@ -129,7 +129,7 @@ http {
            autoindex on;
            root /root/apps/demo/dist;
            index index.html index.htm =404;
-           try_files   $uri $uri/ /index.html;
+           try_files   $request_uri $request_uri/ /index.html;
         }
 
     }
@@ -264,16 +264,13 @@ http {
             proxy_pass http://192.168.1.102:8080/;
             
             # 当转发到其他组主机时，一般需要携带如下的头，否则可能丢失客户端的HTTP信息
-            proxy_pass_header Server;
-            proxy_set_header Host $http_host;
+            proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Scheme $scheme;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_redirect off;
             
             # 其他的一些参数
-            proxy_redirect     off;
-            proxy_set_header   Host             $host;
-            proxy_set_header   X-Real-IP        $remote_addr;
-            proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
             proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
             proxy_max_temp_file_size 0;
             proxy_connect_timeout      90;
@@ -343,3 +340,118 @@ http {
     }
 }
 ```
+
+## 前端部署
+```shell script
+http {
+    ...
+    # 直接顶级URL部署
+    server {
+        listen 8080;
+        server_name localhost;
+
+        charset utf-8;
+
+        # 漏洞，非法文件访问，修复：url必须以/结尾，防止访问到其他路径
+        location / {
+           # 漏洞，目录遍历，修复：关闭此选项
+           autoindex off;
+           # 漏洞，非法文件访问，修复：路径必须以/结尾，防止访问到其他路径
+           root /home/apps/web/dist/;
+           index index.html index.htm =404;
+           try_files   $request_uri $request_uri/ /index.html;
+        }
+
+    }
+ 
+    # 二级URL路径部署
+    server {
+       listen 8081;
+       server_name localhost;
+  
+       charset utf-8;
+  
+       location /app/ {
+          autoindex off;
+          # 其实alias和root一样
+          alias /home/apps/app/dist/;
+          index index.html index.htm =404;
+          # 二级路径时，需要带上二级路径的尝试/app/
+          try_files  $request_uri $request_uri/ /app/index.html;
+       }
+    }
+}
+```
+
+## 漏洞解析
+- $uri 引发的CRLF漏洞
+```shell script
+解析：
+$uri $document_uri 都会 decode-uri
+也就会导致解析出/r/n
+导致XSS注入的可能
+/r/n === %0d%0a
+
+$request_uri 则是原始的uri，不会进行decode-uri
+
+复现：
+http://localhost/index.html%0d%0aSet-Cookie:%20user=admin
+
+后果：
+这样，就成功的设置了cookie
+Set-Cookie: user=admin
+
+修复：
+使用 $request_uri 替换 $uri $document_uri
+```
+- 目录跨越漏洞
+```shell script
+解析：
+可能发生的位置，将使用 [loc] 进行标记
+以下是可能发生的位置
+localtion [loc]
+alias [loc]
+root [loc]
+proxy_pass [loc]
+这些位置，如果配置的不是/结尾，将可能导致目录跨越
+
+复现：
+配置如下：
+location /app {
+   alias /home/app/;
+}
+由于，location配置的是/app
+则就可以导致目录跨域
+http://localhost/app../
+而如果，alias没有以/结尾，将导致相同前缀的路径的跨越
+http://localhost/app-wechat/index.html
+
+修复：
+配置中，尽量全部以/结尾，避免目录跨越
+location /app/ {
+  alias /home/app/;
+}
+```
+- 头部覆盖漏洞
+```shell script
+解析：
+在server节点中配置的add_header会被在location节点中配置的add_header覆盖
+从而导致，在server节点中配置的全局header失效，从而导致头部覆盖，丢失原本应有的头部
+
+复现：
+配置如下：
+server {
+  add_header Content-Security-Policy "default-src 'self'";
+  add_header X-Frame-Options DENY;
+  
+  location = /app {
+      add_header Content-Security-Policy nosniff;
+      rewrite ^(.*)$ /xss.html break;
+  }
+}
+这里，location中配置了add_header头部
+导致server中配置的头部被覆盖，从而导致这个配置丢失，这个头部原本是用来做XSS防御的
+需要注意的是，一旦子节点中配置了add_header，则所有父节点的add_header都失效
+而不是相同的header才会被覆盖
+```
+
