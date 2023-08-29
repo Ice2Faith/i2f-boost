@@ -70,6 +70,23 @@ const SecureTransferFilter = {
     if (SecureConfig.enable == false) {
       return config
     }
+    if (config.url.indexOf('://') >= 0) {
+      if (config.baseURL && config.baseURL != '') {
+        if (config.url.startsWith(config.baseURL)) {
+          config.url = config.url.substring(config.baseURL.length)
+        }
+      }
+      let idx = config.url.indexOf('://')
+      let purl = config.url
+      if (idx >= 0) {
+        purl = purl.substring(idx + '://'.length)
+        idx = purl.indexOf('/')
+        if (idx >= 0) {
+          purl = purl.substring(idx)
+          config.url = purl
+        }
+      }
+    }
     if (config.url.indexOf('?') >= 0) {
       // regular query string
       const url = config.url
