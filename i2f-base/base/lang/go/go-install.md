@@ -149,7 +149,7 @@ pwd
 vi /etc/profile
 ```
 ```shell script
-export PATH=$PATH:/root/env/go-1.19
+export PATH=$PATH:/root/env/go-1.19/bin
 ```
 - 应用环境变量
 ```shell script
