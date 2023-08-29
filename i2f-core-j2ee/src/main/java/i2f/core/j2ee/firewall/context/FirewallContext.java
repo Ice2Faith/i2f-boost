@@ -35,7 +35,7 @@ public class FirewallContext {
 
     public static final char[] DEFAULT_BAD_CRLF_CHARS = {'\r', '\n'};
 
-    public static final char[] DEFAULT_BAD_URL_CHARS = {';', '\\', '\r', '\n', '%', '?', '$', '<', '>', '|', '&', '\'', '"', '{', '}', '!', (char) 0};
+    public static final char[] DEFAULT_BAD_URL_CHARS = {';', '\\', '\r', '\n', '?', '$', '<', '>', '|', '&', '\'', '"', '{', '}', '!', (char) 0};
 
     public static final String[] DEFAULT_BAD_URL_STRS = {"./", "../", "//", ".\\", "..\\", "\\\\"};
 

@@ -118,6 +118,13 @@ public class FirewallUtils {
     }
 
     public static void assertUrlBadStrs(String errorMsg, String value) {
+        if (value == null || "".equals(value)) {
+            return;
+        }
+        int idx = value.indexOf("://");
+        if (idx >= 0) {
+            value = value.substring(idx + "://".length());
+        }
         // bad strs
         String[] badStrs = FirewallContext.DEFAULT_BAD_URL_STRS;
         for (String item : badStrs) {

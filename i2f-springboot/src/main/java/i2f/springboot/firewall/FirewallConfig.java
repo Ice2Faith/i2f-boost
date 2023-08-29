@@ -12,6 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import javax.servlet.DispatcherType;
 import java.util.HashSet;
@@ -37,6 +38,7 @@ public class FirewallConfig implements InitializingBean {
     private boolean enableMultipart = true;
     private boolean enableParameter = true;
     private boolean enableQueryString = true;
+    private boolean enableRequestHeader = true;
 
     private Set<String> addBadSuffixes = new HashSet<>();
     private Set<String> removeBadSuffixes = new HashSet<>();
@@ -52,6 +54,8 @@ public class FirewallConfig implements InitializingBean {
         FirewallContext.enableMultipart = enableMultipart;
         FirewallContext.enableParameter = enableParameter;
         FirewallContext.enableQueryString = enableQueryString;
+        FirewallContext.enableRequestHeader = enableRequestHeader;
+
         if (addBadSuffixes != null) {
             FirewallContext.addBadSuffixes.addAll(addBadSuffixes);
         }
@@ -68,10 +72,16 @@ public class FirewallConfig implements InitializingBean {
         log.info("FirewallConfig config done.");
     }
 
+    @Order(-1)
     @Bean
-    public FilterRegistrationBean<FirewallFilter> filterFilterRegistrationBean() {
+    public FirewallFilter firewallFilter() {
         FirewallFilter filter = new FirewallFilter();
         autowireCapableBeanFactory.autowireBean(filter);
+        return filter;
+    }
+
+    @Bean
+    public FilterRegistrationBean<FirewallFilter> filterFilterRegistrationBean(FirewallFilter filter) {
         FilterRegistrationBean<FirewallFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.addUrlPatterns("/**");

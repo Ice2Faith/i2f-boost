@@ -1,7 +1,9 @@
 package i2f.core.j2ee.firewall;
 
+import i2f.core.j2ee.firewall.exception.FirewallException;
 import i2f.core.j2ee.firewall.wrapper.FirewallHttpServletRequestWrapper;
 import i2f.core.j2ee.firewall.wrapper.FirewallHttpServletResponseWrapper;
+import i2f.core.network.net.http.HttpStatus;
 import lombok.Data;
 
 import javax.servlet.*;
@@ -43,7 +45,15 @@ public class FirewallFilter implements Filter {
             }
         }
 
-        doInnerFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        try {
+            doInnerFilter(httpRequest, httpResponse, chain);
+        } catch (FirewallException e) {
+            httpResponse.setStatus(HttpStatus.BAD_REQUEST);
+            httpResponse.setContentType("text/plain;charset=UTF-8");
+            httpResponse.getWriter().write(e.getMessage());
+        }
     }
 
     public void doInnerFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
