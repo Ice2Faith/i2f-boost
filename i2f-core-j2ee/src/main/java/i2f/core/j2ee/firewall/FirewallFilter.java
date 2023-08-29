@@ -3,7 +3,6 @@ package i2f.core.j2ee.firewall;
 import i2f.core.j2ee.firewall.wrapper.FirewallHttpServletRequestWrapper;
 import i2f.core.j2ee.firewall.wrapper.FirewallHttpServletResponseWrapper;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -16,7 +15,6 @@ import java.io.IOException;
  * @date 2023/8/28 10:02
  * @desc
  */
-@Slf4j
 @Data
 @WebFilter(
         urlPatterns = "/**",
