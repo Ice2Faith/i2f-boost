@@ -69,9 +69,29 @@ public class FirewallUtils {
             value = value.replaceAll("\\\\", "/");
         }
 
+        assertUrlBadChars(errorMsg, value);
 
+        assertUrlBadStrs(errorMsg, value);
+
+        assertFileName(errorMsg, value);
+    }
+
+    public static void assertUrlBadChars(String errorMsg, String value) {
+        assertBadChars(FirewallContext.DEFAULT_BAD_URL_CHARS, errorMsg, value);
+    }
+
+    public static void assertHeaderBadChars(String errorMsg, String value) {
+        assertBadChars(FirewallContext.DEFAULT_BAD_HEADER_CHARS, errorMsg, value);
+    }
+
+    public static void assertBadChars(char[] badChars, String errorMsg, String value) {
+        if (value == null || "".equals(value)) {
+            return;
+        }
+        if (badChars == null) {
+            badChars = new char[]{(char) 0};
+        }
         // bad chars
-        char[] badChars = FirewallContext.DEFAULT_BAD_URL_CHARS;
         for (char ch : badChars) {
             String str = ch + "";
             assertUrl(errorMsg, value, str);
@@ -95,14 +115,15 @@ public class FirewallUtils {
                 throw new UrlInjectFirewallException(errorMsg + ", " + "[" + value + "] contains [" + String.format("%02x", (int) ch) + "]");
             }
         }
+    }
+
+    public static void assertUrlBadStrs(String errorMsg, String value) {
         // bad strs
         String[] badStrs = FirewallContext.DEFAULT_BAD_URL_STRS;
         for (String item : badStrs) {
             String str = item;
             assertUrl(errorMsg, value, str);
         }
-
-        assertFileName(errorMsg, value);
     }
 
     public static void assertUrl(String errorMsg, String value, String str) {
@@ -279,4 +300,51 @@ public class FirewallUtils {
         }
         assertUrlInject(errorMsg, parameterValue, true);
     }
+
+    public static void assertRequestHeader(String errorMsg, String headerName, String headerValue) {
+        if (headerName == null || "".equalsIgnoreCase(headerName)) {
+            return;
+        }
+        headerName = headerName.trim();
+        if ("host".equalsIgnoreCase(headerName)) {
+            assertHost(errorMsg, headerName, headerValue);
+            return;
+        }
+        if ("x-forwarded-for".equalsIgnoreCase(headerName)) {
+            assertHost(errorMsg, headerName, headerValue);
+            return;
+        }
+        if ("WL-Proxy-Client-IP".equalsIgnoreCase(headerName)) {
+            assertHost(errorMsg, headerName, headerValue);
+            return;
+        }
+        if ("X-Real-IP".equalsIgnoreCase(headerName)) {
+            assertHost(errorMsg, headerName, headerValue);
+            return;
+        }
+        if ("x-forwarded-host".equalsIgnoreCase(headerName)) {
+            assertHost(errorMsg, headerName, headerValue);
+            return;
+        }
+        if ("Referer".equalsIgnoreCase(headerName)) {
+            assertUrlInject(errorMsg, headerValue, false);
+            return;
+        }
+        if ("Origin".equalsIgnoreCase(headerName)) {
+            assertUrlInject(errorMsg, headerValue, false);
+            return;
+        }
+        assertHeaderBadChars(errorMsg, headerValue);
+    }
+
+    public static void assertHost(String errorMsg, String headerName, String headerValue) {
+        if (headerValue == null || "".equals(headerValue)) {
+            return;
+        }
+        headerValue = headerValue.trim();
+
+        assertUrlBadChars(errorMsg, headerValue);
+    }
+
+
 }

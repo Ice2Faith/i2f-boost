@@ -454,4 +454,48 @@ server {
 需要注意的是，一旦子节点中配置了add_header，则所有父节点的add_header都失效
 而不是相同的header才会被覆盖
 ```
+- XSS漏洞防范配置
+    - 配置到 location 节点即可
+```shell script
+ #只允许本网站的frame嵌套
+ add_header X-Frame-Options 'SAMEORIGIN';
+ #开启XSS过滤器
+ add_header X-XSS-Protection '1; mode=block';
+ #禁止嗅探文件类型
+ add_header X-Content-Type-Options 'nosniff';
+
+  # 判断 referer
+ if ($http_referer !~ ^(https?://(www.)?example.com))
+ { return 403; }
+
+ # 判断url和请求参数
+ set $block_xss 0;
+
+ if ($query_string ~ "base64_(en|de)code(.*)")
+ { set $block_xss 1; }
+
+ if ($request_uri ~ "base64_(en|de)code(.*)")
+ { set $block_xss 1; }
+ 
+ if ($query_string ~ "(<|%3C)*.script.*(/?>|%3E)")
+ { set $block_xss 1; }
+
+ if ($request_uri ~ "(<|%3C)*.script.*(/?>|%3E)")
+ { set $block_xss 1; }
+
+ if ($query_string ~ "(<|%3C)*.iframe.*(/?>|%3E)")
+ { set $block_xss 1; }
+
+ if ($request_uri ~ "(<|%3C)*.iframe.*(/?>|%3E)")
+ { set $block_xss 1; }
+
+ if ($query_string ~ "GLOBALS(=|[|%[0-9A-Z]{0,2})")
+ { set $block_xss 1; }
+
+ if ($query_string ~ "_REQUEST(=|[|%[0-9A-Z]{0,2})")
+ { set $block_xss 1; }
+
+ if ($block_xss = 1)
+ { return 403; }
+```
 

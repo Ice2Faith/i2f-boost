@@ -39,11 +39,15 @@ public class FirewallContext {
 
     public static final String[] DEFAULT_BAD_URL_STRS = {"./", "../", "//", ".\\", "..\\", "\\\\"};
 
+    public static final char[] DEFAULT_BAD_HEADER_CHARS = {'\\', '\r', '\n', '<', '>', '|', '{', '}', '!', '\'', (char) 0};
+
+
     public static boolean enableUrl = true;
     public static boolean enableMethod = true;
     public static boolean enableMultipart = true;
     public static boolean enableParameter = true;
     public static boolean enableQueryString = true;
+    public static boolean enableRequestHeader = true;
 
     public static Set<String> addBadSuffixes = new HashSet<>();
     public static Set<String> removeBadSuffixes = new HashSet<>();

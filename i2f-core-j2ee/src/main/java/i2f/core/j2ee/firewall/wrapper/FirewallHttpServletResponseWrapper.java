@@ -25,12 +25,19 @@ public class FirewallHttpServletResponseWrapper extends HttpServletResponseWrapp
         FirewallUtils.assertCrLfXssInject("cookie path", cookie.getPath());
         FirewallUtils.assertCrLfXssInject("cookie domain", cookie.getDomain());
         FirewallUtils.assertCrLfXssInject("cookie comment", cookie.getComment());
+        FirewallUtils.assertHeaderBadChars("cookie name", cookie.getName());
+        FirewallUtils.assertHeaderBadChars("cookie value", cookie.getValue());
+        FirewallUtils.assertHeaderBadChars("cookie path", cookie.getPath());
+        FirewallUtils.assertHeaderBadChars("cookie domain", cookie.getDomain());
+        FirewallUtils.assertHeaderBadChars("cookie comment", cookie.getComment());
+
         super.addCookie(cookie);
     }
 
     @Override
     public void sendRedirect(String location) throws IOException {
         FirewallUtils.assertCrLfXssInject("redirect location", location);
+        FirewallUtils.assertHeaderBadChars("redirect location", location);
         super.sendRedirect(location);
     }
 
@@ -39,6 +46,8 @@ public class FirewallHttpServletResponseWrapper extends HttpServletResponseWrapp
         FirewallUtils.assertCrLfXssInject("header name", name);
         FirewallUtils.assertCrLfXssInject("header value", value);
         FirewallUtils.assertContentDispositionHeader(name, value);
+        FirewallUtils.assertHeaderBadChars("header name", name);
+        FirewallUtils.assertHeaderBadChars("header value", value);
         super.setHeader(name, value);
     }
 
@@ -47,12 +56,15 @@ public class FirewallHttpServletResponseWrapper extends HttpServletResponseWrapp
         FirewallUtils.assertCrLfXssInject("header name", name);
         FirewallUtils.assertCrLfXssInject("header value", value);
         FirewallUtils.assertContentDispositionHeader(name, value);
+        FirewallUtils.assertHeaderBadChars("header name", name);
+        FirewallUtils.assertHeaderBadChars("header value", value);
         super.addHeader(name, value);
     }
 
     @Override
     public void setContentType(String type) {
         FirewallUtils.assertCrLfXssInject("content-type", type);
+        FirewallUtils.assertHeaderBadChars("content-type", type);
         super.setContentType(type);
     }
 

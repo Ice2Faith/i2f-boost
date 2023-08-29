@@ -39,11 +39,26 @@ public class FirewallHttpServletRequestWrapper extends HttpServletRequestWrapper
             assertHttpServletParameters(request);
         }
         if (FirewallContext.enableQueryString) {
-            assertHttpSevletQueryString(request);
+            assertHttpServletQueryString(request);
+        }
+        if (FirewallContext.enableRequestHeader) {
+            assertHttpServletHeader(request);
         }
     }
 
-    public static void assertHttpSevletQueryString(HttpServletRequest request) {
+    public static void assertHttpServletHeader(HttpServletRequest request) {
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            Enumeration<String> headers = request.getHeaders(headerName);
+            while (headers.hasMoreElements()) {
+                String header = headers.nextElement();
+                FirewallUtils.assertRequestHeader("request header", headerName, header);
+            }
+        }
+    }
+
+    public static void assertHttpServletQueryString(HttpServletRequest request) {
         String queryString = request.getQueryString();
         if (queryString != null && !"".equals(queryString)) {
             String[] arr = queryString.split("&");
