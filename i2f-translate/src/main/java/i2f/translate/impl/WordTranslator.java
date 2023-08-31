@@ -2,9 +2,9 @@ package i2f.translate.impl;
 
 import i2f.core.database.jdbc.data.DBResultList;
 import i2f.core.io.file.FileUtil;
+import i2f.core.match.regex.data.RegexFindPartMeta;
 import i2f.core.resource.ResourceUtil;
 import i2f.core.type.str.Strings;
-import i2f.core.type.str.data.RegexFindPartMeta;
 import i2f.core.type.tuple.impl.Tuple2;
 
 import java.io.File;

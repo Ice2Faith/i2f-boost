@@ -1,8 +1,8 @@
 package i2f.core.serialize.str.xml.impl.parser;
 
 import i2f.core.generate.RegexGenerator;
+import i2f.core.match.regex.data.RegexMatchItem;
 import i2f.core.type.str.Strings;
-import i2f.core.type.str.data.RegexMatchItem;
 
 import java.util.HashMap;
 import java.util.List;

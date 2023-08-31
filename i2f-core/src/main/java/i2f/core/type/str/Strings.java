@@ -6,16 +6,13 @@ import i2f.core.check.CheckUtil;
 import i2f.core.container.array.ArrayUtil;
 import i2f.core.data.Pair;
 import i2f.core.lang.functional.common.IMapper;
-import i2f.core.type.str.data.RegexFindPartMeta;
-import i2f.core.type.str.data.RegexMatchItem;
+import i2f.core.match.regex.RegexUtil;
+import i2f.core.match.regex.data.RegexFindPartMeta;
+import i2f.core.match.regex.data.RegexMatchItem;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Author("i2f")
 public class Strings {
@@ -432,22 +429,7 @@ public class Strings {
     }
 
     public static List<RegexMatchItem> regexFinds(String str, String regex){
-        List<RegexMatchItem> ret=new ArrayList<>();
-        Pattern patten=Pattern.compile(regex);
-        Matcher matcher=patten.matcher(str);
-        while (matcher.find()){
-            MatchResult result=matcher.toMatchResult();
-
-            RegexMatchItem item=new RegexMatchItem();
-            item.srcStr=str;
-            item.regexStr=regex;
-            item.matchStr=matcher.group();
-            item.idxStart= result.start();
-            item.idxEnd= result.end();
-
-            ret.add(item);
-        }
-        return ret;
+        return RegexUtil.regexFinds(str, regex);
     }
 
     /**
@@ -458,34 +440,7 @@ public class Strings {
      * @return
      */
     public static List<RegexFindPartMeta> regexFindParts(String str, String regex){
-        List<RegexFindPartMeta> ret=new ArrayList<>(64);
-        Pattern patten=Pattern.compile(regex);
-        Matcher matcher=patten.matcher(str);
-        int lidx=0;
-        while (matcher.find()){
-            MatchResult result=matcher.toMatchResult();
-
-            RegexFindPartMeta oth=new RegexFindPartMeta();
-            oth.part=str.substring(lidx,result.start());
-            oth.isMatch=false;
-            ret.add(oth);
-
-            lidx=result.end();
-            String group=matcher.group();
-
-            RegexFindPartMeta mth=new RegexFindPartMeta();
-            mth.part=group;
-            mth.isMatch=true;
-            ret.add(mth);
-
-        }
-
-        RegexFindPartMeta oth=new RegexFindPartMeta();
-        oth.part=str.substring(lidx);
-        oth.isMatch=false;
-        ret.add(oth);
-
-        return ret;
+        return RegexUtil.regexFindParts(str, regex);
     }
 
     /**
@@ -502,16 +457,7 @@ public class Strings {
      * @return
      */
     public static String regexFindAndReplace(String str, String regex, IMapper<String, String> mapper) {
-        List<RegexFindPartMeta> list = regexFindParts(str, regex);
-        StringBuilder builder = new StringBuilder();
-        for (RegexFindPartMeta item : list) {
-            if (!item.isMatch) {
-                builder.append(item.part);
-            } else {
-                builder.append(mapper.get(item.part));
-            }
-        }
-        return builder.toString();
+        return RegexUtil.regexFindAndReplace(str, regex, mapper);
     }
 
     /**

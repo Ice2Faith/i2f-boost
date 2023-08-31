@@ -1,4 +1,4 @@
-package i2f.core.type.str.data;
+package i2f.core.match.regex.data;
 
 import i2f.core.annotations.remark.Author;
 import lombok.Data;

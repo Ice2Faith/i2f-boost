@@ -17,6 +17,9 @@ import i2f.core.codec.compress.zip.ZipByteByteCodec;
 import i2f.core.codec.ex.stream.compress.deflate.DeflateStreamCodecEx;
 import i2f.core.codec.ex.stream.compress.gzip.GzipStreamCodecEx;
 import i2f.core.codec.ex.stream.compress.zip.ZipStreamCodecEx;
+import i2f.core.codec.str.code.UCodeStringCodec;
+import i2f.core.codec.str.code.XCodeStringCodec;
+import i2f.core.codec.str.html.HtmlStringStringCodec;
 import i2f.core.codec.str.url.UrlStringStringCodec;
 import i2f.core.serialize.bytes.jdk.JdkBytesObjectSerializer;
 
@@ -233,5 +236,29 @@ public class CodecUtil {
 
     public static <T> T jdkDeserialize(byte[] data) {
         return (T) JdkBytesObjectSerializer.INSTANCE.decode(data);
+    }
+
+    public static String toHtml(String str) {
+        return HtmlStringStringCodec.INSTANCE.encode(str);
+    }
+
+    public static String ofHtml(String str) {
+        return HtmlStringStringCodec.INSTANCE.decode(str);
+    }
+
+    public static String toUCodeString(String str) {
+        return UCodeStringCodec.INSTANCE.encode(str);
+    }
+
+    public static String ofUCodeString(String str) {
+        return UCodeStringCodec.INSTANCE.decode(str);
+    }
+
+    public static String toXCodeString(String str) {
+        return XCodeStringCodec.INSTANCE.encode(str);
+    }
+
+    public static String ofXCodeString(String str) {
+        return XCodeStringCodec.INSTANCE.decode(str);
     }
 }
