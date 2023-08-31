@@ -48,7 +48,7 @@ public class XxeFirewallAsserter implements IStringFirewallAsserter {
             List<RegexMatchItem> matchItems = RegexUtil.regexFinds(text, XXE_MATCH_PATTEN);
             for (RegexMatchItem item : matchItems) {
                 String express = item.matchStr;
-                throw new XxeFirewallException(errorMsg + ", " + " contains illegal class [" + express + "]");
+                throw new XxeFirewallException(errorMsg + ", " + " contains illegal xxe express [" + express + "]");
             }
         }
     }
