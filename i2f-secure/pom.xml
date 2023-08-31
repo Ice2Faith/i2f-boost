@@ -52,21 +52,25 @@
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-core</artifactId>
-			<scope>provided</scope>
+            <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-core-j2ee</artifactId>
-			<scope>provided</scope>
+            <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-spring</artifactId>
-			<scope>provided</scope>
+            <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-springboot</artifactId>
+            <version>1.0</version>
             <scope>provided</scope>
         </dependency>
 
