@@ -4,10 +4,13 @@ import i2f.core.security.jce.bc.BouncyCastleHolder;
 import i2f.core.security.jce.encrypt.CipherUtil;
 import i2f.core.security.jce.encrypt.CipherWorker;
 import i2f.core.security.jce.encrypt.std.asymmetric.basic.BasicAsymmetricEncryptor;
+import i2f.core.security.jce.encrypt.std.asymmetric.data.AsymKeyPair;
 
 import javax.crypto.Cipher;
-import java.security.*;
-import java.security.spec.InvalidKeySpecException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -22,29 +25,30 @@ public class BcRsaEncryptor extends BasicAsymmetricEncryptor {
         providerName = BouncyCastleHolder.PROVIDER_NAME;
     }
 
-    public BcRsaEncryptor(byte[] publicBytes, byte[] privateBytes) {
-        super(BcRsaType.ECB_PKCS1PADDING, publicBytes, privateBytes);
+    public BcRsaEncryptor() {
+        super(BcRsaType.ECB_PKCS1PADDING);
     }
 
-    public BcRsaEncryptor(BcRsaType type, byte[] publicBytes, byte[] privateBytes) {
-        super(type, publicBytes, privateBytes);
-    }
-
-    public BcRsaEncryptor(PublicKey publicKey, PrivateKey privateKey) {
-        super(BcRsaType.ECB_PKCS1PADDING, publicKey, privateKey);
-    }
-
-    public BcRsaEncryptor(BcRsaType type, PublicKey publicKey, PrivateKey privateKey) {
-        super(type, publicKey, privateKey);
+    public BcRsaEncryptor(BcRsaType type) {
+        super(type);
     }
 
     public BcRsaEncryptor(KeyPair keyPair) {
-        this(keyPair.getPublic(), keyPair.getPrivate());
+        super(BcRsaType.ECB_PKCS1PADDING, keyPair);
     }
 
     public BcRsaEncryptor(BcRsaType type, KeyPair keyPair) {
         super(type, keyPair);
     }
+
+    public BcRsaEncryptor(AsymKeyPair keyPair) {
+        super(BcRsaType.ECB_PKCS1PADDING, keyPair);
+    }
+
+    public BcRsaEncryptor(BcRsaType type, AsymKeyPair keyPair) {
+        super(type, keyPair);
+    }
+
 
     @Override
     public byte[] publicDecrypt(byte[] data) throws Exception {
@@ -88,12 +92,14 @@ public class BcRsaEncryptor extends BasicAsymmetricEncryptor {
         return cipher;
     }
 
-    public PublicKey getPublicKey(byte[] codes) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    @Override
+    public PublicKey getPublicKey(byte[] codes) throws Exception {
         PublicKey pubKey = KeyFactory.getInstance(type.algorithmName()).generatePublic(new X509EncodedKeySpec(codes));
         return pubKey;
     }
 
-    public PrivateKey getPrivateKey(byte[] codes) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    @Override
+    public PrivateKey getPrivateKey(byte[] codes) throws Exception {
         PrivateKey priKey = KeyFactory.getInstance(type.algorithmName()).generatePrivate(new PKCS8EncodedKeySpec(codes));
         return priKey;
     }

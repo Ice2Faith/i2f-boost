@@ -18,6 +18,14 @@ public class BcDesEncryptor extends BasicSymmetricEncryptor {
         super(BcDesType.ECB_PKCS5PADDING, secretBytes);
     }
 
+    public BcDesEncryptor() {
+        super(BcDesType.ECB_PKCS5PADDING);
+    }
+
+    public BcDesEncryptor(BcDesType type) {
+        super(type);
+    }
+
     public BcDesEncryptor(BcDesType type, byte[] secretBytes) {
         super(type, secretBytes);
     }

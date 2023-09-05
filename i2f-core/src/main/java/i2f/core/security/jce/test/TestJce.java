@@ -42,7 +42,7 @@ public class TestJce {
             BouncyCastleHolder.registry();
             KeyPair keyPair = CipherUtil.genKeyPair(BcSm2Type.DEFAULT, BouncyCastleHolder.PROVIDER_NAME, "123456".getBytes(), 256, null);
 
-            AsymmetricEncryptor encryptor = new BcSm2Encryptor(BcSm2Type.DEFAULT, keyPair.getPublic().getEncoded(), keyPair.getPrivate().getEncoded());
+            AsymmetricEncryptor encryptor = new BcSm2Encryptor(BcSm2Type.DEFAULT, keyPair);
 
 //            byte[] pridata = encryptor.privateEncrypt("hello".getBytes());
 //            byte[] ddata = encryptor.publicDecrypt(pridata);
@@ -105,7 +105,7 @@ public class TestJce {
         if (true) {
             KeyPair keyPair = CipherUtil.genKeyPair(RsaType.ECB_PKCS1PADDING, "123456".getBytes(), 1024, null);
 
-            AsymmetricEncryptor encryptor = new RsaEncryptor(RsaType.ECB_PKCS1PADDING, keyPair.getPublic().getEncoded(), keyPair.getPrivate().getEncoded());
+            AsymmetricEncryptor encryptor = new RsaEncryptor(RsaType.ECB_PKCS1PADDING, keyPair);
 
             byte[] pridata = encryptor.privateEncrypt("hello".getBytes());
             byte[] ddata = encryptor.publicDecrypt(pridata);

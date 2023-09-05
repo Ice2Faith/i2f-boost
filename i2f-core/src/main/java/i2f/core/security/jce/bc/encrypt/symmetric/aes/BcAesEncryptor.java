@@ -18,6 +18,14 @@ public class BcAesEncryptor extends BasicSymmetricEncryptor {
         super(BcAesType.ECB_PKCS5PADDING, secretBytes);
     }
 
+    public BcAesEncryptor() {
+        super(BcAesType.ECB_PKCS5PADDING);
+    }
+
+    public BcAesEncryptor(BcAesType type) {
+        super(type);
+    }
+
     public BcAesEncryptor(BcAesType type, byte[] secretBytes) {
         super(type, secretBytes);
     }

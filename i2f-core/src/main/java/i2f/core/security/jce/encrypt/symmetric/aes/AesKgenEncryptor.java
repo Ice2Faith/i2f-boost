@@ -13,12 +13,20 @@ public class AesKgenEncryptor extends BasicKgenSymmetricEncryptor {
         super(AesType.ECB_PKCS5PADDING, secretBytes);
     }
 
+    public AesKgenEncryptor() {
+        super(AesType.ECB_PKCS5PADDING);
+    }
+
+    public AesKgenEncryptor(AesType type) {
+        super(type);
+    }
+
     public AesKgenEncryptor(AesType type, byte[] secretBytes) {
         super(type, secretBytes);
     }
 
     public AesKgenEncryptor(AesType type, byte[] secretBytes, byte[] vectorBytes) {
-        super(type,secretBytes,vectorBytes);
+        super(type, secretBytes, vectorBytes);
     }
 
 }

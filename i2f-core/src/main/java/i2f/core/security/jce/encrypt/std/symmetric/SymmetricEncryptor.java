@@ -14,6 +14,10 @@ public interface SymmetricEncryptor extends IByteByteCodec {
 
     byte[] decrypt(byte[] data) throws Exception;
 
+    void setSecretBytes(byte[] secretBytes);
+
+    void setVectorBytes(byte[] vectorBytes);
+
     @Override
     default byte[] encode(byte[] data) {
         try {

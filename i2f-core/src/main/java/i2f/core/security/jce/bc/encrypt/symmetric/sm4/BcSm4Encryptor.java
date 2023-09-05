@@ -18,6 +18,14 @@ public class BcSm4Encryptor extends BasicSymmetricEncryptor {
         super(BcSm4Type.ECB_PKCS5PADDING, secretBytes);
     }
 
+    public BcSm4Encryptor() {
+        super(BcSm4Type.ECB_PKCS5PADDING);
+    }
+
+    public BcSm4Encryptor(BcSm4Type type) {
+        super(type);
+    }
+
     public BcSm4Encryptor(BcSm4Type type, byte[] secretBytes) {
         super(type, secretBytes);
     }

@@ -44,7 +44,7 @@ public class BcRsaUtil {
      */
     public static byte[] privateKeyDecrypt(AsymmetricKeyPair key, byte[] data) {
         try {
-            BcRsaEncryptor encryptor = new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, key.publicKeyBytes(), key.privateKeyBytes());
+            BcRsaEncryptor encryptor = new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, key.getKeyPair());
             return encryptor.privateDecrypt(data);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -60,7 +60,7 @@ public class BcRsaUtil {
      */
     public static byte[] privateKeyEncrypt(AsymmetricKeyPair key, byte[] data) {
         try {
-            BcRsaEncryptor encryptor = new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, key.publicKeyBytes(), key.privateKeyBytes());
+            BcRsaEncryptor encryptor = new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, key.getKeyPair());
             return encryptor.privateEncrypt(data);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -76,7 +76,7 @@ public class BcRsaUtil {
      */
     public static byte[] publicKeyDecrypt(AsymmetricKeyPair key, byte[] data) {
         try {
-            BcRsaEncryptor encryptor = new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, key.publicKeyBytes(), key.privateKeyBytes());
+            BcRsaEncryptor encryptor = new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, key.getKeyPair());
             return encryptor.publicDecrypt(data);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -92,7 +92,7 @@ public class BcRsaUtil {
      */
     public static byte[] publicKeyEncrypt(AsymmetricKeyPair key, byte[] data) {
         try {
-            BcRsaEncryptor encryptor = new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, key.publicKeyBytes(), key.privateKeyBytes());
+            BcRsaEncryptor encryptor = new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, key.getKeyPair());
             return encryptor.publicEncrypt(data);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);

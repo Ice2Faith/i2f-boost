@@ -4,11 +4,10 @@ import i2f.core.security.jce.encrypt.CipherWorker;
 import i2f.core.security.jce.encrypt.IEncryptType;
 import i2f.core.security.jce.encrypt.std.asymmetric.AsymmetricEncryptor;
 import i2f.core.security.jce.encrypt.std.asymmetric.IAsymmetricCipherProvider;
+import i2f.core.security.jce.encrypt.std.asymmetric.data.AsymKeyPair;
 
 import javax.crypto.Cipher;
 import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 
 /**
  * @author Ice2Faith
@@ -21,14 +20,22 @@ public abstract class BasicAsymmetricEncryptor implements AsymmetricEncryptor, I
     protected byte[] privateBytes;
     protected String providerName;
 
-    public BasicAsymmetricEncryptor(IEncryptType type, byte[] publicBytes, byte[] privateBytes) {
+    public BasicAsymmetricEncryptor(IEncryptType type) {
         this.type = type;
-        this.publicBytes = publicBytes;
-        this.privateBytes = privateBytes;
     }
 
     public BasicAsymmetricEncryptor(IEncryptType type, KeyPair keyPair) {
         this.type = type;
+        setKeyPair(keyPair);
+    }
+
+    public BasicAsymmetricEncryptor(IEncryptType type, AsymKeyPair keyPair) {
+        this.type = type;
+        setKeyPair(keyPair);
+    }
+
+    @Override
+    public void setKeyPair(KeyPair keyPair) {
         if (keyPair != null) {
             if (keyPair.getPublic() != null) {
                 this.publicBytes = keyPair.getPublic().getEncoded();
@@ -39,15 +46,6 @@ public abstract class BasicAsymmetricEncryptor implements AsymmetricEncryptor, I
         }
     }
 
-    public BasicAsymmetricEncryptor(IEncryptType type, PublicKey publicKey, PrivateKey privateKey) {
-        this.type = type;
-        if (publicKey != null) {
-            this.publicBytes = publicKey.getEncoded();
-        }
-        if (privateKey != null) {
-            this.privateBytes = privateKey.getEncoded();
-        }
-    }
 
     @Override
     public byte[] publicEncrypt(byte[] data) throws Exception {

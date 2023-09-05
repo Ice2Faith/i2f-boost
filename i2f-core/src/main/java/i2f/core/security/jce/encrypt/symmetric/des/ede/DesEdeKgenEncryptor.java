@@ -13,6 +13,14 @@ public class DesEdeKgenEncryptor extends BasicKgenSymmetricEncryptor {
         super(DesEdeType.ECB_PKCS5PADDING, secretBytes);
     }
 
+    public DesEdeKgenEncryptor() {
+        super(DesEdeType.ECB_PKCS5PADDING);
+    }
+
+    public DesEdeKgenEncryptor(DesEdeType type) {
+        super(type);
+    }
+
     public DesEdeKgenEncryptor(DesEdeType type, byte[] secretBytes) {
         super(type, secretBytes);
     }

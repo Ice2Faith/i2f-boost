@@ -19,6 +19,14 @@ public class BcSm4KgenEncryptor extends BasicKgenSymmetricEncryptor {
         super(BcSm4Type.ECB_PKCS5PADDING, secretBytes);
     }
 
+    public BcSm4KgenEncryptor() {
+        super(BcSm4Type.ECB_PKCS5PADDING);
+    }
+
+    public BcSm4KgenEncryptor(BcSm4Type type) {
+        super(type);
+    }
+
     public BcSm4KgenEncryptor(BcSm4Type type, byte[] secretBytes) {
         super(type, secretBytes);
     }

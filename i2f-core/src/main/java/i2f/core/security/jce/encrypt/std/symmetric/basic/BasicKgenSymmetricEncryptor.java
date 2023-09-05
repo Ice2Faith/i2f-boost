@@ -19,6 +19,10 @@ public class BasicKgenSymmetricEncryptor extends BasicSymmetricEncryptor {
     protected int secretBytesLen = -1;
     protected int vectorBytesLen = -1;
 
+    public BasicKgenSymmetricEncryptor(IEncryptType type) {
+        super(type);
+    }
+
     public BasicKgenSymmetricEncryptor(IEncryptType type, byte[] secretBytes) {
         super(type, secretBytes);
     }

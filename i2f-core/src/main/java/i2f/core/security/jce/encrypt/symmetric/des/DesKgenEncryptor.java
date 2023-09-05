@@ -13,12 +13,20 @@ public class DesKgenEncryptor extends BasicKgenSymmetricEncryptor {
         super(DesType.ECB_PKCS5PADDING, secretBytes);
     }
 
+    public DesKgenEncryptor() {
+        super(DesType.ECB_PKCS5PADDING);
+    }
+
+    public DesKgenEncryptor(DesType type) {
+        super(type);
+    }
+
     public DesKgenEncryptor(DesType type, byte[] secretBytes) {
         super(type, secretBytes);
     }
 
     public DesKgenEncryptor(DesType type, byte[] secretBytes, byte[] vectorBytes) {
-        super(type,secretBytes,vectorBytes);
+        super(type, secretBytes, vectorBytes);
     }
 
 

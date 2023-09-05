@@ -65,7 +65,7 @@ public class RsaUtil {
      */
     public static byte[] privateKeyDecrypt(AsymmetricKeyPair key, byte[] data) {
         try {
-            RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.publicKeyBytes(), key.privateKeyBytes());
+            RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.getKeyPair());
             Cipher cipher = encryptor.getCipher(false, true);
             return doCipherWorker(cipher, data);
         } catch (Exception e) {
@@ -82,7 +82,7 @@ public class RsaUtil {
      */
     public static byte[] privateKeyEncrypt(AsymmetricKeyPair key, byte[] data) {
         try {
-            RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.publicKeyBytes(), key.privateKeyBytes());
+            RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.getKeyPair());
             Cipher cipher = encryptor.getCipher(true, true);
             return doCipherWorker(cipher, data);
         } catch (Exception e) {
@@ -99,7 +99,7 @@ public class RsaUtil {
      */
     public static byte[] publicKeyDecrypt(AsymmetricKeyPair key, byte[] data) {
         try {
-            RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.publicKeyBytes(), key.privateKeyBytes());
+            RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.getKeyPair());
             Cipher cipher = encryptor.getCipher(false, false);
             return doCipherWorker(cipher, data);
         } catch (Exception e) {
@@ -116,7 +116,7 @@ public class RsaUtil {
      */
     public static byte[] publicKeyEncrypt(AsymmetricKeyPair key, byte[] data) {
         try {
-            RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.publicKeyBytes(), key.privateKeyBytes());
+            RsaEncryptor encryptor = new RsaEncryptor(RSA_TYPE, key.getKeyPair());
             Cipher cipher = encryptor.getCipher(true, false);
             return doCipherWorker(cipher, data);
         } catch (Exception e) {

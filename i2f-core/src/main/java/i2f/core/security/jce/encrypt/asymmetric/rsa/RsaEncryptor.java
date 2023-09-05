@@ -3,10 +3,13 @@ package i2f.core.security.jce.encrypt.asymmetric.rsa;
 import i2f.core.security.jce.encrypt.CipherUtil;
 import i2f.core.security.jce.encrypt.CipherWorker;
 import i2f.core.security.jce.encrypt.std.asymmetric.basic.BasicAsymmetricEncryptor;
+import i2f.core.security.jce.encrypt.std.asymmetric.data.AsymKeyPair;
 
 import javax.crypto.Cipher;
-import java.security.*;
-import java.security.spec.InvalidKeySpecException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -16,29 +19,31 @@ import java.security.spec.X509EncodedKeySpec;
  * @desc RSA加解密器
  */
 public class RsaEncryptor extends BasicAsymmetricEncryptor {
-    public RsaEncryptor(byte[] publicBytes, byte[] privateBytes) {
-        super(RsaType.ECB_PKCS1PADDING, publicBytes, privateBytes);
+
+    public RsaEncryptor() {
+        super(RsaType.ECB_PKCS1PADDING);
     }
 
-    public RsaEncryptor(RsaType type, byte[] publicBytes, byte[] privateBytes) {
-        super(type, publicBytes, privateBytes);
-    }
-
-    public RsaEncryptor(PublicKey publicKey, PrivateKey privateKey) {
-        super(RsaType.ECB_PKCS1PADDING, publicKey, privateKey);
-    }
-
-    public RsaEncryptor(RsaType type, PublicKey publicKey, PrivateKey privateKey) {
-        super(type, publicKey, privateKey);
+    public RsaEncryptor(RsaType type) {
+        super(type);
     }
 
     public RsaEncryptor(KeyPair keyPair) {
-        this(keyPair.getPublic(), keyPair.getPrivate());
+        super(RsaType.ECB_PKCS1PADDING, keyPair);
     }
 
     public RsaEncryptor(RsaType type, KeyPair keyPair) {
         super(type, keyPair);
     }
+
+    public RsaEncryptor(AsymKeyPair keyPair) {
+        super(RsaType.ECB_PKCS1PADDING, keyPair);
+    }
+
+    public RsaEncryptor(RsaType type, AsymKeyPair keyPair) {
+        super(type, keyPair);
+    }
+
 
     @Override
     public byte[] publicDecrypt(byte[] data) throws Exception {
@@ -82,12 +87,14 @@ public class RsaEncryptor extends BasicAsymmetricEncryptor {
         return cipher;
     }
 
-    public PublicKey getPublicKey(byte[] codes) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    @Override
+    public PublicKey getPublicKey(byte[] codes) throws Exception {
         PublicKey pubKey = KeyFactory.getInstance(type.algorithmName()).generatePublic(new X509EncodedKeySpec(codes));
         return pubKey;
     }
 
-    public PrivateKey getPrivateKey(byte[] codes) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    @Override
+    public PrivateKey getPrivateKey(byte[] codes) throws Exception {
         PrivateKey priKey = KeyFactory.getInstance(type.algorithmName()).generatePrivate(new PKCS8EncodedKeySpec(codes));
         return priKey;
     }

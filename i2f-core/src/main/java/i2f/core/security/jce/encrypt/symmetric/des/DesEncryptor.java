@@ -13,12 +13,20 @@ public class DesEncryptor extends BasicSymmetricEncryptor {
         super(DesType.ECB_PKCS5PADDING, secretBytes);
     }
 
+    public DesEncryptor() {
+        super(DesType.ECB_PKCS5PADDING);
+    }
+
+    public DesEncryptor(DesType type) {
+        super(type);
+    }
+
     public DesEncryptor(DesType type, byte[] secretBytes) {
         super(type, secretBytes);
     }
 
     public DesEncryptor(DesType type, byte[] secretBytes, byte[] vectorBytes) {
-        super(type,secretBytes,vectorBytes);
+        super(type, secretBytes, vectorBytes);
     }
 
 }

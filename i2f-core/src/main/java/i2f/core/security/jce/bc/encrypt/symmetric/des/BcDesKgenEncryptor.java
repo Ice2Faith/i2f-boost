@@ -18,6 +18,14 @@ public class BcDesKgenEncryptor extends BasicKgenSymmetricEncryptor {
         super(BcDesType.ECB_PKCS5PADDING, secretBytes);
     }
 
+    public BcDesKgenEncryptor() {
+        super(BcDesType.ECB_PKCS5PADDING);
+    }
+
+    public BcDesKgenEncryptor(BcDesType type) {
+        super(type);
+    }
+
     public BcDesKgenEncryptor(BcDesType type, byte[] secretBytes) {
         super(type, secretBytes);
     }

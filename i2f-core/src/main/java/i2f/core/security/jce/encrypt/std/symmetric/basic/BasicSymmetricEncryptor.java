@@ -24,6 +24,10 @@ public class BasicSymmetricEncryptor implements SymmetricEncryptor, ISymmetricCi
     protected byte[] secretBytes;
     protected byte[] vectorBytes;
 
+    public BasicSymmetricEncryptor(IEncryptType type) {
+        this.type = type;
+    }
+
     public BasicSymmetricEncryptor(IEncryptType type, byte[] secretBytes) {
         this.type = type;
         this.secretBytes = secretBytes;
