@@ -1,7 +1,9 @@
 package i2f.secure.crypto;
 
+import i2f.core.check.CheckUtil;
 import i2f.core.codec.CodecUtil;
 import i2f.core.security.jce.encrypt.std.asymmetric.AsymmetricEncryptor;
+import i2f.core.security.jce.encrypt.std.asymmetric.data.AsymKeyPair;
 import i2f.core.security.jce.encrypt.std.asymmetric.data.BytesPrivateKey;
 import i2f.core.security.jce.encrypt.std.asymmetric.data.BytesPublicKey;
 
@@ -46,6 +48,49 @@ public class Sm2CryptoEncryptor implements AsymmetricEncryptor {
         this.cipherMode = cipherMode;
         this.publicHex = publicHex;
         this.privateHex = privateHex;
+    }
+
+    @Override
+    public AsymKeyPair encodeKeyPair(KeyPair keyPair) {
+        String publicKey = null;
+        String privateKey = null;
+        if (keyPair != null) {
+            if (keyPair.getPublic() != null) {
+                byte[] bts = keyPair.getPublic().getEncoded();
+                publicKey = CodecUtil.toHexString(bts);
+            }
+            if (keyPair.getPrivate() != null) {
+                byte[] bts = keyPair.getPrivate().getEncoded();
+                privateKey = CodecUtil.toHexString(bts);
+            }
+        }
+        return new AsymKeyPair(publicKey, privateKey);
+    }
+
+    @Override
+    public KeyPair decodeKeyPair(AsymKeyPair keyPair) {
+        PublicKey publicKey = null;
+        PrivateKey privateKey = null;
+        if (keyPair != null) {
+            if (!CheckUtil.isEmptyStr(keyPair.getPublicKey())) {
+                byte[] bts = CodecUtil.ofHexString(keyPair.getPublicKey());
+                try {
+                    publicKey = new BytesPublicKey(bts);
+                } catch (Exception e) {
+
+                }
+            }
+            if (!CheckUtil.isEmptyStr(keyPair.getPrivateKey())) {
+                byte[] bts = CodecUtil.ofHexString(keyPair.getPrivateKey());
+                try {
+                    privateKey = new BytesPrivateKey(bts);
+                } catch (Exception e) {
+
+                }
+            }
+        }
+
+        return new KeyPair(publicKey, privateKey);
     }
 
     @Override

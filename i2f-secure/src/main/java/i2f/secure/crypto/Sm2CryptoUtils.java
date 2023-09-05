@@ -25,8 +25,8 @@ public class Sm2CryptoUtils {
         String privateKey = keypair.getPrivateKey(); // 公钥
         String publicKey = keypair.getPublicKey(); // 私钥
         return new KeyPair(
-                new BytesPublicKey(publicKey.getBytes()),
-                new BytesPrivateKey(privateKey.getBytes())
+                new BytesPublicKey(publicKey),
+                new BytesPrivateKey(privateKey)
         );
     }
 
