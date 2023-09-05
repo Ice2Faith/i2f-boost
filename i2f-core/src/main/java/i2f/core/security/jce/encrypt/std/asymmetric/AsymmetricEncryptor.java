@@ -36,7 +36,7 @@ public interface AsymmetricEncryptor extends IByteByteCodec {
         if (keyPair != null) {
             if (keyPair.getPublic() != null) {
                 byte[] bts = keyPair.getPublic().getEncoded();
-                privateKey = CodecUtil.toBase64(bts);
+                publicKey = CodecUtil.toBase64(bts);
             }
             if (keyPair.getPrivate() != null) {
                 byte[] bts = keyPair.getPrivate().getEncoded();

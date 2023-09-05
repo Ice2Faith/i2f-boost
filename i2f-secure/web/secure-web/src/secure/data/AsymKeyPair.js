@@ -1,5 +1,5 @@
-const AsymmetricKeyPair = {
-  newObj (publicKey, privateKey) {
+const AsymKeyPair = {
+  newObj(publicKey, privateKey) {
     return {
       publicKey: publicKey,
       privateKey: privateKey
@@ -7,4 +7,4 @@ const AsymmetricKeyPair = {
   }
 }
 
-export default AsymmetricKeyPair
+export default AsymKeyPair
