@@ -13,7 +13,9 @@
     "js-base64": "^3.6.1",
     "crypto-js": "^4.1.1",
     "vue-router": "^3.0.1",
-    "jsrsasign": "^10.8.6"
+    "jsrsasign": "^10.8.6",
+    "gm-crypto": "^0.1.12",
+    "sm-crypto": "^0.3.12"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

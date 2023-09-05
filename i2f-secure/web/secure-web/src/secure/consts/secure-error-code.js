@@ -2,6 +2,8 @@
  * 定义异常的错误码
  */
 const SecureErrorCode = {
+  SECURE_NOT_SUPPORT: () => 10,
+
   SECURE_HEADER_EMPTY: () => 101,
   SECURE_HEADER_STRUCTURE: () => 102,
   SECURE_HEADER_SIGN_EMPTY: () => 103,

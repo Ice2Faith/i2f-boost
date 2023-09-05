@@ -255,12 +255,8 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
                     throw new SecureException(SecureErrorCode.BAD_SIGN, "签名验证失败");
                 }
 
-                String digital = secureTransfer.getRequestDigitalHeader(requestHeader.digital, clientAsymSign);
-                if (digital == null) {
-                    freshClientContext = true;
-                    throw new SecureException(SecureErrorCode.BAD_DIGITAL, "数字签名验证失败，请重试！");
-                }
-                if (!digital.equals(requestHeader.sign)) {
+                boolean digitalOk = secureTransfer.verifyDigitalSign(requestHeader.digital, requestHeader.sign, clientAsymSign);
+                if (!digitalOk) {
                     freshClientContext = true;
                     throw new SecureException(SecureErrorCode.BAD_DIGITAL, "数字签名验证失败，请重试！");
                 }
@@ -412,7 +408,7 @@ public class SecureTransferFilter implements Filter, InitializingBean, Applicati
 
             responseHeader.setClientAsymSign(clientAsymSignOrigin);
             responseHeader.sign = SecureUtils.makeSecureSign(enData, responseHeader);
-            responseHeader.digital = secureTransfer.getResponseDigitalHeader(responseHeader.sign);
+            responseHeader.digital = secureTransfer.makeDigitalSign(responseHeader.sign);
 
             // 写回数据体
             edata = enData.getBytes(responseProxyWrapper.getCharacterEncoding());

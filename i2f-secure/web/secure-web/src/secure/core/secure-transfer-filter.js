@@ -171,7 +171,7 @@ const SecureTransferFilter = {
     }
     requestHeader.clientAsymSign = SecureTransfer.getAsymSlfPubSign()
     requestHeader.sign = SecureUtils.makeSecureSign(signText, requestHeader)
-    requestHeader.digital = SecureTransfer.getRequestDigitalHeader(requestHeader.sign)
+    requestHeader.digital = SecureTransfer.makeDigitalSign(requestHeader.sign)
     if (SecureConfig.enableDebugLog) {
       console.log('request:secureHeader:', (config.secure.url || config.url), ObjectUtils.deepClone(requestHeader))
     }
@@ -252,22 +252,8 @@ const SecureTransferFilter = {
       throw SecureException.newObj(SecureErrorCode.BAD_SIGN, '签名验证失败')
     }
 
-    const digital = SecureTransfer.getResponseDigitalHeader(responseHeader.digital)
-    if (digital == null) {
-      if (SecureConfig.enableSwapAsymKey) {
-        if (SecureCallback.callSwapKey && !callbackFlags.swapKey) {
-          SecureCallback.callSwapKey()
-          callbackFlags.swapKey = true
-        }
-      } else {
-        if (SecureCallback.callPubKey && !callbackFlags.pubKey) {
-          SecureCallback.callPubKey()
-          callbackFlags.pubKey = true
-        }
-      }
-      throw SecureException.newObj(SecureErrorCode.BAD_DIGITAL(), '数字签名验证失败，请重试！')
-    }
-    if (digital != responseHeader.sign) {
+    const digitalOk = SecureTransfer.verifyDigitalSign(responseHeader.digital, responseHeader.sign)
+    if (!digitalOk) {
       if (SecureConfig.enableSwapAsymKey) {
         if (SecureCallback.callSwapKey && !callbackFlags.swapKey) {
           SecureCallback.callSwapKey()

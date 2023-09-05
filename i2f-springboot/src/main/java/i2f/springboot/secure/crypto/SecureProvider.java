@@ -11,6 +11,7 @@ import i2f.core.security.jce.digest.sha.ShaType;
 import i2f.core.security.jce.digest.std.IMessageDigester;
 import i2f.core.security.jce.encrypt.CipherUtil;
 import i2f.core.security.jce.encrypt.std.asymmetric.AsymmetricEncryptor;
+import i2f.core.security.jce.encrypt.std.asymmetric.data.AsymKeyPair;
 import i2f.core.security.jce.encrypt.std.symmetric.SymmetricEncryptor;
 import i2f.core.security.jce.encrypt.symmetric.aes.AesEncryptor;
 import i2f.core.security.jce.encrypt.symmetric.aes.AesType;
@@ -24,7 +25,7 @@ import java.util.function.Supplier;
  * @desc
  */
 public class SecureProvider {
-    public static BiSupplier<AsymmetricEncryptor, KeyPair> asymmetricEncryptorSupplier = (keyPair) -> new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING, keyPair);
+    public static Supplier<AsymmetricEncryptor> asymmetricEncryptorSupplier = () -> new BcRsaEncryptor(BcRsaType.NONE_PKCS1PADDING);
 
     public static BiSupplier<SymmetricEncryptor, byte[]> symmetricEncryptorSupplier = (secretBytes) -> new AesEncryptor(AesType.ECB_ISO10126PADDING, secretBytes);
 
@@ -32,11 +33,13 @@ public class SecureProvider {
 
     public static BiSupplier<byte[], Integer> symmetricKeySupplier = (len) -> CodecUtil.toUtf8(CodeUtil.makeCheckCode(len));
 
-    public static BiSupplier<KeyPair, Integer> asymmetricKeyPairSupplier = (len) -> {
+    public static BiSupplier<AsymKeyPair, Integer> asymmetricKeyPairSupplier = (len) -> {
         try {
             BouncyCastleHolder.registry();
             KeyPair keyPair = CipherUtil.genKeyPair(BcRsaType.NONE_PKCS1PADDING, BouncyCastleHolder.PROVIDER_NAME, null, len, null);
-            return keyPair;
+
+            AsymmetricEncryptor encryptor = asymmetricEncryptorSupplier.get();
+            return encryptor.encodeKeyPair(keyPair);
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage(), e);
         }

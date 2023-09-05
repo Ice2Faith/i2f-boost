@@ -1,11 +1,9 @@
 package i2f.springboot.secure.crypto;
 
 import i2f.core.codec.CodecUtil;
-import i2f.core.digest.AsymmetricKeyPair;
 import i2f.core.digest.Base64Util;
 import i2f.core.security.jce.encrypt.std.asymmetric.AsymmetricEncryptor;
-
-import java.security.KeyPair;
+import i2f.core.security.jce.encrypt.std.asymmetric.data.AsymKeyPair;
 
 /**
  * @author ltb
@@ -14,7 +12,7 @@ import java.security.KeyPair;
  */
 public class AsymmetricUtil {
 
-    public static AsymmetricKeyPair makeKeyPair() {
+    public static AsymKeyPair makeKeyPair() {
         return makeKeyPair(1024);
     }
 
@@ -24,10 +22,10 @@ public class AsymmetricUtil {
      * @param size
      * @return
      */
-    public static AsymmetricKeyPair makeKeyPair(int size) {
+    public static AsymKeyPair makeKeyPair(int size) {
         try {
-            KeyPair keyPair = SecureProvider.asymmetricKeyPairSupplier.get(size);
-            return new AsymmetricKeyPair(keyPair);
+            AsymKeyPair keyPair = SecureProvider.asymmetricKeyPairSupplier.get(size);
+            return keyPair;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -40,9 +38,10 @@ public class AsymmetricUtil {
      * @param data
      * @return
      */
-    public static byte[] privateKeyDecrypt(AsymmetricKeyPair key, byte[] data) {
+    public static byte[] privateKeyDecrypt(AsymKeyPair key, byte[] data) {
         try {
-            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get(key.getKeyPair());
+            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get();
+            encryptor.setKeyPair(key);
             return encryptor.privateDecrypt(data);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -56,9 +55,10 @@ public class AsymmetricUtil {
      * @param data
      * @return
      */
-    public static byte[] privateKeyEncrypt(AsymmetricKeyPair key, byte[] data) {
+    public static byte[] privateKeyEncrypt(AsymKeyPair key, byte[] data) {
         try {
-            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get(key.getKeyPair());
+            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get();
+            encryptor.setKeyPair(key);
             return encryptor.privateEncrypt(data);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -72,9 +72,10 @@ public class AsymmetricUtil {
      * @param data
      * @return
      */
-    public static byte[] publicKeyDecrypt(AsymmetricKeyPair key, byte[] data) {
+    public static byte[] publicKeyDecrypt(AsymKeyPair key, byte[] data) {
         try {
-            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get(key.getKeyPair());
+            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get();
+            encryptor.setKeyPair(key);
             return encryptor.publicDecrypt(data);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -88,15 +89,55 @@ public class AsymmetricUtil {
      * @param data
      * @return
      */
-    public static byte[] publicKeyEncrypt(AsymmetricKeyPair key, byte[] data) {
+    public static byte[] publicKeyEncrypt(AsymKeyPair key, byte[] data) {
         try {
-            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get(key.getKeyPair());
+            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get();
+            encryptor.setKeyPair(key);
             return encryptor.publicEncrypt(data);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
+    public static byte[] makeSign(AsymKeyPair key, byte[] data) {
+        try {
+            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get();
+            encryptor.setKeyPair(key);
+            return encryptor.makeSign(data);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public static String makeSignAsString(AsymKeyPair key, byte[] data) {
+        try {
+            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get();
+            encryptor.setKeyPair(key);
+            return encryptor.makeSignAsString(data);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public static boolean verifySign(AsymKeyPair key, byte[] sign, byte[] data) {
+        try {
+            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get();
+            encryptor.setKeyPair(key);
+            return encryptor.verifySign(sign, data);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public static boolean verifySignByString(AsymKeyPair key, String sign, byte[] data) {
+        try {
+            AsymmetricEncryptor encryptor = SecureProvider.asymmetricEncryptorSupplier.get();
+            encryptor.setKeyPair(key);
+            return encryptor.verifySignByString(sign, data);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 
     /**
      * 私钥，对输入base64解密为string字符串
@@ -106,7 +147,7 @@ public class AsymmetricUtil {
      * @param bs64
      * @return
      */
-    public static String privateKeyDecryptBase64(AsymmetricKeyPair key, String bs64) {
+    public static String privateKeyDecryptBase64(AsymKeyPair key, String bs64) {
         byte[] enc = Base64Util.decode(bs64);
         byte[] dec = privateKeyDecrypt(key, enc);
         return CodecUtil.ofUtf8(dec);
@@ -120,7 +161,7 @@ public class AsymmetricUtil {
      * @param text
      * @return
      */
-    public static String privateKeyEncryptBase64(AsymmetricKeyPair key, String text) {
+    public static String privateKeyEncryptBase64(AsymKeyPair key, String text) {
         byte[] data = CodecUtil.toUtf8(text);
         byte[] enc = privateKeyEncrypt(key, data);
         return Base64Util.encode(enc);
@@ -134,7 +175,7 @@ public class AsymmetricUtil {
      * @param bs64
      * @return
      */
-    public static String publicKeyDecryptBase64(AsymmetricKeyPair key, String bs64) {
+    public static String publicKeyDecryptBase64(AsymKeyPair key, String bs64) {
         byte[] enc = Base64Util.decode(bs64);
         byte[] dec = publicKeyDecrypt(key, enc);
         return CodecUtil.ofUtf8(dec);
@@ -148,7 +189,7 @@ public class AsymmetricUtil {
      * @param text
      * @return
      */
-    public static String publicKeyEncryptBase64(AsymmetricKeyPair key, String text) {
+    public static String publicKeyEncryptBase64(AsymKeyPair key, String text) {
         byte[] data = CodecUtil.toUtf8(text);
         byte[] enc = publicKeyEncrypt(key, data);
         return Base64Util.encode(enc);

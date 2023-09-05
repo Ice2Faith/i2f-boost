@@ -154,12 +154,12 @@ const SecureTransfer = {
     return symmKeyTransfer
   },
   // 获取安全请求头的值
-  getRequestDigitalHeader (symmKey) {
+  makeDigitalSign(symmKey) {
     if (StringUtils.isEmpty(symmKey)) {
       return 'null'
     }
     const priKey = this.loadAsymSlfPriKey()
-    let symmKeyTransfer = AsymmetricUtil.privateKeyEncrypt(priKey, symmKey)
+    let symmKeyTransfer = AsymmetricUtil.makeSign(priKey, symmKey)
     symmKeyTransfer = Base64Obfuscator.encode(symmKeyTransfer, true)
     return symmKeyTransfer
   },
@@ -176,7 +176,7 @@ const SecureTransfer = {
     return symmKey
   },
   // 获取安全响应头中的值
-  getResponseDigitalHeader (symmKeyTransfer) {
+  verifyDigitalSign(symmKeyTransfer, sign) {
     if (StringUtils.isEmpty(symmKeyTransfer)) {
       return null
     }
@@ -184,8 +184,7 @@ const SecureTransfer = {
     symmKeyTransfer = symmKeyTransfer.trim()
     // 解除模糊之后使用asym进行解密得到symm秘钥
     let symmKey = Base64Obfuscator.decode(symmKeyTransfer)
-    symmKey = AsymmetricUtil.publicKeyDecrypt(pubKey, symmKey)
-    return symmKey
+    return AsymmetricUtil.verifySign(pubKey, symmKey, sign)
   }
 
 }
