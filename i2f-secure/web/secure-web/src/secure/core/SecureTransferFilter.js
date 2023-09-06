@@ -1,20 +1,20 @@
 /**
  * 自动加解密的核心过滤器
  */
-import SecureConfig from '../secure-config'
-import SecureTransfer from './secure-transfer'
-import StringUtils from '../util/string-utils'
-import SecureUtils from '../util/secure-utils'
-import SecureConsts from '../consts/secure-consts'
-import SecureHeader from '../data/secure-header'
+import SecureConfig from '../SecureConfig'
+import SecureTransfer from './SecureTransfer'
+import StringUtils from '../util/StringUtils'
+import SecureUtils from '../util/SecureUtils'
+import SecureConsts from '../consts/SecureConsts'
+import SecureHeader from '../data/SecureHeader'
 import ObjectUtils from '../util/ObjectUtils'
 import qs from 'qs'
-import SecureException from '../excception/secure-exception'
-import SecureErrorCode from '../consts/secure-error-code'
-import SecureCallback from './secure-callback'
+import SecureException from '../excception/SecureException'
+import SecureErrorCode from '../consts/SecureErrorCode'
+import SecureCallback from './SecureCallback'
 
 const SecureTransferFilter = {
-  getRequestContentType (config) {
+  getRequestContentType(config) {
     let contentType = null
     const method = config.method
     if (contentType == null) {

@@ -2,9 +2,10 @@
  * RSA工具
  */
 import {sm2} from 'sm-crypto'
-import AsymKeyPair from '../data/AsymKeyPair'
-import SecureException from "@/secure/excception/secure-exception";
-import SecureErrorCode from "@/secure/consts/secure-error-code";
+import AsymKeyPair from '../../data/AsymKeyPair'
+import SecureException from "../../excception/SecureException";
+import SecureErrorCode from "../../consts/SecureErrorCode";
+import Base64Util from "../../util/Base64Util";
 
 const Sm2Util = {
   MODE_C1C3C2: () => 0,
@@ -17,7 +18,9 @@ const Sm2Util = {
     return AsymKeyPair.newObj(publicKey, privateKey)
   },
   publicKeyEncrypt(pubKey, text) {
-    return sm2.doEncrypt(text, pubKey, this.cipherMode)
+    let ret = sm2.doEncrypt(text, pubKey, this.cipherMode)
+    ret = Base64Util.encrypt(ret)
+    return ret
   },
   publicKeyDecrypt(pubKey, text) {
     throw SecureException.newObj(SecureErrorCode.SECURE_NOT_SUPPORT(), "Sm2算法不支持公钥解密")
@@ -26,6 +29,7 @@ const Sm2Util = {
     throw SecureException.newObj(SecureErrorCode.SECURE_NOT_SUPPORT(), "Sm2算法不支持私钥加密")
   },
   privateKeyDecrypt(priKey, text) {
+    text = Base64Util.decrypt(text)
     return sm2.doDecrypt(text, priKey, this.cipherMode)
   },
   makeSign(priKey, text) {

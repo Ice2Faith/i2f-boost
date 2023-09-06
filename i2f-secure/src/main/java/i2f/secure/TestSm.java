@@ -5,7 +5,7 @@ import com.antherd.smcrypto.sm2.Sm2;
 import com.antherd.smcrypto.sm3.Sm3;
 import com.antherd.smcrypto.sm4.Sm4;
 import i2f.core.security.jce.encrypt.std.asymmetric.AsymmetricEncryptor;
-import i2f.secure.crypto.Sm2CryptoEncryptor;
+import i2f.core.security.jce.sm.encrypt.asymmetric.Sm2CryptoEncryptor;
 
 /**
  * @author Ice2Faith

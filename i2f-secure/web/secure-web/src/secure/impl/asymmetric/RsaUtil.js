@@ -1,9 +1,9 @@
 /**
  * RSA工具
  */
-import JSEncrypt from '../static/jsencrypt'
+import JSEncrypt from '../../static/jsencrypt'
 import jsrsasign from 'jsrsasign'
-import AsymKeyPair from '../data/AsymKeyPair'
+import AsymKeyPair from '../../data/AsymKeyPair'
 
 const RsaUtil = {
   genKeyPair (size = 1024) {

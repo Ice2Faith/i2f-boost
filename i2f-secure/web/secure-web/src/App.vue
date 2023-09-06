@@ -6,9 +6,9 @@
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
-import SecureTransfer from "@/secure/core/secure-transfer";
-import SecureCallback from '@/secure/core/secure-callback'
-import SecureConfig from "@/secure/secure-config";
+import SecureTransfer from "@/secure/core/SecureTransfer";
+import SecureCallback from '@/secure/core/SecureCallback'
+import SecureConfig from "@/secure/SecureConfig";
 
 export default {
   name: 'App',

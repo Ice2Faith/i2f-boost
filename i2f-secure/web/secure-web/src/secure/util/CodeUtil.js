@@ -1,4 +1,4 @@
-import Random from './random'
+import Random from './Random'
 
 const CodeUtil = {
   makeCheckCode (len, onlyNumber = false) {
@@ -8,7 +8,7 @@ const CodeUtil = {
       bounce = 10
     }
     for (let i = 0; i < len; i++) {
-      const val = Random.nextLowerInt(10 + 26 + 26)
+      const val = Random.nextLowerInt(bounce)
       if (val < 10) {
         ret += String.fromCharCode(val + '0'.charCodeAt())
       } else if (val < (10 + 26)) {

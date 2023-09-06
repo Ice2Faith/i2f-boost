@@ -2,7 +2,7 @@
  * AES工具
  */
 import CryptoJS from 'crypto-js'
-import CodeUtil from './CodeUtil'
+import CodeUtil from '../../util/CodeUtil'
 
 const AesUtil = {
   genKey (size = 32) {

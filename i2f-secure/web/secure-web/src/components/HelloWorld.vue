@@ -14,15 +14,13 @@
 </template>
 
 <script>
-import SecureTransfer from "@/secure/core/secure-transfer";
-import Random from "@/secure/util/random";
+import SecureTransfer from "@/secure/core/SecureTransfer";
+import Random from "@/secure/util/Random";
 
 export default {
   name: 'HelloWorld',
-  props: {
-
-  },
-  data:()=>{
+  props: {},
+  data: () => {
     return {
       msg: 'aaa'
     }

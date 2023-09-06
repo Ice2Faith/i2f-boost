@@ -1,17 +1,17 @@
 /**
  * 核心处理逻辑类
  */
-import Base64Obfuscator from '../util/base64-obfuscator'
-import SecureConsts from '../consts/secure-consts'
-import StringUtils from '../util/string-utils'
+import Base64Obfuscator from '../util/Base64Obfuscator'
+import SecureConsts from '../consts/SecureConsts'
+import StringUtils from '../util/StringUtils'
 import SignatureUtil from '../crypto/SignatureUtil'
 import AsymmetricUtil from '../crypto/AsymmetricUtil'
 import SymmetricUtil from '../crypto/SymmetricUtil'
-import SecureConfig from '../secure-config'
+import SecureConfig from '../SecureConfig'
 
 const SecureTransfer = {
   // 获取安全请求头，参数：是否启用安全参数，是否编码URL
-  getSecureHeader (openSecureParams, openSecureUrl) {
+  getSecureHeader(openSecureParams, openSecureUrl) {
     const ret = {}
 
     return this.getSecureHeaderInto(ret, openSecureParams, openSecureUrl)

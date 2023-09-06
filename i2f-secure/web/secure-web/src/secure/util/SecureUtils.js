@@ -1,20 +1,20 @@
 /**
  * 安全工具
  */
-import SecureConfig from '../secure-config'
-import Base64Obfuscator from '../util/base64-obfuscator'
-import B64 from '../util/base64'
-import SecureHeader from '../data/secure-header'
-import StringUtils from '../util/string-utils'
-import SecureErrorCode from '../consts/secure-error-code'
-import SecureException from '../excception/secure-exception'
+import SecureConfig from '../SecureConfig'
+import Base64Obfuscator from './Base64Obfuscator'
+import Base64Util from './Base64Util'
+import SecureHeader from '../data/SecureHeader'
+import StringUtils from './StringUtils'
+import SecureErrorCode from '../consts/SecureErrorCode'
+import SecureException from '../excception/SecureException'
 import SignatureUtil from '../crypto/SignatureUtil'
 
 const SecureUtils = {
-  typeOf (data) {
+  typeOf(data) {
     return Object.prototype.toString.call(data).slice(8, -1).toLowerCase()
   },
-  parseSecureHeader (key, separator, res) {
+  parseSecureHeader(key, separator, res) {
     const value = this.getPossibleValue(res)
     return this.decodeSecureHeader(value, separator)
   },
@@ -25,7 +25,7 @@ const SecureUtils = {
     if (StringUtils.isEmpty(str)) {
       throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_EMPTY(), '空安全头')
     }
-    str = B64.decrypt(Base64Obfuscator.decode(str))
+    str = Base64Util.decrypt(Base64Obfuscator.decode(str))
     const arr = str.split(separator)
     if (arr.length < 5) {
       throw SecureException.newObj(SecureErrorCode.SECURE_HEADER_STRUCTURE(), '不正确的安全头结构')
@@ -64,7 +64,7 @@ const SecureUtils = {
     str += header.serverAsymSign
     str += separator
     str += header.digital
-    return Base64Obfuscator.encode(B64.encrypt(str), true)
+    return Base64Obfuscator.encode(Base64Util.encrypt(str), true)
   },
   makeSecureSign (body, header) {
     if (StringUtils.isEmpty(body)) {
@@ -84,7 +84,7 @@ const SecureUtils = {
     return sign == header.sign
   },
   decodeEncTrueUrl (encodeUrl) {
-    let text = B64.decrypt(text)
+    let text = Base64Util.decrypt(text)
     text = Base64Obfuscator.decode(encodeUrl)
     const arr = text.split(';')
     if (arr.length != 2) {
@@ -96,14 +96,14 @@ const SecureUtils = {
     if (usign != sign) {
       throw SecureException.newObj(SecureErrorCode.BAD_SIGN(), '签名验证失败')
     }
-    const trueUrl = B64.decrypt(Base64Obfuscator.decode(url))
+    const trueUrl = Base64Util.decrypt(Base64Obfuscator.decode(url))
     return trueUrl
   },
   encodeEncTrueUrl (trueUrl) {
-    const url = Base64Obfuscator.encode(B64.encrypt(trueUrl), false)
+    const url = Base64Obfuscator.encode(Base64Util.encrypt(trueUrl), false)
     const sign = SignatureUtil.sign(url)
     let text = Base64Obfuscator.encode(sign + ';' + url, false)
-    text = B64.encrypt(text)
+    text = Base64Util.encrypt(text)
     return encodeURIComponent(text)
   }
 }

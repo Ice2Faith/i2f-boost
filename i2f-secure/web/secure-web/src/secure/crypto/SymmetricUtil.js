@@ -1,4 +1,4 @@
-import B64 from '../util/base64'
+import Base64Util from '../util/Base64Util'
 import SecureProvider from './SecureProvider'
 
 const SymmetricUtil = {
@@ -12,12 +12,12 @@ const SymmetricUtil = {
     return SecureProvider.symmetricEncryptor.decrypt(data, key)
   },
   encryptObj: function (data, key) {
-    const srcs = B64.encryptObj(data)
+    const srcs = Base64Util.encryptObj(data)
     return this.encrypt(srcs, key)
   },
   decryptObj: function (data, key) {
     const srcs = this.decrypt(data, key)
-    return B64.decryptObj(srcs)
+    return Base64Util.decryptObj(srcs)
   }
 }
 

@@ -1,7 +1,7 @@
 /**
  * Base64混淆工具
  */
-import Random from './random'
+import Random from './Random'
 
 const Base64Obfuscator = {
   OBF_PREFIX () {

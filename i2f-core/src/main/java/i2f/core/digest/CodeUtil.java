@@ -30,7 +30,7 @@ public class CodeUtil {
             bounce = 10;
         }
         for (int i = 0; i < len; i++) {
-            int val = rand.nextInt(10 + 26 + 26);
+            int val = rand.nextInt(bounce);
             if (val < 10) {
                 ret += (char) (val + '0');
             } else if (val < (10 + 26)) {

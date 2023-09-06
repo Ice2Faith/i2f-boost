@@ -1,4 +1,4 @@
-package i2f.secure.crypto;
+package i2f.core.security.jce.sm.encrypt.asymmetric;
 
 import com.antherd.smcrypto.sm2.Keypair;
 import com.antherd.smcrypto.sm2.Sm2;
@@ -35,7 +35,7 @@ public class Sm2CryptoUtils {
     }
 
     public static byte[] publicEncrypt(byte[] data, String publicHex, int mode) throws Exception {
-        String bs64 = CodecUtil.toBase64(data);
+        String bs64 = CodecUtil.ofUtf8(data);
         String result = Sm2.doEncrypt(bs64, publicHex, mode);
         return CodecUtil.toUtf8(result);
     }
@@ -47,18 +47,18 @@ public class Sm2CryptoUtils {
     public static byte[] privateDecrypt(byte[] data, String privateHex, int mode) throws Exception {
         String str = CodecUtil.ofUtf8(data);
         String bs64 = Sm2.doDecrypt(str, privateHex, mode);
-        return CodecUtil.ofBase64(bs64);
+        return CodecUtil.toUtf8(bs64);
     }
 
     public static byte[] makeSign(byte[] data, String privateHex) throws Exception {
-        String bs64 = CodecUtil.toBase64(data);
+        String bs64 = CodecUtil.ofUtf8(data);
         String sign = Sm2.doSignature(bs64, privateHex);
         return CodecUtil.toUtf8(sign);
     }
 
     public static boolean verifySign(byte[] sign, byte[] data, String publicHex) throws Exception {
         String str = CodecUtil.ofUtf8(sign);
-        String bs64 = CodecUtil.toBase64(data);
+        String bs64 = CodecUtil.ofUtf8(data);
         boolean ok = Sm2.doVerifySignature(bs64, str, publicHex);
         return ok;
     }

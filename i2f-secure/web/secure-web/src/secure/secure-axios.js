@@ -4,7 +4,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import server from './server'
-import SecureTransferFilter from './core/secure-transfer-filter'
+import SecureTransferFilter from './core/SecureTransferFilter'
 
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 // 创建axios实例

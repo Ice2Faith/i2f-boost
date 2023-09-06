@@ -1,7 +1,7 @@
 /**
  * 主配置
  */
-import SecureConsts from './consts/secure-consts'
+import SecureConsts from './consts/SecureConsts'
 
 const SecureConfig = {
   enable: true,

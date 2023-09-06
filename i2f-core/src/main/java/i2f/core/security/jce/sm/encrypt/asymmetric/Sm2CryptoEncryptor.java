@@ -1,4 +1,4 @@
-package i2f.secure.crypto;
+package i2f.core.security.jce.sm.encrypt.asymmetric;
 
 import i2f.core.check.CheckUtil;
 import i2f.core.codec.CodecUtil;
@@ -129,6 +129,18 @@ public class Sm2CryptoEncryptor implements AsymmetricEncryptor {
     @Override
     public boolean verifySign(byte[] sign, byte[] data) throws Exception {
         return Sm2CryptoUtils.verifySign(sign, data, publicHex);
+    }
+
+    @Override
+    public String makeSignAsString(byte[] data) throws Exception {
+        byte[] bytes = makeSign(data);
+        return CodecUtil.ofUtf8(bytes).toLowerCase();
+    }
+
+    @Override
+    public boolean verifySignByString(String hexSign, byte[] data) throws Exception {
+        byte[] bytes = CodecUtil.toUtf8(hexSign.toLowerCase());
+        return verifySign(bytes, data);
     }
 
     @Override

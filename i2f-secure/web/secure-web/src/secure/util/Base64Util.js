@@ -1,9 +1,9 @@
 /**
  * Base64工具
  */
-import { Base64 } from 'js-base64'
+import {Base64} from 'js-base64'
 
-const B64 = {
+const Base64Util = {
   encrypt: function (data) {
     return Base64.encode(data)
   },
@@ -20,4 +20,4 @@ const B64 = {
   }
 }
 
-export default B64
+export default Base64Util
