@@ -50,66 +50,77 @@
         </dependency>
 
         <dependency>
-			<groupId>i2f.boost</groupId>
-			<artifactId>i2f-core</artifactId>
-			<version>1.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>i2f.boost</groupId>
-			<artifactId>i2f-core-j2ee</artifactId>
-			<version>1.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>i2f.boost</groupId>
-			<artifactId>i2f-spring</artifactId>
-			<version>1.0</version>
-			<scope>provided</scope>
-		</dependency>
+            <groupId>i2f.boost</groupId>
+            <artifactId>i2f-core</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>i2f.boost</groupId>
+            <artifactId>i2f-core-j2ee</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>i2f.boost</groupId>
+            <artifactId>i2f-spring</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-springboot</artifactId>
-			<version>1.0</version>
+            <version>1.0</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-			<scope>provided</scope>
+            <scope>provided</scope>
         </dependency>
 
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-			<scope>provided</scope>
-		</dependency>
+            <scope>provided</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-aop</artifactId>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+        </dependency>
 
-		<!-- 加密算法的BC实现，没有出口政策限制，可以使用更强的加密强度 -->
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- 加密算法的BC实现，没有出口政策限制，可以使用更强的加密强度 -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>1.64</version>
 			<scope>provided</scope>
-		</dependency>
+        </dependency>
 
-		<!-- 增加了对国密SM系列算法的支持 -->
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>1.64</version>
-			<scope>provided</scope>
-		</dependency>
+        <!-- 增加了对国密SM系列算法的支持 -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>1.64</version>
+            <scope>provided</scope>
+        </dependency>
 
-	</dependencies>
+
+        <dependency>
+            <groupId>com.antherd</groupId>
+            <artifactId>sm-crypto</artifactId>
+            <version>0.3.2</version>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<!-- 指定资源路径，部分项目的xml写在java路径中，需要包含进来 -->

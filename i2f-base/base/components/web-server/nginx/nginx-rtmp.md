@@ -13,6 +13,9 @@ http://nginx.org/en/download.html
     - 选择一个tag下载
 ```shell script
 https://github.com/arut/nginx-rtmp-module/tags
+
+wget -c https://codeload.github.com/arut/nginx-rtmp-module/tar.gz/refs/tags/v1.2.2
+mv v1.2.2 nginx-rtmp-module-1.2.2.tar.gz
 ```
 
 ## 配置

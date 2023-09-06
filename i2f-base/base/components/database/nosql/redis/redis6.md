@@ -61,6 +61,10 @@ echo redis pid=$PID
 kill -9 $PID
 echo done.
 ```
+- 添加执行权限
+```shell script
+chmod a+x *.sh
+```
 
 ## 启动服务
 ```shell script
