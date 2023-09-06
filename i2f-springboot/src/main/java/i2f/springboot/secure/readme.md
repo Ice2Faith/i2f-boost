@@ -1,4 +1,4 @@
-# RSA+AES+SHA256 安全网络传输方案使用指南
+# Asym+Symm+Md 安全网络传输方案使用指南
 - Asym 是 Asymmetric 非对称加密的简写，默认实现是 RSA
 - Symm 是 Symmetric 对称加密的简写，默认实现是 AES
 - Md 是 Message Digest 消息摘要的简写，默认实现是 SHA256
@@ -6,6 +6,23 @@
 - Oth 是 other 他人的简写，对应的就是相对的对方
 - 为了方便介绍，介绍中全部使用默认实现进行描述
 - 当然，这些实现，都可以方便的替换
+
+## 预置方案
+- Asym: RSA/SM2
+- Symm: AES/SM4
+- Md: SHA256/SM3
+
+- 可以任意搭配
+- 保证得到：Asym + Aymm + Md 的完整组合即可
+- 通过修改 SecureProvider 进行替换配置
+    - 如果不需要自定义实现
+    - 可以使用预置实现直接替换即可
+    - 预置实现类 SecureProviderPresets
+- 需要注意的是
+- 替换之后，服务端和前端需要清空历史生成的密钥对
+- 后端对应清空cache实现
+- 前端对应清空sessionStorage和localStorage
+
 
 ---
 ## 简介
@@ -276,9 +293,9 @@ App.vue
 ```
 
 ```js
-import SecureTransfer from "@/secure/core/secure-transfer";
-import SecureCallback from '@/secure/core/secure-callback'
-import SecureConfig from "@/secure/secure-config";
+import SecureTransfer from "@/secure/core/SecureTransfer";
+import SecureCallback from '@/secure/core/SecureCallback'
+import SecureConfig from "@/secure/SecureConfig";
 
 export default {
   name: 'App',
@@ -286,14 +303,14 @@ export default {
     
   },
   created() {
-    if(SecureConfig.enableSwapAsymKey){
+    if (SecureConfig.enableSwapAsymKey) {
       this.swapAsymKey()
       SecureCallback.callSwapKey = this.swapAsymKey
       let _this = this
       window.rsaTimer = setInterval(function () {
         _this.swapAsymKey()
       }, 5 * 60 * 1000)
-    }else{
+    } else {
       this.initAsymOthPubKey()
       this.initAsymSlfPriKey()
       SecureCallback.callPubKey = this.initAsymOthPubKey
@@ -308,17 +325,17 @@ export default {
     clearInterval(window.rsaTimer)
   },
   methods: {
-    swapAsymKey(){
+    swapAsymKey() {
       this.$axios({
-          url: 'secure/swapKey',
-          method: 'post',
-          data: {
-            key: SecureTransfer.loadWebAsymSlfPubKey()
-          }
-        }).then(({data}) => {
-          console.log('SECURE_KEY', data)
-          SecureTransfer.saveAsymOthPubKey(data)
-        })
+        url: 'secure/swapKey',
+        method: 'post',
+        data: {
+          key: SecureTransfer.loadWebAsymSlfPubKey()
+        }
+      }).then(({data}) => {
+        console.log('SECURE_KEY', data)
+        SecureTransfer.saveAsymOthPubKey(data)
+      })
     },
     initAsymOthPubKey() {
       this.$axios({
@@ -369,6 +386,17 @@ export default {
 </dependency>
 ```
 
+- 如果使用预置的国密 sm-crypto 实现
+- 则引入此包
+
+```xml
+<dependency>
+    <groupId>com.antherd</groupId>
+    <artifactId>sm-crypto</artifactId>
+    <version>0.3.2</version>
+</dependency>
+```
+
 - 引入本包secure
 - 如果本包在项目的扫描路径下，则不需要配置
 - 如果不再扫描路径下，则在启动类上添加注解 @EnableSecureConfig 注解，以自动引入此功能
@@ -384,16 +412,17 @@ export default {
 - 当然你也可以单独npm install这些依赖，这里使用另一种方式
 - 先添加前三个依赖到对应的dependencies节点中，直接复制进去即可
 - 这里保留了vue的两个依赖，方便做参考
+- 其中 sm-crypto 是国密算法的预置实现
 
 ```json
 "dependencies": {
-    "axios": "0.21.0",
+    "vue": "^2.6.14",
+    "vue-router": "^3.0.1",
     "js-base64": "^3.6.1",
     "crypto-js": "^4.1.1",
     "jsrsasign": "^10.8.6",
-    "vue": "^2.6.14",
-    "vue-router": "^3.0.1",
-  },
+    "sm-crypto": "^0.3.12"
+}
 ```
 
 - 保存package.json之后，进入自己的项目路径
@@ -413,7 +442,7 @@ npm install
     - src
         - secure
             - secure-vue-main.js
-            - secure-config.js
+            - SecureConfig.js
             - secure-axios.js
             - server.js
             - ...
@@ -827,3 +856,4 @@ export default SecureConfig
     - 一般的非对称加密算法，都是公钥加密私钥解密的
 - 使用其他对称加密算法替代AES，例如DES，3Des
 - 使用其他签名摘要算法替代StringSignature，例如MD5,SHA1,SHA256,Hmac
+- 如果不使用内置实现，则可以根据内置的SM国密算法实现，进行实现自己的方案
