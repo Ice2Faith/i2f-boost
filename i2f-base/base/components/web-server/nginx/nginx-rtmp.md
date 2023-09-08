@@ -404,6 +404,15 @@ ffmpeg -f dshow -i video="[Camera]" audio="[MIC]" -vcodec libx264 -s 720*480 -r 
 ffmpeg -f dshow -i video="BisonCam,NB Pro" -vcodec libx264 -s 200*200 -r 5 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://[IP]:11935/live/aaa
 ```
 
+## 采集桌面
+- 使用 -f gdigrab 仅采集桌面图像
+- 不采集声音
+- 如果需要采集声音
+- 配合 -f dshow 使用
+```shell script
+ffmpeg -f gdigrab -i desktop -vcodec libx264 -s 720*480 -r 30 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://[IP]:11935/live/desktop
+```
+
 ## ffmpeg的简单使用
 - 下载ffmpeg
 ```shell script
