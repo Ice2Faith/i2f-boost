@@ -281,12 +281,23 @@ hls_cleanup off;
 ```
 
 ## 推流实现直播
+
+### 直接使用rtmp协议进行推流和拉流
+- 这种方式优点是延迟较低
+- 缺点是需要flash的支持
+- 也就是说只能在web端开启flash支持才行
+- 或者是使用支持rtmp协议的视频播放客户端
+    - 例如：PotPlayer,VlcPlayer,ffplay
 - 这里介绍一个示例
 - 推流本地的一个文件作为直播流进行直播
 - 使用ffmpeg进行推流
 - 开启推流
     - 将test.mp4文件推流到hello这个直播频道
     - 这里以flv方式进行推流转码
+    - 注意，根据nginx的配置
+    - rtmp协议访问的是/live这个应用
+    - 因此，推流和拉流都是/live这个应用
+    - 后面是通道名称hello
 ```shell script
 ffmpeg.exe -re -i test.mp4 -f flv rtmp://[IP]:11935/live/hello
 ```
@@ -294,6 +305,82 @@ ffmpeg.exe -re -i test.mp4 -f flv rtmp://[IP]:11935/live/hello
 ```
 rtmp://[IP]:11935/live/hello
 ```
+
+### 使用hls协议进行推流和拉流
+- 这种方式的优点是支持浏览器直接访问
+- 浏览器使用hls.js,video.js,flv.js等即可直接播放
+- 不依赖flash
+- 缺点是，延迟高
+- 这里介绍一个示例
+- 推流本地的一个文件作为直播流进行直播
+- 使用ffmpeg进行推流
+- 开启推流
+    - 将test.mp4文件推流到hello这个直播频道
+    - 这里以flv方式进行推流转码
+    - 注意，根据nginx的配置
+    - hl协议访问的是/hls这个应用
+    - 因此，推流和拉流都是/hls这个应用
+    - 后面是通道名称hello
+```shell script
+ffmpeg.exe -re -i test.mp4 -f flv rtmp://[IP]:11935/hls/hello
+```
+- 拉流播放，VLC和ffplay一样
+    - 注意区别
+    - 使用的是http协议
+    - 访问的端口是11934的web端口
+    - 走的是/hls这个应用
+    - 访问的是/hello通道
+    - 入口文件是index.m3u8
+```
+http://[IP]:11934/hls/hello/index.m3u8
+```
+
+## 直接使用工具进行直播
+- 推流工具
+    - 选用：OBS Studio
+    - 下载地址：https://obsproject.com/
+    - 这是一个开源免费的推流软件
+    - 支持多种预设推流，以及自定义推流
+    - 我们这里使用的就是自定义推流
+- 拉流工具
+    - 选用：VlcPlayer/PotPlayer
+    - VLC下载地址：https://www.videolan.org/
+    - POT下载地址：https://potplayer.org/category-3.html
+    - 其实是支持播放直播流/网络流的播放器都行
+- 配置推流
+    - 打开 OBS Studio
+    - 根据向导创建即可
+    - 名词解释：
+        - 场景：就是你可以准备多个场景方便切换，默认添加一个就行
+        - 来源：也就是你要推流的视频的来源，是摄像头，还是屏幕等
+- 方式一：直接推送rtmp协议流
+    - 配置服务器
+        - 服务器：rtmp://[IP]:11935/live/
+        - 推流码：hello?token=123456
+    - 实际上就是配置了：rtmp://[IP]:11935/live/hello?token=123456
+        - 这里为了演示可能会有授权验证的需求
+        - 添加了token作为授权验证参数
+        - 因此推流码，实际上就是一层路径
+        - 加上你需要携带的参数
+    - 播放
+        - 直接播放器填入地址即可
+        - 访问地址：rtmp://[IP]:11935/live/hello?token=123456
+        - 因此，rtmp协议下，推流和拉流的地址配置是一样的
+        - 这里也同样添加参数用以授权验证
+- 方式二：推送hls协议流
+    - 配置服务器
+            - 服务器：rtmp://[IP]:11935/hls/
+            - 推流码：hello?token=123456
+    - 实际上就是配置了：rtmp://[IP]:11935/hls/hello?token=123456
+        - 这里为了演示可能会有授权验证的需求
+        - 添加了token作为授权验证参数
+        - 因此推流码，实际上就是一层路径
+        - 加上你需要携带的参数
+    - 播放
+        - 直接播放器填入地址即可
+        - 访问地址：http://[IP]:11934/hls/hello/index.m3u8
+        - 因此，hls协议下，推流和拉流的地址是不一样的，用的协议和端口也不一样
+        - 由于是http协议，因此如果需要鉴权，就需要自己实现鉴权逻辑
 
 ## 直接将本地的摄像头和麦克风采集并推流
 - 这里，需要知道两个参数
@@ -433,7 +520,7 @@ rtmp {
             hls_fragment 5s;
             hls_playlist_length 15s;
             hls_continuous on; # 连续模式。
-            hls_cleanup off;    # 对多余的切片进行删除。
+            hls_cleanup on;    # 对多余的切片进行删除。
             hls_nested on;     # 嵌套模式。
         }
     }
