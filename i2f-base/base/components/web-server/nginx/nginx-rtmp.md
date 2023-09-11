@@ -413,6 +413,31 @@ ffmpeg -f dshow -i video="BisonCam,NB Pro" -vcodec libx264 -s 200*200 -r 5 -pres
 ffmpeg -f gdigrab -i desktop -vcodec libx264 -s 720*480 -r 30 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://[IP]:11935/live/desktop
 ```
 
+## 采集桌面+音频
+- 方法1，采用gdigrab和dshow结合，实现推送音视频
+```shell script
+ffmpeg -f gdigrab -i desktop -f dshow -i audio="[MIC]" -vcodec libx264 -s 720*480 -r 25 -bufsize 1000000k -preset:v ultrafast -tune:v zerolatency -f flv rtmp://[IP]:11935/live/cam
+```
+- 方法2，借助第三方插件，使用固定的采集名称
+- 下载安装
+```shell script
+https://sourceforge.net/projects/screencapturer/files/
+```
+- 安装之后，会得到两个固定的设备名称
+    - 屏幕：screen-capture-recorder
+    - 音频：virtual-audio-capturer
+```shell script
+ffmpeg -f dshow -i video="screen-capture-recorder" -f dshow -i audio="virtual-audio-capturer" -vcodec libx264 -s 480*320 -r 30 -acodec aac -ar 44100 -b:a 18000 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://[IP]:11935/live/cam
+```
+
+## 采集默认摄像头
+- 置顶摄像头名称
+- 在命令行中不太好用
+- 因此可以使用默认摄像头
+```shell script
+ffmpeg -f vfwcap -i 0  -vcodec libx264 -s 480*320 -r 30 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://[IP]:11935/live/cam
+```
+
 ## ffmpeg的简单使用
 - 下载ffmpeg
 ```shell script
