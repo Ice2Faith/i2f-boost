@@ -39,6 +39,8 @@ cd D:\nodejs
 dir
 ```
 - 创建全局目录和缓存目录
+    - 可能无法创建
+    - 需要管理员权限
 ```shell script
 mkdir node_global
 mkdir node_cache
@@ -50,14 +52,17 @@ npm config set cache "D:\nodejs\node_cache"
 ```
 - 配置环境变量
 ```shell script
+NODE_HOME
+C:\nodejs
+
 NODE_PATH
-C:\nodejs\node_modules
+%NODE_HOME%\node_modules
 
 Path
-D:\nodejs\node_global
+%NODE_HOME%\node_global
 
 Path
-D:\nodejs
+%NODE_HOME%
 ```
 - 配置完环境变量
     - 之前的cmd窗口不会刷新环境变量
@@ -90,4 +95,47 @@ npm config list
 - 安装express
 ```shell script
 npm install express -g
+```
+
+## 可选命令安装
+- 安装vite
+```shell script
+npm install -g vite
+vite -v
+```
+- 安装vue-cli
+```shell script
+npm install -g @vue/cli
+vue -v
+```
+- 安装create-react-app
+```shell script
+npm install -g create-react-app
+create-react-app -v
+```
+- 安装yarn
+```shell script
+npm install -g yarn
+yarn -v
+```
+- 安装pnpm
+```shell script
+npm install -g pnpm
+pnpm -v
+```
+- 安装rimraf
+```shell script
+npm install -g rimraf
+```
+- 安装cross-env
+```shell script
+npm install -g cross-env
+```
+- 安装prettier
+```shell script
+npm install -g prettier
+```
+- 安装parcel
+```shell script
+npm install -g parcel
 ```

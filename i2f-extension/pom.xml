@@ -12,35 +12,9 @@
     <artifactId>i2f-extension</artifactId>
 
     <properties>
-        <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
-        <spring-cloud.version>Hoxton.SR12</spring-cloud.version>
-
-        <spring-version>5.2.4.RELEASE</spring-version>
-        <jackson-version>2.9.4</jackson-version>
-
         <flink.version>1.13.5</flink.version>
         <flink.scala.version>2.12</flink.scala.version>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
 
     <dependencies>
@@ -53,199 +27,173 @@
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-core</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-core-j2ee</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>i2f.boost</groupId>
             <artifactId>i2f-spring</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- i2f.web -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- i2f.proxy.cglib -->
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
-            <version>3.3.0</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- i2f.file.excel.jexcel -->
         <dependency>
             <groupId>org.jxls</groupId>
             <artifactId>jxls-jexcel</artifactId>
-            <version>1.0.9</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- i2f.component.json.gson  -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.8.2</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- i2f.component.json.fastjson  -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.47</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- i2f.component.mybatis  -->
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>3.5.6</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- MySQL的jdbc驱动包 -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.17</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- pagehelper 分页插件 -->
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>
-            <version>1.3.0</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- i2f.component.aspectj -->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.8.13</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- i2f.component.spring -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>${spring-version}</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>${spring-version}</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- i2f.component.redis -->
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
-            <version>2.3.5.RELEASE</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>2.7.3</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- i2f.component.email -->
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
-            <version>1.1.1</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
-            <version>1.6.2</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- QrCode -->
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
-            <version>3.4.1</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
-            <version>3.4.1</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- 阿里云云服务调用核心依赖 -->
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>
-            <version>4.5.20</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <!-- multipart/form-data -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
-            <version>4.5.3</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
 
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
-            <version>7.6.2</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
-            <version>7.6.2</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
-            <version>2.3.7.RELEASE</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- for excel ope -->
@@ -253,49 +201,42 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>4.1.2</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-scratchpad</artifactId>
-            <version>4.1.2</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>4.1.2</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml-schemas</artifactId>
-            <version>4.1.2</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
-            <version>3.2.1</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz -->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>2.3.2</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.alibaba.jstorm/jstorm-core -->
         <dependency>
             <groupId>com.alibaba.jstorm</groupId>
             <artifactId>jstorm-core</artifactId>
-            <version>2.2.1</version>
-            <scope>provided</scope>
+            <optional>true</optional>
             <exclusions> <!-- logback与slf4j版本不兼容问题时 -->
                 <exclusion>
                     <groupId>ch.qos.logback</groupId>
@@ -311,28 +252,24 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.26</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>1.2.3</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.dom4j/dom4j -->
         <dependency>
             <groupId>org.dom4j</groupId>
             <artifactId>dom4j</artifactId>
-            <version>2.1.3</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
 
@@ -340,16 +277,14 @@
         <dependency>
             <groupId>com.github.penggle</groupId>
             <artifactId>kaptcha</artifactId>
-            <version>2.3.2</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
 
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.1.65.Final</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- sftp -->
@@ -357,8 +292,7 @@
         <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.1.55</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- ftp -->
@@ -366,8 +300,7 @@
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
-            <version>3.6</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
 
@@ -376,8 +309,7 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
-            <version>3.2.1</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- generator -->
@@ -385,8 +317,7 @@
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity</artifactId>
-            <version>1.7</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
 
@@ -394,16 +325,14 @@
         <dependency>
             <groupId>net.lingala.zip4j</groupId>
             <artifactId>zip4j</artifactId>
-            <version>2.9.1</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- TAR -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.21</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- swagger2-->

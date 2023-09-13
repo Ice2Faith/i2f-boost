@@ -5,6 +5,7 @@ import i2f.core.j2ee.firewall.std.str.IStringFirewallAsserter;
 import i2f.core.match.regex.RegexUtil;
 import i2f.core.match.regex.data.RegexMatchItem;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -33,6 +34,11 @@ import java.util.function.Function;
  */
 public class XxeFirewallAsserter implements IStringFirewallAsserter {
     public static final String XXE_MATCH_PATTEN = "<!(doctype|entity)\\s+";
+
+    public static void disableDomXxeConfig() {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setExpandEntityReferences(false);
+    }
 
     public static void assertEntry(String errorMsg, String value) {
         if (value == null || "".equals(value)) {

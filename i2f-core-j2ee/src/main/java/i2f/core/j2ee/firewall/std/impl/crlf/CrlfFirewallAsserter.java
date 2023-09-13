@@ -50,7 +50,7 @@ public class CrlfFirewallAsserter implements IStringFirewallAsserter {
         boolean useCombine = true;
         if (useCombine) {
             List<Function<String, String>> groupWrappers = new LinkedList<>();
-            List<List<Integer>> groups = getGroups(size);
+            List<List<Integer>> groups = getAllCombinations(size);
             for (List<Integer> group : groups) {
                 Function<String, String> groupWrapper = (str) -> {
                     String ret = str;
@@ -80,23 +80,59 @@ public class CrlfFirewallAsserter implements IStringFirewallAsserter {
     }
 
     public static void main(String[] args) {
-        List<List<Integer>> groups = getGroups(4);
+        List<List<Integer>> groups = getAllCombinations(3);
         System.out.println(groups);
 
         assertEntry("clrf", "%25%20\\x25\\x20&#x25;&#32;\\u0025\\u0020&nbsp;&emsp;|");
     }
 
-    private static List<List<Integer>> getGroups(int size) {
+    /**
+     * 获取size个元素的全部组合
+     * 指包含选一个，2个...size个元素的所有组合
+     * 比如：size=3
+     * 则，返回从3个中 ，选一个，选两个，选三个的所有组合
+     * 结果为：[[0], [1], [2], [0, 1], [0, 2], [1, 2], [0, 1, 2]]
+     *
+     * @param size
+     * @return
+     */
+    public static List<List<Integer>> getAllCombinations(int size) {
         List<List<Integer>> ret = new LinkedList<>();
         for (int i = 1; i <= size; i++) {
             // 从size中选区i个元素的组合
             LinkedList<Integer> current = new LinkedList<>();
-            getNextGroups(size, i, current, ret);
+            getNextCombinations(size, i, current, ret);
         }
         return ret;
     }
 
-    private static void getNextGroups(int size, int cnt, LinkedList<Integer> current, List<List<Integer>> ret) {
+    /**
+     * 获取从size个元素中取cnt个元素的所有组合
+     * 比如：从3个中选择两个
+     * 结果为：[[0, 1], [0, 2], [1, 2]]
+     *
+     * @param size
+     * @param cnt
+     * @return
+     */
+    public static List<List<Integer>> getCombinations(int size, int cnt) {
+        List<List<Integer>> ret = new LinkedList<>();
+
+        LinkedList<Integer> current = new LinkedList<>();
+        getNextCombinations(size, cnt, current, ret);
+
+        return ret;
+    }
+
+    /**
+     * 进行dfs递归遍历的内部调用
+     *
+     * @param size    总共多少个元素
+     * @param cnt     要选择多少个元素
+     * @param current 已经选择了哪些元素
+     * @param ret     结果集合
+     */
+    public static void getNextCombinations(int size, int cnt, LinkedList<Integer> current, List<List<Integer>> ret) {
         int curSize = current.size();
         if (curSize == cnt) {
             ret.add(new LinkedList<>(current));
@@ -108,7 +144,7 @@ public class CrlfFirewallAsserter implements IStringFirewallAsserter {
         }
         for (int i = start; i < size; i++) {
             current.add(i);
-            getNextGroups(size, cnt, current, ret);
+            getNextCombinations(size, cnt, current, ret);
             current.removeLast();
         }
     }
