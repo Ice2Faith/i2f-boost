@@ -2,7 +2,7 @@ package i2f.core.digest;
 
 import i2f.core.annotations.remark.Author;
 
-import java.util.Random;
+import java.security.SecureRandom;
 import java.util.UUID;
 
 /**
@@ -17,7 +17,7 @@ public class CodeUtil {
         return UUID.randomUUID().toString().replace("-", "").toUpperCase();
     }
 
-    public static volatile Random rand = new Random();
+    public static volatile SecureRandom rand = new SecureRandom();
 
     public static String makeCheckCode(int len) {
         return makeCheckCode(len, false);
