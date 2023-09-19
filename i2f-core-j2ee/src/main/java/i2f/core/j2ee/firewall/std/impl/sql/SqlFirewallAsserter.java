@@ -20,19 +20,22 @@ public class SqlFirewallAsserter implements IStringFirewallAsserter {
 
     public static final String SPACE_CHARS_PATTEN = "[\\s\\p{Zs}\\u3000]+";
     public static final String DATABASE_NAME_PATTEN = "[0-9a-zA-Z_\\.$@]+";
-    public static final String CONST_CONDITION = "('[a-zA-Z0-9\\$@_-]+'|[a-zA-Z0-9\\$@_-]+)[\\s\\p{Zs}\\u3000]*(=|>|<|>=|<=|<>|!=)[\\s\\p{Zs}\\u3000]*('[a-zA-Z0-9\\$@_-]+'|[a-zA-Z0-9\\$@_-]+)";
-    public static final String MYSQL_CONDITION_COMMENTS_1 = "\\/\\*[\\s\\p{Zs}\\u3000]*\\[.*\\][\\s\\p{Zs}\\u3000]*\\*\\/";
-    public static final String MYSQL_CONDITION_COMMENTS_2 = "\\/\\*\\!.*\\*\\/";
-    public static final String ORACLE_CONDITION_COMMENTS_1 = "\\/\\*\\+.*\\*\\/";
-    public static final String ORACLE_CONDITION_COMMENTS_2 = "--\\+" + SPACE_CHARS_PATTEN;
+    public static final String CONST_CONDITION_NUM = "([+|-]?\\d+)[\\s\\p{Zs}\\u3000]*(=|>|<|>=|<=|<>|!=)[\\s\\p{Zs}\\u3000]*([+|-]?\\d+)";
+    public static final String CONST_CONDITION_STR = "('[^']*')[\\s\\p{Zs}\\u3000]*(=|>|<|>=|<=|<>|!=)[\\s\\p{Zs}\\u3000]*('[^']*')";
+    public static final String CONST_CONDITION_COL = "([a-zA-Z_\\\\$@][0-9a-zA-Z_\\\\$@]*)[\\s\\p{Zs}\\u3000]*(=|>|<|>=|<=|<>|!=)[\\s\\p{Zs}\\u3000]*([a-zA-Z_\\\\$@][0-9a-zA-Z_\\\\$@]*)";
 
-    public static final char[] BAD_CHARS = {'`', '\'', '\"', '\\', ';', (char) 0};
+    public static final String MYSQL_COMMENT_HINT_1 = "\\/\\*[\\s\\p{Zs}\\u3000]*\\[.*\\][\\s\\p{Zs}\\u3000]*\\*\\/";
+    public static final String MYSQL_COMMENT_HINT_2 = "\\/\\*\\!.*\\*\\/";
+    public static final String ORACLE_COMMENT_HINT_1 = "\\/\\*\\+.*\\*\\/";
+    public static final String ORACLE_COMMENT_HINT_2 = "--\\+" + SPACE_CHARS_PATTEN;
+
+    public static final char[] BAD_CHARS = {'\'', ';', (char) 0};
+    public static final char[] STRICT_CHARTS = {'"', '`', '\\'};
     public static final String[] BAD_STRS = {"extractvalue", "updatexml", "geohash",
             "gtid_subset", "gtid_subtract",
-            " and ", " or ", " -- ",
-            " exec ", " insert ", "select ", " delete ", " update ", " drop ", " create ", " replace ", "count ", "chr ", "mid ",
-            " union ", " union all ", " grant ", " revoke ", " alter ",
-            "master ", " truncate ", "char ", " declare ",
+            " exec ", "count ", "chr ", "mid ", "call ",
+            " union ", " union all ",
+            " declare ",
             "user()", "database()", "version()", "load_file", "save_file",
             " dumpfile ", " outfile ", " load data ", " infile ", " mysql.", " information_schema.",
             "show databases", "show tables", "show variables", "show users",
@@ -45,24 +48,43 @@ public class SqlFirewallAsserter implements IStringFirewallAsserter {
             "execute(", "sp_oacreate", "sp_oamethod", "utl_file",
             ".write(", ".read(", ".store(", ".load(", ".start(", ".run(", ".shell(", ".exec(", ".execute(",
             "@@datadir", "@@basedir", "@@version_compile_os", "@@global", "@@session", "@@local",
+            "wscript.shell", "sp_oamethod", "sp_oacreate", "sp_dropextendedproc",
+            "xp_dirtree", "xp_fileexist", "sp_addextendedproc",
+            " pg_description ", " pg_class ", " pg_user ", " pg_proc ", " pg_shadow ",
+            " pg_tables ", " pg_attribute ",
+            "fn_listextendedproperty", "is_srvrolemember", "sys.",
+            "master..", "master.dbo.", "sysdatabases", "sysobjects", "syscolumns",
+            "sqlite_master",
+            "MSysObjects",
+    };
+    public static final String[] STRICT_STRS = {
+            " and ", " or ", " -- ", " && ", " || ",
+            " insert ", "select ", " delete ", " update ", " drop ", " create ", " replace ",
+            " grant ", " revoke ", " alter ", " event ", " trigger ",
+            "master ", " truncate ", "char ",
+            "/etc/", "/root/", "/usr/", "/var/log/", "/var/www/", "/proc/", "/var/db/",
+            "/logs/", "/mysql/", "/php/", "/windows/", "/winnt/", "\\windows\\", "\\winnt\\",
+
     };
     public static final String[] BAD_MATCHES = {
             // common
-            "--" + SPACE_CHARS_PATTEN, // --
-            "#" + SPACE_CHARS_PATTEN, // #
-            CONST_CONDITION, // 1=1 , 1!=1 '1'='2' user=user ...
-            MYSQL_CONDITION_COMMENTS_1,
-            MYSQL_CONDITION_COMMENTS_2,
-            ORACLE_CONDITION_COMMENTS_1,
-            ORACLE_CONDITION_COMMENTS_2,
 
+            CONST_CONDITION_NUM, // 1=1 , 1!=1 ...
+            CONST_CONDITION_STR, //  '1'='2' ...
+            MYSQL_COMMENT_HINT_1, // /*[xxx]*/
+            MYSQL_COMMENT_HINT_2, // /*!xxx*/
+            ORACLE_COMMENT_HINT_1, // /*+xxx*/
+            ORACLE_COMMENT_HINT_2,  // // --+
 
             "exec" + SPACE_CHARS_PATTEN + "\\(", // exec(
+            "exec" + SPACE_CHARS_PATTEN + DATABASE_NAME_PATTEN, // exec ***
             "shell" + SPACE_CHARS_PATTEN + "\\(", // shell(
             "cmd" + SPACE_CHARS_PATTEN + "\\(", // cmd(
             "run" + SPACE_CHARS_PATTEN + "\\(", // run(
             "command" + SPACE_CHARS_PATTEN + "\\(", // command(
             "execute" + SPACE_CHARS_PATTEN + "\\(", // execute(
+            "execute" + SPACE_CHARS_PATTEN + DATABASE_NAME_PATTEN, // execute ***
+            "call" + SPACE_CHARS_PATTEN + DATABASE_NAME_PATTEN, // call ***
 
             // mysql
             "user" + SPACE_CHARS_PATTEN + "\\(" + SPACE_CHARS_PATTEN + "\\)", // user()
@@ -110,10 +132,80 @@ public class SqlFirewallAsserter implements IStringFirewallAsserter {
             "sys_" + DATABASE_NAME_PATTEN,// sys_***
             "file_" + DATABASE_NAME_PATTEN,// sys_***
             "utl_" + DATABASE_NAME_PATTEN,// sys_***
+            "xmltype" + SPACE_CHARS_PATTEN + "\\(", // xmltype(***
+            "sleep" + SPACE_CHARS_PATTEN + "\\(", // sleep(***
+            "benchmark" + SPACE_CHARS_PATTEN + "\\(", // benchmark(***
+            "receive_message" + SPACE_CHARS_PATTEN + "\\(", // receive_message(***
+            // postgre
+            "pg_" + DATABASE_NAME_PATTEN, // pg_***
+            "pg_sleep" + SPACE_CHARS_PATTEN + "\\(", // pg_sleep(***
+            "generate_series" + SPACE_CHARS_PATTEN + "\\(", // generate_series(***
+            "waitfor" + SPACE_CHARS_PATTEN + "delay" + SPACE_CHARS_PATTEN, // waitfor delay
+            // mssql
+            "master(\\.)+" + DATABASE_NAME_PATTEN, // master.***
+            "reconfigure" + SPACE_CHARS_PATTEN + DATABASE_NAME_PATTEN, // reconfigure ***
+            "openrowset" + SPACE_CHARS_PATTEN + "\\(", // openrowset(
+            // db2
+            "sysibm\\." + DATABASE_NAME_PATTEN, // sysibm.***
+            "syscat\\." + DATABASE_NAME_PATTEN, // syscat.***
+            "sysstat\\." + DATABASE_NAME_PATTEN, // sysstat.***
+            "randomblob" + SPACE_CHARS_PATTEN + "\\(", // randomblob(
+            // firebird
+            "rdb\\$" + DATABASE_NAME_PATTEN, // rdb$***
+            // sap maxdb
+            "domain\\." + DATABASE_NAME_PATTEN, // domain.***
+            // hsqldb
+            "regexp_substring" + SPACE_CHARS_PATTEN + "\\(", // regexp_substring(
+            "crypt_key" + SPACE_CHARS_PATTEN + "\\(", // crypt_key(
+            // informix
+            "sysuser:" + DATABASE_NAME_PATTEN, // sysuser:***
+            "sysmaster:" + DATABASE_NAME_PATTEN,// sysmaster:***
+            // monetdb
+            "from" + SPACE_CHARS_PATTEN + "environment" + SPACE_CHARS_PATTEN, // from environment
+            "from" + SPACE_CHARS_PATTEN + "schemas" + SPACE_CHARS_PATTEN, // from schemas
+            "from" + SPACE_CHARS_PATTEN + "columns" + SPACE_CHARS_PATTEN, // from columns
+            "from" + SPACE_CHARS_PATTEN + "tables" + SPACE_CHARS_PATTEN, // from tables
+            // vertica
+            "v_catalog\\." + DATABASE_NAME_PATTEN, // v_catalog.***
+            "v_monitor\\." + DATABASE_NAME_PATTEN, // v_monitor.***
+            // altibase
+            "system_\\." + DATABASE_NAME_PATTEN, // system_.***
+            // mimersql
+            "system\\." + DATABASE_NAME_PATTEN, // system.***
+            // cubrid
+            "from" + SPACE_CHARS_PATTEN + "db_class" + SPACE_CHARS_PATTEN, // from tables
+            "from" + SPACE_CHARS_PATTEN + "db_attribute" + SPACE_CHARS_PATTEN, // from tables
+            "from" + SPACE_CHARS_PATTEN + "db_method" + SPACE_CHARS_PATTEN, // from tables
+            "from" + SPACE_CHARS_PATTEN + "db_user" + SPACE_CHARS_PATTEN, // from tables
+            "from" + SPACE_CHARS_PATTEN + "db_auth" + SPACE_CHARS_PATTEN, // from tables
+            //
+            "dm_" + DATABASE_NAME_PATTEN,// dm_***
+            "trace_" + DATABASE_NAME_PATTEN,// trace_***
+            "xml_" + DATABASE_NAME_PATTEN,// xml_***
+            "log_" + DATABASE_NAME_PATTEN,// log_***
+            "sysmail_" + DATABASE_NAME_PATTEN,// sysmail_***
+            "master_" + DATABASE_NAME_PATTEN,// master_***
+            "master\\.\\." + DATABASE_NAME_PATTEN,// master..***
+            "replicate_" + DATABASE_NAME_PATTEN,// replicate_***
+            "secondary_" + DATABASE_NAME_PATTEN,// secondary_***
+            "source_" + DATABASE_NAME_PATTEN,// source_***
+            "sql_" + DATABASE_NAME_PATTEN,// sql_***
+            "current_" + DATABASE_NAME_PATTEN,// current_***
+
+    };
+    public static final String[] STRICT_MATCHES = {
+            "--" + SPACE_CHARS_PATTEN, // --
+            "#" + SPACE_CHARS_PATTEN, // #
+            SPACE_CHARS_PATTEN + "escape" + SPACE_CHARS_PATTEN + "'.'", // escape '*'
+
+            CONST_CONDITION_COL, //  user=user ...
     };
 
-
     public static void assertEntry(String errorMsg, String value) {
+        assertEntry(false, errorMsg, value);
+    }
+
+    public static void assertEntry(boolean strict, String errorMsg, String value) {
         if (value == null || "".equals(value)) {
             return;
         }
@@ -136,6 +228,16 @@ public class SqlFirewallAsserter implements IStringFirewallAsserter {
             String vstr = containsInjectForm(sql, str);
             if (vstr != null) {
                 throw new SqlFirewallException(errorMsg + ", " + " contains illegal str [" + vstr + "]");
+            }
+        }
+        if (strict) {
+            badChars = STRICT_CHARTS;
+            for (char ch : badChars) {
+                String str = ch + "";
+                String vstr = containsInjectForm(sql, str);
+                if (vstr != null) {
+                    throw new SqlFirewallException(errorMsg + ", " + " contains illegal str [" + vstr + "]");
+                }
             }
         }
 
@@ -165,6 +267,16 @@ public class SqlFirewallAsserter implements IStringFirewallAsserter {
                 throw new SqlFirewallException(errorMsg + ", " + " contains illegal str [" + vstr + "]");
             }
         }
+        if (strict) {
+            badStrs = STRICT_STRS;
+            for (String badStr : badStrs) {
+                String str = badStr;
+                String vstr = containsInjectForm(sql, str);
+                if (vstr != null) {
+                    throw new SqlFirewallException(errorMsg + ", " + " contains illegal str [" + vstr + "]");
+                }
+            }
+        }
 
         String[] badMatches = BAD_MATCHES;
         for (String badMatch : badMatches) {
@@ -174,6 +286,18 @@ public class SqlFirewallAsserter implements IStringFirewallAsserter {
                 MatchResult rs = m.toMatchResult();
                 String vstr = sql.substring(rs.start(), rs.end());
                 throw new SqlFirewallException(errorMsg + ", " + " contains illegal str [" + vstr + "]");
+            }
+        }
+        if (strict) {
+            badMatches = STRICT_MATCHES;
+            for (String badMatch : badMatches) {
+                Pattern p = Pattern.compile(badMatch);
+                Matcher m = p.matcher(sql);
+                if (m.find()) {
+                    MatchResult rs = m.toMatchResult();
+                    String vstr = sql.substring(rs.start(), rs.end());
+                    throw new SqlFirewallException(errorMsg + ", " + " contains illegal str [" + vstr + "]");
+                }
             }
         }
 
@@ -244,7 +368,7 @@ public class SqlFirewallAsserter implements IStringFirewallAsserter {
 
     @Override
     public void doAssert(String errorMsg, String value) {
-        assertEntry(errorMsg, value);
+        assertEntry(false, errorMsg, value);
     }
 
 }
