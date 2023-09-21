@@ -129,7 +129,7 @@ public class SqlFirewallAsserter implements IStringFirewallAsserter {
             "sys_context" + SPACE_CHARS_PATTEN + "\\(", // sys_context(
             "dbms_" + DATABASE_NAME_PATTEN,// dbms_***
             "dbns_" + DATABASE_NAME_PATTEN,// dbns_***
-            "sys_" + DATABASE_NAME_PATTEN,// sys_***
+//            "sys_" + DATABASE_NAME_PATTEN,// sys_***
             "file_" + DATABASE_NAME_PATTEN,// sys_***
             "utl_" + DATABASE_NAME_PATTEN,// sys_***
             "xmltype" + SPACE_CHARS_PATTEN + "\\(", // xmltype(***
@@ -243,6 +243,9 @@ public class SqlFirewallAsserter implements IStringFirewallAsserter {
 
         for (int i = 0; i < 32; i++) {
             char ch = (char) i;
+            if(ch=='\n'||ch=='\r'||ch=='\t'){
+                continue;
+            }
             String str = ch + "";
             String vstr = containsInjectForm(sql, str);
             if (vstr != null) {
