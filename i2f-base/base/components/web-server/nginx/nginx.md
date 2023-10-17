@@ -383,6 +383,58 @@ http {
 }
 ```
 
+## 常见配置
+- 文件上传大小限制
+```shell script
+http{
+  server {
+    ...
+    client_max_body_size 200m;
+    client_body_buffer_size 1m;
+    ...
+  }
+}
+```
+- 请求头长度限制
+```shell script
+http{
+  server {
+    ...
+    client_header_buffer_size 2k;
+    large_client_header_buffers 4 16k;
+    ...
+  }
+}
+```
+- 跨域配置
+```shell script
+http{
+  server{
+    ...
+    # *星号代表任意跨源请求都支持
+    add_header Access-Control-Allow-Origin '*';  
+    add_header Access-Control-Allow-Credentials "true";
+    add_header Access-Control-Allow-Methods 'GET, POST, OPTIONS';
+    add_header Access-Control-Allow-Headers  'token,DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,XRequested-With';
+    if ($request_method = 'OPTIONS') {
+        return 200;
+    }
+    ...
+  }
+}
+```
+- 动态匹配的跨域控制
+```shell script
+# 设置变量 $cors_origin
+set $cors_origin "";
+# 请求地址匹配格式  用来控制http请求地址 设置跨域白名单
+if ($http_origin ~ "http://(.*).baidu.com$") {
+    set $cors_origin $http_origin;              
+}
+
+add_header Access-Control-Allow-Origin '$cors_origin';  
+```
+
 ## 漏洞解析
 - $uri 引发的CRLF漏洞
 ```shell script

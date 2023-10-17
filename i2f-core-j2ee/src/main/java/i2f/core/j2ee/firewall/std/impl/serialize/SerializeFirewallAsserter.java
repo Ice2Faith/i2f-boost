@@ -1,9 +1,11 @@
 package i2f.core.j2ee.firewall.std.impl.serialize;
 
+import i2f.core.codec.str.code.UCodeStringCodec;
+import i2f.core.codec.str.code.XCodeStringCodec;
 import i2f.core.codec.str.html.HtmlStringStringCodec;
+import i2f.core.codec.str.url.UrlStringStringCodec;
+import i2f.core.j2ee.firewall.std.common.FirewallAsserterUtils;
 import i2f.core.j2ee.firewall.std.str.IStringFirewallAsserter;
-import i2f.core.match.regex.RegexUtil;
-import i2f.core.match.regex.data.RegexMatchItem;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,6 +18,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Ice2Faith
@@ -34,26 +39,21 @@ import java.util.function.Function;
  * 说到这里
  */
 public class SerializeFirewallAsserter implements IStringFirewallAsserter {
-    public static final String CLASS_MATCH_PATTEN = "[a-zA-Z0-9-_$]+(\\.[a-zA-Z0-9-_$]+)+";
+    public static final String JAVA_NAME_PATTEN = "[a-zA-Z0-9-_\\$\\.]+";
+    public static final String CLASS_MATCH_PATTEN = "[a-zA-Z0-9-_\\$]+(\\.[a-zA-Z0-9-_\\$]+)+";
     public static final String DEFAULT_JDK_PKGS = "java.,javax.,javafx.,com.sun.,sun.,oracle.,jdk.,com.oracle.,org.ietf,org.jcp,org.omg,org.w3c,org.xml,org.relaxng";
-
-    public static void assertEntry(String errorMsg, String value) {
-        if (value == null || "".equals(value)) {
-            return;
-        }
-        List<Function<String, String>> wrappers = Arrays.asList(
-                (str) -> str,
-                HtmlStringStringCodec.INSTANCE::decode
-        );
-        for (Function<String, String> wrapper : wrappers) {
-            String text = wrapper.apply(value);
-            List<RegexMatchItem> matchItems = RegexUtil.regexFinds(text, CLASS_MATCH_PATTEN);
-            for (RegexMatchItem item : matchItems) {
-                String className = item.matchStr;
-                assertClassname(errorMsg, className);
-            }
-        }
-    }
+    public static final String[] BAD_MATCHES = {
+            CLASS_MATCH_PATTEN,
+            JAVA_NAME_PATTEN + "executor",
+            JAVA_NAME_PATTEN + "runner",
+            JAVA_NAME_PATTEN + "processor",
+            JAVA_NAME_PATTEN + "runtime",
+            JAVA_NAME_PATTEN + "connector",
+            JAVA_NAME_PATTEN + "connection",
+            JAVA_NAME_PATTEN + "listener",
+            JAVA_NAME_PATTEN + "parser",
+    };
+    public static final SerializeFirewallAsserter INSTANCE = new SerializeFirewallAsserter();
 
     public static boolean isHasPkgPrefix(String className, String checkPkgs) {
         if (className == null) {
@@ -142,9 +142,179 @@ public class SerializeFirewallAsserter implements IStringFirewallAsserter {
         }
     }
 
+    private Context context;
+    private boolean useCombine = true;
+
+    public SerializeFirewallAsserter() {
+        this.applyRules(null);
+    }
+
+    public SerializeFirewallAsserter(Rules rules) {
+        this.applyRules(rules);
+    }
+
+    public static void main(String[] args) {
+        String className = "org.springframework.ApplicationRunner";
+        INSTANCE.doAssert("serialize", className);
+    }
+
+    public static String containsInjectFormByEncode(String targetStr, String testStr, boolean useCombine) {
+        if (testStr == null || "".equals(testStr)) {
+            return null;
+        }
+        List<Function<String, String>> singleWrappers = Arrays.asList(
+                (str) -> str,
+                UrlStringStringCodec.INSTANCE::encode,
+                UrlStringStringCodec.INSTANCE::encode,
+                FirewallAsserterUtils.ENCODE_0X_02X,
+                FirewallAsserterUtils.ENCODE_PER_02X,
+                FirewallAsserterUtils.ENCODE_XCODE_02X,
+                FirewallAsserterUtils.ENCODE_UCODE_04X,
+                HtmlStringStringCodec.INSTANCE::encode,
+                UCodeStringCodec.INSTANCE::encode,
+                XCodeStringCodec.INSTANCE::encode
+        );
+
+        List<Function<String, String>> wrappers = FirewallAsserterUtils.combinationsWrappers(singleWrappers, useCombine);
+
+        for (Function<String, String> wrapper : wrappers) {
+            try {
+                String text = wrapper.apply(testStr);
+                text = text.toLowerCase();
+                if (targetStr.contains(text)) {
+                    return text;
+                }
+            } catch (Exception e) {
+
+            }
+        }
+
+        return null;
+    }
+
+    public static String containsInjectFormByDecode(String targetStr, String testStr, boolean useCombine, String testMatchStr) {
+        boolean normalEq = false;
+        if (testStr != null && !"".equals(testStr)) {
+            normalEq = true;
+        }
+
+        Pattern pattern = null;
+        if (testMatchStr != null && !"".equalsIgnoreCase(testMatchStr)) {
+            pattern = Pattern.compile(testMatchStr);
+        }
+
+        if (!normalEq && pattern == null) {
+            return null;
+        }
+
+        List<Function<String, String>> singleWrappers = Arrays.asList(
+                (str) -> str,
+                UrlStringStringCodec.INSTANCE::decode,
+                UrlStringStringCodec.INSTANCE::decode,
+                HtmlStringStringCodec.INSTANCE::decode,
+                UCodeStringCodec.INSTANCE::decode,
+                XCodeStringCodec.INSTANCE::decode
+        );
+
+        List<Function<String, String>> wrappers = FirewallAsserterUtils.combinationsWrappers(singleWrappers, useCombine);
+
+        for (Function<String, String> wrapper : wrappers) {
+            try {
+                String text = wrapper.apply(targetStr);
+                text = text.toLowerCase();
+                if (normalEq) {
+                    if (text.contains(testStr)) {
+                        return testStr;
+                    }
+                }
+                if (pattern != null) {
+                    Matcher matcher = pattern.matcher(text);
+                    if (matcher.find()) {
+                        MatchResult rs = matcher.toMatchResult();
+                        String vstr = text.substring(rs.start(), rs.end());
+                        return vstr;
+                    }
+                }
+            } catch (Exception e) {
+
+            }
+        }
+        return null;
+    }
+
+    public static String containsInjectForm(String targetStr, String testStr, boolean useCombine, String testMatchStr) {
+        String vstr = containsInjectFormByEncode(targetStr, testStr, useCombine);
+        if (vstr != null) {
+            return vstr;
+        }
+        return containsInjectFormByDecode(targetStr, testStr, useCombine, testMatchStr);
+    }
+
+    public SerializeFirewallAsserter applyRules(Rules rules) {
+        this.context = Context.defaultInstance();
+        if (rules != null) {
+            this.context.badMatches = FirewallAsserterUtils.merge(
+                    Arrays.asList(BAD_MATCHES),
+                    Arrays.asList(rules.includeBadMatches),
+                    Arrays.asList(rules.excludeBadMatches),
+                    Arrays.asList(rules.replaceBadMatches));
+
+        }
+        return this;
+    }
+
+    public SerializeFirewallAsserter applyCombine(boolean enable) {
+        this.useCombine = enable;
+        return this;
+    }
+
     @Override
     public void doAssert(String errorMsg, String value) {
-        assertEntry(errorMsg, value);
+        if (value == null || "".equals(value)) {
+            return;
+        }
+        String content = value;
+
+        content = content.trim();
+        if ("".equals(content)) {
+            return;
+        }
+
+
+        List<String> badMatches = context.badMatches;
+        if (badMatches != null) {
+            for (String badMatch : badMatches) {
+                String str = badMatch;
+                String vstr = containsInjectForm(content, null, useCombine, str);
+                if (vstr != null) {
+                    if (CLASS_MATCH_PATTEN.equals(badMatch)) {
+                        String className = vstr;
+                        assertClassname(errorMsg, className);
+                    } else {
+                        throw new SerializeFirewallException(errorMsg + ", " + " contains illegal str [" + vstr + "]");
+                    }
+                }
+            }
+        }
+
+    }
+
+    public static class Rules {
+
+        public String[] includeBadMatches;
+        public String[] excludeBadMatches;
+        public String[] replaceBadMatches;
+
+    }
+
+    public static class Context {
+        public List<String> badMatches;
+
+        public static Context defaultInstance() {
+            Context ret = new Context();
+            ret.badMatches = FirewallAsserterUtils.merge(Arrays.asList(BAD_MATCHES), null, null, null);
+            return ret;
+        }
     }
 
 }

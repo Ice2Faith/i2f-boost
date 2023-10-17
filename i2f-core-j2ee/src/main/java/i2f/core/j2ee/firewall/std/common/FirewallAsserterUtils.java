@@ -1,6 +1,7 @@
 package i2f.core.j2ee.firewall.std.common;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * @author Ice2Faith
@@ -213,5 +214,60 @@ public class FirewallAsserterUtils {
             getNextCombinations(size, cnt, current, ret);
             current.removeLast();
         }
+    }
+
+    public static final Function<String, String> ENCODE_0X_02X = (str) -> str2form(str, null, (ch) -> String.format("0x%02x", (int) ch));
+    public static final Function<String, String> ENCODE_PER_02X = (str) -> str2form(str, null, (ch) -> String.format("%%%02x", (int) ch));
+    public static final Function<String, String> ENCODE_XCODE_02X = (str) -> str2form(str, null, (ch) -> String.format("\\x%02x", (int) ch));
+    public static final Function<String, String> ENCODE_UCODE_04X = (str) -> str2form(str, null, (ch) -> String.format("\\u%04x", (int) ch));
+
+
+    public static String str2form(String str, String separator, Function<Character, String> chMapper) {
+        if (str == null) {
+            return str;
+        }
+        if ("".equals(str)) {
+            return str;
+        }
+        StringBuilder builder = new StringBuilder();
+        char[] chars = str.toCharArray();
+        boolean isFirst = true;
+        for (char ch : chars) {
+            if (!isFirst) {
+                if (separator != null) {
+                    builder.append(separator);
+                }
+            }
+            builder.append(chMapper.apply(ch));
+            isFirst = false;
+        }
+        return builder.toString();
+    }
+
+    public static List<Function<String, String>> combinationsWrappers(List<Function<String, String>> singleWrappers, boolean useCombine) {
+        int size = singleWrappers.size();
+
+        List<Function<String, String>> wrappers = new LinkedList<>(singleWrappers);
+        if (useCombine) {
+            List<Function<String, String>> groupWrappers = new LinkedList<>();
+            List<List<Integer>> groups = FirewallAsserterUtils.getAllCombinations(size);
+            for (List<Integer> group : groups) {
+                Function<String, String> groupWrapper = (str) -> {
+                    String ret = str;
+                    for (Integer idx : group) {
+                        Function<String, String> func = singleWrappers.get(idx);
+                        try {
+                            ret = func.apply(ret);
+                        } catch (Exception e) {
+
+                        }
+                    }
+                    return ret;
+                };
+                groupWrappers.add(groupWrapper);
+            }
+            wrappers = groupWrappers;
+        }
+        return wrappers;
     }
 }

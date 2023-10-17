@@ -4,13 +4,15 @@ import i2f.core.codec.str.code.UCodeStringCodec;
 import i2f.core.codec.str.code.XCodeStringCodec;
 import i2f.core.codec.str.html.HtmlStringStringCodec;
 import i2f.core.codec.str.url.UrlStringStringCodec;
-import i2f.core.j2ee.firewall.std.impl.xxe.XxeFirewallException;
+import i2f.core.j2ee.firewall.std.common.FirewallAsserterUtils;
 import i2f.core.j2ee.firewall.std.str.IStringFirewallAsserter;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Ice2Faith
@@ -32,125 +34,198 @@ import java.util.function.Function;
  * 变体包括但不限于URL编码、HTML编码、字符编码等
  */
 public class CrlfFirewallAsserter implements IStringFirewallAsserter {
+    public static final char[] BAD_CHARS = {'\r', '\n', (char) 0};
+    public static final String[] BAD_STRS = {"\r\n"};
 
-    public static void assertEntry(String errorMsg, String value) {
-        if (value == null || "".equals(value)) {
-            return;
+    public static final CrlfFirewallAsserter INSTANCE = new CrlfFirewallAsserter();
+    private Context context;
+    private boolean useCombine = true;
+
+    public CrlfFirewallAsserter() {
+        this.applyRules(null);
+    }
+
+    public CrlfFirewallAsserter(Rules rules) {
+        this.applyRules(rules);
+    }
+
+    public static String containsInjectFormByEncode(String targetStr, String testStr, boolean useCombine) {
+        if (testStr == null || "".equals(testStr)) {
+            return null;
         }
         List<Function<String, String>> singleWrappers = Arrays.asList(
                 (str) -> str,
+                UrlStringStringCodec.INSTANCE::encode,
+                UrlStringStringCodec.INSTANCE::encode,
+                FirewallAsserterUtils.ENCODE_0X_02X,
+                FirewallAsserterUtils.ENCODE_PER_02X,
+                FirewallAsserterUtils.ENCODE_XCODE_02X,
+                FirewallAsserterUtils.ENCODE_UCODE_04X,
+                HtmlStringStringCodec.INSTANCE::encode,
+                UCodeStringCodec.INSTANCE::encode,
+                XCodeStringCodec.INSTANCE::encode
+        );
+
+        List<Function<String, String>> wrappers = FirewallAsserterUtils.combinationsWrappers(singleWrappers, useCombine);
+
+        for (Function<String, String> wrapper : wrappers) {
+            try {
+                String text = wrapper.apply(testStr);
+                text = text.toLowerCase();
+                if (targetStr.contains(text)) {
+                    return text;
+                }
+            } catch (Exception e) {
+
+            }
+        }
+
+        return null;
+    }
+
+    public static String containsInjectFormByDecode(String targetStr, String testStr, boolean useCombine, String testMatchStr) {
+        boolean normalEq = false;
+        if (testStr != null && !"".equals(testStr)) {
+            normalEq = true;
+        }
+
+        Pattern pattern = null;
+        if (testMatchStr != null && !"".equalsIgnoreCase(testMatchStr)) {
+            pattern = Pattern.compile(testMatchStr);
+        }
+
+        if (!normalEq && pattern == null) {
+            return null;
+        }
+
+        List<Function<String, String>> singleWrappers = Arrays.asList(
+                (str) -> str,
+                UrlStringStringCodec.INSTANCE::decode,
                 UrlStringStringCodec.INSTANCE::decode,
                 HtmlStringStringCodec.INSTANCE::decode,
                 UCodeStringCodec.INSTANCE::decode,
                 XCodeStringCodec.INSTANCE::decode
         );
-        int size = singleWrappers.size();
 
-        List<Function<String, String>> wrappers = new LinkedList<>(singleWrappers);
-        boolean useCombine = true;
-        if (useCombine) {
-            List<Function<String, String>> groupWrappers = new LinkedList<>();
-            List<List<Integer>> groups = getAllCombinations(size);
-            for (List<Integer> group : groups) {
-                Function<String, String> groupWrapper = (str) -> {
-                    String ret = str;
-                    for (Integer idx : group) {
-                        Function<String, String> func = singleWrappers.get(idx);
-                        ret = func.apply(ret);
-                    }
-                    return ret;
-                };
-                groupWrappers.add(groupWrapper);
-            }
-            wrappers = groupWrappers;
-        }
+        List<Function<String, String>> wrappers = FirewallAsserterUtils.combinationsWrappers(singleWrappers, useCombine);
+
         for (Function<String, String> wrapper : wrappers) {
-            String text = wrapper.apply(value);
-            text = text.toLowerCase();
-            boolean trimSpace = true;
-            if (trimSpace) {
-                text = text.replaceAll("\\s+", "");
-            }
-            System.out.println(text);
-            if (text.contains("\n")) {
-                throw new XxeFirewallException(errorMsg + ", " + " contains illegal crlf express [" + text + "]");
-            }
+            try {
+                String text = wrapper.apply(targetStr);
+                text = text.toLowerCase();
+                if (normalEq) {
+                    if (text.contains(testStr)) {
+                        return testStr;
+                    }
+                }
+                if (pattern != null) {
+                    Matcher matcher = pattern.matcher(text);
+                    if (matcher.find()) {
+                        MatchResult rs = matcher.toMatchResult();
+                        String vstr = text.substring(rs.start(), rs.end());
+                        return vstr;
+                    }
+                }
+            } catch (Exception e) {
 
+            }
         }
+        return null;
+    }
+
+    public static String containsInjectForm(String targetStr, String testStr, boolean useCombine, String testMatchStr) {
+        String vstr = containsInjectFormByEncode(targetStr, testStr, useCombine);
+        if (vstr != null) {
+            return vstr;
+        }
+        return containsInjectFormByDecode(targetStr, testStr, useCombine, testMatchStr);
     }
 
     public static void main(String[] args) {
-        List<List<Integer>> groups = getAllCombinations(3);
+        List<List<Integer>> groups = FirewallAsserterUtils.getAllCombinations(3);
         System.out.println(groups);
 
-        assertEntry("clrf", "%25%20\\x25\\x20&#x25;&#32;\\u0025\\u0020&nbsp;&emsp;|");
+        CrlfFirewallAsserter.INSTANCE.doAssert("clrf", "%25%20\\x25\\x20&#x25;&#32;\\u0025\\u0020&nbsp;&emsp;|%250a;");
     }
 
-    /**
-     * 获取size个元素的全部组合
-     * 指包含选一个，2个...size个元素的所有组合
-     * 比如：size=3
-     * 则，返回从3个中 ，选一个，选两个，选三个的所有组合
-     * 结果为：[[0], [1], [2], [0, 1], [0, 2], [1, 2], [0, 1, 2]]
-     *
-     * @param size
-     * @return
-     */
-    public static List<List<Integer>> getAllCombinations(int size) {
-        List<List<Integer>> ret = new LinkedList<>();
-        for (int i = 1; i <= size; i++) {
-            // 从size中选区i个元素的组合
-            LinkedList<Integer> current = new LinkedList<>();
-            getNextCombinations(size, i, current, ret);
+    public CrlfFirewallAsserter applyRules(Rules rules) {
+        this.context = Context.defaultInstance();
+        if (rules != null) {
+            this.context.badChars = FirewallAsserterUtils.merge(
+                    BAD_CHARS,
+                    rules.includeBadChars,
+                    rules.excludeBadChars,
+                    rules.replaceBadChars);
+            this.context.badStrs = FirewallAsserterUtils.merge(
+                    Arrays.asList(BAD_STRS),
+                    Arrays.asList(rules.includeBadStrs),
+                    Arrays.asList(rules.excludeBadStrs),
+                    Arrays.asList(rules.replaceBadStrs));
+
         }
-        return ret;
+        return this;
     }
 
-    /**
-     * 获取从size个元素中取cnt个元素的所有组合
-     * 比如：从3个中选择两个
-     * 结果为：[[0, 1], [0, 2], [1, 2]]
-     *
-     * @param size
-     * @param cnt
-     * @return
-     */
-    public static List<List<Integer>> getCombinations(int size, int cnt) {
-        List<List<Integer>> ret = new LinkedList<>();
-
-        LinkedList<Integer> current = new LinkedList<>();
-        getNextCombinations(size, cnt, current, ret);
-
-        return ret;
-    }
-
-    /**
-     * 进行dfs递归遍历的内部调用
-     *
-     * @param size    总共多少个元素
-     * @param cnt     要选择多少个元素
-     * @param current 已经选择了哪些元素
-     * @param ret     结果集合
-     */
-    public static void getNextCombinations(int size, int cnt, LinkedList<Integer> current, List<List<Integer>> ret) {
-        int curSize = current.size();
-        if (curSize == cnt) {
-            ret.add(new LinkedList<>(current));
-            return;
-        }
-        int start = 0;
-        if (curSize > 0) {
-            start = current.getLast() + 1;
-        }
-        for (int i = start; i < size; i++) {
-            current.add(i);
-            getNextCombinations(size, cnt, current, ret);
-            current.removeLast();
-        }
+    public CrlfFirewallAsserter applyCombine(boolean enable) {
+        this.useCombine = enable;
+        return this;
     }
 
     @Override
     public void doAssert(String errorMsg, String value) {
-        assertEntry(errorMsg, value);
+        if (value == null || "".equals(value)) {
+            return;
+        }
+        String line = value;
+
+        line = line.toLowerCase();
+
+
+        char[] badChars = context.badChars;
+        if (badChars != null) {
+            for (char ch : badChars) {
+                String str = ch + "";
+                String vstr = containsInjectForm(line, str, useCombine, null);
+                if (vstr != null) {
+                    throw new CrlfFirewallException(errorMsg + ", " + " contains illegal str [" + vstr + "]");
+                }
+            }
+        }
+
+        List<String> badStrs = context.badStrs;
+        if (badStrs != null) {
+            for (String badStr : badStrs) {
+                String str = badStr;
+                String vstr = containsInjectForm(line, str, useCombine, null);
+                if (vstr != null) {
+                    throw new CrlfFirewallException(errorMsg + ", " + " contains illegal str [" + vstr + "]");
+                }
+            }
+        }
+
+    }
+
+    public static class Rules {
+        public char[] includeBadChars;
+        public char[] excludeBadChars;
+        public char[] replaceBadChars;
+
+        public String[] includeBadStrs;
+        public String[] excludeBadStrs;
+        public String[] replaceBadStrs;
+    }
+
+    public static class Context {
+        public char[] badChars;
+        public List<String> badStrs;
+        public List<String> badSuffixes;
+        public List<String> badFilenames;
+
+        public static Context defaultInstance() {
+            Context ret = new Context();
+            ret.badChars = FirewallAsserterUtils.merge(BAD_CHARS, null, null, null);
+            ret.badStrs = FirewallAsserterUtils.merge(Arrays.asList(BAD_STRS), null, null, null);
+            return ret;
+        }
     }
 }

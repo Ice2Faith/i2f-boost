@@ -5,15 +5,14 @@ import i2f.core.codec.str.code.XCodeStringCodec;
 import i2f.core.codec.str.html.HtmlStringStringCodec;
 import i2f.core.codec.str.url.UrlStringStringCodec;
 import i2f.core.j2ee.firewall.std.common.FirewallAsserterUtils;
-import i2f.core.j2ee.firewall.std.impl.xxe.XxeFirewallException;
 import i2f.core.j2ee.firewall.std.str.IStringFirewallAsserter;
-import lombok.Data;
 
-import java.net.URLEncoder;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Ice2Faith
@@ -91,25 +90,27 @@ public class PathFirewallAsserter implements IStringFirewallAsserter {
         public List<String> badFilenames;
         public static Context defaultInstance(){
             Context ret = new Context();
-            ret.badChars= FirewallAsserterUtils.merge(BAD_CHARS,null,null,null);
-            ret.badStrs=FirewallAsserterUtils.merge(Arrays.asList(BAD_STRS),null,null,null);
-            ret.badSuffixes=FirewallAsserterUtils.merge(Arrays.asList(BAD_SUFFIXES),null,null,null);
-            ret.badFilenames=FirewallAsserterUtils.merge(Arrays.asList(BAD_FILENAMES),null,null,null);
+            ret.badChars = FirewallAsserterUtils.merge(BAD_CHARS, null, null, null);
+            ret.badStrs = FirewallAsserterUtils.merge(Arrays.asList(BAD_STRS), null, null, null);
+            ret.badSuffixes = FirewallAsserterUtils.merge(Arrays.asList(BAD_SUFFIXES), null, null, null);
+            ret.badFilenames = FirewallAsserterUtils.merge(Arrays.asList(BAD_FILENAMES), null, null, null);
             return ret;
         }
     }
 
     private Context context;
+    private boolean useCombine = true;
+    private boolean strict = false;
 
-    public PathFirewallAsserter(){
+    public PathFirewallAsserter() {
         this.applyRules(null);
     }
 
-    public PathFirewallAsserter(Rules rules){
+    public PathFirewallAsserter(Rules rules) {
         this.applyRules(rules);
     }
 
-    public PathFirewallAsserter applyRules(Rules rules){
+    public PathFirewallAsserter applyRules(Rules rules) {
         this.context=Context.defaultInstance();
         if(rules!=null){
             this.context.badChars=FirewallAsserterUtils.merge(
@@ -127,7 +128,7 @@ public class PathFirewallAsserter implements IStringFirewallAsserter {
                     Arrays.asList(rules.includeBadSuffixes),
                     Arrays.asList(rules.excludeBadSuffixes),
                     Arrays.asList(rules.replaceBadSuffixes));
-            this.context.badFilenames=FirewallAsserterUtils.merge(
+            this.context.badFilenames = FirewallAsserterUtils.merge(
                     Arrays.asList(BAD_FILENAMES),
                     Arrays.asList(rules.includeBadFilenames),
                     Arrays.asList(rules.excludeBadFilenames),
@@ -137,76 +138,55 @@ public class PathFirewallAsserter implements IStringFirewallAsserter {
         return this;
     }
 
-
-
-
-    public static String str2form(String str, String separator, Function<Character, String> chMapper) {
-        if (str == null) {
-            return str;
+    public static String containsInjectFormByEncode(String targetStr, String testStr, boolean useCombine) {
+        if (testStr == null || "".equals(testStr)) {
+            return null;
         }
-        if ("".equals(str)) {
-            return str;
-        }
-        StringBuilder builder = new StringBuilder();
-        char[] chars = str.toCharArray();
-        boolean isFirst = true;
-        for (char ch : chars) {
-            if (!isFirst) {
-                if (separator != null) {
-                    builder.append(separator);
-                }
-            }
-            builder.append(chMapper.apply(ch));
-            isFirst = false;
-        }
-        return builder.toString();
-    }
-
-    public static String containsInjectFormByEncode(String targetStr, String testStr) {
         List<Function<String, String>> singleWrappers = Arrays.asList(
                 (str) -> str,
                 UrlStringStringCodec.INSTANCE::encode,
-                (str)->str2form(str, null, (ch) -> String.format("0x%02x", (int) ch)),
-                (str)->str2form(str, null, (ch) -> String.format("%%%02x", (int) ch)),
-                (str)->str2form(str, null, (ch) -> String.format("\\x%02x", (int) ch)),
-                (str)->str2form(testStr, null, (ch) -> String.format("\\u%04x", (int) ch)),
                 UrlStringStringCodec.INSTANCE::encode,
+                FirewallAsserterUtils.ENCODE_0X_02X,
+                FirewallAsserterUtils.ENCODE_PER_02X,
+                FirewallAsserterUtils.ENCODE_XCODE_02X,
+                FirewallAsserterUtils.ENCODE_UCODE_04X,
                 HtmlStringStringCodec.INSTANCE::encode,
                 UCodeStringCodec.INSTANCE::encode,
                 XCodeStringCodec.INSTANCE::encode
         );
-        int size = singleWrappers.size();
 
-        List<Function<String, String>> wrappers = new LinkedList<>(singleWrappers);
-        boolean useCombine = true;
-        if (useCombine) {
-            List<Function<String, String>> groupWrappers = new LinkedList<>();
-            List<List<Integer>> groups = FirewallAsserterUtils.getAllCombinations(size);
-            for (List<Integer> group : groups) {
-                Function<String, String> groupWrapper = (str) -> {
-                    String ret = str;
-                    for (Integer idx : group) {
-                        Function<String, String> func = singleWrappers.get(idx);
-                        ret = func.apply(ret);
-                    }
-                    return ret;
-                };
-                groupWrappers.add(groupWrapper);
-            }
-            wrappers = groupWrappers;
-        }
+        List<Function<String, String>> wrappers = FirewallAsserterUtils.combinationsWrappers(singleWrappers, useCombine);
+
         for (Function<String, String> wrapper : wrappers) {
-            String text = wrapper.apply(testStr);
-            text = text.toLowerCase();
-            if (targetStr.contains(text)) {
-                return text;
+            try {
+                String text = wrapper.apply(testStr);
+                text = text.toLowerCase();
+                if (targetStr.contains(text)) {
+                    return text;
+                }
+            } catch (Exception e) {
+
             }
         }
 
         return null;
     }
 
-    public static String containsInjectFormByDecode(String targetStr, String testStr) {
+    public static String containsInjectFormByDecode(String targetStr, String testStr, boolean useCombine, String testMatchStr) {
+        boolean normalEq = false;
+        if (testStr != null && !"".equals(testStr)) {
+            normalEq = true;
+        }
+
+        Pattern pattern = null;
+        if (testMatchStr != null && !"".equalsIgnoreCase(testMatchStr)) {
+            pattern = Pattern.compile(testMatchStr);
+        }
+
+        if (!normalEq && pattern == null) {
+            return null;
+        }
+
         List<Function<String, String>> singleWrappers = Arrays.asList(
                 (str) -> str,
                 UrlStringStringCodec.INSTANCE::decode,
@@ -215,44 +195,50 @@ public class PathFirewallAsserter implements IStringFirewallAsserter {
                 UCodeStringCodec.INSTANCE::decode,
                 XCodeStringCodec.INSTANCE::decode
         );
-        int size = singleWrappers.size();
 
-        List<Function<String, String>> wrappers = new LinkedList<>(singleWrappers);
-        boolean useCombine = true;
-        if (useCombine) {
-            List<Function<String, String>> groupWrappers = new LinkedList<>();
-            List<List<Integer>> groups = FirewallAsserterUtils.getAllCombinations(size);
-            for (List<Integer> group : groups) {
-                Function<String, String> groupWrapper = (str) -> {
-                    String ret = str;
-                    for (Integer idx : group) {
-                        Function<String, String> func = singleWrappers.get(idx);
-                        ret = func.apply(ret);
-                    }
-                    return ret;
-                };
-                groupWrappers.add(groupWrapper);
-            }
-            wrappers = groupWrappers;
-        }
+        List<Function<String, String>> wrappers = FirewallAsserterUtils.combinationsWrappers(singleWrappers, useCombine);
+
         for (Function<String, String> wrapper : wrappers) {
-            String text = wrapper.apply(targetStr);
-            text = text.toLowerCase();
-            if (text.contains(testStr)) {
-                return testStr;
+            try {
+                String text = wrapper.apply(targetStr);
+                text = text.toLowerCase();
+                if (normalEq) {
+                    if (text.contains(testStr)) {
+                        return testStr;
+                    }
+                }
+                if (pattern != null) {
+                    Matcher matcher = pattern.matcher(text);
+                    if (matcher.find()) {
+                        MatchResult rs = matcher.toMatchResult();
+                        String vstr = text.substring(rs.start(), rs.end());
+                        return vstr;
+                    }
+                }
+            } catch (Exception e) {
+
             }
         }
         return null;
     }
 
-    public static String containsInjectForm(String filePath, String str) {
-        String vstr = containsInjectFormByEncode(filePath, str);
-        if(vstr!=null){
+    public static String containsInjectForm(String targetStr, String testStr, boolean useCombine, String testMatchStr) {
+        String vstr = containsInjectFormByEncode(targetStr, testStr, useCombine);
+        if (vstr != null) {
             return vstr;
         }
-        return containsInjectFormByDecode(filePath,str);
+        return containsInjectFormByDecode(targetStr, testStr, useCombine, testMatchStr);
     }
 
+    public PathFirewallAsserter applyCombine(boolean enable) {
+        this.useCombine = enable;
+        return this;
+    }
+
+    public PathFirewallAsserter applyStrict(boolean enable) {
+        this.strict = enable;
+        return this;
+    }
 
     @Override
     public void doAssert(String errorMsg, String value) {
@@ -266,16 +252,18 @@ public class PathFirewallAsserter implements IStringFirewallAsserter {
             return;
         }
 
-        filePath = filePath.replaceAll("\\\\", "/");
+        if (!strict) {
+            filePath = filePath.replaceAll("\\\\", "/");
+        }
 
         filePath = filePath.toLowerCase();
 
 
         char[] badChars = context.badChars;
-        if(badChars!=null){
+        if (badChars != null) {
             for (char ch : badChars) {
                 String str = ch + "";
-                String vstr = containsInjectForm(filePath, str);
+                String vstr = containsInjectForm(filePath, str, useCombine, null);
                 if (vstr != null) {
                     throw new PathFirewallException(errorMsg + ", " + " contains illegal str [" + vstr + "]");
                 }
@@ -286,7 +274,7 @@ public class PathFirewallAsserter implements IStringFirewallAsserter {
         for (int i = 0; i < 32; i++) {
             char ch = (char) i;
             String str = ch + "";
-            String vstr = containsInjectForm(filePath, str);
+            String vstr = containsInjectForm(filePath, str, useCombine, null);
             if (vstr != null) {
                 throw new PathFirewallException(errorMsg + ", " + " contains illegal str [" + vstr + "]");
             }
@@ -294,7 +282,7 @@ public class PathFirewallAsserter implements IStringFirewallAsserter {
         for (int i = 127; i < 128; i++) {
             char ch = (char) i;
             String str = ch + "";
-            String vstr = containsInjectForm(filePath, str);
+            String vstr = containsInjectForm(filePath, str, useCombine, null);
             if (vstr != null) {
                 throw new PathFirewallException(errorMsg + ", " + " contains illegal str [" + vstr + "]");
             }
@@ -305,7 +293,7 @@ public class PathFirewallAsserter implements IStringFirewallAsserter {
         if(badStrs!=null){
             for (String badStr : badStrs) {
                 String str = badStr;
-                String vstr = containsInjectForm(filePath, str);
+                String vstr = containsInjectForm(filePath, str, useCombine, null);
                 if (vstr != null) {
                     throw new PathFirewallException(errorMsg + ", " + " contains illegal str [" + vstr + "]");
                 }
