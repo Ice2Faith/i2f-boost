@@ -37,10 +37,10 @@ public class LoginLockBeforeLoginChecker implements BeforeLoginChecker {
 
     public void onLogin(String username, HttpServletRequest request) {
         LoginGuarder.LockType type = loginGuarder.check(request, username);
-        if (type == LoginGuarder.LockType.USERNAME) {
+        if (type == LoginGuarder.LockType.RESOURCES) {
             throw new BoostAuthenticationException("您的账号已被锁定，请在" +
                     loginGuarder.getCache().getExpire(
-                            loginGuarder.usernameCacheKey(username),
+                            loginGuarder.resourcesCacheKey(username),
                             TimeUnit.SECONDS) +
                     "秒后重试");
         } else if (type == LoginGuarder.LockType.IP) {

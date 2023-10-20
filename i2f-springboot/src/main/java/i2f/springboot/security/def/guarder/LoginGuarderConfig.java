@@ -19,6 +19,6 @@ import org.springframework.context.annotation.Configuration;
 public class LoginGuarderConfig {
     @Bean
     public LoginGuarder loginGuarder(@Autowired ICache<String, Object> cache) {
-        return new LoginGuarder(cache);
+        return new LoginGuarder("login", cache);
     }
 }
