@@ -1,0 +1,14 @@
+# http-proxy 配置
+i2f:
+  springboot:
+    config:
+      http-proxy:
+        enable: true
+        mappings:
+          - prefix: /baidu
+            target: https://www.baidu.com
+          - prefix: /github
+            target: https://www.github.com
+
+
+

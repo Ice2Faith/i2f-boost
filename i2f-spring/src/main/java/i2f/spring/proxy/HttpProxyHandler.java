@@ -5,6 +5,7 @@ import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,23 +34,6 @@ public class HttpProxyHandler {
         pathMapping.put(proxyPrefix,targetUrl);
         return this;
     }
-    public boolean handle(HttpServletRequest request,HttpServletResponse response) throws IOException, URISyntaxException {
-        String uri = request.getRequestURI();
-        String targetUrl=null;
-        String proxyPrefix=null;
-        for(String prefix : pathMapping.keySet()){
-            if(uri.startsWith(prefix)){
-                proxyPrefix=prefix;
-                targetUrl=pathMapping.get(prefix);
-                break;
-            }
-        }
-        if(proxyPrefix !=null && targetUrl!=null){
-            proxy(request,response,proxyPrefix,targetUrl);
-            return true;
-        }
-        return false;
-    }
     /**
      * 请求的完美转发
      * 举例：
@@ -70,9 +54,18 @@ public class HttpProxyHandler {
     public static void proxy(HttpServletRequest request, HttpServletResponse response,String proxyPrefix,String targetUrl) throws IOException, URISyntaxException {
         URI uri = new URI(request.getRequestURI());
         String path = uri.getPath();
+        String contextPath = request.getContextPath();
+        if (!StringUtils.isEmpty(contextPath)) {
+            if (path.startsWith(contextPath)) {
+                path = path.substring(contextPath.length());
+            }
+        }
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
         String query = request.getQueryString();
         String target = targetUrl + path.replace(proxyPrefix, "");
-        if (query != null && !query.equals("") && !query.equals("null")) {
+        if (query != null && !"".equals(query) && !"null".equals(query)) {
             target = target + "?" + query;
         }
         URI newUri = new URI(target);
@@ -103,6 +96,33 @@ public class HttpProxyHandler {
             response.setHeader(key, it);
         }));
         StreamUtils.copy(clientHttpResponse.getBody(), response.getOutputStream());
+    }
+
+    public boolean handle(HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+        String uri = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        if (!StringUtils.isEmpty(contextPath)) {
+            if (uri.startsWith(contextPath)) {
+                uri = uri.substring(contextPath.length());
+            }
+        }
+        if (!uri.startsWith("/")) {
+            uri = "/" + uri;
+        }
+        String targetUrl = null;
+        String proxyPrefix = null;
+        for (String prefix : pathMapping.keySet()) {
+            if (uri.startsWith(prefix)) {
+                proxyPrefix = prefix;
+                targetUrl = pathMapping.get(prefix);
+                break;
+            }
+        }
+        if (proxyPrefix != null && targetUrl != null) {
+            proxy(request, response, proxyPrefix, targetUrl);
+            return true;
+        }
+        return false;
     }
 
 }
