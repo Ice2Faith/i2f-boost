@@ -12,9 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -34,6 +32,7 @@ public class HttpProxyHandler {
         pathMapping.put(proxyPrefix,targetUrl);
         return this;
     }
+
     /**
      * 请求的完美转发
      * 举例：
@@ -98,7 +97,8 @@ public class HttpProxyHandler {
         StreamUtils.copy(clientHttpResponse.getBody(), response.getOutputStream());
     }
 
-    public boolean handle(HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+    public Map.Entry<String, String> accept(HttpServletRequest request) {
+        Map<String, String> ret = new HashMap<>();
         String uri = request.getRequestURI();
         String contextPath = request.getContextPath();
         if (!StringUtils.isEmpty(contextPath)) {
@@ -119,7 +119,19 @@ public class HttpProxyHandler {
             }
         }
         if (proxyPrefix != null && targetUrl != null) {
-            proxy(request, response, proxyPrefix, targetUrl);
+            ret.put(proxyPrefix, targetUrl);
+        }
+        Iterator<Map.Entry<String, String>> iterator = ret.entrySet().iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
+        }
+        return null;
+    }
+
+    public boolean handle(HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException {
+        Map.Entry<String, String> mapping = accept(request);
+        if (mapping != null) {
+            proxy(request, response, mapping.getKey(), mapping.getValue());
             return true;
         }
         return false;
