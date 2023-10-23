@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
@@ -39,7 +38,7 @@ public class CorsConfig {
     public CorsFilter corsFilter()
     {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
+        OriginPattenCorsConfiguration config = new OriginPattenCorsConfiguration();
         config.setAllowedMethods(Arrays.asList(allowMethods.split(",")));
         config.setAllowedOrigins(Arrays.asList(allowOrigins.split(",")));
         config.setAllowedHeaders(Arrays.asList(allowHeaders.split(",")));
