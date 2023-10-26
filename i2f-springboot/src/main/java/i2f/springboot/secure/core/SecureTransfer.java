@@ -122,7 +122,7 @@ public class SecureTransfer implements InitializingBean {
     }
 
     public AsymKeyPair currentSlfKey() {
-        Object obj = cache.get(SECURE_SLF_CURR_KEY);
+        Object obj = cacheGetRetry(SECURE_SLF_CURR_KEY);
         if (obj != null) {
             String str = String.valueOf(obj);
             return parseKeyPair(str);
@@ -138,7 +138,7 @@ public class SecureTransfer implements InitializingBean {
         if (slfSign.equals(sign)) {
             return currentSlfKey();
         }
-        Object obj = cache.get(SECURE_SLF_HIS_KEY_PREFIX + sign);
+        Object obj = cacheGetRetry(SECURE_SLF_HIS_KEY_PREFIX + sign);
         if (obj != null) {
             String str = String.valueOf(obj);
             return parseKeyPair(str);
@@ -207,8 +207,31 @@ public class SecureTransfer implements InitializingBean {
         return SymmetricUtil.decryptJsonBeforeBase64(bs64, symmKey);
     }
 
+    public Object cacheGetRetry(String key) {
+        Object obj = null;
+        int maxCount = 15;
+        int curCount = 0;
+        while (curCount < maxCount && obj == null) {
+            if (curCount > 0) {
+                try {
+                    Thread.sleep(60 * curCount);
+                } catch (Exception e) {
+
+                }
+            }
+            obj = cache.get(key);
+            curCount++;
+        }
+        if (curCount > 1) {
+            log.warn("cache-retry,curCount=" + curCount + ",isNull=" + (obj == null));
+        } else {
+            log.info("cache-retry,curCount=" + curCount + ",isNull=" + (obj == null));
+        }
+        return obj;
+    }
+
     public AsymKeyPair clientKeyPair(String clientAsymSign) {
-        Object obj = cache.get(SECURE_CLI_KEY_PREFIX + clientAsymSign);
+        Object obj = cacheGetRetry(SECURE_CLI_KEY_PREFIX + clientAsymSign);
         if (obj != null) {
             String str = String.valueOf(obj);
             return parseKeyPair(str);
@@ -338,7 +361,7 @@ public class SecureTransfer implements InitializingBean {
         }
 
         if (clientIp != null) {
-            Object obj = cache.get(SECURE_CLI_KEY_IP_BIND_PREFIX + clientIp);
+            Object obj = cacheGetRetry(SECURE_CLI_KEY_IP_BIND_PREFIX + clientIp);
             if (obj != null) {
                 String skey = String.valueOf(obj);
                 keyPair = clientKeyPair(skey);
@@ -367,7 +390,7 @@ public class SecureTransfer implements InitializingBean {
         try {
             cache.remove(SECURE_CLI_KEY_PREFIX + clientAsymSign);
 
-            Object obj = cache.get(SECURE_CLI_KEY_IP_BIND_PREFIX + clientIp);
+            Object obj = cacheGetRetry(SECURE_CLI_KEY_IP_BIND_PREFIX + clientIp);
             if (obj != null) {
                 String ckey = String.valueOf(obj);
                 cache.remove(SECURE_CLI_KEY_PREFIX + ckey);
@@ -414,7 +437,7 @@ public class SecureTransfer implements InitializingBean {
         try {
             cache.remove(SECURE_CLI_KEY_PREFIX + clientAsymSign);
 
-            Object obj = cache.get(SECURE_CLI_KEY_IP_BIND_PREFIX + clientIp);
+            Object obj = cacheGetRetry(SECURE_CLI_KEY_IP_BIND_PREFIX + clientIp);
             if (obj != null) {
                 String ckey = String.valueOf(obj);
                 cache.remove(SECURE_CLI_KEY_PREFIX + ckey);
