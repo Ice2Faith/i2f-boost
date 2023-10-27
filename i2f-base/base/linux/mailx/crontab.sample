@@ -6,3 +6,4 @@
 */10 * * * * /home/env/mailx/user-chk-mail.sh
 */10 * * * * /home/env/mailx/sock-chk-mail.sh 192.168.1.120 3306
 */10 * * * * /home/env/mailx/jdump-chk-mail.sh
+*/10 * * * * /home/env/mailx/load-chk-mail.sh
