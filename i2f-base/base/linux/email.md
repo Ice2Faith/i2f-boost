@@ -1,7 +1,9 @@
 # linux 发送邮件
 
 ---
-- 安装
+
+## 安装
+
 ```shell script
 yum install mailx -y
 ```
@@ -36,3 +38,47 @@ echo "内容" | mail -s [标题] [接受账号]
 ```shell script
 mail -s [标题] [接受账号] < [正文文件路径]
 ```
+
+---
+
+## 应用
+- 常见的使用方式就是结合crontab做定时监控
+- 进行服务或者服务器的监控与邮件报警操作
+- 这里，准备了一些检测的脚本
+```shell script
+cd ./mailx
+```
+- 文件介绍
+```shell script
+# crontab的举例说明
+crontab.sample
+# 进行磁盘占用率监控
+disk-chk-mail.sh
+# 进行内存使用率监控
+mem-chk-mail.sh
+# 进行网络连通性监控
+net-chk-mail.sh
+# 进行进程存活性监控
+ps-chk-mail.sh
+# 进行套接字连接性监控
+sock-chk-mail.sh
+# 进行在线用户数监控
+user-chk-mail.sh
+```
+- 使用方式
+- 放到系统目录中
+```shell script
+cd /home/env/mailx
+```
+- 更改需要接受告警的邮箱地址
+    - 找到此行
+    - 根据格式，添加接受者邮箱地址即可
+    - 修改完毕，报错
+```shell script
+for sendto in x123@qq.com x456@139.com;
+```
+- 编辑crontab
+```shell script
+crontab -e
+```
+- 保存crontab即可
