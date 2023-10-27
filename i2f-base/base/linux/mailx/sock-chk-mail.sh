@@ -6,7 +6,8 @@ TimeNow=$(date "+%Y-%m-%d %H:%M:%S")
 
 echo server socket on $ServerName checking...
 
-tmpFile="/tmp/sock-chk-${remotePort}-${TimeNow}.dat"
+ts=$(date "+%Y%m%d-%H%M%S")
+tmpFile="/tmp/sock-chk-${remotePort}-${ts}.dat"
 nc -zv $remoteHost $remotePort > $tmpFile 2>&1
 ncResult=`cat $tmpFile`
 okCount=`cat $tmpFile | grep Connected | wc -l`
