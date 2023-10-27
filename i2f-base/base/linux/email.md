@@ -23,12 +23,21 @@ cat >>/etc/mail.rc <<EOF
 set nss-config-dir=/etc/pki/nssdb/          #加密方式配置
 set smtp-user-starttls                      #加密方式配置
 set ssl-verify=ignore                       #加密方式配置
-set from=mufengxiaoyue@163.com                #配置发件人
+set from=xxx@163.com                #配置发件人
 set smtp=smtps://smtp.163.com:465            #配置使用163邮箱发送邮件，不加密方式参考上面
-set smtp-auth-user=mufengxiaoyue@163.com      #邮箱名
-set smtp-auth-password=HMACZIJFDUKRWPSX             #授权码
+set smtp-auth-user=xxx@163.com      #邮箱名
+set smtp-auth-password=xxx123             #授权码
 set smtp-auth=login                         #认证形式
 EOF
+```
+- 如果想要右键显示自定义发件人名称
+- 则变更为如下配置
+```shell script
+# format
+set from="发送邮箱账号(自定义名称)"
+
+# example
+set from="xxx@163.com(Server-Alarm)"
 ```
 - 发送
 ```shell script
