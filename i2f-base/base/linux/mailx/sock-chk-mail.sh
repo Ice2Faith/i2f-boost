@@ -4,7 +4,7 @@ remotePort=$2
 ServerName=`hostname`
 TimeNow=$(date "+%Y-%m-%d %H:%M:%S")
 
-echo server online user exceed warn count on $ServerName checking...
+echo server socket on $ServerName checking...
 
 tmpFile="/tmp/sock-chk-${remotePort}-${TimeNow}.dat"
 nc -zv $remoteHost $remotePort > $tmpFile 2>&1
