@@ -73,7 +73,6 @@ https://unpkg.zhimg.com/...
     <script src="https://unpkg.zhimg.com/vue@2.7.14/dist/vue.js"></script>
 
     <!-- element-ui -->
-
     <!-- 引入样式 -->
     <link rel="stylesheet" href="https://unpkg.zhimg.com/element-ui/lib/theme-chalk/index.css">
     <!-- 引入组件库 -->
@@ -123,4 +122,67 @@ https://unpkg.zhimg.com/...
         }
     })
 </script>
+```
+
+## CDN 搜索站
+- bootcdn
+- 国内访问良好
+```shell script
+https://www.bootcdn.cn/
+```
+
+## 常用CDN的引入
+- VUE2
+```html
+<!-- vue2 -->
+<script src="https://unpkg.zhimg.com/vue@2.7.14/dist/vue.js"></script>
+```
+- VUE3
+```html
+<!-- vue3 -->
+<script src="https://unpkg.zhimg.com/vue@3.3.7/dist/vue.global.js"></script>
+```
+- element-ui for vue2
+```html
+<!-- element-ui -->
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://unpkg.zhimg.com/element-ui/lib/theme-chalk/index.css">
+<!-- 引入组件库 -->
+<script src="https://unpkg.zhimg.com/element-ui/lib/index.js"></script>
+```
+- vant2 for vue2
+```html
+<!-- vant2 -->
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://unpkg.zhimg.com/vant@2.12.54/lib/index.css">
+<!-- 引入组件库 -->
+<script src="https://unpkg.zhimg.com/vant@2.12.54/lib/vant.min.js"></script>
+```
+- vant4 for vue3
+```html
+<!-- vant4 -->
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://unpkg.zhimg.com/vant@4.7.3/lib/index.css">
+<!-- 引入组件库 -->
+<script src="https://unpkg.zhimg.com/vant@4.7.3/lib/vant.min.js"></script>
+```
+- three-js
+```shell script
+<!-- three-js -->
+<script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+```
+- axios
+```html
+<!-- axios -->
+<script src="https://unpkg.zhimg.com/axios@1.5.0/dist/axios.min.js"></script>
+```
+- jquery
+```html
+<!-- jquery -->
+<script src="https://unpkg.zhimg.com/jquery@3.7.1/dist/jquery.min.js"></script>
+```
+- gsap
+```html
+<!-- jquery -->
+<script src="https://cdn.bootcdn.net/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 ```
