@@ -11,10 +11,16 @@
 - 下载yum
 ```shell script
 curl https://repo.mysql.com//mysql80-community-release-el7-3.noarch.rpm > centos7.mysql.rpm
+
+-- centos8
+curl https://repo.mysql.com/mysql80-community-release-el8-2.noarch.rpm  > centos8.mysql.rpm
 ```
 - 安装rpm
 ```shell script
 yum install centos7.mysql.rpm -y
+
+-- centos8
+yum install centos8.mysql.rpm -y
 ```
 - 禁用已有mysql
 ```shell script

@@ -699,6 +699,150 @@ unmount -df /mnt/hdc2
 unmount -df /root/disk3
 ```
 
+## 新磁盘初始化及挂载
+- 查看所有磁盘
+```shell script
+lsblk
+```
+- 得到如下结果
+    - 可以看到多了一个设备 vdb
+    - 没有任何分区
+```shell script
+NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINTS
+vda    253:0    0  40G  0 disk 
+└─vda1 253:1    0  40G  0 part /
+vdb    253:16   0   1T  0 disk 
+```
+- 分区及类型设置
+```shell script
+fdisk /dev/vdb
+```
+- 按照顺序输入完成
+    - 注意，下方内容有添加注释部分，实际输出不会有
+```shell script
+Welcome to fdisk (util-linux 2.37.2).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+Device does not contain a recognized partition table.
+Created a new DOS disklabel with disk identifier 0x306c6efa.
+
+Command (m for help): n # 输入n选择命令
+Partition type
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended (container for logical partitions)
+Select (default p): p # 输入p进行分区操作
+Partition number (1-4, default 1): 1 # 输入1选择第一个分区
+First sector (2048-2147483647, default 2048):  # 直接回车，使用默认设置
+Last sector, +/-sectors or +/-size{K,M,G,T,P} (2048-2147483647, default 2147483647): # 直接回车，使用默认设置
+
+Created a new partition 1 of type 'Linux' and of size 1024 GiB.
+
+Command (m for help): t # 输入t指定类型
+Selected partition 1
+Hex code or alias (type L to list all): 83 # 输入83指定为linux类型
+Changed type of partition 'Linux' to 'Linux'.
+
+Command (m for help): w # 输入w保存操作
+The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.
+```
+- 重新查看磁盘情况
+```shell script
+fdisk -l
+```
+- 得到如下结果
+    - 可以看到在vdb磁盘下面多个一个设备 /dev/vdb1
+```shell script
+Disk /dev/vda: 40 GiB, 42949672960 bytes, 83886080 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x74ef0e45
+
+Device     Boot Start      End  Sectors Size Id Type
+/dev/vda1  *     2048 83886079 83884032  40G 83 Linux
+
+
+Disk /dev/vdb: 1 TiB, 1099511627776 bytes, 2147483648 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x306c6efa
+
+Device     Boot Start        End    Sectors  Size Id Type
+/dev/vdb1        2048 2147483647 2147481600 1024G 83 Linux
+[root@ecs-6f86 ~]# mkfs -t ext4 /dev/vdb1
+mke2fs 1.46.4 (18-Aug-2021)
+Creating filesystem with 268435200 4k blocks and 67108864 inodes
+Filesystem UUID: 1508277e-1fc9-4160-98e1-92daef1e7040
+Superblock backups stored on blocks: 
+        32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+        4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968, 
+        102400000, 214990848
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (262144 blocks): done
+Writing superblocks and filesystem accounting information: done  
+```
+- 格式化磁盘
+```shell script
+mkfs -t ext4 /dev/vdb1
+```
+- 得到如下结果
+```shell script
+mke2fs 1.46.4 (18-Aug-2021)
+Creating filesystem with 268435200 4k blocks and 67108864 inodes
+Filesystem UUID: 1508277e-1fc9-4160-98e1-92daef1e7040
+Superblock backups stored on blocks: 
+        32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+        4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968, 
+        102400000, 214990848
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (262144 blocks): done
+Writing superblocks and filesystem accounting information: done   
+```
+- 创建目标挂载路径
+```shell script
+mkdir -p /opt/disk
+```
+- 挂载磁盘到目录
+```shell script
+mount /dev/vdb1 /opt/disk
+```
+- 查看磁盘挂载
+```shell script
+df -h
+```
+- 得到如下结果
+    - 可以看到设备已经挂载到 /opt/disk
+```shell script
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        4.0M     0  4.0M   0% /dev
+tmpfs            16G     0   16G   0% /dev/shm
+tmpfs            16G   17M   16G   1% /run
+tmpfs           4.0M     0  4.0M   0% /sys/fs/cgroup
+/dev/vda1        40G   16G   22G  42% /
+tmpfs            16G   58M   16G   1% /tmp
+/dev/vdb1      1007G   28K  956G   1% /opt/disk
+```
+- 建立开机自动挂载
+    - 含义：
+    - 将设备 /dev/vdb1 挂载到 /opt/disk
+    - 格式是ext4
+    - 使用默认配置defaults
+    - 不进行备份0（0不开启，1开启）
+    - 开启磁盘检查2（0不开启，1最高优先级开启，2普通开启）
+```shell script
+echo '/dev/vdb1 /opt/disk ext4 defaults 0 2' >> /etc/fstab
+```
+
 ---
 ## 归档
 - tar解包(.tar)

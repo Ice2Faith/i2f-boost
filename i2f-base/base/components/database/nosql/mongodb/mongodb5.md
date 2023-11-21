@@ -13,6 +13,9 @@
 - 下载
 ```shell script
 wget -c https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-5.0.9.tgz
+
+-- centos8
+wget -c https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel80-5.0.9.tgz
 ```
 - 解压:
 ```shell script
@@ -57,6 +60,17 @@ vi start.sh
 ```
 ```shell script
 ./mongod -f ../conf/mongo.conf
+```
+- 编写停止文件
+```shell script
+vi stop.sh
+```
+```shell script
+./mongod -f ../conf/mongo.conf --shutdown
+```
+- 添加权限
+```shell script
+chmod a+x *.sh
 ```
 
 ## 启动服务

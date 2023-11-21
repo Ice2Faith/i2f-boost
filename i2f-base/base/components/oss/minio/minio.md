@@ -45,6 +45,10 @@ vi reboot.sh
 ./stop.sh
 ./start.sh
 ```
+- 添加权限
+```shell script
+chmod a+x *.sh
+```
 
 ## 启动服务
 ```shell script
