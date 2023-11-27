@@ -2,9 +2,7 @@ package i2f.core.type.date;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
@@ -44,6 +42,8 @@ public class DateFormatter {
             "HH时mm分ss秒",
             "HH时mm分",
     };
+
+
 
     public static SimpleDateFormat getSimpleFormatter(String patten) {
         if (simpleFormatMap.containsKey(patten)) {
@@ -115,7 +115,7 @@ public class DateFormatter {
         Exception ex = null;
         for (String patten : pattens) {
             try {
-                return parseLocalDateTime(patten, date);
+                return date2LocalDateTime(parse(patten, date));
             } catch (Exception e) {
                 ex = e;
             }
@@ -125,5 +125,25 @@ public class DateFormatter {
         } else {
             throw new IllegalArgumentException(ex);
         }
+    }
+
+    public static LocalDate parseLocalDate(String date){
+        return parseLocalDateTime(date).toLocalDate();
+    }
+
+    public static LocalTime parseLocalTime(String date){
+        return parseLocalDateTime(date).toLocalTime();
+    }
+
+    public static LocalDateTime date2LocalDateTime(Date val) {
+        Instant instant = new Date(val.getTime()).toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        return LocalDateTime.ofInstant(instant, zone);
+    }
+
+    public static Date localDateTime2Date(LocalDateTime val) {
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = ((LocalDateTime) val).atZone(zone).toInstant();
+        return Date.from(instant);
     }
 }

@@ -2,6 +2,7 @@ package i2f.springboot.secure.customizer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import i2f.spring.jackson.datetime.*;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 /**
  * @author Ice2Faith
@@ -48,35 +50,23 @@ public class SecureObjectMapperCustomizerConfig {
                     builder.serializerByType(Long.TYPE, ToStringSerializer.instance);
                     builder.serializerByType(long.class, ToStringSerializer.instance);
                 }
+                if(StringUtils.isEmpty(dateFormat)){
+                    builder.deserializerByType(Date.class,new JacksonDateDeserializer());
+                }
                 if (!StringUtils.isEmpty(dateFormat)) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat);
-                    builder.serializerByType(LocalDateTime.class, new JacksonDatetimeFormatterSerializer<LocalDateTime>(formatter));
-                    builder.deserializerByType(LocalDateTime.class, new JacksonDatetimeFormatterDeserializer<LocalDateTime>(formatter) {
-                        @Override
-                        public LocalDateTime parse(String str, DateTimeFormatter formatter) throws JsonProcessingException {
-                            return LocalDateTime.parse(str);
-                        }
-                    });
+                    builder.serializerByType(LocalDateTime.class, new JacksonTemporalSerializer<LocalDateTime>(formatter));
+                    builder.deserializerByType(LocalDateTime.class, new JacksonLocalDateTimeDeserializer(formatter));
                 }
                 if (!StringUtils.isEmpty(localDateFormat)) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern(localDateFormat);
-                    builder.serializerByType(LocalDate.class, new JacksonDatetimeFormatterSerializer<LocalDate>(formatter));
-                    builder.deserializerByType(LocalDate.class, new JacksonDatetimeFormatterDeserializer<LocalDate>(formatter) {
-                        @Override
-                        public LocalDate parse(String str, DateTimeFormatter formatter) throws JsonProcessingException {
-                            return LocalDate.parse(str);
-                        }
-                    });
+                    builder.serializerByType(LocalDate.class, new JacksonTemporalSerializer<LocalDate>(formatter));
+                    builder.deserializerByType(LocalDate.class, new JacksonLocalDateDeserializer(formatter));
                 }
                 if (!StringUtils.isEmpty(localTimeFormat)) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern(localTimeFormat);
-                    builder.serializerByType(LocalTime.class, new JacksonDatetimeFormatterSerializer<LocalTime>(formatter));
-                    builder.deserializerByType(LocalTime.class, new JacksonDatetimeFormatterDeserializer<LocalTime>(formatter) {
-                        @Override
-                        public LocalTime parse(String str, DateTimeFormatter formatter) throws JsonProcessingException {
-                            return LocalTime.parse(str);
-                        }
-                    });
+                    builder.serializerByType(LocalTime.class, new JacksonTemporalSerializer<LocalTime>(formatter));
+                    builder.deserializerByType(LocalTime.class, new JacksonLocalTimeDeserializer(formatter));
                 }
             }
         };
