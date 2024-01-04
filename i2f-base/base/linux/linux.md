@@ -1401,7 +1401,11 @@ fc-cache -fv
 - 至此，安装已经完毕
 - 查看安装字体列表
 ```shell script
-fl-list
+fc-list
+```
+- 如果此命令未找到
+```shell script
+yum install -y fontconfig
 ```
 
 ## 安装阿里国内yum镜像源

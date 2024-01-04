@@ -1,0 +1,30 @@
+# spring配置
+spring:
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: 127.0.0.1:8848
+        # 用户名密码
+        username: nacos
+        password: 123456
+        # 分租（本地开发设置自己的标识）
+        group: DEFAULT_GROUP
+        #命名空间
+        namespace: public
+      config:
+        # 配置中心地址
+        server-addr:  ${spring.cloud.nacos.discovery.server-addr}
+        # 用户名密码
+        username: ${spring.cloud.nacos.discovery.username}
+        password: ${spring.cloud.nacos.discovery.password}
+        # 配置分组
+        group: ${spring.cloud.nacos.discovery.group}
+        #命名空间
+        namespace: ${spring.cloud.nacos.discovery.namespace}
+        # 配置文件格式
+        file-extension: yml
+        # 共享配置
+        shared-configs:
+          - ${spring.application.name}-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+

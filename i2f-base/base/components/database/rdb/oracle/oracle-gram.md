@@ -60,6 +60,27 @@ from (
 ) tmp
 where row_id > 0
 ```
+- insert-batch
+```sql
+insert into sys_user
+(
+ID,
+name
+)
+
+select SEQ_SYS_USER_ID.nextval,tmp.*
+from (
+
+	select 'admin' AS name from dual
+	
+	union all 
+	
+	select 'logger' AS name from dual
+
+) tmp 
+
+```
+
 ---
 ## DDL
 - 创建表

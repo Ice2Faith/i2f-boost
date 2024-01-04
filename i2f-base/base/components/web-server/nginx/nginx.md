@@ -435,6 +435,49 @@ if ($http_origin ~ "http://(.*).baidu.com$") {
 add_header Access-Control-Allow-Origin '$cors_origin';  
 ```
 
+- 获取URL参数
+```shell script
+$arg_xxx
+
+也就是$arg_加上你的变量名
+比如要获取名为name的变量
+注意，变量名不区分大小写
+
+$arg_name
+
+下面举例说明：
+
+location /dispatcher {
+   # 获取URL参数system到sub_path变量中
+   set $sub_path $arg_system;
+   # 根据变量动态的进行proxy_pass
+   proxy_pass http://localhost:8080/gateway/$sub_path;
+}
+```
+
+- 获取header参数
+```shell script
+$http_xxx
+
+也就是$http_加上你的变量名
+比如要获取user-agent的请求头
+注意，变量名不区分大小写
+
+$http_user_agent
+
+下面举例说明：
+
+location /dispatcher {
+   # 获取header参数token到user_token变量中
+   set $user_token $http_token;
+   # 如果没有token，则直接响应403
+   if ($user_token ~ "\s+")
+   { return 403; }
+   # 根据变量动态的进行proxy_pass
+   proxy_pass http://localhost:8080/api;
+}
+```
+
 ## 漏洞解析
 - $uri 引发的CRLF漏洞
 ```shell script
