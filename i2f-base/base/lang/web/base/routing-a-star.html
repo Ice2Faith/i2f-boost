@@ -90,13 +90,15 @@
         <span class="form-item-content">
             <button class="form-button" id="btnInitial">随机生成</button>
             <button class="form-button" id="btnRun">开始</button>
+            <span style="border-left: solid 1px #ddd;width: 0px"></span>
+            <button class="form-button" id="btnExec">执行</button>
         </span>
     </div>
     <div class="form-item">
         <span id="resultText"></span>
     </div>
 	<hr/>
-	
+
 	<div class="form-item operation-tips">
         值说明：<br/>
 			&emsp;&emsp;左上角(history)：表示该点到起点的距离权重<br/>
@@ -115,6 +117,9 @@
 
     window.onload = () => {
         let context = initContext()
+        document.getElementById('btnExec').onclick = () => {
+            main(context)
+        }
         document.getElementById('btnRun').onclick = () => {
             applyUiSetting(context)
 
@@ -131,7 +136,7 @@
 
             drawMap(context)
         }
-		
+
 		document.getElementById('displayMode').onchange=()=>{
 			updateUiSetting(context)
 		}
@@ -162,10 +167,10 @@
 		document.getElementById('moveDirection8').onchange=()=>{
 			updateUiSetting(context)
 		}
-		document.getElementById('openBoost').onchange=()=>{    
+		document.getElementById('openBoost').onchange=()=>{
 			updateUiSetting(context)
 		}
-		
+
         main(context)
     }
 
@@ -182,21 +187,29 @@
     }
 
     function run(context) {
+        document.getElementById('btnExec').setAttribute('disabled', 'disabled')
         document.getElementById('btnRun').setAttribute('disabled', 'disabled')
         document.getElementById('btnInitial').setAttribute('disabled', 'disabled')
         document.getElementById('resultText').innerText = ''
         route(context, (ok) => {
+            document.getElementById('btnExec').removeAttribute('disabled')
             document.getElementById('btnRun').removeAttribute('disabled')
             document.getElementById('btnInitial').removeAttribute('disabled')
             let idxText = `访问${context.dropStep.length}/候选${context.stepQueue.length}/总共${context.dropStep.length + context.stepQueue.length}`
+
+            let validRate=Math.floor(context.routeStep.length*10000.0/context.dropStep.length)/100.0
+            let fullMapRate=Math.floor(context.dropStep.length*10000.0/context.mapData.filter(e=>e==0).length)/100.0
+            let regionRate=Math.floor(context.dropStep.length*10000.0/((Math.abs(context.endPos.x-context.beginPos.x)+1)*(Math.abs(context.endPos.y-context.beginPos.y)+1)))/100.0
+            let borderRate=Math.floor(context.stepQueue.length*10000.0/context.dropStep.length)/100.0
+            let sumText=`有效比${validRate}/全图比${fullMapRate}/区域比${regionRate}/边缘比${borderRate}`
             if (ok) {
                 document.getElementById('resultText').style.color = 'deepskyblue'
-                document.getElementById('resultText').innerHTML = `路径已找到<br/>${idxText}`
+                document.getElementById('resultText').innerHTML = `路径已找到<br/>${idxText}<br/>${sumText}`
             } else {
                 document.getElementById('resultText').style.color = 'orangered'
-                document.getElementById('resultText').innerHTML = `未找到路径<br/>${idxText}`
+                document.getElementById('resultText').innerHTML = `未找到路径<br/>${idxText}<br/>${sumText}`
             }
-			
+
 			let displayMode=document.getElementById('displayMode').checked
 			if(displayMode){
 				setTimeout(()=>{
@@ -213,7 +226,7 @@
 
 		updateUiSetting(context)
     }
-	
+
 	function updateUiSetting(context){
 		context.wallRate = parseFloat(document.getElementById('wallRate').value)
         context.sleepTime = Math.floor(parseFloat(document.getElementById('sleepTime').value))
@@ -276,6 +289,8 @@
 
         context._maxTtl=0
 
+        let ttlCount=0
+
         let findStep = null
         while (context.stepQueue.length > 0) {
 
@@ -313,6 +328,16 @@
                     context._maxTtl=pnode.ttl
                 }
                 pnode=pnode.prev
+            }
+
+            ttlCount++
+            if(ttlCount%10==0){
+                context._maxTtl=0
+                for (let i = 0; i < context.dropStep.length; i++) {
+                    let pnode=context.dropStep[i]
+                    pnode.ttl=Math.max(pnode.ttl-1,1)
+                    context._maxTtl=Math.max(context._maxTtl,pnode.ttl)
+                }
             }
 
             for (let i = 0; i < nextOffsets.length; i++) {
@@ -445,17 +470,17 @@
                 let offsetY = item.pos.y * blockHeight
 
                 if(context.smoothColor){
-                    let rate=item.ttl*0.8/context._maxTtl+0.2
-                    let alpha=Math.floor(rate*256)
+                    let rate=item.ttl*1.0/context._maxTtl
+                    let alpha=Math.floor(rate*220)+36
                     let alphaHex=alpha.toString(16)
                     if(alphaHex.length==1){
                         alphaHex='0'+alphaHex
                     }
-                    context.graphics.fillStyle = routeColorMap.drop+alphaHex
+                    context.graphics.fillStyle = '#FF4500'+alphaHex
                 }else{
                     context.graphics.fillStyle = routeColorMap.drop
                 }
-                
+
                 context.graphics.fillRect(offsetX, offsetY, blockWidth, blockHeight)
             }
         }
@@ -468,14 +493,7 @@
                 let offsetX = item.pos.x * blockWidth
                 let offsetY = item.pos.y * blockHeight
 
-                let rate=item.ttl*0.7/context._maxTtl+0.3
-                let alpha=Math.floor(rate*256)
-                let alphaHex=alpha.toString(16)
-                if(alphaHex.length==1){
-                    alphaHex='0'+alphaHex
-                }
-
-                context.graphics.fillStyle = routeColorMap.step+alphaHex
+                context.graphics.fillStyle = routeColorMap.step
                 context.graphics.fillRect(offsetX, offsetY, blockWidth, blockHeight)
             }
         }
@@ -514,32 +532,33 @@
 
         let steps = [...context.dropStep, ...context.stepQueue]
 
-        let linkMap={}
         // 绘制连线
         if (context.drawLink) {
-            context.graphics.lineWidth = 1
+
             for (let i = 0; i < steps.length; i++) {
                 let cur = steps[i]
 
                 if (cur.prev) {
 
                     if(context.smoothColor){
-                        let rate=Math.min(cur.ttl,cur.prev.ttl)*0.95/context._maxTtl+0.05
-                        let alpha=Math.floor(rate*256)
+                        let rate=Math.min(cur.ttl,cur.prev.ttl)*1.0/context._maxTtl
+                        let alpha=Math.floor(rate*220)+36
                         let alphaHex=alpha.toString(16)
                         if(alphaHex.length==1){
                             alphaHex='0'+alphaHex
                         }
-                        
+
+                        context.graphics.lineWidth = Math.max(1,Math.floor(rate*Math.min(blockWidth,blockHeight)*0.7))
                         context.graphics.strokeStyle = '#ff831e'+alphaHex
                     }else{
                         context.graphics.strokeStyle = '#ff831e'
+                        context.graphics.lineWidth = 1
                     }
-                    
+
                     context.graphics.moveTo(cur.pos.x * blockWidth + halfBlockWidth, cur.pos.y * blockHeight + halfBlockHeight)
                     context.graphics.lineTo(cur.prev.pos.x * blockWidth + halfBlockWidth, cur.prev.pos.y * blockHeight + halfBlockHeight)
                     context.graphics.stroke()
-                    
+
                 }
             }
         }
@@ -719,7 +738,7 @@
         filter: grayscale(0.6);
         cursor: not-allowed;
     }
-	
+
 	.operation-tips{
 		height: 20px;
 		overflow: hidden;
