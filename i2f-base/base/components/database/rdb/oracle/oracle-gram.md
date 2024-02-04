@@ -80,6 +80,36 @@ from (
 ) tmp 
 
 ```
+- 递归查询路径
+```sql
+-- 递归查询路径
+SELECT * FROM SYS_AREA a
+START WITH a.ID = 101010
+CONNECT BY PRIOR a.PARENT_ID = a.ID
+```
+- 递归查询所有子节点
+```sql
+SELECT * FROM SYS_AREA a
+START WITH a.ID = 101010
+CONNECT BY PRIOR a.ID = a.PARENT_ID
+```
+- 随机排序
+```sql
+select *
+from SYS_AREA a 
+order by dbms_random.value()
+```
+- 查询时带出整个路径
+```sql
+SELECT 
+(
+	SELECT LISTAGG(p.NAME,'/') WITHIN GROUP(ORDER BY ROWNUM desc) AS NAME_PATH -- 这里因为是找路径，递归层数越大的应该是越顶层，因此对行号 rownum 进行降序
+	FROM SYS_AREA p
+	START WITH p.ID=a.ID
+	CONNECT BY PRIOR p.PARENT_ID = p.ID -- 因为带了 PRIOR 参数，因此默认排序就是递归层数排序
+) AS AREA_PATH
+FROM SYS_AREA a
+```
 
 ---
 ## DDL
@@ -114,6 +144,16 @@ create sequence SEQ_TB_USER_USER_ID
 select 
     SEQ_TB_USER_USER_ID.nextval 
 from dual
+```
+- 批量取序列
+```sql
+SELECT 
+	SEQ_TB_USER_USER_ID.nextval
+FROM (
+	select level
+	from dual
+	connect by level <= 5 -- 取序列的个数
+) a
 ```
 - 创建索引
 ```sql

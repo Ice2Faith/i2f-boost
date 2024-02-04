@@ -32,6 +32,7 @@
                 <el-button type="primary" size="small" @click="copyTabUrls()">复制当页链接</el-button>
             </el-badge>
             <el-button type="primary" size="small" @click="cleanTabUrls()">清空当页</el-button>
+            <el-button type="primary" size="small" @click="refreshTabUrls($event.currentTarget)">刷新当页</el-button>
         </el-col>
         <el-col>
             <el-badge :value="count.all" class="item">
@@ -45,6 +46,7 @@
             <el-row style="overflow:auto;width: 100%;height: calc(100vh - 125px)">
                 <el-row>
                     <el-col v-for="(item,index) in tabs.mainFav.data" :span="4">
+                        <a :name="'mainFav-'+index"></a>
                         <el-card shadow="never" style="width:100%;height:100%;">
                             <el-image
                                     style="width: 100%; height: 230px;"
@@ -52,10 +54,10 @@
                                     fit="cover"></el-image>
                             <el-row type="flex" jusitify="justify" :gutter="20">
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="playVideo(item,index)">播放</el-button>
+                                    <el-button :type="isInPlay(tabs.mainFav,item)?'success':'primary'" size="small" @click="playVideo(item,index)">播放</el-button>
                                 </el-col>
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="addCollect(item,$event.currentTarget)">+</el-button>
+                                    <el-button type="primary" size="small" v-show="iShowAdd(tabs.mainFav,item)" @click="addCollect(item,$event.currentTarget)">+</el-button>
                                 </el-col>
                                 <el-col>
                                     <el-button type="success" size="small"
@@ -75,6 +77,7 @@
             <el-row style="overflow:auto;width: 100%;height: calc(100vh - 125px)">
                 <el-row>
                     <el-col v-for="(item,index) in tabs.mineFav.data" :span="4">
+                        <a :name="'mineFav-'+index"></a>
                         <el-card shadow="never" style="width:100%;height:100%;">
                             <el-image
                                     style="width: 100%; height: 230px;"
@@ -82,10 +85,10 @@
                                     fit="cover"></el-image>
                             <el-row type="flex" jusitify="justify" :gutter="20">
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="playVideo(item,index)">播放</el-button>
+                                    <el-button :type="isInPlay(tabs.mineFav,item)?'success':'primary'" size="small" @click="playVideo(item,index)">播放</el-button>
                                 </el-col>
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="addCollect(item,$event.currentTarget)">+</el-button>
+                                    <el-button type="primary" size="small" v-show="iShowAdd(tabs.mineFav,item)" @click="addCollect(item,$event.currentTarget)">+</el-button>
                                 </el-col>
                                 <el-col>
                                     <el-button type="success" size="small"
@@ -105,6 +108,7 @@
             <el-row style="overflow:auto;width: 100%;height: calc(100vh - 125px)">
                 <el-row>
                     <el-col v-for="(item,index) in tabs.mainRec.data" :span="4">
+                        <a :name="'mainRec-'+index"></a>
                         <el-card shadow="never" style="width:100%;height:100%;">
                             <el-image
                                     style="width: 100%; height: 230px;"
@@ -112,10 +116,10 @@
                                     fit="cover"></el-image>
                             <el-row type="flex" jusitify="justify" :gutter="20">
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="playVideo(item,index)">播放</el-button>
+                                    <el-button :type="isInPlay(tabs.mainRec,item)?'success':'primary'" size="small" @click="playVideo(item,index)">播放</el-button>
                                 </el-col>
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="addCollect(item,$event.currentTarget)">+</el-button>
+                                    <el-button type="primary" size="small" v-show="iShowAdd(tabs.mainRec,item)" @click="addCollect(item,$event.currentTarget)">+</el-button>
                                 </el-col>
                                 <el-col>
                                     <el-button type="success" size="small"
@@ -134,6 +138,7 @@
             <el-row style="overflow:auto;width: 100%;height: calc(100vh - 125px)">
                 <el-row>
                     <el-col v-for="(item,index) in tabs.mainNew.data" :span="4">
+                        <a :name="'mainNew-'+index"></a>
                         <el-card shadow="never" style="width:100%;height:100%;">
                             <el-image
                                     style="width: 100%; height: 230px;"
@@ -141,10 +146,10 @@
                                     fit="cover"></el-image>
                             <el-row type="flex" jusitify="justify" :gutter="20">
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="playVideo(item,index)">播放</el-button>
+                                    <el-button :type="isInPlay(tabs.mainNew,item)?'success':'primary'" size="small" @click="playVideo(item,index)">播放</el-button>
                                 </el-col>
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="addCollect(item,$event.currentTarget)">+</el-button>
+                                    <el-button type="primary" size="small" v-show="iShowAdd(tabs.mainNew,item)" @click="addCollect(item,$event.currentTarget)">+</el-button>
                                 </el-col>
                                 <el-col>
                                     <el-button type="success" size="small"
@@ -162,6 +167,7 @@
             <el-row style="overflow:auto;width: 100%;height: calc(100vh - 125px)">
                 <el-row>
                     <el-col v-for="(item,index) in tabs.videoDance.data" :span="4">
+                        <a :name="'videoDance-'+index"></a>
                         <el-card shadow="never" style="width:100%;height:100%;">
                             <el-image
                                     style="width: 100%; height: 230px;"
@@ -169,10 +175,10 @@
                                     fit="cover"></el-image>
                             <el-row type="flex" jusitify="justify" :gutter="20">
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="playVideo(item,index)">播放</el-button>
+                                    <el-button :type="isInPlay(tabs.videoDance,item)?'success':'primary'" size="small" @click="playVideo(item,index)">播放</el-button>
                                 </el-col>
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="addCollect(item,$event.currentTarget)">+</el-button>
+                                    <el-button type="primary" size="small" v-show="iShowAdd(tabs.videoDance,item)" @click="addCollect(item,$event.currentTarget)">+</el-button>
                                 </el-col>
                                 <el-col>
                                     <el-button type="success" size="small"
@@ -190,6 +196,7 @@
             <el-row style="overflow:auto;width: 100%;height: calc(100vh - 125px)">
                 <el-row>
                     <el-col v-for="(item,index) in tabs.moreFav.data" :span="4">
+                        <a :name="'moreFav-'+index"></a>
                         <el-card shadow="never" style="width:100%;height:100%;">
                             <el-image
                                     style="width: 100%; height: 230px;"
@@ -197,10 +204,10 @@
                                     fit="cover"></el-image>
                             <el-row type="flex" jusitify="justify" :gutter="20">
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="playVideo(item,index)">播放</el-button>
+                                    <el-button :type="isInPlay(tabs.moreFav,item)?'success':'primary'" size="small" @click="playVideo(item,index)">播放</el-button>
                                 </el-col>
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="addCollect(item,$event.currentTarget)">+</el-button>
+                                    <el-button type="primary" size="small" v-show="iShowAdd(tabs.moreFav,item)" @click="addCollect(item,$event.currentTarget)">+</el-button>
                                 </el-col>
                                 <el-col>
                                     <el-button type="success" size="small"
@@ -219,6 +226,7 @@
             <el-row style="overflow:auto;width: 100%;height: calc(100vh - 125px)">
                 <el-row>
                     <el-col v-for="(item,index) in tabs.moreDownload.data" :span="4">
+                        <a :name="'moreDownload-'+index"></a>
                         <el-card shadow="never" style="width:100%;height:100%;">
                             <el-image
                                     style="width: 100%; height: 230px;"
@@ -226,10 +234,10 @@
                                     fit="cover"></el-image>
                             <el-row type="flex" jusitify="justify" :gutter="20">
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="playVideo(item,index)">播放</el-button>
+                                    <el-button :type="isInPlay(tabs.moreDownload,item)?'success':'primary'" size="small" @click="playVideo(item,index)">播放</el-button>
                                 </el-col>
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="addCollect(item,$event.currentTarget)">+</el-button>
+                                    <el-button type="primary" size="small" v-show="iShowAdd(tabs.moreDownload,item)" @click="addCollect(item,$event.currentTarget)">+</el-button>
                                 </el-col>
                                 <el-col>
                                     <el-button type="success" size="small"
@@ -248,6 +256,7 @@
             <el-row style="overflow:auto;width: 100%;height: calc(100vh - 125px)">
                 <el-row>
                     <el-col v-for="(item,index) in tabs.morePlay.data" :span="4">
+                        <a :name="'morePlay-'+index"></a>
                         <el-card shadow="never" style="width:100%;height:100%;">
                             <el-image
                                     style="width: 100%; height: 230px;"
@@ -255,10 +264,10 @@
                                     fit="cover"></el-image>
                             <el-row type="flex" jusitify="justify" :gutter="20">
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="playVideo(item,index)">播放</el-button>
+                                    <el-button :type="isInPlay(tabs.morePlay,item)?'success':'primary'" size="small" @click="playVideo(item,index)">播放</el-button>
                                 </el-col>
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="addCollect(item,$event.currentTarget)">+</el-button>
+                                    <el-button type="primary" size="small" v-show="iShowAdd(tabs.morePlay,item)" @click="addCollect(item,$event.currentTarget)">+</el-button>
                                 </el-col>
                                 <el-col>
                                     <el-button type="success" size="small"
@@ -284,6 +293,7 @@
             <el-row style="overflow:auto;width: 100%;height: calc(100vh - 125px)">
                 <el-row>
                     <el-col v-for="(item,index) in tabs.collect.data" :span="4">
+                        <a :name="'collect-'+index"></a>
                         <el-card shadow="never" style="width:100%;height:100%;">
                             <el-image
                                     style="width: 100%; height: 230px;"
@@ -291,7 +301,7 @@
                                     fit="cover"></el-image>
                             <el-row type="flex" jusitify="justify" :gutter="20">
                                 <el-col>
-                                    <el-button type="primary" size="small" @click="playVideo(item,index)">播放</el-button>
+                                    <el-button :type="isInPlay(tabs.collect,item)?'success':'primary'" size="small" @click="playVideo(item,index)">播放</el-button>
                                 </el-col>
                                 <el-col>
                                     <el-button type="danger" size="small" @click="deleteCollect(item,index)">-</el-button>
@@ -310,14 +320,36 @@
         </el-tab-pane>
     </el-tabs>
     <el-drawer
-            :title="play.title"
+            
             :visible.sync="play.show"
             v-if="play.show"
             :key="play.url"
-            size="75%"
+            :size="play.fullscreen?'100%':'75%'"
             class="drawer-video"
             append-to-body>
-        <!--        <span slot="title" v-html="play.title"></span>-->
+        <span slot="title">
+            <el-button type="primary" size="small" :icon="play.fullscreen?'el-icon-crop':'el-icon-full-screen'"
+                    @click="switchFullScreen()">
+            </el-button>
+            <span>[{{play.index+1}}]&emsp;{{play.title}}</span>
+            <span style="float: right;margin-right: 50px;">
+                <span>本页{{count.current}}</span>
+                <el-divider direction="vertical"></el-divider>
+                <span>全部{{count.all}}</span>
+                <el-divider direction="vertical"></el-divider>
+                <span>收集{{tabs.collect.data.length}}</span>
+                <el-divider direction="vertical"></el-divider>
+                <el-button type="success" size="small"
+                        @click="playPrev()">&lt;&lt;&lt;
+                </el-button>
+                <el-button type="primary" size="small"  v-show="!tabs.collect.map[play.key]"
+                        @click="playAdd($event.currentTarget)">+
+                </el-button>
+                <el-button type="success" size="small"
+                        @click="playNext()">&gt;&gt;&gt;
+                </el-button>
+            </span>
+        </span>
         <video width="100%" height="100%"
                style="background-color: #444"
                controls autoplay @ended="onPlayEnd">
@@ -405,14 +437,16 @@
                 '45.11.0.248',
                 '45.11.0.249',
                 '45.11.0.251',
-                '45.11.0.254',
+                // '45.11.0.254',
             ],
             streamUrl: 'http://LBHOST:9455/stream.php?format_id=22&video_id=',
             play: {
                 title: '视频播放',
                 url: '',
                 show: false,
-                index: 0
+                fullscreen: false,
+                index: 0,
+                key: ''
             },
             count: {
                 current: 0,
@@ -566,6 +600,7 @@
                         key: (item) => item.key,
                     },
                     data: [],
+                    map:{}
                 }
 
             }
@@ -577,6 +612,16 @@
 
         },
         methods: {
+            iShowAdd(tabMeta,item){
+                return !this.tabs.collect.map[tabMeta.play.key(item)]
+            },
+            isInPlay(tabMeta,item){
+                let currMeta = this.tabs[this.activeTabName]
+                return currMeta==tabMeta && tabMeta.play.key(item)==this.play.key
+            },
+            switchFullScreen(){
+                this.play.fullscreen=!this.play.fullscreen
+            },
             handleTabClick() {
                 let tabMeta = this.tabs[this.activeTabName]
                 if (tabMeta.data.length == 0) {
@@ -584,7 +629,7 @@
                 }
                 this.updateCount()
             },
-            loadMoreData(dom) {
+            loadMoreData(dom,callback) {
                 let tabMeta = this.tabs[this.activeTabName]
                 if (dom) {
                     dom.style.transform = 'scale(0.75)'
@@ -597,6 +642,9 @@
                     tabMeta.data = [...tabMeta.data, ...tabMeta.route(data)]
                     tabMeta.query.page = tabMeta.query.page + 1
                     this.updateCount()
+                    if(callback){
+                        callback(tabMeta)
+                    }
                 }).finally(() => {
                     if (dom) {
                         dom.style.transform = 'scale(1)'
@@ -612,13 +660,19 @@
                     count += _this.tabs[key].data.length
                 })
                 this.count.all = count
+                this.$forceUpdate()
             },
             playVideo(item, index) {
                 let tabMeta = this.tabs[this.activeTabName]
                 this.play.index = index
                 this.play.title = tabMeta.play.title(item)
                 this.play.url = tabMeta.play.url(item)
+                this.play.key=tabMeta.play.key(item)
                 this.play.show = true
+                let link=document.createElement('a')
+                link.href=`#${this.activeTabName}-${this.play.index}`
+                link.click()
+                this.onPlayError()
             },
             downloadVideo(item, dom) {
                 let tabMeta = this.tabs[this.activeTabName]
@@ -639,20 +693,25 @@
                 let url = tabMeta.play.url(item)
                 let pic = item.pic
                 let key=tabMeta.play.key(item)
-                dom.style.display='none'
                 let exItem = this.tabs.collect.data.find((item)=>item.key==key)
                 if(!exItem){
-                    this.tabs.collect.data.push({
-                        title,
-                        url,
-                        pic,
-                        key
-                    })
+                    if(!this.tabs.collect.map[key]){
+                        this.tabs.collect.data.push({
+                            title,
+                            url,
+                            pic,
+                            key
+                        })
+                        this.tabs.collect.map[key]=true
+                    }
                     this.updateCount()
                 }
             },
             deleteCollect(item,index){
-                this.tabs.collect.data.splice(index,1)
+                let elems=this.tabs.collect.data.splice(index,1)
+                elems.forEach(e=>{
+                    delete this.tabs.collect.map[e.key]
+                })
                 this.updateCount()
             },
             escapeHtml(html) {
@@ -674,6 +733,27 @@
                 let tabMeta = this.tabs[this.activeTabName]
                 tabMeta.data = []
                 this.updateCount()
+            },
+            refreshTabUrls(dom){
+                let tabMeta = this.tabs[this.activeTabName]
+                tabMeta.query.page=0
+                tabMeta.data=[]
+                if (dom) {
+                    dom.style.transform = 'scale(0.75)'
+                }
+                this.$axios({
+                    url: tabMeta.url,
+                    method: 'get',
+                    params: Object.assign({}, this.pub, tabMeta.query)
+                }).then(({data}) => {
+                    tabMeta.data = [...tabMeta.data, ...tabMeta.route(data)]
+                    tabMeta.query.page = tabMeta.query.page + 1
+                    this.updateCount()
+                }).finally(() => {
+                    if (dom) {
+                        dom.style.transform = 'scale(1)'
+                    }
+                })
             },
             copyAllUrls() {
                 let _this = this
@@ -725,9 +805,74 @@
             },
             onPlayEnd() {
                 let tabMeta = this.tabs[this.activeTabName]
-                this.play.index = (this.play.index + 1) % tabMeta.data.length
+                let nextIndex=this.play.index + 1
+                this.play.index = nextIndex % tabMeta.data.length
                 this.play.title = tabMeta.play.title(tabMeta.data[this.play.index])
                 this.play.url = tabMeta.play.url(tabMeta.data[this.play.index])
+                this.play.key=tabMeta.play.key(tabMeta.data[this.play.index])
+                let link=document.createElement('a')
+                link.href=`#${this.activeTabName}-${this.play.index}`
+                link.click()
+                this.onPlayError()
+            },
+            onPlayError(){
+                setTimeout(()=>{
+                    let player=document.querySelector('video')
+                    if(!player){
+                        return
+                    }
+                    if(player.networkState==3){
+                        ELEMENT.Message.error('视频播放失败')
+                    }
+                },1500)
+            },
+            playNext(){
+                let tabMeta = this.tabs[this.activeTabName]
+                let nextIndex=this.play.index + 1
+                if(nextIndex>=tabMeta.data.length){
+                    this.loadMoreData(null,(meta)=>{
+                        this.play.index = nextIndex % tabMeta.data.length
+                        this.play.title = tabMeta.play.title(tabMeta.data[this.play.index])
+                        this.play.url = tabMeta.play.url(tabMeta.data[this.play.index])
+                        this.play.key=tabMeta.play.key(tabMeta.data[this.play.index])
+                        let link=document.createElement('a')
+                        link.href=`#${this.activeTabName}-${this.play.index}`
+                        link.click()
+                        this.onPlayError()
+                    })
+                }else{
+                    this.play.index = nextIndex % tabMeta.data.length
+                    this.play.title = tabMeta.play.title(tabMeta.data[this.play.index])
+                    this.play.url = tabMeta.play.url(tabMeta.data[this.play.index])
+                    this.play.key=tabMeta.play.key(tabMeta.data[this.play.index])
+                    let link=document.createElement('a')
+                    link.href=`#${this.activeTabName}-${this.play.index}`
+                    link.click()
+                    this.onPlayError()
+                }
+                
+            },
+            playPrev(){
+                let tabMeta = this.tabs[this.activeTabName]
+                let nextIndex=this.play.index - 1
+                if(nextIndex<0){
+                    nextIndex=tabMeta.data.length-1
+                }
+                this.play.index = nextIndex % tabMeta.data.length
+                this.play.title = tabMeta.play.title(tabMeta.data[this.play.index])
+                this.play.url = tabMeta.play.url(tabMeta.data[this.play.index])
+                this.play.key=tabMeta.play.key(tabMeta.data[this.play.index])
+                let link=document.createElement('a')
+                link.href=`#${this.activeTabName}-${this.play.index}`
+                link.click()
+                this.onPlayError()
+            },
+            playAdd(dom){
+                let tabMeta = this.tabs[this.activeTabName]
+                let item=tabMeta.data[this.play.index]
+                if(item){
+                    this.addCollect(item,null)
+                }
             }
         }
     })
