@@ -16,6 +16,9 @@
     <modules>
         <module>i2f-base</module>
 
+        <!-- 提供基础的注解 -->
+        <module>i2f-annotations</module>
+
         <!-- 仅依赖jdk1.8,javase -->
         <module>i2f-core</module>
 

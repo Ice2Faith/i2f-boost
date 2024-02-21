@@ -1,0 +1,6 @@
+{
+  "pkg": "com.test",
+  "author": "dev",
+  "useLombok": false,
+  "useSwagger": false
+}
