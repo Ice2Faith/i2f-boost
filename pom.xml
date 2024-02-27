@@ -64,6 +64,7 @@
         <module>i2f-liteflow</module>
 
         <module>i2f-secure</module>
+        <module>i2f-stream</module>
 
     </modules>
 
