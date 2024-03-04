@@ -66,6 +66,7 @@
         <module>i2f-secure</module>
         <module>i2f-stream</module>
         <module>i2f-reflect</module>
+        <module>i2f-tuple</module>
 
     </modules>
 
