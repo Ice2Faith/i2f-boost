@@ -1,6 +1,7 @@
 package i2f.stream;
 
 import i2f.stream.impl.*;
+import i2f.stream.timed.TimedStreaming;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -327,9 +328,22 @@ public interface Streaming<E> {
                                         Function<E, V> valueSupplier,
                                         BiFunction<V, V, V> valueSelector);
 
+    default <K, V, R extends Map<K, V>> R toMap(Supplier<R> mapSupplier,
+                                                Function<E, K> keySupplier,
+                                        Function<E, V> valueSupplier,
+                                        BiFunction<V, V, V> valueSelector){
+        return toMap(mapSupplier.get(), keySupplier, valueSupplier, valueSelector);
+    }
+
     <K, V extends Collection<E>, R extends Map<K, V>> Map.Entry<V,R> toGroup(R map,
                                                                 Supplier<V> containerSupplier,
                                                                 Function<E, K> keySupplier);
+
+    default <K, V extends Collection<E>, R extends Map<K, V>> Map.Entry<V,R> toGroup(Supplier<R> mapSupplier,
+                                                                             Supplier<V> containerSupplier,
+                                                                             Function<E, K> keySupplier){
+        return toGroup(mapSupplier.get(), containerSupplier, keySupplier);
+    }
 
     Reference<E> first();
 
@@ -428,4 +442,5 @@ public interface Streaming<E> {
 
     void toWriter(Writer writer,String prefix,String separator,String suffix) throws IOException;
 
+    TimedStreaming<E> timed(Function<E,Long> timestampMapper);
 }

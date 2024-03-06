@@ -5,6 +5,8 @@ import i2f.stream.richable.RichStreamProcessor;
 import i2f.stream.thread.AtomicCountDownLatch;
 import i2f.stream.thread.AtomicCountDownLatchRunnable;
 import i2f.stream.thread.NamingForkJoinPool;
+import i2f.stream.timed.TimedStreaming;
+import i2f.stream.timed.TimedStreamingImpl;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -1348,7 +1350,14 @@ public class StreamingImpl<E> implements Streaming<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return this.holdIterator;
+        return new ResourcesIterator<>(this.holdIterator,
+                (iterator,holder)->{
+                    richBefore(iterator);
+                    return iterator;
+                },
+                (iterator,holder)->{
+                    richAfter(iterator);
+                });
     }
 
     @Override
@@ -2153,5 +2162,10 @@ public class StreamingImpl<E> implements Streaming<E> {
         } finally {
             richAfter(this.holdIterator);
         }
+    }
+
+    @Override
+    public TimedStreaming<E> timed(Function<E, Long> timestampMapper) {
+        return new TimedStreamingImpl<>(this.holdIterator,this,timestampMapper);
     }
 }

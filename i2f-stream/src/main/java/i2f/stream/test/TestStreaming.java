@@ -102,19 +102,24 @@ public class TestStreaming {
         Streaming.ofMethod(Streaming.class)
                 .sysout();
 
+//
+//        Streaming.ofGenerator((collector)->{
+//            SecureRandom random=new SecureRandom();
+//            long cnt=0;
+//            while (true) {
+//                collector.accept(Reference.of(new SimpleEntry<>(random.nextInt(100),++cnt)));
+//                try{
+//                    Thread.sleep(random.nextInt(10));
+//                }catch(Exception e){
+//                    e.printStackTrace();
+//                    System.out.println(e.getMessage());
+//                }
+//            }
+//        }).sysout("value:");
 
-        Streaming.ofGenerator((collector)->{
-            SecureRandom random=new SecureRandom();
-            long cnt=0;
-            while (true) {
-                collector.accept(Reference.of(new SimpleEntry<>(random.nextInt(100),++cnt)));
-                try{
-                    Thread.sleep(random.nextInt(10));
-                }catch(Exception e){
-                    e.printStackTrace();
-                    System.out.println(e.getMessage());
-                }
-            }
-        }).sysout("value:");
+        Streaming.of(1,2,3,6,7,8,11,12,18,22,29,31,32,38,45)
+                .timed((e)->(long)e)
+                .sessionTimeWindow(3)
+                .sysout("time:");
     }
 }
