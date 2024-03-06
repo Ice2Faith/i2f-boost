@@ -1,7 +1,6 @@
 package i2f.stream;
 
 import i2f.stream.impl.*;
-import org.apache.poi.ss.formula.functions.T;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -213,7 +212,9 @@ public interface Streaming<E> {
 
     Streaming<E> defaultPool();
 
-    Streaming<E> parallel(int count);
+    Streaming<E> pool(int size);
+
+    Streaming<E> parallelism(int count);
 
     <R> Streaming<R> process(BiConsumer<E,Consumer<R>> mapper);
 

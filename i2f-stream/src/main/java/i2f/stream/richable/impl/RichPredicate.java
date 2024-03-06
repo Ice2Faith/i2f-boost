@@ -1,7 +1,6 @@
 package i2f.stream.richable.impl;
 
 import i2f.stream.richable.BaseRichStreamProcessor;
-import org.apache.poi.ss.formula.functions.T;
 
 import java.util.function.Predicate;
 

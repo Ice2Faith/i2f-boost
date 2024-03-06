@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class TestStreaming {
     public static void main(String[] args) throws Exception {
-        String filePath="E:\\MySystemDefaultFiles\\Desktop\\30OfficeCenter\\103-NytRoot\\Agri131\\SampleSurvey\\SPSV-SVC\\spsv-biz\\src\\main\\java\\i2f\\stream\\Streaming.java";
+        String filePath="D:\\IDEA_ROOT\\DevCenter\\i2f-boost\\i2f-stream\\src\\main\\java\\i2f\\stream\\Streaming.java";
         Streaming.of(new File(filePath),"UTF-8")
 
                 .<String>process((item,collector)->{
@@ -66,7 +66,7 @@ public class TestStreaming {
                     System.out.println("cond:"+entry.getKey()+"="+entry.getValue());
                 });
 
-        Streaming.ofDir(new File("E:\\MySystemDefaultFiles\\Desktop\\30OfficeCenter\\103-NytRoot\\Agri131\\SampleSurvey\\SPSV-SVC\\spsv-biz\\src\\main\\java\\i2f\\stream"))
+        Streaming.ofDir(new File("D:\\IDEA_ROOT\\DevCenter\\i2f-boost\\i2f-stream\\src\\main\\java"))
                 .recursive((file, collector)->{
                     if(file.isFile()){
                         return;

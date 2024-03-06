@@ -1,6 +1,5 @@
 package i2f.stream.impl;
 
-import org.apache.poi.ss.formula.functions.T;
 
 import java.util.Iterator;
 import java.util.Map;

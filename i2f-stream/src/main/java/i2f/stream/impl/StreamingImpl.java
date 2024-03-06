@@ -3,7 +3,6 @@ package i2f.stream.impl;
 import i2f.stream.Streaming;
 import i2f.stream.richable.RichStreamProcessor;
 import i2f.stream.thread.AtomicCountDownLatch;
-import i2f.stream.thread.AtomicCountDownLatchCallable;
 import i2f.stream.thread.AtomicCountDownLatchRunnable;
 import i2f.stream.thread.NamingForkJoinPool;
 
@@ -12,11 +11,10 @@ import java.io.Writer;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.*;
 
 /**
@@ -140,51 +138,62 @@ public class StreamingImpl<E> implements Streaming<E> {
     }
 
     @Override
-    public Streaming<E> parallel(int count) {
-        this.parallelCount = count;
-        if (this.parallelCount <= 0) {
-            this.parallelCount = 1;
+    public Streaming<E> pool(int size) {
+        if (size <= 0) {
+            size = 1;
         }
-        this.pool = NamingForkJoinPool.getPool(this.parallelCount, "streaming",
-                "custom(" + this.parallelCount + ")");
+        this.pool = NamingForkJoinPool.getPool(size, "streaming",
+                "pool(" + size + ")");
         return this;
     }
 
-    public static <R, E> Iterator<R> delegateParallel(Supplier<ExecutorService> poolSupplier,
-                                                      Supplier<AtomicCountDownLatch> latchSupplier,
-                                                      Iterator<E> holdIterator,
-                                                      Function<E, Reference<R>> mapper
-    ) {
-        List<R> ret = new LinkedList<>();
-        try {
-            AtomicCountDownLatch latch = latchSupplier.get();
-            ExecutorService pool = poolSupplier.get();
-            latch.begin();
-            while (holdIterator.hasNext()) {
-                E elem = holdIterator.next();
-                latch.count();
+    @Override
+    public Streaming<E> parallelism(int count) {
+        this.parallelCount=count;
+        return this;
+    }
 
-                AtomicCountDownLatchRunnable task = new AtomicCountDownLatchRunnable(latch) {
-                    @Override
-                    public void doTask(AtomicCountDownLatch resource) throws Throwable {
-                        Reference<R> result = mapper.apply(elem);
-                        synchronized (ret) {
-                            if (result.hasValue()) {
-                                ret.add(result.get());
-                            }
+    public static <R, E> Iterator<R> delegateParallelism(int parallelCount,
+                                                         Supplier<ExecutorService> poolSupplier,
+                                                         Supplier<AtomicCountDownLatch> latchSupplier,
+                                                         Iterator<E> holdIterator,
+                                                         BiConsumer<E, Consumer<R>> consumer
+    ){
+        return new GeneratorIterator<>((collector)->{
+            try {
+
+                AtomicCountDownLatch latch = latchSupplier.get();
+                ExecutorService pool = poolSupplier.get();
+                latch.begin();
+                while (holdIterator.hasNext()) {
+                    E elem = holdIterator.next();
+                    latch.count();
+
+                    AtomicCountDownLatchRunnable task = new AtomicCountDownLatchRunnable(latch) {
+                        @Override
+                        public void doTask(AtomicCountDownLatch resource) throws Throwable {
+                            consumer.accept(elem,(e)->collector.accept(Reference.of(e)));
                         }
+
+                    };
+                    pool.submit(task);
+
+                    if(parallelCount>0 && latch.current()==parallelCount){
+                        latch.finish();
+                        latch.await();
+
+                        latch.begin();
                     }
+                }
 
-                };
-                pool.submit(task);
+                latch.finish();
+                latch.await();
+
+                collector.accept(Reference.finish());
+            } catch (Exception e) {
+                throw new IllegalStateException("parallel exception", e);
             }
-            latch.finish();
-            latch.await();
-
-        } catch (Exception e) {
-            throw new IllegalStateException("parallel exception", e);
-        }
-        return ret.iterator();
+        });
     }
 
     @Override
@@ -193,29 +202,26 @@ public class StreamingImpl<E> implements Streaming<E> {
             richBefore(mapper);
             richBefore(this.holdIterator);
             try {
-                List<R> ret = new LinkedList<>();
                 if (this.parallel) {
-                    Iterator<List<R>> iterator = delegateParallel(
+                    return delegateParallelism(
+                            this.parallelCount,
                             () -> this.pool,
                             AtomicCountDownLatch::new,
                             this.holdIterator,
-                            (e) -> {
-                                List<R> batch = new LinkedList<>();
-                                mapper.accept(e, batch::add);
-                                return Reference.of(batch);
+                            (e,collector) -> {
+                                mapper.accept(e, collector);
                             });
-                    while (iterator.hasNext()) {
-                        ret.addAll(iterator.next());
-                    }
                 } else {
-                    while (this.holdIterator.hasNext()) {
-                        E elem = this.holdIterator.next();
-                        List<R> result = new LinkedList<>();
-                        mapper.accept(elem, result::add);
-                        ret.addAll(result);
-                    }
+                    return new SupplierBufferIterator<>(()->{
+                        while (this.holdIterator.hasNext()) {
+                            E elem = this.holdIterator.next();
+                            List<R> result = new LinkedList<>();
+                            mapper.accept(elem, result::add);
+                            return Reference.of(result);
+                        }
+                        return Reference.finish();
+                    });
                 }
-                return ret.iterator();
             } finally {
                 richAfter(this.holdIterator);
                 richAfter(mapper);
@@ -264,14 +270,14 @@ public class StreamingImpl<E> implements Streaming<E> {
             richBefore(this.holdIterator);
             try {
                 if (parallel) {
-                    Iterator<E> iterator = delegateParallel(() -> this.pool,
+                    Iterator<E> iterator = delegateParallelism(this.parallelCount,
+                            () -> this.pool,
                             AtomicCountDownLatch::new,
                             this.holdIterator,
-                            (e) -> {
+                            (e,collector) -> {
                                 if (filter.test(e)) {
-                                    return Reference.of(e);
+                                    collector.accept(e);
                                 }
-                                return Reference.nop();
                             });
                     richAfter(this.holdIterator);
                     richAfter(filter);
@@ -414,12 +420,13 @@ public class StreamingImpl<E> implements Streaming<E> {
             richBefore(this.holdIterator);
             try {
                 if (parallel) {
-                    Iterator<R> iterator = delegateParallel(() -> this.pool,
+                    Iterator<R> iterator = delegateParallelism(this.parallelCount,
+                            () -> this.pool,
                             AtomicCountDownLatch::new,
                             this.holdIterator,
-                            (e) -> {
+                            (e,collector) -> {
                                 R ret = mapper.apply(e);
-                                return Reference.of(ret);
+                                collector.accept(ret);
                             });
                     richAfter(this.holdIterator);
                     richAfter(mapper);
@@ -449,21 +456,13 @@ public class StreamingImpl<E> implements Streaming<E> {
             richBefore(this.holdIterator);
             try {
                 if (parallel) {
-                    Iterator<List<R>> iterator = delegateParallel(() -> this.pool,
+                    return delegateParallelism(this.parallelCount,
+                            () -> this.pool,
                             AtomicCountDownLatch::new,
                             this.holdIterator,
-                            (elem) -> {
-                                List<R> buffer = new LinkedList<>();
-                                collector.accept(elem, (e) -> {
-                                    buffer.add(e);
-                                });
-                                return Reference.of(buffer);
+                            (elem,collect) -> {
+                                collector.accept(elem, collect::accept);
                             });
-                    List<R> ret = new LinkedList<>();
-                    while (iterator.hasNext()) {
-                        ret.addAll(iterator.next());
-                    }
-                    return ret.iterator();
                 } else {
                     return new SupplierBufferIterator<>(() -> {
                         while (this.holdIterator.hasNext()) {
@@ -1820,12 +1819,12 @@ public class StreamingImpl<E> implements Streaming<E> {
         richBefore(this.holdIterator);
         try {
             if (parallel) {
-                delegateParallel(() -> this.pool,
+                delegateParallelism(this.parallelCount,
+                        () -> this.pool,
                         AtomicCountDownLatch::new,
                         this.holdIterator,
-                        (elem) -> {
+                        (elem,collector) -> {
                             consumer.accept(elem);
-                            return Reference.nop();
                         });
             } else {
                 while (this.holdIterator.hasNext()) {
@@ -1880,16 +1879,16 @@ public class StreamingImpl<E> implements Streaming<E> {
         richBefore(this.holdIterator);
         try {
             if (parallel) {
-                delegateParallel(() -> this.pool,
+                delegateParallelism(this.parallelCount,
+                        () -> this.pool,
                         AtomicCountDownLatch::new,
                         this.holdIterator,
-                        (elem) -> {
+                        (elem,collector) -> {
                             if(prefix!=null){
                                 System.out.println(prefix+elem);
                             }else{
                                 System.out.println(elem);
                             }
-                            return Reference.nop();
                         });
             } else {
                 while (this.holdIterator.hasNext()) {
