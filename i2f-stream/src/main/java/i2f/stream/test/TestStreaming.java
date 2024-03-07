@@ -144,5 +144,25 @@ public class TestStreaming {
                         .next(e->e==8)
                         .end()
                 ).sysout("match:");
+
+        Streaming.of(1,8,
+                6,6,2,
+                6,6,3,4,0,0,0,5,0,0,7,0,7,8, //
+                2,5,
+                6,6,3,4,5,0,7,7,8, //
+                6,6,3,4,0,0,5,7,8,8,7,8, //
+                6,6,3,4,0,5,0,0,0,7,0,0,7,8, //
+                6,6,3,2,5,0,0,7,8
+        )
+                .pattenWindow((patten)->
+                            patten.next(e->e==6).repeat(2)
+                                    .next(e->e==3)
+                                    .next(e->e==4)
+                                    .next(e->e==0)
+                                    .next(e->e==0).repeats()
+                                    .next(e->e==5)
+                                    .follow(3,e->e==7).repeat(2)
+                                    .next(e->e==8)
+                ).sysout("match:");
     }
 }

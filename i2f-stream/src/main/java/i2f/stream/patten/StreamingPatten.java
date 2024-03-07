@@ -35,6 +35,10 @@ public class StreamingPatten<E> {
         }
     }
 
+    public static<T> StreamingPatten<T> begin(){
+        return new StreamingPatten<>(null,1,null);
+    }
+
     public static<T> StreamingPatten<T> begin(Predicate<T> filter){
         return new StreamingPatten<>(filter,1,null);
     }
@@ -65,6 +69,13 @@ public class StreamingPatten<E> {
         StreamingPatten<E> curr=this;
         while(curr.prev!=null){
             curr=curr.prev;
+        }
+        if(curr.filter==null){
+            curr=curr.next;
+            if(curr!=null){
+                curr.prev.next=null;
+                curr.prev=null;
+            }
         }
         return curr;
     }

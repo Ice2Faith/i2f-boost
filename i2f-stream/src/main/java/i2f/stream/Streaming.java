@@ -317,6 +317,12 @@ public interface Streaming<E> {
 
     Streaming<Map.Entry<List<E>,Map.Entry<Long,Long>>> pattenWindow(StreamingPatten<E> patten);
 
+    default Streaming<Map.Entry<List<E>,Map.Entry<Long,Long>>> pattenWindow(Function<StreamingPatten<E>,StreamingPatten<E>> consumer){
+        StreamingPatten<E> patten=StreamingPatten.begin();
+        patten=consumer.apply(patten);
+        return pattenWindow(patten.end());
+    }
+
     <T> Streaming<Map.Entry<E,T>> connect(Streaming<T> other);
 
     <T> Streaming<Map.Entry<E,T>> join(Streaming<T> other,BiPredicate<E,T> conditional);
