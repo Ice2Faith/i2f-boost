@@ -11,6 +11,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -211,6 +212,17 @@ public class TestStreaming {
         ).latelyAverage(3,2,e->new BigDecimal(e))
                 .sysout("avg:");
 
+        Streaming.of(1,8,
+                6,6,2,
+                6,6,3,4,0,0,0,5,0,0,7,0,7,8, //
+                2,5,
+                6,6,3,4,5,0,7,7,8, //
+                6,6,3,4,0,0,5,7,8,8,7,8, //
+                6,6,3,4,0,5,0,0,0,7,0,0,7,8, //
+                6,6,3,2,5,0,0,7,8
+        ).latelyIndex(3,2,e->new BigDecimal(e))
+                .sysout("indexes:");
+
         Streaming.of(1,2,3,4,5,6,7,8,9)
                 .timed((e)->(long)e)
                 .viewTimeWindow(3,2)
@@ -220,6 +232,21 @@ public class TestStreaming {
                 .timed((e)->(long)e)
                 .viewTimeWindow(3,2)
                 .sysout("time-view-real:");
+
+        Streaming.of(1,2,3,4,5,6,7,8,9)
+                .timed((e)->(long)e)
+                .latelyAverageTime(3,2,e->new BigDecimal(e))
+                .sysout("late-time:");
+
+        Streaming.of(1,2,2,3,3,6,7,8,11,12,18,22,29,31,32,38,45)
+                .timed((e)->(long)e)
+                .latelyAggregateTime(3, LinkedList::new,(t,e)->{t.add(e);return t;},e->e)
+                .sysout("late-time-list:");
+
+        Streaming.of(1,2,2,3,3,6,7,8,11,12,18,22,29,31,32,38,45)
+                .timed((e)->(long)e)
+                .latelyIndexTime(3,2,e->new BigDecimal(e))
+                .sysout("late-time-indexes:");
     }
 
 }

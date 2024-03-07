@@ -6,8 +6,11 @@ import i2f.stream.window.TimeWindowInfo;
 import i2f.stream.window.ViewTimeWindowInfo;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @author Ice2Faith
@@ -381,6 +384,55 @@ public class TimedStreamingImpl<E> extends StreamingImpl<Map.Entry<Long, E>> imp
 
                 if(!buff.isEmpty()){
                     return Reference.of(buff);
+                }
+
+                richAfter(this.holdIterator);
+                return Reference.finish();
+            });
+
+        }), this);
+    }
+
+    @Override
+    public <T, R> Streaming<Map.Entry<Map.Entry<Long, E>, R>> latelyAggregateTime(long latelyMillSeconds, Supplier<T> firstSupplier, BiFunction<T, E, T> accumulator, Function<T, R> finisher) {
+        return new StreamingImpl<>(new LazyIterator<>(() -> {
+
+            LinkedList<Map.Entry<Long,E>> beforeList=new LinkedList<>();
+            AtomicLong elemCount=new AtomicLong(0L);
+
+            return new SupplierIterator<Map.Entry<Map.Entry<Long,E>,R>>(() -> {
+                while (this.holdIterator.hasNext()) {
+                    Map.Entry<Long,E> elem = this.holdIterator.next();
+                    elemCount.incrementAndGet();
+
+                    while(!beforeList.isEmpty()){
+                        Map.Entry<Long, E> first = beforeList.getFirst();
+                        if(first.getKey()<elem.getKey()-latelyMillSeconds){
+                            beforeList.removeFirst();
+                        }else{
+                            break;
+                        }
+                    }
+
+                    T cvt = firstSupplier.get();
+                    for (Map.Entry<Long,E> item : beforeList) {
+                        cvt=accumulator.apply(cvt,item.getValue());
+                    }
+                    cvt = accumulator.apply(cvt, elem.getValue());
+
+
+                    beforeList.add(elem);
+
+                    while(!beforeList.isEmpty()){
+                        Map.Entry<Long, E> first = beforeList.getFirst();
+                        if(first.getKey()<elem.getKey()-latelyMillSeconds){
+                            beforeList.removeFirst();
+                        }else{
+                            break;
+                        }
+                    }
+
+                    return Reference.of(new SimpleEntry<>(elem, finisher.apply(cvt)));
                 }
 
                 richAfter(this.holdIterator);

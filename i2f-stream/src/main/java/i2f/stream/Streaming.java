@@ -1,6 +1,7 @@
 package i2f.stream;
 
 import i2f.stream.impl.*;
+import i2f.stream.index.DecimalIndex;
 import i2f.stream.patten.StreamingPatten;
 import i2f.stream.timed.TimedStreaming;
 import i2f.stream.window.ConditionWindowInfo;
@@ -340,6 +341,38 @@ public interface Streaming<E> {
                     t.setValue(t.getValue().add(BigDecimal.ONE));
                     return t;
                 },(e)->e.getKey().divide(e.getValue(),scale, RoundingMode.HALF_UP));
+    }
+
+    default Streaming<Map.Entry<E, DecimalIndex>> latelyIndex(int latelyCount,
+                                                              int scale,
+                                                              Function<E,BigDecimal> valueMapper){
+        return latelyAggregate(latelyCount,
+                ()->{
+                    DecimalIndex index=new DecimalIndex();
+                    index.setAvg(BigDecimal.ZERO);
+                    index.setCount(BigDecimal.ZERO);
+                    index.setSum(BigDecimal.ZERO);
+                    return index;
+                },
+                (t,e)->{
+                    BigDecimal val = valueMapper.apply(e);
+                    t.setSum(t.getSum().add(val));
+                    t.setCount(t.getCount().add(BigDecimal.ONE));
+                    if(t.getMin()==null){
+                        t.setMin(val);
+                    }else{
+                        t.setMin(t.getMin().min(val));
+                    }
+                    if(t.getMax()==null){
+                        t.setMax(val);
+                    }else{
+                        t.setMax(t.getMax().max(val));
+                    }
+                    return t;
+                },(e)->{
+                    e.setAvg(e.getSum().divide(e.getCount(),scale,RoundingMode.HALF_UP));
+                    return e;
+                });
     }
 
     <T,R> Streaming<Map.Entry<E,R>> latelyAggregate(int latelyCount,
