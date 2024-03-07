@@ -2,9 +2,10 @@ package i2f.stream.timed;
 
 import i2f.stream.Streaming;
 import i2f.stream.impl.*;
+import i2f.stream.window.TimeWindowInfo;
+import i2f.stream.window.ViewTimeWindowInfo;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
@@ -100,33 +101,43 @@ public class TimedStreamingImpl<E> extends StreamingImpl<Map.Entry<Long, E>> imp
     }
 
     @Override
-    public Streaming<Map.Entry<List<Map.Entry<Long, E>>, Map.Entry<Long, Long>>> slideTimeWindow(long windowMillSeconds, long slideMillSeconds) {
+    public Streaming<Map.Entry<List<Map.Entry<Long, E>>, TimeWindowInfo>> slideTimeWindow(long windowMillSeconds, long slideMillSeconds) {
         return new StreamingImpl<>(new LazyIterator<>(() -> {
 
-            LinkedList<SimpleEntry<LinkedList<Map.Entry<Long, E>>, SimpleEntry<Long, SimpleEntry<Long, Long>>>> waitList = new LinkedList<>();
-            AtomicLong elemCount = new AtomicLong(0L);
+            LinkedList<SimpleEntry<LinkedList<Map.Entry<Long, E>>, TimeWindowInfo>> waitList = new LinkedList<>();
+            AtomicLong elementCount = new AtomicLong(0L);
             AtomicLong windowCount = new AtomicLong(0L);
+            AtomicLong submitWindowCount = new AtomicLong(0L);
             AtomicLong current = new AtomicLong(0);
 
-            return new SupplierBufferIterator<Map.Entry<List<Map.Entry<Long, E>>, Map.Entry<Long, Long>>>(() -> {
+            return new SupplierBufferIterator<Map.Entry<List<Map.Entry<Long, E>>, TimeWindowInfo>>(() -> {
                 synchronized (waitList) {
                     while (this.holdIterator.hasNext()) {
                         Map.Entry<Long, E> elem = this.holdIterator.next();
-                        elemCount.incrementAndGet();
+                        elementCount.incrementAndGet();
 
-                        for (SimpleEntry<LinkedList<Map.Entry<Long, E>>, SimpleEntry<Long, SimpleEntry<Long, Long>>> entry : waitList) {
-                            if (entry.getValue().getKey() + windowMillSeconds > elem.getKey()) {
+                        for (SimpleEntry<LinkedList<Map.Entry<Long, E>>, TimeWindowInfo> entry : waitList) {
+                            if (entry.getValue().getWindowEndTime() > elem.getKey()) {
                                 entry.getKey().add(elem);
+                                entry.getValue().setRealEndTime(elem.getKey());
                             }
                         }
 
                         boolean isNew = false;
-                        if (elemCount.get() == 1) {
+                        if (elementCount.get() == 1) {
                             current.set(elem.getKey());
                             LinkedList<Map.Entry<Long, E>> newList = new LinkedList<>();
                             newList.add(elem);
                             windowCount.incrementAndGet();
-                            waitList.add(new SimpleEntry<>(newList, new SimpleEntry<>(elem.getKey(), new SimpleEntry<>(elemCount.get(), windowCount.get()))));
+
+                            TimeWindowInfo info=new TimeWindowInfo();
+                            info.setElementCount(elementCount.get());
+                            info.setWindowCount(windowCount.get());
+                            info.setSubmitWindowCount(submitWindowCount.get());
+                            info.setWindowBeginTime(current.get());
+                            info.setWindowEndTime(current.get()+windowMillSeconds);
+                            info.setRealEndTime(elem.getKey());
+                            waitList.add(new SimpleEntry<>(newList, info));
                             isNew = true;
                         }
 
@@ -139,16 +150,26 @@ public class TimedStreamingImpl<E> extends StreamingImpl<Map.Entry<Long, E>> imp
                                 LinkedList<Map.Entry<Long, E>> newList = new LinkedList<>();
                                 newList.add(elem);
                                 windowCount.incrementAndGet();
-                                waitList.add(new SimpleEntry<>(newList, new SimpleEntry<>(elem.getKey(), new SimpleEntry<>(elemCount.get(), windowCount.get()))));
+
+                                TimeWindowInfo info=new TimeWindowInfo();
+                                info.setElementCount(elementCount.get());
+                                info.setWindowCount(windowCount.get());
+                                info.setSubmitWindowCount(submitWindowCount.get());
+                                info.setWindowBeginTime(current.get());
+                                info.setWindowEndTime(current.get()+windowMillSeconds);
+                                info.setRealEndTime(elem.getKey());
+                                waitList.add(new SimpleEntry<>(newList, info));
                             }
                         }
 
 
-                        Collection<Map.Entry<List<Map.Entry<Long, E>>, Map.Entry<Long, Long>>> buff = new LinkedList<>();
+                        Collection<Map.Entry<List<Map.Entry<Long, E>>, TimeWindowInfo>> buff = new LinkedList<>();
                         while (!waitList.isEmpty()) {
-                            SimpleEntry<LinkedList<Map.Entry<Long, E>>, SimpleEntry<Long, SimpleEntry<Long, Long>>> first = waitList.getFirst();
-                            if (first.getValue().getKey() + windowMillSeconds <= elem.getKey()) {
-                                buff.add(new SimpleEntry<>(first.getKey(), first.getValue().getValue()));
+                            SimpleEntry<LinkedList<Map.Entry<Long, E>>, TimeWindowInfo> first = waitList.getFirst();
+                            if (first.getValue().getWindowEndTime() <= elem.getKey()) {
+                                submitWindowCount.incrementAndGet();
+                                first.getValue().setSubmitWindowCount(submitWindowCount.get());
+                                buff.add(new SimpleEntry<>(first.getKey(), first.getValue()));
                                 waitList.removeFirst();
                             } else {
                                 break;
@@ -163,10 +184,12 @@ public class TimedStreamingImpl<E> extends StreamingImpl<Map.Entry<Long, E>> imp
                         }
                     }
 
-                    Collection<Map.Entry<List<Map.Entry<Long, E>>, Map.Entry<Long, Long>>> buff = new LinkedList<>();
+                    Collection<Map.Entry<List<Map.Entry<Long, E>>, TimeWindowInfo>> buff = new LinkedList<>();
                     while (!waitList.isEmpty()) {
-                        SimpleEntry<LinkedList<Map.Entry<Long, E>>, SimpleEntry<Long, SimpleEntry<Long, Long>>> first = waitList.getFirst();
-                        buff.add(new SimpleEntry<>(first.getKey(), first.getValue().getValue()));
+                        SimpleEntry<LinkedList<Map.Entry<Long, E>>, TimeWindowInfo> first = waitList.getFirst();
+                        submitWindowCount.incrementAndGet();
+                        first.getValue().setSubmitWindowCount(submitWindowCount.get());
+                        buff.add(new SimpleEntry<>(first.getKey(), first.getValue()));
                         waitList.removeFirst();
                     }
 
@@ -183,26 +206,32 @@ public class TimedStreamingImpl<E> extends StreamingImpl<Map.Entry<Long, E>> imp
     }
 
     @Override
-    public Streaming<Map.Entry<List<Map.Entry<Long, E>>, Map.Entry<Long, Long>>> sessionTimeWindow(long sessionTimeoutMillSeconds) {
+    public Streaming<Map.Entry<List<Map.Entry<Long, E>>, TimeWindowInfo>> sessionTimeWindow(long sessionTimeoutMillSeconds) {
         return new StreamingImpl<>(new LazyIterator<>(() -> {
-            LinkedList<SimpleEntry<LinkedList<Map.Entry<Long, E>>, SimpleEntry<Long, SimpleEntry<Long, Long>>>> waitList = new LinkedList<>();
-            AtomicLong elemCount = new AtomicLong(0L);
+            LinkedList<SimpleEntry<LinkedList<Map.Entry<Long, E>>, SimpleEntry<Long, TimeWindowInfo>>> waitList = new LinkedList<>();
+            AtomicLong elementCount = new AtomicLong(0L);
             AtomicLong windowCount = new AtomicLong(0L);
+            AtomicLong submitWindowCount = new AtomicLong(0L);
             AtomicLong current = new AtomicLong(0);
 
-            return new SupplierBufferIterator<Map.Entry<List<Map.Entry<Long, E>>, Map.Entry<Long, Long>>>(() -> {
+            return new SupplierBufferIterator<Map.Entry<List<Map.Entry<Long, E>>, TimeWindowInfo>>(() -> {
                 synchronized (waitList) {
                     while (this.holdIterator.hasNext()) {
                         Map.Entry<Long, E> elem = this.holdIterator.next();
-                        elemCount.incrementAndGet();
+                        elementCount.incrementAndGet();
 
                         boolean isTimeout=false;
-                        Collection<Map.Entry<List<Map.Entry<Long, E>>, Map.Entry<Long, Long>>> buff = new LinkedList<>();
-                        for (SimpleEntry<LinkedList<Map.Entry<Long, E>>, SimpleEntry<Long, SimpleEntry<Long, Long>>> entry : waitList) {
-                            if (entry.getValue().getKey() + sessionTimeoutMillSeconds > elem.getKey()) {
+                        Collection<Map.Entry<List<Map.Entry<Long, E>>, TimeWindowInfo>> buff = new LinkedList<>();
+                        for (SimpleEntry<LinkedList<Map.Entry<Long, E>>, SimpleEntry<Long, TimeWindowInfo>> entry : waitList) {
+                            if (entry.getValue().getKey() + sessionTimeoutMillSeconds >= elem.getKey()) {
                                 entry.getValue().setKey(elem.getKey());
                                 entry.getKey().add(elem);
+
+                                entry.getValue().getValue().setWindowEndTime(entry.getValue().getKey() + sessionTimeoutMillSeconds);
+                                entry.getValue().getValue().setRealEndTime(elem.getKey());
                             } else {
+                                submitWindowCount.incrementAndGet();
+                                entry.getValue().getValue().setSubmitWindowCount(submitWindowCount.get());
                                 buff.add(new SimpleEntry<>(entry.getKey(), entry.getValue().getValue()));
                                 isTimeout=true;
                                 break;
@@ -218,14 +247,24 @@ public class TimedStreamingImpl<E> extends StreamingImpl<Map.Entry<Long, E>> imp
                             LinkedList<Map.Entry<Long, E>> newList = new LinkedList<>();
                             newList.add(elem);
                             windowCount.incrementAndGet();
-                            waitList.add(new SimpleEntry<>(newList, new SimpleEntry<>(elem.getKey(), new SimpleEntry<>(elemCount.get(), windowCount.get()))));
+
+                            TimeWindowInfo info=new TimeWindowInfo();
+                            info.setElementCount(elementCount.get());
+                            info.setWindowCount(windowCount.get());
+                            info.setSubmitWindowCount(submitWindowCount.get());
+                            info.setWindowBeginTime(current.get());
+                            info.setWindowEndTime(current.get()+sessionTimeoutMillSeconds);
+                            info.setRealEndTime(elem.getKey());
+                            waitList.add(new SimpleEntry<>(newList, new SimpleEntry<>(elem.getKey(), info)));
                         }
 
 
 
                         while (!waitList.isEmpty()) {
-                            SimpleEntry<LinkedList<Map.Entry<Long, E>>, SimpleEntry<Long, SimpleEntry<Long, Long>>> first = waitList.getFirst();
-                            if (first.getValue().getKey() + sessionTimeoutMillSeconds <= elem.getKey()) {
+                            SimpleEntry<LinkedList<Map.Entry<Long, E>>, SimpleEntry<Long, TimeWindowInfo>> first = waitList.getFirst();
+                            if (first.getValue().getKey() + sessionTimeoutMillSeconds < elem.getKey()) {
+                                submitWindowCount.incrementAndGet();
+                                first.getValue().getValue().setSubmitWindowCount(submitWindowCount.get());
                                 buff.add(new SimpleEntry<>(first.getKey(), first.getValue().getValue()));
                                 waitList.removeFirst();
                             } else {
@@ -241,9 +280,11 @@ public class TimedStreamingImpl<E> extends StreamingImpl<Map.Entry<Long, E>> imp
                         }
                     }
 
-                    Collection<Map.Entry<List<Map.Entry<Long, E>>, Map.Entry<Long, Long>>> buff = new LinkedList<>();
+                    Collection<Map.Entry<List<Map.Entry<Long, E>>, TimeWindowInfo>> buff = new LinkedList<>();
                     while (!waitList.isEmpty()) {
-                        SimpleEntry<LinkedList<Map.Entry<Long, E>>, SimpleEntry<Long, SimpleEntry<Long, Long>>> first = waitList.getFirst();
+                        SimpleEntry<LinkedList<Map.Entry<Long, E>>, SimpleEntry<Long, TimeWindowInfo>> first = waitList.getFirst();
+                        submitWindowCount.incrementAndGet();
+                        first.getValue().getValue().setSubmitWindowCount(submitWindowCount.get());
                         buff.add(new SimpleEntry<>(first.getKey(), first.getValue().getValue()));
                         waitList.removeFirst();
                     }
@@ -261,7 +302,91 @@ public class TimedStreamingImpl<E> extends StreamingImpl<Map.Entry<Long, E>> imp
     }
 
     @Override
-    public Streaming<Map.Entry<List<Map.Entry<Long, E>>, Map.Entry<Long, Long>>> viewTimeWindow(long beforeMillSeconds, long afterMillSeconds) {
-        return null;
+    public Streaming<Map.Entry<List<Map.Entry<Long, E>>, ViewTimeWindowInfo>> viewTimeWindow(long beforeMillSeconds, long afterMillSeconds) {
+        return new StreamingImpl<>(new LazyIterator<>(() -> {
+
+            LinkedList<SimpleEntry<LinkedList<Map.Entry<Long, E>>,ViewTimeWindowInfo>> waitList = new LinkedList<>();
+
+            AtomicLong elementCount = new AtomicLong(0L);
+            AtomicLong windowCount = new AtomicLong(0L);
+            AtomicLong submitWindowCount = new AtomicLong(0L);
+            LinkedList<Map.Entry<Long, E>> beforeList = new LinkedList<>();
+
+            return new SupplierBufferIterator<Map.Entry<List<Map.Entry<Long, E>>,ViewTimeWindowInfo>>(() -> {
+                while (this.holdIterator.hasNext()) {
+                    Map.Entry<Long, E> elem = this.holdIterator.next();
+                    elementCount.incrementAndGet();
+
+                    for (SimpleEntry<LinkedList<Map.Entry<Long, E>>, ViewTimeWindowInfo> entry : waitList) {
+                        if(entry.getValue().getWindowEndTime()>=elem.getKey()){
+                            entry.getKey().add(elem);
+                            entry.getValue().setRealEndTime(elem.getKey());
+                        }
+                    }
+
+                    while(!beforeList.isEmpty()){
+                        Map.Entry<Long, E> first = beforeList.getFirst();
+                        if(first.getKey()<elem.getKey()-beforeMillSeconds){
+                            beforeList.removeFirst();
+                        }else{
+                            break;
+                        }
+                    }
+
+                    LinkedList<Map.Entry<Long,E>> nextList=new LinkedList<>();
+                    nextList.addAll(beforeList);
+                    nextList.add(elem);
+                    windowCount.incrementAndGet();
+
+                    ViewTimeWindowInfo info=new ViewTimeWindowInfo();
+                    info.setElementCount(elementCount.get());
+                    info.setWindowCount(windowCount.get());
+                    info.setSubmitWindowCount(submitWindowCount.get());
+                    info.setWindowBeginTime(elem.getKey()-beforeMillSeconds);
+                    info.setWindowEndTime(elem.getKey()+afterMillSeconds);
+                    info.setRealBeginTime(nextList.getFirst().getKey());
+                    info.setRealEndTime(elem.getKey());
+                    waitList.add(new SimpleEntry<>(nextList,info));
+
+                    Collection<Map.Entry<List<Map.Entry<Long, E>>, ViewTimeWindowInfo>> buff=new LinkedList<>();
+                    while(!waitList.isEmpty()){
+                        SimpleEntry<LinkedList<Map.Entry<Long, E>>, ViewTimeWindowInfo> first = waitList.getFirst();
+                        if(first.getValue().getWindowEndTime()<elem.getKey()){
+                            submitWindowCount.incrementAndGet();
+                            first.getValue().setSubmitWindowCount(submitWindowCount.get());
+                            buff.add(new SimpleEntry<>(first.getKey(),first.getValue()));
+                            waitList.removeFirst();
+                        }else{
+                            break;
+                        }
+                    }
+
+                    beforeList.add(elem);
+
+                    if(!buff.isEmpty()){
+                        return Reference.of(buff);
+                    }else{
+                        return Reference.nop();
+                    }
+                }
+
+                Collection<Map.Entry<List<Map.Entry<Long, E>>, ViewTimeWindowInfo>> buff=new LinkedList<>();
+                while(!waitList.isEmpty()){
+                    SimpleEntry<LinkedList<Map.Entry<Long, E>>, ViewTimeWindowInfo> first = waitList.getFirst();
+                    submitWindowCount.incrementAndGet();
+                    first.getValue().setSubmitWindowCount(submitWindowCount.get());
+                    buff.add(new SimpleEntry<>(first.getKey(),first.getValue()));
+                    waitList.removeFirst();
+                }
+
+                if(!buff.isEmpty()){
+                    return Reference.of(buff);
+                }
+
+                richAfter(this.holdIterator);
+                return Reference.finish();
+            });
+
+        }), this);
     }
 }

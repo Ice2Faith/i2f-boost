@@ -3,10 +3,14 @@ package i2f.stream.test;
 import i2f.stream.Streaming;
 import i2f.stream.impl.GeneratorIterator;
 import i2f.stream.impl.Reference;
+import i2f.stream.impl.SimpleEntry;
 import i2f.stream.patten.StreamingPatten;
+import i2f.stream.window.ViewWindowInfo;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,8 +46,8 @@ public class TestStreaming {
                 .viewWindow(2,3)
                 .forEach((entry)->{
                     List<Integer> key = entry.getKey();
-                    Map.Entry<Integer, Integer> value = entry.getValue();
-                    System.out.println(key.get(value.getKey())+"="+key+":"+value);
+                    ViewWindowInfo value = entry.getValue();
+                    System.out.println(key.get(value.getBeforeCount())+"="+key+":"+value);
                 });
 
         Streaming.of(1,2,3,4,5,6,7,8,9)
@@ -163,6 +167,59 @@ public class TestStreaming {
                                     .next(e->e==5)
                                     .follow(3,e->e==7).repeat(2)
                                     .next(e->e==8)
-                ).sysout("match:");
+                ).sysout("match-map:");
+
+        Streaming.of(1,8,
+                6,6,2,
+                6,6,3,4,0,0,0,5,0,0,7,0,7,8, //
+                2,5,
+                6,6,3,4,5,0,7,7,8, //
+                6,6,3,4,0,0,5,7,8,8,7,8, //
+                6,6,3,4,0,5,0,0,0,7,0,0,7,8, //
+                6,6,3,2,5,0,0,7,8
+        )
+                .pattenWindow((patten)->
+                        patten.next(e->e==6).repeat(2)
+                                .next(e->e==3)
+                                .next(e->e==4)
+                                .any().repeats()
+                ).sysout("ends:");
+
+        Streaming.of(1,8,
+                6,6,2,
+                6,6,3,4,0,0,0,5,0,0,7,0,7,8, //
+                2,5,
+                6,6,3,4,5,0,7,7,8, //
+                6,6,3,4,0,0,5,7,8,8,7,8, //
+                6,6,3,4,0,5,0,0,0,7,0,0,7,8, //
+                6,6,3,2,5,0,0,7,8
+        ).latelyAggregate(3,()->new SimpleEntry<Integer,Integer>(0,0),(t, e)->{
+            t.setKey(t.getKey()+e);
+            t.setValue(t.getValue()+1);
+            return t;
+        }, e->e.getKey()*1.0/e.getValue())
+                .sysout("delay:");
+
+        Streaming.of(1,8,
+                6,6,2,
+                6,6,3,4,0,0,0,5,0,0,7,0,7,8, //
+                2,5,
+                6,6,3,4,5,0,7,7,8, //
+                6,6,3,4,0,0,5,7,8,8,7,8, //
+                6,6,3,4,0,5,0,0,0,7,0,0,7,8, //
+                6,6,3,2,5,0,0,7,8
+        ).latelyAverage(3,2,e->new BigDecimal(e))
+                .sysout("avg:");
+
+        Streaming.of(1,2,3,4,5,6,7,8,9)
+                .timed((e)->(long)e)
+                .viewTimeWindow(3,2)
+                .sysout("time-view:");
+
+        Streaming.of(1,2,2,3,3,6,7,8,11,12,18,22,29,31,32,38,45)
+                .timed((e)->(long)e)
+                .viewTimeWindow(3,2)
+                .sysout("time-view-real:");
     }
+
 }

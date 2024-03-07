@@ -9,11 +9,11 @@ import java.util.function.Predicate;
  */
 public class StreamingPatten<E> {
 
-    public Predicate<E> filter;
-    public int count;
-    public int maxCount;
-    public StreamingPatten<E> next;
-    public StreamingPatten<E> prev;
+    protected Predicate<E> filter;
+    protected int count;
+    protected int maxCount;
+    protected StreamingPatten<E> next;
+    protected StreamingPatten<E> prev;
 
     public StreamingPatten(Predicate<E> filter, int count,StreamingPatten<E> prev) {
         this.filter = filter;
@@ -78,5 +78,25 @@ public class StreamingPatten<E> {
             }
         }
         return curr;
+    }
+
+    public Predicate<E> getFilter() {
+        return filter;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public int getMaxCount() {
+        return maxCount;
+    }
+
+    public StreamingPatten<E> getNext() {
+        return next;
+    }
+
+    public StreamingPatten<E> getPrev() {
+        return prev;
     }
 }

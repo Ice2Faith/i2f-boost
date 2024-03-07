@@ -3,10 +3,17 @@ package i2f.stream;
 import i2f.stream.impl.*;
 import i2f.stream.patten.StreamingPatten;
 import i2f.stream.timed.TimedStreaming;
+import i2f.stream.window.ConditionWindowInfo;
+import i2f.stream.window.SlideWindowInfo;
+import i2f.stream.window.ViewWindowInfo;
+import i2f.stream.window.WindowInfo;
 
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -303,25 +310,42 @@ public interface Streaming<E> {
 
     <K> Streaming<Map.Entry<K,Long>> countBy(Function<E,K> keySupplier);
 
-    Streaming<Map.Entry<List<E>,Map.Entry<Integer,Integer>>> viewWindow(int beforeCount, int afterCount);
+    Streaming<Map.Entry<List<E>, ViewWindowInfo>> viewWindow(int beforeCount, int afterCount);
 
-    Streaming<Map.Entry<List<E>,Map.Entry<Long,Long>>> slideWindow(int windowSize,int slideCount);
+    Streaming<Map.Entry<List<E>, SlideWindowInfo>> slideWindow(int windowSize, int slideCount);
 
-    default Streaming<Map.Entry<List<E>,Map.Entry<Long,Long>>> countWindow(int windowSize){
+    default Streaming<Map.Entry<List<E>,SlideWindowInfo>> countWindow(int windowSize){
         return slideWindow(windowSize,windowSize);
     }
 
-    <R> Streaming<Map.Entry<List<E>,R>> conditionWindow(Supplier<R> initConditionSupplier,
-                                                        Function<E,R> currentConditionMapper,
-                                                        BiPredicate<R,R> conditionChangePredicater);
+    <R> Streaming<Map.Entry<List<E>, ConditionWindowInfo<R>>> conditionWindow(Supplier<R> initConditionSupplier,
+                                                                           Function<E,R> currentConditionMapper,
+                                                                           BiPredicate<R,R> conditionChangePredicater);
 
-    Streaming<Map.Entry<List<E>,Map.Entry<Long,Long>>> pattenWindow(StreamingPatten<E> patten);
+    Streaming<Map.Entry<List<E>, WindowInfo>> pattenWindow(StreamingPatten<E> patten);
 
-    default Streaming<Map.Entry<List<E>,Map.Entry<Long,Long>>> pattenWindow(Function<StreamingPatten<E>,StreamingPatten<E>> consumer){
+    default Streaming<Map.Entry<List<E>,WindowInfo>> pattenWindow(Function<StreamingPatten<E>,StreamingPatten<E>> consumer){
         StreamingPatten<E> patten=StreamingPatten.begin();
         patten=consumer.apply(patten);
         return pattenWindow(patten.end());
     }
+
+    default Streaming<Map.Entry<E, BigDecimal>> latelyAverage(int latelyCount,
+                                                              int scale,
+                                                              Function<E,BigDecimal> valueMapper){
+        return latelyAggregate(latelyCount,
+                ()->new SimpleEntry<BigDecimal,BigDecimal>(BigDecimal.ZERO,BigDecimal.ZERO),
+                (t,e)->{
+                    t.setKey(t.getKey().add(valueMapper.apply(e)));
+                    t.setValue(t.getValue().add(BigDecimal.ONE));
+                    return t;
+                },(e)->e.getKey().divide(e.getValue(),scale, RoundingMode.HALF_UP));
+    }
+
+    <T,R> Streaming<Map.Entry<E,R>> latelyAggregate(int latelyCount,
+                                                    Supplier<T> firstSupplier,
+                                                  BiFunction<T,E,T> accumulator,
+                                                  Function<T,R> finisher);
 
     <T> Streaming<Map.Entry<E,T>> connect(Streaming<T> other);
 

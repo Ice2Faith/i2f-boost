@@ -8,6 +8,10 @@ import i2f.stream.thread.AtomicCountDownLatchRunnable;
 import i2f.stream.thread.NamingForkJoinPool;
 import i2f.stream.timed.TimedStreaming;
 import i2f.stream.timed.TimedStreamingImpl;
+import i2f.stream.window.ConditionWindowInfo;
+import i2f.stream.window.SlideWindowInfo;
+import i2f.stream.window.ViewWindowInfo;
+import i2f.stream.window.WindowInfo;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -1146,36 +1150,50 @@ public class StreamingImpl<E> implements Streaming<E> {
     }
 
     @Override
-    public Streaming<Map.Entry<List<E>, Map.Entry<Integer, Integer>>> viewWindow(int beforeCount, int afterCount) {
+    public Streaming<Map.Entry<List<E>, ViewWindowInfo>> viewWindow(int beforeCount, int afterCount) {
         return new StreamingImpl<>(new LazyIterator<>(() -> {
 
-            LinkedList<SimpleEntry<LinkedList<E>, SimpleEntry<Integer, Integer>>> waitList = new LinkedList<>();
+            LinkedList<SimpleEntry<LinkedList<E>, ViewWindowInfo>> waitList = new LinkedList<>();
 
             LinkedList<E> beforeList = new LinkedList<>();
             AtomicInteger beforeSize = new AtomicInteger(0);
 
-            return new SupplierBufferIterator<Map.Entry<List<E>, Map.Entry<Integer, Integer>>>(() -> {
+            AtomicLong elementCount=new AtomicLong(0);
+            AtomicLong windowCount=new AtomicLong(0);
+            AtomicLong submitWindowCount=new AtomicLong(0);
+
+            return new SupplierBufferIterator<Map.Entry<List<E>, ViewWindowInfo>>(() -> {
                 while (this.holdIterator.hasNext()) {
                     E elem = this.holdIterator.next();
+                    elementCount.incrementAndGet();
 
                     LinkedList<E> newList = new LinkedList<>();
                     newList.addAll(beforeList);
 
                     newList.add(elem);
 
-                    for (SimpleEntry<LinkedList<E>, SimpleEntry<Integer, Integer>> entry : waitList) {
-                        if (entry.getValue().getValue() < afterCount) {
+                    for (SimpleEntry<LinkedList<E>, ViewWindowInfo> entry : waitList) {
+                        if (entry.getValue().getAfterCount() < afterCount) {
                             entry.getKey().add(elem);
-                            entry.getValue().setValue(entry.getValue().getValue() + 1);
+                            entry.getValue().setAfterCount(entry.getValue().getAfterCount() + 1);
                         }
                     }
 
-                    waitList.add(new SimpleEntry<>(newList, new SimpleEntry<>(beforeSize.get(), 0)));
+                    windowCount.incrementAndGet();
+                    ViewWindowInfo info=new ViewWindowInfo();
+                    info.setElementCount(elementCount.get());
+                    info.setWindowCount(windowCount.get());
+                    info.setSubmitWindowCount(submitWindowCount.get());
+                    info.setBeforeCount(beforeSize.get());
+                    info.setAfterCount(0);
+                    waitList.add(new SimpleEntry<>(newList, info));
 
-                    Collection<Map.Entry<List<E>, Map.Entry<Integer, Integer>>> buff=new ArrayList<>();
+                    Collection<Map.Entry<List<E>, ViewWindowInfo>> buff=new ArrayList<>();
                     while (!waitList.isEmpty()) {
-                        SimpleEntry<LinkedList<E>, SimpleEntry<Integer, Integer>> first = waitList.getFirst();
-                        if (first.getValue().getValue() >= afterCount) {
+                        SimpleEntry<LinkedList<E>, ViewWindowInfo> first = waitList.getFirst();
+                        if (first.getValue().getAfterCount() >= afterCount) {
+                            submitWindowCount.incrementAndGet();
+                            first.getValue().setSubmitWindowCount(submitWindowCount.get());
                             buff.add(new SimpleEntry<>(first.getKey(), first.getValue()));
                             waitList.removeFirst();
                         }else{
@@ -1197,9 +1215,11 @@ public class StreamingImpl<E> implements Streaming<E> {
                     }
                 }
 
-                Collection<Map.Entry<List<E>, Map.Entry<Integer, Integer>>> buff=new ArrayList<>();
+                Collection<Map.Entry<List<E>, ViewWindowInfo>> buff=new ArrayList<>();
                 while (!waitList.isEmpty()) {
-                    SimpleEntry<LinkedList<E>, SimpleEntry<Integer, Integer>> first = waitList.getFirst();
+                    SimpleEntry<LinkedList<E>, ViewWindowInfo> first = waitList.getFirst();
+                    submitWindowCount.incrementAndGet();
+                    first.getValue().setSubmitWindowCount(submitWindowCount.get());
                     buff.add(new SimpleEntry<>(first.getKey(), first.getValue()));
                     waitList.removeFirst();
                 }
@@ -1217,36 +1237,45 @@ public class StreamingImpl<E> implements Streaming<E> {
 
 
     @Override
-    public Streaming<Map.Entry<List<E>,Map.Entry<Long,Long>>> slideWindow(int windowSize, int slideCount) {
+    public Streaming<Map.Entry<List<E>, SlideWindowInfo>> slideWindow(int windowSize, int slideCount) {
         return new StreamingImpl<>(new LazyIterator<>(() -> {
 
-            LinkedList<SimpleEntry<LinkedList<E>, SimpleEntry<Integer,SimpleEntry<Long,Long>>>> waitList = new LinkedList<>();
+            LinkedList<SimpleEntry<LinkedList<E>, SlideWindowInfo>> waitList = new LinkedList<>();
             AtomicInteger idx=new AtomicInteger(0);
             AtomicLong elemCount=new AtomicLong(0L);
             AtomicLong windowCount=new AtomicLong(0L);
+            AtomicLong submitWindowCount=new AtomicLong(0L);
 
-            return new SupplierBufferIterator<Map.Entry<List<E>,Map.Entry<Long,Long>>>(() -> {
+            return new SupplierBufferIterator<Map.Entry<List<E>,SlideWindowInfo>>(() -> {
                 while (this.holdIterator.hasNext()) {
                     E elem = this.holdIterator.next();
                     elemCount.incrementAndGet();
 
-                    for (SimpleEntry<LinkedList<E>, SimpleEntry<Integer,SimpleEntry<Long,Long>>> entry : waitList) {
+                    for (SimpleEntry<LinkedList<E>, SlideWindowInfo> entry : waitList) {
                         entry.getKey().add(elem);
-                        entry.getValue().setKey(entry.getValue().getKey()+1);
+                        entry.getValue().setCurrentCount(entry.getValue().getCurrentCount()+1);
                     }
 
                     if(idx.get()==0){
                         LinkedList<E> newList = new LinkedList<>();
                         newList.add(elem);
                         windowCount.incrementAndGet();
-                        waitList.add(new SimpleEntry<>(newList,new SimpleEntry<>(1,new SimpleEntry<>(elemCount.get(),windowCount.get()))));
+
+                        SlideWindowInfo info=new SlideWindowInfo();
+                        info.setElementCount(elemCount.get());
+                        info.setWindowCount(windowCount.get());
+                        info.setSubmitWindowCount(submitWindowCount.get());
+                        info.setCurrentCount(1);
+                        waitList.add(new SimpleEntry<>(newList,info));
                     }
 
-                    Collection<Map.Entry<List<E>,Map.Entry<Long,Long>>> buff=new LinkedList<>();
+                    Collection<Map.Entry<List<E>,SlideWindowInfo>> buff=new LinkedList<>();
                     while(!waitList.isEmpty()){
-                        SimpleEntry<LinkedList<E>, SimpleEntry<Integer, SimpleEntry<Long, Long>>> first = waitList.getFirst();
-                        if(first.getValue().getKey()>=windowSize){
-                            buff.add(new SimpleEntry<>(first.getKey(),first.getValue().getValue()));
+                        SimpleEntry<LinkedList<E>,SlideWindowInfo> first = waitList.getFirst();
+                        if(first.getValue().getCurrentCount()>=windowSize){
+                            submitWindowCount.incrementAndGet();
+                            first.getValue().setSubmitWindowCount(submitWindowCount.get());
+                            buff.add(new SimpleEntry<>(first.getKey(),first.getValue()));
                             waitList.removeFirst();
                         }else{
                             break;
@@ -1264,10 +1293,12 @@ public class StreamingImpl<E> implements Streaming<E> {
                     }
                 }
 
-                Collection<Map.Entry<List<E>,Map.Entry<Long,Long>>> buff=new LinkedList<>();
+                Collection<Map.Entry<List<E>,SlideWindowInfo>> buff=new LinkedList<>();
                 while (!waitList.isEmpty()) {
-                    SimpleEntry<LinkedList<E>, SimpleEntry<Integer, SimpleEntry<Long, Long>>> first = waitList.getFirst();
-                    buff.add(new SimpleEntry<>(first.getKey(),first.getValue().getValue()));
+                    SimpleEntry<LinkedList<E>, SlideWindowInfo> first = waitList.getFirst();
+                    submitWindowCount.incrementAndGet();
+                    first.getValue().setSubmitWindowCount(submitWindowCount.get());
+                    buff.add(new SimpleEntry<>(first.getKey(),first.getValue()));
                     waitList.removeFirst();
                 }
 
@@ -1284,23 +1315,51 @@ public class StreamingImpl<E> implements Streaming<E> {
 
 
     @Override
-    public <R> Streaming<Map.Entry<List<E>, R>> conditionWindow(Supplier<R> initConditionSupplier, Function<E, R> currentConditionMapper, BiPredicate<R, R> conditionChangePredicater) {
+    public <R> Streaming<Map.Entry<List<E>, ConditionWindowInfo<R>>> conditionWindow(Supplier<R> initConditionSupplier, Function<E, R> currentConditionMapper, BiPredicate<R, R> conditionChangePredicater) {
         return new StreamingImpl<>(new LazyIterator<>(() -> {
 
+            AtomicLong elemCount=new AtomicLong(0L);
+            AtomicLong windowCount=new AtomicLong(0L);
+            AtomicLong submitWindowCount=new AtomicLong(0L);
+
             R initCond = initConditionSupplier.get();
-            SimpleEntry<List<E>, R> current=new SimpleEntry<>(new LinkedList<>(),initCond);
+            ConditionWindowInfo<R> initInfo=new ConditionWindowInfo<>();
+            initInfo.setElementCount(elemCount.get());
+            initInfo.setWindowCount(windowCount.get());
+            initInfo.setSubmitWindowCount(submitWindowCount.get());
+            initInfo.setCondition(initCond);
+
+            SimpleEntry<List<E>, ConditionWindowInfo<R>> current=new SimpleEntry<>(new LinkedList<>(),initInfo);
 
             return new SupplierIterator<>(() -> {
                 while (this.holdIterator.hasNext()) {
                     E elem = this.holdIterator.next();
+                    elemCount.incrementAndGet();
+
+                    if(elemCount.get()==1){
+                        windowCount.incrementAndGet();
+                        initInfo.setElementCount(elemCount.get());
+                        initInfo.setWindowCount(windowCount.get());
+                        initInfo.setSubmitWindowCount(submitWindowCount.get());
+                    }
+
                     R currCond = currentConditionMapper.apply(elem);
-                    Reference<Map.Entry<List<E>,R>> ret=Reference.nop();
-                    if(!conditionChangePredicater.test(current.getValue(),currCond)){
+                    Reference<Map.Entry<List<E>,ConditionWindowInfo<R>>> ret=Reference.nop();
+                    if(!conditionChangePredicater.test(current.getValue().getCondition(),currCond)){
                         if(!current.getKey().isEmpty()){
+                            submitWindowCount.incrementAndGet();
+                            current.getValue().setSubmitWindowCount(submitWindowCount.get());
                             ret=Reference.of(new SimpleEntry<>(current.getKey(),current.getValue()));
                         }
                         current.setKey(new LinkedList<>());
-                        current.setValue(currCond);
+
+                        windowCount.incrementAndGet();
+                        ConditionWindowInfo<R> info=new ConditionWindowInfo<>();
+                        info.setElementCount(elemCount.get());
+                        info.setWindowCount(windowCount.get());
+                        info.setSubmitWindowCount(submitWindowCount.get());
+                        info.setCondition(currCond);
+                        current.setValue(info);
                     }
                     current.getKey().add(elem);
                     return ret;
@@ -1308,7 +1367,9 @@ public class StreamingImpl<E> implements Streaming<E> {
 
 
                 if(!current.getKey().isEmpty()){
-                    Reference<Map.Entry<List<E>, R>> ret = Reference.of(new SimpleEntry<>(current.getKey(), current.getValue()));
+                    Reference<Map.Entry<List<E>, ConditionWindowInfo<R>>> ret = Reference.of(new SimpleEntry<>(current.getKey(), current.getValue()));
+                    submitWindowCount.incrementAndGet();
+                    current.getValue().setSubmitWindowCount(submitWindowCount.get());
                     current.setKey(new LinkedList<>());
                     return ret;
                 }
@@ -1321,14 +1382,15 @@ public class StreamingImpl<E> implements Streaming<E> {
     }
 
     @Override
-    public Streaming<Map.Entry<List<E>, Map.Entry<Long, Long>>> pattenWindow(StreamingPatten<E> patten) {
+    public Streaming<Map.Entry<List<E>, WindowInfo>> pattenWindow(StreamingPatten<E> patten) {
         return new StreamingImpl<>(new LazyIterator<>(() -> {
             richBefore(this.holdIterator);
 
-            LinkedList<SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>,SimpleEntry<Integer,Integer>>,SimpleEntry<Long,Long>>>> waitList = new LinkedList<>();
+            LinkedList<SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>,SimpleEntry<Integer,Integer>>,WindowInfo>>> waitList = new LinkedList<>();
             AtomicLong elemCount = new AtomicLong(0L);
             AtomicLong windowCount = new AtomicLong(0L);
-            StreamingPatten<E> head=patten;
+            AtomicLong submitWindowCount = new AtomicLong(0L);
+            StreamingPatten<E> head=patten.end();
 
             return new SupplierBufferIterator<>(()->{
 
@@ -1336,23 +1398,23 @@ public class StreamingImpl<E> implements Streaming<E> {
                     E elem = this.holdIterator.next();
                     elemCount.incrementAndGet();
 
-                    Iterator<SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>, SimpleEntry<Integer, Integer>>, SimpleEntry<Long, Long>>>> waitIterator = waitList.iterator();
+                    Iterator<SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>, SimpleEntry<Integer, Integer>>, WindowInfo>>> waitIterator = waitList.iterator();
 
                     while (waitIterator.hasNext()) {
-                        SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>, SimpleEntry<Integer,Integer>>, SimpleEntry<Long, Long>>> entry= waitIterator.next();
+                        SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>, SimpleEntry<Integer,Integer>>, WindowInfo>> entry= waitIterator.next();
                         SimpleEntry<StreamingPatten<E>, SimpleEntry<Integer,Integer>> ctrl = entry.getValue().getKey();
                         if(ctrl.getKey()==null){
                             continue;
                         }
 
 
-                        if(ctrl.getValue().getKey()<ctrl.getKey().count){
-                            if(ctrl.getKey().filter.test(elem)){
+                        if(ctrl.getValue().getKey()<ctrl.getKey().getCount()){
+                            if(ctrl.getKey().getFilter().test(elem)){
                                 entry.getKey().add(elem);
                                 ctrl.getValue().setKey(ctrl.getValue().getKey()+1);
                                 ctrl.getValue().setValue(0);
                             }else{
-                                if(ctrl.getValue().getValue()<ctrl.getKey().maxCount){
+                                if(ctrl.getValue().getValue()<ctrl.getKey().getMaxCount()){
                                     //
                                     entry.getKey().add(elem);
                                     ctrl.getValue().setValue(ctrl.getValue().getValue()+1);
@@ -1361,35 +1423,35 @@ public class StreamingImpl<E> implements Streaming<E> {
                                 }
                             }
                         }else{
-                            boolean isRepeat=(ctrl.getKey().count<0);
+                            boolean isRepeat=(ctrl.getKey().getCount()<0);
                             if(isRepeat){
-                                if(!ctrl.getKey().filter.test(elem)){
+                                if(!ctrl.getKey().getFilter().test(elem)){
                                     isRepeat=false;
                                 }
                             }
                             if(isRepeat){
-                                if(ctrl.getKey().next!=null){
-                                    if(ctrl.getKey().next.filter.test(elem)){
+                                if(ctrl.getKey().getNext()!=null){
+                                    if(ctrl.getKey().getNext().getFilter().test(elem)){
                                         isRepeat=false;
                                     }
                                 }
                             }
                             if(!isRepeat){
-                                ctrl.setKey(ctrl.getKey().next);
+                                ctrl.setKey(ctrl.getKey().getNext());
                                 ctrl.setValue(new SimpleEntry<>(0,0));
                             }
                             if(ctrl.getKey()==null){
                                 continue;
                             }
-                            if(ctrl.getKey().count<0){
+                            if(ctrl.getKey().getCount()<0){
                                 boolean isJump=false;
-                                if(ctrl.getKey().next!=null){
-                                    if(ctrl.getKey().next.filter.test(elem)){
+                                if(ctrl.getKey().getNext()!=null){
+                                    if(ctrl.getKey().getNext().getFilter().test(elem)){
                                         isJump=true;
                                     }
                                 }
                                 if(isJump){
-                                    ctrl.setKey(ctrl.getKey().next);
+                                    ctrl.setKey(ctrl.getKey().getNext());
                                     ctrl.setValue(new SimpleEntry<>(0,0));
                                 }
                                 if(ctrl.getKey()==null){
@@ -1397,12 +1459,12 @@ public class StreamingImpl<E> implements Streaming<E> {
                                 }
                             }
 
-                            if(ctrl.getKey().filter.test(elem)){
+                            if(ctrl.getKey().getFilter().test(elem)){
                                 entry.getKey().add(elem);
                                 ctrl.getValue().setKey(ctrl.getValue().getKey()+1);
                                 ctrl.getValue().setValue(0);
                             }else{
-                                if(ctrl.getValue().getValue()<ctrl.getKey().maxCount){
+                                if(ctrl.getValue().getValue()<ctrl.getKey().getMaxCount()){
                                     entry.getKey().add(elem);
                                     ctrl.getValue().setValue(ctrl.getValue().getValue()+1);
                                 }else{
@@ -1413,19 +1475,25 @@ public class StreamingImpl<E> implements Streaming<E> {
 
                     }
 
-                    if(head.filter.test(elem)){
+                    if(head.getFilter().test(elem)){
                         LinkedList<E> list=new LinkedList<>();
                         list.add(elem);
                         windowCount.incrementAndGet();
-                        waitList.add(new SimpleEntry<>(list,new SimpleEntry<>(new SimpleEntry<>(head,new SimpleEntry<>(1,0)),new SimpleEntry<>(elemCount.get(),windowCount.get()))));
+                        WindowInfo info=new WindowInfo();
+                        info.setElementCount(elemCount.get());
+                        info.setWindowCount(windowCount.get());
+                        info.setSubmitWindowCount(submitWindowCount.get());
+                        waitList.add(new SimpleEntry<>(list,new SimpleEntry<>(new SimpleEntry<>(head,new SimpleEntry<>(1,0)),info)));
                     }
 
 
-                    Collection<Map.Entry<List<E>,Map.Entry<Long,Long>>> buff=new LinkedList<>();
+                    Collection<Map.Entry<List<E>,WindowInfo>> buff=new LinkedList<>();
                     waitIterator = waitList.iterator();
                     while(waitIterator.hasNext()){
-                        SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>, SimpleEntry<Integer, Integer>>, SimpleEntry<Long, Long>>> entry = waitIterator.next();
+                        SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>, SimpleEntry<Integer, Integer>>, WindowInfo>> entry = waitIterator.next();
                         if(entry.getValue().getKey().getKey()==null){
+                            submitWindowCount.incrementAndGet();
+                            entry.getValue().getValue().setSubmitWindowCount(submitWindowCount.get());
                             buff.add(new SimpleEntry<>(entry.getKey(),entry.getValue().getValue()));
                             waitIterator.remove();
                         }
@@ -1438,6 +1506,64 @@ public class StreamingImpl<E> implements Streaming<E> {
                     return Reference.nop();
                 }
 
+                if(!waitList.isEmpty()){
+                    Collection<Map.Entry<List<E>,WindowInfo>> buff=new LinkedList<>();
+                    Iterator<SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>, SimpleEntry<Integer, Integer>>, WindowInfo>>> waitIterator = waitList.iterator();
+                    while(waitIterator.hasNext()){
+                        SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>, SimpleEntry<Integer, Integer>>, WindowInfo>> entry = waitIterator.next();
+                        if(entry.getValue().getKey().getKey().getCount()<0){
+                            submitWindowCount.incrementAndGet();
+                            entry.getValue().getValue().setSubmitWindowCount(submitWindowCount.get());
+                            buff.add(new SimpleEntry<>(entry.getKey(),entry.getValue().getValue()));
+                        }
+                    }
+                    waitIterator.remove();
+                    waitList.clear();
+                    if(!buff.isEmpty()){
+                        return Reference.of(buff);
+                    }
+                }
+
+
+                richAfter(this.holdIterator);
+                return Reference.finish();
+            });
+
+        }), this);
+    }
+
+    @Override
+    public <T, R> Streaming<Map.Entry<E, R>> latelyAggregate(int latelyCount, Supplier<T> firstSupplier, BiFunction<T, E, T> accumulator, Function<T, R> finisher) {
+        return new StreamingImpl<>(new LazyIterator<>(() -> {
+
+            LinkedList<E> beforeList=new LinkedList<>();
+            AtomicInteger beforeCount=new AtomicInteger(0);
+            AtomicLong elemCount=new AtomicLong(0L);
+
+            return new SupplierIterator<Map.Entry<E,R>>(() -> {
+                while (this.holdIterator.hasNext()) {
+                    E elem = this.holdIterator.next();
+                    elemCount.incrementAndGet();
+
+
+
+                    T cvt = firstSupplier.get();
+                    for (E item : beforeList) {
+                        cvt=accumulator.apply(cvt,item);
+                    }
+                    cvt = accumulator.apply(cvt, elem);
+
+
+                    beforeList.add(elem);
+                    beforeCount.incrementAndGet();
+
+                    while(beforeCount.get()>latelyCount){
+                        beforeList.removeFirst();
+                        beforeCount.decrementAndGet();
+                    }
+
+                    return Reference.of(new SimpleEntry<>(elem, finisher.apply(cvt)));
+                }
 
                 richAfter(this.holdIterator);
                 return Reference.finish();
