@@ -3,7 +3,7 @@ package i2f.stream.test;
 import i2f.stream.Streaming;
 import i2f.stream.impl.GeneratorIterator;
 import i2f.stream.impl.Reference;
-import i2f.stream.impl.SimpleEntry;
+import i2f.stream.patten.StreamingPatten;
 
 import java.io.File;
 import java.security.SecureRandom;
@@ -121,5 +121,28 @@ public class TestStreaming {
                 .timed((e)->(long)e)
                 .sessionTimeWindow(3)
                 .sysout("time:");
+
+
+        Streaming.of(1,8,
+                6,6,2,
+                6,6,3,4,0,0,0,5,0,0,7,0,7,8, //
+                2,5,
+                6,6,3,4,5,0,7,7,8, //
+                6,6,3,4,0,0,5,7,8,8,7,8, //
+                6,6,3,4,0,5,0,0,0,7,0,0,7,8, //
+                6,6,3,2,5,0,0,7,8
+                )
+                .pattenWindow(
+                        StreamingPatten.
+                                <Integer>begin(e->e==6).repeat(2)
+                        .next(e->e==3)
+                        .next(e->e==4)
+                       .next(e->e==0)
+                                .next(e->e==0).repeats()
+                        .next(e->e==5)
+                        .follow(3,e->e==7).repeat(2)
+                        .next(e->e==8)
+                        .end()
+                ).sysout("match:");
     }
 }

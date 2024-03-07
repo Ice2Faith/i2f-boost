@@ -21,4 +21,6 @@ public interface TimedStreaming<E> extends Streaming<Map.Entry<Long,E>> {
     Streaming<Map.Entry<List<Map.Entry<Long,E>>,Map.Entry<Long,Long>>> slideTimeWindow(long windowMillSeconds,long slideMillSeconds);
 
     Streaming<Map.Entry<List<Map.Entry<Long,E>>,Map.Entry<Long,Long>>> sessionTimeWindow(long sessionTimeoutMillSeconds);
+
+    Streaming<Map.Entry<List<Map.Entry<Long,E>>,Map.Entry<Long,Long>>> viewTimeWindow(long beforeMillSeconds,long afterMillSeconds);
 }

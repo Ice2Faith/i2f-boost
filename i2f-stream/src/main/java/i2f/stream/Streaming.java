@@ -1,6 +1,7 @@
 package i2f.stream;
 
 import i2f.stream.impl.*;
+import i2f.stream.patten.StreamingPatten;
 import i2f.stream.timed.TimedStreaming;
 
 import java.io.*;
@@ -235,6 +236,12 @@ public interface Streaming<E> {
 
     Streaming<E> rangeAll(Predicate<E> beginFilter,Predicate<E> endFilter,boolean includeBegin,boolean includeEnd);
 
+    default Streaming<E> dropRange(Predicate<E> beginFilter,Predicate<E> endFilter){
+        return dropRange(beginFilter, endFilter,true,false);
+    }
+
+    Streaming<E> dropRange(Predicate<E> beginFilter,Predicate<E> endFilter,boolean includeBegin,boolean includeEnd);
+
     <R> Streaming<R> map(Function<E, R> mapper);
 
     <R> Streaming<R> flatMap(BiConsumer<E, Consumer<R>> collector);
@@ -307,6 +314,8 @@ public interface Streaming<E> {
     <R> Streaming<Map.Entry<List<E>,R>> conditionWindow(Supplier<R> initConditionSupplier,
                                                         Function<E,R> currentConditionMapper,
                                                         BiPredicate<R,R> conditionChangePredicater);
+
+    Streaming<Map.Entry<List<E>,Map.Entry<Long,Long>>> pattenWindow(StreamingPatten<E> patten);
 
     <T> Streaming<Map.Entry<E,T>> connect(Streaming<T> other);
 

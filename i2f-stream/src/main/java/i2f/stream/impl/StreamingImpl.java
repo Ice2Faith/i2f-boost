@@ -1,6 +1,7 @@
 package i2f.stream.impl;
 
 import i2f.stream.Streaming;
+import i2f.stream.patten.StreamingPatten;
 import i2f.stream.richable.RichStreamProcessor;
 import i2f.stream.thread.AtomicCountDownLatch;
 import i2f.stream.thread.AtomicCountDownLatchRunnable;
@@ -400,6 +401,54 @@ public class StreamingImpl<E> implements Streaming<E> {
                                 return Reference.of(elem);
                             } else {
                                 break;
+                            }
+                        }
+                    }
+                    richAfter(this.holdIterator);
+                    richAfter(beginFilter);
+                    richAfter(endFilter);
+                    return Reference.finish();
+                });
+
+            } finally {
+
+            }
+        }), this);
+    }
+
+    @Override
+    public Streaming<E> dropRange(Predicate<E> beginFilter, Predicate<E> endFilter, boolean includeBegin, boolean includeEnd) {
+        return new StreamingImpl<>(new LazyIterator<>(() -> {
+            richBefore(beginFilter);
+            richBefore(endFilter);
+            richBefore(this.holdIterator);
+            try {
+                AtomicBoolean hasFind = new AtomicBoolean(false);
+                return new SupplierIterator<>(() -> {
+                    while (this.holdIterator.hasNext()) {
+                        E elem = this.holdIterator.next();
+                        boolean isBegin = false;
+                        if (!hasFind.get()) {
+                            if (beginFilter.test(elem)) {
+                                hasFind.set(true);
+                                isBegin = true;
+                            }
+                        }
+                        if (!hasFind.get()) {
+                            return Reference.of(elem);
+                        }
+                        boolean isEnd = endFilter.test(elem);
+                        if (!isEnd) {
+                            if (isBegin) {
+                                return includeBegin ? Reference.nop() : Reference.of(elem);
+                            } else {
+                                return Reference.nop();
+                            }
+                        } else {
+                            if (includeEnd) {
+                                return Reference.nop();
+                            } else {
+                                return Reference.of(elem);
                             }
                         }
                     }
@@ -1263,6 +1312,132 @@ public class StreamingImpl<E> implements Streaming<E> {
                     current.setKey(new LinkedList<>());
                     return ret;
                 }
+
+                richAfter(this.holdIterator);
+                return Reference.finish();
+            });
+
+        }), this);
+    }
+
+    @Override
+    public Streaming<Map.Entry<List<E>, Map.Entry<Long, Long>>> pattenWindow(StreamingPatten<E> patten) {
+        return new StreamingImpl<>(new LazyIterator<>(() -> {
+            richBefore(this.holdIterator);
+
+            LinkedList<SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>,SimpleEntry<Integer,Integer>>,SimpleEntry<Long,Long>>>> waitList = new LinkedList<>();
+            AtomicLong elemCount = new AtomicLong(0L);
+            AtomicLong windowCount = new AtomicLong(0L);
+            StreamingPatten<E> head=patten;
+
+            return new SupplierBufferIterator<>(()->{
+
+                while(this.holdIterator.hasNext()){
+                    E elem = this.holdIterator.next();
+                    elemCount.incrementAndGet();
+
+                    Iterator<SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>, SimpleEntry<Integer, Integer>>, SimpleEntry<Long, Long>>>> waitIterator = waitList.iterator();
+
+                    while (waitIterator.hasNext()) {
+                        SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>, SimpleEntry<Integer,Integer>>, SimpleEntry<Long, Long>>> entry= waitIterator.next();
+                        SimpleEntry<StreamingPatten<E>, SimpleEntry<Integer,Integer>> ctrl = entry.getValue().getKey();
+                        if(ctrl.getKey()==null){
+                            continue;
+                        }
+
+
+                        if(ctrl.getValue().getKey()<ctrl.getKey().count){
+                            if(ctrl.getKey().filter.test(elem)){
+                                entry.getKey().add(elem);
+                                ctrl.getValue().setKey(ctrl.getValue().getKey()+1);
+                                ctrl.getValue().setValue(0);
+                            }else{
+                                if(ctrl.getValue().getValue()<ctrl.getKey().maxCount){
+                                    //
+                                    entry.getKey().add(elem);
+                                    ctrl.getValue().setValue(ctrl.getValue().getValue()+1);
+                                }else{
+                                    waitIterator.remove();
+                                }
+                            }
+                        }else{
+                            boolean isRepeat=(ctrl.getKey().count<0);
+                            if(isRepeat){
+                                if(!ctrl.getKey().filter.test(elem)){
+                                    isRepeat=false;
+                                }
+                            }
+                            if(isRepeat){
+                                if(ctrl.getKey().next!=null){
+                                    if(ctrl.getKey().next.filter.test(elem)){
+                                        isRepeat=false;
+                                    }
+                                }
+                            }
+                            if(!isRepeat){
+                                ctrl.setKey(ctrl.getKey().next);
+                                ctrl.setValue(new SimpleEntry<>(0,0));
+                            }
+                            if(ctrl.getKey()==null){
+                                continue;
+                            }
+                            if(ctrl.getKey().count<0){
+                                boolean isJump=false;
+                                if(ctrl.getKey().next!=null){
+                                    if(ctrl.getKey().next.filter.test(elem)){
+                                        isJump=true;
+                                    }
+                                }
+                                if(isJump){
+                                    ctrl.setKey(ctrl.getKey().next);
+                                    ctrl.setValue(new SimpleEntry<>(0,0));
+                                }
+                                if(ctrl.getKey()==null){
+                                    continue;
+                                }
+                            }
+
+                            if(ctrl.getKey().filter.test(elem)){
+                                entry.getKey().add(elem);
+                                ctrl.getValue().setKey(ctrl.getValue().getKey()+1);
+                                ctrl.getValue().setValue(0);
+                            }else{
+                                if(ctrl.getValue().getValue()<ctrl.getKey().maxCount){
+                                    entry.getKey().add(elem);
+                                    ctrl.getValue().setValue(ctrl.getValue().getValue()+1);
+                                }else{
+                                    waitIterator.remove();
+                                }
+                            }
+                        }
+
+                    }
+
+                    if(head.filter.test(elem)){
+                        LinkedList<E> list=new LinkedList<>();
+                        list.add(elem);
+                        windowCount.incrementAndGet();
+                        waitList.add(new SimpleEntry<>(list,new SimpleEntry<>(new SimpleEntry<>(head,new SimpleEntry<>(1,0)),new SimpleEntry<>(elemCount.get(),windowCount.get()))));
+                    }
+
+
+                    Collection<Map.Entry<List<E>,Map.Entry<Long,Long>>> buff=new LinkedList<>();
+                    waitIterator = waitList.iterator();
+                    while(waitIterator.hasNext()){
+                        SimpleEntry<LinkedList<E>, SimpleEntry<SimpleEntry<StreamingPatten<E>, SimpleEntry<Integer, Integer>>, SimpleEntry<Long, Long>>> entry = waitIterator.next();
+                        if(entry.getValue().getKey().getKey()==null){
+                            buff.add(new SimpleEntry<>(entry.getKey(),entry.getValue().getValue()));
+                            waitIterator.remove();
+                        }
+                    }
+
+                    if(!buff.isEmpty()){
+                        return Reference.of(buff);
+                    }
+
+                    return Reference.nop();
+                }
+
 
                 richAfter(this.holdIterator);
                 return Reference.finish();

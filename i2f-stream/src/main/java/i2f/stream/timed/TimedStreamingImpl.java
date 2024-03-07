@@ -259,4 +259,9 @@ public class TimedStreamingImpl<E> extends StreamingImpl<Map.Entry<Long, E>> imp
 
         }), this);
     }
+
+    @Override
+    public Streaming<Map.Entry<List<Map.Entry<Long, E>>, Map.Entry<Long, Long>>> viewTimeWindow(long beforeMillSeconds, long afterMillSeconds) {
+        return null;
+    }
 }
