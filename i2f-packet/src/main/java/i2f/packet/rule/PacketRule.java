@@ -99,6 +99,15 @@ public class PacketRule<T> {
         return ret;
     };
 
+    public static final Function<RuleByte,Byte> DEFAULT_XOR_ENCODER=(e)->{
+        long fac=0x31;
+        fac=fac+(e.isHead()?3:5);
+        fac=fac*11+e.getCurrentCount();
+        fac=fac*13+e.getCurrentIndex();
+        fac=fac*19+e.getDataIndex();
+        return (byte)(e.getData()^fac);
+    };
+
     private byte escape;
     private byte start;
     private byte separator;
@@ -113,7 +122,7 @@ public class PacketRule<T> {
     private Function<RuleByte,Byte> byteEncoder;
     private Function<RuleByte,Byte> byteDecoder;
 
-    public static PacketRule<?> defaultRule() {
+    public static PacketRule<?> simpleRule() {
         return new PacketRule<>(DEFAULT_ESCAPE,
                 DEFAULT_START,
                 DEFAULT_SEPARATOR,
@@ -121,8 +130,7 @@ public class PacketRule<T> {
                 DEFAULT_MEMORY_SIZE);
     }
 
-
-    public static PacketRule<Long> defaultHashRule() {
+    public static PacketRule<Long> hashRule() {
         return new PacketRule<>(DEFAULT_ESCAPE,
                 DEFAULT_START,
                 DEFAULT_SEPARATOR,
@@ -131,6 +139,19 @@ public class PacketRule<T> {
                 DEFAULT_TAIL_INITIALIZER,
                 DEFAULT_TAIL_ACCUMULATOR,
                 DEFAULT_TAIL_FINISHER);
+    }
+
+    public static PacketRule<Long> defaultRule() {
+        return new PacketRule<>(DEFAULT_ESCAPE,
+                DEFAULT_START,
+                DEFAULT_SEPARATOR,
+                DEFAULT_END,
+                DEFAULT_MEMORY_SIZE,
+                DEFAULT_TAIL_INITIALIZER,
+                DEFAULT_TAIL_ACCUMULATOR,
+                DEFAULT_TAIL_FINISHER,
+                DEFAULT_XOR_ENCODER,
+                DEFAULT_XOR_ENCODER);
     }
 
     public PacketRule() {
@@ -154,6 +175,20 @@ public class PacketRule<T> {
         this.tailInitializer = tailInitializer;
         this.tailAccumulator = tailAccumulator;
         this.tailFinisher = tailFinisher;
+        assertValidBytes();
+    }
+
+    public PacketRule(byte escape, byte start, byte separator, byte end, int memorySize, Supplier<T> tailInitializer, BiFunction<T, RuleByte, T> tailAccumulator, Function<T, byte[]> tailFinisher, Function<RuleByte, Byte> byteEncoder, Function<RuleByte, Byte> byteDecoder) {
+        this.escape = escape;
+        this.start = start;
+        this.separator = separator;
+        this.end = end;
+        this.memorySize = memorySize;
+        this.tailInitializer = tailInitializer;
+        this.tailAccumulator = tailAccumulator;
+        this.tailFinisher = tailFinisher;
+        this.byteEncoder = byteEncoder;
+        this.byteDecoder = byteDecoder;
         assertValidBytes();
     }
 

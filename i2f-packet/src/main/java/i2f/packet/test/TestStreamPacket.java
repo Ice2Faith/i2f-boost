@@ -93,7 +93,7 @@ public class TestStreamPacket {
     }
 
     public static void testBasic() throws Exception {
-        PacketRule<Long> rule = PacketRule.defaultHashRule();
+        PacketRule<Long> rule = PacketRule.hashRule();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         byte[] headData = {(byte)0xea, (byte)0xeb, 0x02, 0x03, 0x00};
         byte[] bodyData = {0x10,  (byte) 0xef, (byte) 0xee, (byte)0xea, (byte)0xeb};

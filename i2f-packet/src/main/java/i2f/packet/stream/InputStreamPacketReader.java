@@ -15,7 +15,7 @@ import java.util.Objects;
  * @desc
  */
 public class InputStreamPacketReader<T> implements Closeable {
-    protected static final PacketRule<Long> DEFAULT_RULE = PacketRule.defaultHashRule();
+    protected static final PacketRule<Long> DEFAULT_RULE = PacketRule.defaultRule();
 
     protected InputStream is;
     protected PacketRule<T> rule;

@@ -15,7 +15,7 @@ import java.util.Objects;
  * @desc
  */
 public class OutputStreamPacketWriter<T> implements Closeable {
-    protected static final PacketRule<Long> DEFAULT_RULE = PacketRule.defaultHashRule();
+    protected static final PacketRule<Long> DEFAULT_RULE = PacketRule.defaultRule();
 
     protected OutputStream os;
     protected PacketRule<T> rule;

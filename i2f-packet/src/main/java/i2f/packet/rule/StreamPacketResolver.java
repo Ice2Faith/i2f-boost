@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @desc
  */
 public class StreamPacketResolver {
-    protected static final PacketRule<Long> DEFAULT_RULE = PacketRule.defaultHashRule();
+    protected static final PacketRule<Long> DEFAULT_RULE = PacketRule.defaultRule();
 
     public static class ReadPacketContext {
         public byte before = 0;
@@ -158,14 +158,19 @@ public class StreamPacketResolver {
             if (b == end) {
                 if (context.before != rule.getEscape()) {
                     if (context.hasBefore) {
+                        byte wb=context.before;
                         if(ruleByte!=null){
-                            ruleByte.setData(context.before);
+                            ruleByte.setData(wb);
                             ruleByte.setDataIndex(dataIndex);
+                            if(rule.getByteDecoder()!=null){
+                                wb=rule.getByteDecoder().apply(ruleByte);
+                                ruleByte.setData(wb);
+                            }
                         }
                         if (isTailSupport) {
                             acc = rule.getTailAccumulator().apply(acc, ruleByte);
                         }
-                        os.write(context.before);
+                        os.write(wb);
                         dataIndex++;
                     }
                     context.hasBefore = true;
@@ -182,14 +187,19 @@ public class StreamPacketResolver {
                             || b == rule.getSeparator()
                             || b == rule.getEnd()
                             || b == end) {
+                        byte wb=b;
                         if(ruleByte!=null){
-                            ruleByte.setData(b);
+                            ruleByte.setData(wb);
                             ruleByte.setDataIndex(dataIndex);
+                            if(rule.getByteDecoder()!=null){
+                                wb=rule.getByteDecoder().apply(ruleByte);
+                                ruleByte.setData(wb);
+                            }
                         }
                         if (isTailSupport) {
                             acc = rule.getTailAccumulator().apply(acc, ruleByte);
                         }
-                        os.write(b);
+                        os.write(wb);
                         context.hasBefore = false;
                         context.before = b;
                         dataIndex++;
@@ -198,14 +208,19 @@ public class StreamPacketResolver {
                         throw new IOException("bad packet found.");
                     }
                 }
+                byte wb= context.before;
                 if(ruleByte!=null){
-                    ruleByte.setData(context.before);
+                    ruleByte.setData(wb);
                     ruleByte.setDataIndex(dataIndex);
+                    if(rule.getByteDecoder()!=null){
+                        wb=rule.getByteDecoder().apply(ruleByte);
+                        ruleByte.setData(wb);
+                    }
                 }
                 if (isTailSupport) {
                     acc = rule.getTailAccumulator().apply(acc, ruleByte);
                 }
-                os.write(context.before);
+                os.write(wb);
                 dataIndex++;
             }
             context.before = b;
@@ -344,20 +359,24 @@ public class StreamPacketResolver {
         int bt = 0;
         while ((bt = bis.read()) >= 0) {
             byte b = (byte) bt;
+            byte wb=b;
             if(ruleByte!=null){
                 ruleByte.setData(b);
                 ruleByte.setDataIndex(dataIndex);
+                if(rule.getByteEncoder()!=null){
+                    wb=rule.getByteEncoder().apply(ruleByte);
+                }
             }
             if (ref != null && isTailSupport) {
                 acc = rule.getTailAccumulator().apply(acc, ruleByte);
             }
-            if (b == rule.getStart()
-                    || b == rule.getEscape()
-                    || b == rule.getSeparator()
-                    || b == rule.getEnd()) {
+            if (wb == rule.getStart()
+                    || wb == rule.getEscape()
+                    || wb == rule.getSeparator()
+                    || wb == rule.getEnd()) {
                 os.write(rule.getEscape());
             }
-            os.write(b);
+            os.write(wb);
             dataIndex++;
         }
         os.flush();
