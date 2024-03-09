@@ -8,9 +8,18 @@ import java.util.Arrays;
  * @author Ice2Faith
  * @date 2024/3/8 8:49
  * @desc 封包
+ * 提供一个具有多个head+多个body分开封包的能力
+ * 以覆盖大多数的场景，
+ * 例如
+ * 1.使用head区分body的类型，比如：文件、文本、图片等等
+ * 2.需要使用多个head，类比HTTP，例如：URL，时间戳，请求方法，文件名等等
+ * 3.需要使用多个body，例如：上传多个文件，多个消息载荷等等
+ * ------------------------------------------------
  * 包构成
- * head+body...body+tail
- * 认为，至少一个包头head
+ * lhead+head ... head+lbody+body...body+tail
+ * lhead表示head的个数
+ * 0-n个head,n的最大值为127，即一个字节整形
+ * lbody表示body的个数
  * 0-n个body,n的最大值为127，即一个字节整形
  * 可以有一个后置的tail，可以用于在传输时，最后发送一些数据
  * 比如校验位
@@ -20,18 +29,17 @@ import java.util.Arrays;
  */
 public class StreamPacket {
 
-    private byte[] head;
+    private byte[][] head;
     private InputStream[] body;
     private byte[] tail;
     private byte[] ruleTail;
 
-
-    public static StreamPacket of(byte[] head,InputStream ... body){
-        return new StreamPacket(head,body);
+    public static<T> T[] array(T ... arr){
+        return arr;
     }
 
-    public static StreamPacket of(String head,InputStream ... body){
-        return new StreamPacket(toCharset(head,"UTF-8"),body);
+    public static StreamPacket of(byte[] head,InputStream ... body){
+        return new StreamPacket(array(head),body);
     }
 
     public static StreamPacket of(String head,String ... body){
@@ -39,7 +47,7 @@ public class StreamPacket {
         for (int i = 0; i < body.length; i++) {
             arr[i]=new ByteArrayInputStream(toCharset(body[i],"UTF-8"));
         }
-        return new StreamPacket(toCharset(head,"UTF-8"),arr);
+        return new StreamPacket(array(toCharset(head,"UTF-8")),arr);
     }
 
     public static StreamPacket of(byte[] head,byte[] ... body){
@@ -47,25 +55,7 @@ public class StreamPacket {
         for (int i = 0; i < body.length; i++) {
             arr[i]=new ByteArrayInputStream(body[i]);
         }
-        return new StreamPacket(head,arr);
-    }
-
-    public static StreamPacket of(String head,File ... files) throws IOException {
-        InputStream[] arr=new InputStream[files.length];
-        for (int i = 0; i < files.length; i++) {
-            arr[i]=new FileInputStream(files[i]);
-        }
-        return new StreamPacket(toCharset(head,"UTF-8"),arr);
-    }
-
-    public static StreamPacket of(File ... files) throws IOException {
-        StringBuilder head=new StringBuilder();
-        InputStream[] arr=new InputStream[files.length];
-        for (int i = 0; i < files.length; i++) {
-            arr[i]=new FileInputStream(files[i]);
-            head.append(files[i].getName()).append("\n");
-        }
-        return new StreamPacket(toCharset(head.toString(),"UTF-8"),arr);
+        return new StreamPacket(array(head),arr);
     }
 
     public static byte[] toCharset(String str,String charset){
@@ -89,7 +79,7 @@ public class StreamPacket {
     }
 
 
-    public StreamPacket(byte[] head, InputStream[] body) {
+    public StreamPacket(byte[][] head, InputStream[] body) {
         this.head = head;
         this.body = body;
     }
@@ -113,11 +103,11 @@ public class StreamPacket {
         return true;
     }
 
-    public byte[] getHead() {
+    public byte[][] getHead() {
         return head;
     }
 
-    public void setHead(byte[] head) {
+    public void setHead(byte[][] head) {
         this.head = head;
     }
 

@@ -1,8 +1,7 @@
-package i2f.packet;
+package i2f.packet.rule;
 
 import i2f.packet.data.StreamPacket;
 import i2f.packet.io.LocalOutputStreamInputAdapter;
-import i2f.packet.rule.PacketRule;
 
 import java.io.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -14,9 +13,9 @@ import java.util.concurrent.atomic.AtomicReference;
  * @desc
  */
 public class StreamPacketResolver {
-    private static final PacketRule<Long> DEFAULT_RULE = PacketRule.defaultHashRule();
+    protected static final PacketRule<Long> DEFAULT_RULE = PacketRule.defaultHashRule();
 
-    private static class ReadPacketContext {
+    public static class ReadPacketContext {
         public byte before = 0;
         public boolean hasBefore = false;
         public boolean isFirst = true;
@@ -28,6 +27,7 @@ public class StreamPacketResolver {
     }
 
     public static <T> StreamPacket read(PacketRule<T> rule, InputStream is) throws IOException {
+        RuleByte ruleByte=new RuleByte();
         StreamPacket ret = null;
         ReadPacketContext context = new ReadPacketContext();
         context.before = 0;
@@ -36,7 +36,7 @@ public class StreamPacketResolver {
         context.isOk = true;
         int bt = 0;
         // 读取开头
-        LocalOutputStreamInputAdapter drop = new LocalOutputStreamInputAdapter();
+        LocalOutputStreamInputAdapter drop = new LocalOutputStreamInputAdapter(rule.getMemorySize());
         context.isOk = false;
         context.hasBefore = false;
         context.isFirst = true;
@@ -74,21 +74,38 @@ public class StreamPacketResolver {
         }
         boolean isTailSupport = (rule.isTailSupport() && ref != null);
 
+        // 读取头数量
+        int headLen=is.read();
+
+        ruleByte.setHead(true);
+        ruleByte.setCurrentCount(headLen);
+
         // 读取头
-        LocalOutputStreamInputAdapter head = new LocalOutputStreamInputAdapter();
-        readNextItem(rule, ref, rule.getSeparator(), is, context, head);
-        head.close();
-        ret.setHead(head.toByteArray());
+        byte[][] head=new byte[headLen][];
+        LocalOutputStreamInputAdapter[] headOuts = new LocalOutputStreamInputAdapter[headLen];
+        for (int i = 0; i < headLen; i++) {
+            ruleByte.setCurrentIndex(i);
+            headOuts[i] = new LocalOutputStreamInputAdapter();
+            readNextItem(rule, ruleByte,ref, rule.getSeparator(), is, context, headOuts[i]);
+            headOuts[i].close();
+            head[i] = headOuts[i].toByteArray();
+        }
+        ret.setHead(head);
+
 
         // 读取体数量
-        int len = is.read();
+        int bodyLen = is.read();
+
+        ruleByte.setHead(false);
+        ruleByte.setCurrentCount(bodyLen);
 
         // 读取体
-        InputStream[] body = new InputStream[len];
-        LocalOutputStreamInputAdapter[] outs = new LocalOutputStreamInputAdapter[len];
-        for (int i = 0; i < len; i++) {
-            outs[i] = new LocalOutputStreamInputAdapter();
-            readNextItem(rule, ref, rule.getSeparator(), is, context, outs[i]);
+        InputStream[] body = new InputStream[bodyLen];
+        LocalOutputStreamInputAdapter[] outs = new LocalOutputStreamInputAdapter[bodyLen];
+        for (int i = 0; i < bodyLen; i++) {
+            ruleByte.setCurrentIndex(i);
+            outs[i] = new LocalOutputStreamInputAdapter(rule.getMemorySize());
+            readNextItem(rule, ruleByte,ref, rule.getSeparator(), is, context, outs[i]);
             outs[i].close();
             body[i] = outs[i].getInputStream();
         }
@@ -96,25 +113,30 @@ public class StreamPacketResolver {
 
         // 读取尾
         LocalOutputStreamInputAdapter tail = new LocalOutputStreamInputAdapter();
-        readNextItem(rule, null, rule.getEnd(), is, context, tail);
+        readNextItem(rule, null,null, rule.getEnd(), is, context, tail);
         tail.close();
         ret.setTail(tail.toByteArray());
 
         if (isTailSupport) {
-            byte[] ruleTail = rule.getTailFinisher().apply(ref.get());
-            ret.setRuleTail(ruleTail);
+            if(headLen+bodyLen>0) {
+                byte[] ruleTail = rule.getTailFinisher().apply(ref.get());
+                ret.setRuleTail(ruleTail);
+            }else{
+                ret.setRuleTail(new byte[0]);
+            }
         }
 
         return ret;
     }
 
-    private static <T> void readNextItem(PacketRule<T> rule, AtomicReference<T> ref, byte end, InputStream is, ReadPacketContext context, OutputStream os) throws IOException {
+    public static <T> void readNextItem(PacketRule<T> rule,RuleByte ruleByte, AtomicReference<T> ref, byte end, InputStream is, ReadPacketContext context, OutputStream os) throws IOException {
         boolean isTailSupport = (rule.isTailSupport() && ref != null);
         T acc = null;
         if (isTailSupport) {
             acc = ref.get();
         }
 
+        long dataIndex=0;
         int bt = 0;
         context.isOk = false;
         context.hasBefore = false;
@@ -136,10 +158,15 @@ public class StreamPacketResolver {
             if (b == end) {
                 if (context.before != rule.getEscape()) {
                     if (context.hasBefore) {
+                        if(ruleByte!=null){
+                            ruleByte.setData(context.before);
+                            ruleByte.setDataIndex(dataIndex);
+                        }
                         if (isTailSupport) {
-                            acc = rule.getTailAccumulator().apply(acc, context.before);
+                            acc = rule.getTailAccumulator().apply(acc, ruleByte);
                         }
                         os.write(context.before);
+                        dataIndex++;
                     }
                     context.hasBefore = true;
                     context.before = b;
@@ -155,21 +182,31 @@ public class StreamPacketResolver {
                             || b == rule.getSeparator()
                             || b == rule.getEnd()
                             || b == end) {
+                        if(ruleByte!=null){
+                            ruleByte.setData(b);
+                            ruleByte.setDataIndex(dataIndex);
+                        }
                         if (isTailSupport) {
-                            acc = rule.getTailAccumulator().apply(acc, b);
+                            acc = rule.getTailAccumulator().apply(acc, ruleByte);
                         }
                         os.write(b);
                         context.hasBefore = false;
                         context.before = b;
+                        dataIndex++;
                         continue;
                     } else {
                         throw new IOException("bad packet found.");
                     }
                 }
+                if(ruleByte!=null){
+                    ruleByte.setData(context.before);
+                    ruleByte.setDataIndex(dataIndex);
+                }
                 if (isTailSupport) {
-                    acc = rule.getTailAccumulator().apply(acc, context.before);
+                    acc = rule.getTailAccumulator().apply(acc, ruleByte);
                 }
                 os.write(context.before);
+                dataIndex++;
             }
             context.before = b;
             context.hasBefore = true;
@@ -189,11 +226,13 @@ public class StreamPacketResolver {
     }
 
     public static <T> void write(PacketRule<T> rule, StreamPacket packet, OutputStream os) throws IOException {
+        RuleByte ruleByte=new RuleByte();
+
         // 写入头
         os.write(rule.getStart());
         os.write(rule.getStart());
 
-        // 写入 head
+
         AtomicReference<T> ref = null;
         if (rule.isTailSupport()) {
             ref = new AtomicReference<>();
@@ -201,15 +240,44 @@ public class StreamPacketResolver {
             ref.set(acc);
         }
 
-        byte[] head = packet.getHead();
-        if (head != null) {
-            InputStream is = new ByteArrayInputStream(head);
-            writeEncoded(rule, ref, is, os);
-            is.close();
+        // 写入 head
+        byte[][] head = packet.getHead();
+        if(head==null){
+            head=new byte[0][];
         }
 
-        // 写入分隔符
-        os.write(rule.getSeparator());
+        if(head.length>127){
+            throw new IOException("packet max head count is 127, but got "+head.length);
+        }
+
+        // 写入head个数
+        byte headLen = (byte) head.length;
+        os.write(headLen);
+
+        ruleByte.setHead(true);
+        ruleByte.setCurrentCount(headLen);
+
+        // 写入head
+        for (int i = 0; i < head.length; i++) {
+            ruleByte.setCurrentIndex(i);
+            if (i > 0) {
+                // 写入分隔符
+                os.write(rule.getSeparator());
+            }
+            if (head[i] != null) {
+                if(head[i]==null){
+                    head[i]=new byte[0];
+                }
+                ByteArrayInputStream his=new ByteArrayInputStream(head[i]);
+                writeEncoded(rule,ruleByte, ref,his , os);
+                his.close();
+            }
+        }
+
+        if(headLen>0) {
+            // 写入分隔符
+            os.write(rule.getSeparator());
+        }
 
         // 写入 body
         InputStream[] body = packet.getBody();
@@ -222,34 +290,40 @@ public class StreamPacketResolver {
         }
 
         // 写入body个数
-        byte len = (byte) body.length;
-        os.write(len);
+        byte bodyLen = (byte) body.length;
+        os.write(bodyLen);
+
+        ruleByte.setHead(false);
+        ruleByte.setCurrentCount(bodyLen);
 
         // 写入body
         for (int i = 0; i < body.length; i++) {
+            ruleByte.setCurrentIndex(i);
             if (i > 0) {
                 // 写入分隔符
                 os.write(rule.getSeparator());
             }
             if (body[i] != null) {
-                writeEncoded(rule, ref, body[i], os);
+                writeEncoded(rule, ruleByte,ref, body[i], os);
                 body[i].close();
             }
         }
 
 
-        if (len > 0) {
+        if (bodyLen > 0) {
             // 写入分隔符
             os.write(rule.getSeparator());
         }
 
         if (rule.isTailSupport()) {
-            T acc = ref.get();
-            byte[] tail = rule.getTailFinisher().apply(acc);
-            if (tail != null) {
-                InputStream is = new ByteArrayInputStream(tail);
-                writeEncoded(rule, null, is, os);
-                is.close();
+            if(headLen+bodyLen>0) {
+                T acc = ref.get();
+                byte[] tail = rule.getTailFinisher().apply(acc);
+                if (tail != null) {
+                    InputStream is = new ByteArrayInputStream(tail);
+                    writeEncoded(rule, null,null, is, os);
+                    is.close();
+                }
             }
         }
 
@@ -259,18 +333,23 @@ public class StreamPacketResolver {
 
     }
 
-    private static <T> void writeEncoded(PacketRule<T> rule, AtomicReference<T> ref, InputStream is, OutputStream os) throws IOException {
+    public static <T> void writeEncoded(PacketRule<T> rule,RuleByte ruleByte, AtomicReference<T> ref, InputStream is, OutputStream os) throws IOException {
         BufferedInputStream bis = (is instanceof BufferedInputStream) ? ((BufferedInputStream) is) : (new BufferedInputStream(is));
         boolean isTailSupport = (rule.isTailSupport() && ref != null);
         T acc = null;
         if (isTailSupport) {
             acc = ref.get();
         }
+        long dataIndex=0;
         int bt = 0;
         while ((bt = bis.read()) >= 0) {
             byte b = (byte) bt;
+            if(ruleByte!=null){
+                ruleByte.setData(b);
+                ruleByte.setDataIndex(dataIndex);
+            }
             if (ref != null && isTailSupport) {
-                acc = rule.getTailAccumulator().apply(acc, b);
+                acc = rule.getTailAccumulator().apply(acc, ruleByte);
             }
             if (b == rule.getStart()
                     || b == rule.getEscape()
@@ -279,6 +358,7 @@ public class StreamPacketResolver {
                 os.write(rule.getEscape());
             }
             os.write(b);
+            dataIndex++;
         }
         os.flush();
         if (isTailSupport) {

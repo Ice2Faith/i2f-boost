@@ -1,6 +1,6 @@
 package i2f.packet.test;
 
-import i2f.packet.StreamPacketResolver;
+import i2f.packet.rule.StreamPacketResolver;
 import i2f.packet.data.StreamPacket;
 import i2f.packet.io.LocalOutputStreamInputAdapter;
 import i2f.packet.rule.PacketRule;
@@ -15,7 +15,7 @@ import java.io.*;
 public class TestStreamPacket {
 
     public static void main(String[] args) throws Exception {
-//        testBasic();
+        testBasic();
         testStream();
 
     }
@@ -59,12 +59,17 @@ public class TestStreamPacket {
                 }else{
                     System.out.println("check ok.");
                 }
-                try{
-                    System.out.println("head:"+StreamPacket.ofCharset(read.getHead(),"UTF-8"));
-                }catch(Exception e){
+                byte[][] head = read.getHead();
+                if(head!=null){
+                    for (byte[] hd : head) {
+                        try{
+                            System.out.println("head:"+StreamPacket.ofCharset(hd,"UTF-8"));
+                        }catch(Exception e){
 
+                        }
+                        System.out.println("head:"+printByte(hd));
+                    }
                 }
-                System.out.println("head:"+printByte(read.getHead()));
                 for (InputStream item : read.getBody()) {
                     ByteArrayOutputStream tos=new ByteArrayOutputStream();
                     LocalOutputStreamInputAdapter.copy(item,tos);
@@ -89,11 +94,10 @@ public class TestStreamPacket {
 
     public static void testBasic() throws Exception {
         PacketRule<Long> rule = PacketRule.defaultHashRule();
-
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        byte[] headData = {(byte)0xea, (byte)0xeb, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, (byte) 0xef, (byte) 0xee, (byte)0xea, (byte)0xeb, 0x30, 0x00};
-        byte[] bodyData = {0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, (byte) 0xef, (byte) 0xee, (byte)0xea, (byte)0xeb, 0x30, 0x01};
-        byte[] head = headData;
+        byte[] headData = {(byte)0xea, (byte)0xeb, 0x02, 0x03, 0x00};
+        byte[] bodyData = {0x10,  (byte) 0xef, (byte) 0xee, (byte)0xea, (byte)0xeb};
+        byte[][] head = new byte[][]{headData,null,headData};
 
         InputStream[] body=new InputStream[]{
                 new ByteArrayInputStream(bodyData),
@@ -101,11 +105,14 @@ public class TestStreamPacket {
                 new ByteArrayInputStream(bodyData)
         };
         StreamPacket src = new StreamPacket(head, body);
+        // 在包之前添加一些杂乱内容，测试包辨别能力
         bos.write("xxx".getBytes());
         StreamPacketResolver.write(rule, src, bos);
 
+        head=new byte[0][];
         body = new InputStream[0];
         src = new StreamPacket(head, body);
+        // 在包之前添加一些杂乱内容，测试包辨别能力
         bos.write("aaa".getBytes());
         StreamPacketResolver.write(rule, src, bos);
 
@@ -128,7 +135,12 @@ public class TestStreamPacket {
                 }else{
                     System.out.println("check ok.");
                 }
-                System.out.println("head:"+printByte(read.getHead()));
+                byte[][] rhd = read.getHead();
+                if(rhd!=null){
+                    for (byte[] hd : rhd) {
+                        System.out.println("head:"+printByte(hd));
+                    }
+                }
                 for (InputStream item : read.getBody()) {
                     ByteArrayOutputStream tos=new ByteArrayOutputStream();
                     LocalOutputStreamInputAdapter.copy(item,tos);
