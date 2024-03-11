@@ -69,6 +69,7 @@
         <module>i2f-tuple</module>
         <module>i2f-check</module>
         <module>i2f-packet</module>
+        <module>i2f-network</module>
 
     </modules>
 
