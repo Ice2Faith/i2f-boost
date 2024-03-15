@@ -70,6 +70,7 @@
         <module>i2f-check</module>
         <module>i2f-packet</module>
         <module>i2f-network</module>
+        <module>i2f-database</module>
 
     </modules>
 
