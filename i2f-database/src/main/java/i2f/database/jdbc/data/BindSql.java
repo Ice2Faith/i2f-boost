@@ -1,5 +1,6 @@
 package i2f.database.jdbc.data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,9 +12,13 @@ import java.util.Objects;
 public class BindSql {
     protected boolean update;
     protected String sql;
-    protected List<?> args;
+    protected List<?> args=new ArrayList<>();
 
     public BindSql() {
+    }
+
+    public BindSql(String sql) {
+        this.sql = sql;
     }
 
     public BindSql(String sql, List<?> args) {
