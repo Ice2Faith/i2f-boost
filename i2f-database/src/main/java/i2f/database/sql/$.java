@@ -5,699 +5,1189 @@ import i2f.database.jdbc.data.BindSql;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 /**
  * @author Ice2Faith
- * @date 2024/3/15 22:25
+ * @date 2024/3/18 8:56
  * @desc
  */
 public class $ {
-    protected List<BindSql> list;
+    protected List<BindSql> sqls = new ArrayList<>();
+    protected String separator = " ";
 
     public $() {
-        this.list = new ArrayList<>();
+
     }
 
-    public static $ $() {
+    public $(BindSql sql) {
+        this.sqls.add(sql);
+    }
+
+    public static $ $_() {
         return new $();
     }
 
-    public static BindSql $$(String sql, Object... args) {
-        return $.$().$(sql, args).$$();
+    public static $ $_(BindSql sql) {
+        if (sql == null) {
+            return new $();
+        }
+        return new $(sql);
     }
 
-    public BindSql $$() {
-        if (list.isEmpty()) {
-            return null;
-        }
-        if (list.size() == 1) {
-            return list.get(0);
-        }
-        StringBuilder builder = new StringBuilder();
-        List<Object> args = new ArrayList<>();
-        for (BindSql item : list) {
-            if (item.getSql() != null) {
-                builder.append(" ");
-                builder.append(item.getSql());
-                if (item.getArgs() != null) {
-                    args.addAll(item.getArgs());
-                }
-            }
-        }
-        String sql = builder.toString();
-        return new BindSql(sql, args);
+    public static <T> T[] array(T... arr) {
+        return arr;
     }
 
-    public $ $(String sql, Object... args) {
-        this.list.add(new BindSql(sql, new ArrayList<>(Arrays.asList(args))));
+    public static <T> List<T> array2list(T[] args) {
+        List<T> ret = new ArrayList<>();
+        if (args == null) {
+            return ret;
+        }
+        for (T arg : args) {
+            ret.add(arg);
+        }
+        return ret;
+    }
+
+    public static $ $_(String sql, Object... args) {
+        return new $(new BindSql(sql, array2list(args)));
+    }
+
+    public $ $sep(String str) {
+        this.separator = str;
         return this;
+    }
+
+    public $ $sepSpace() {
+        this.separator = " ";
+        return this;
+    }
+
+    public $ $sepNone() {
+        this.separator = null;
+        return this;
+    }
+
+    public $ $sepComma() {
+        this.separator = ",";
+        return this;
+    }
+
+    public $ $sepLine() {
+        this.separator = "\n";
+        return this;
+    }
+
+    public $ $($ sql) {
+        if (sql == null) {
+            return this;
+        }
+        BindSql bsql = sql.$$();
+        return $(bsql);
     }
 
     public $ $(BindSql sql) {
-        this.list.add(sql);
+        if (sql == null) {
+            return this;
+        }
+        if (this.separator != null) {
+            this.sqls.add(new BindSql(this.separator));
+        }
+        this.sqls.add(sql);
         return this;
     }
 
-    public <T> $ $(T val, Predicate<T> filter, String sql, Object... args) {
-        return $(val, filter, e -> new BindSql(sql, new ArrayList<>(Arrays.asList(args))));
+    public $ $(String sql, Object... args) {
+        return $(new BindSql(sql, array2list(args)));
     }
 
-    public <T> $ $(T val, Predicate<T> filter, BindSql sql) {
-        return $(val, filter, e -> sql);
+    public static BindSql $$(String sql, Object... args) {
+        return $.$_(sql, args).$$();
     }
 
-    public <T> $ $(T val, Predicate<T> filter, Function<T, BindSql> mapper) {
-        if (filter == null || filter.test(val)) {
-            BindSql sql = mapper.apply(val);
-            if (sql != null) {
-                this.list.add(sql);
-            }
+    public BindSql $$() {
+        if (this.sqls.isEmpty()) {
+            return new BindSql("");
+        }
+        if (this.sqls.size() == 1) {
+            return this.sqls.get(0);
+        }
+        StringBuilder builder = new StringBuilder();
+        List<Object> args = new ArrayList<>();
+        for (BindSql sql : this.sqls) {
+            builder.append(sql.getSql());
+            args.addAll(sql.getArgs());
+        }
+        return new BindSql(builder.toString(), args);
+    }
+
+    public <T> $ $if(T val, Predicate<T> condition, String sql, Object... args) {
+        return $if(val, condition, e -> new BindSql(sql, array2list(args)));
+    }
+
+    public <T> $ $if(T val, Predicate<T> condition, BindSql sql) {
+        return $if(val, condition, e -> sql);
+    }
+
+    public <T> $ $if(T val, Predicate<T> condition, $ sql) {
+        return $if(val, condition, e -> sql.$$());
+    }
+
+    public <T> $ $if(T val, Predicate<T> condition, Function<T, BindSql> processor) {
+        if (condition == null || condition.test(val)) {
+            return $(processor.apply(val));
         }
         return this;
     }
 
-    public $ $val(Object val) {
-        this.list.add(new BindSql("?", new ArrayList<>(Arrays.asList(val))));
+    public <T> $ $if$(T val, Predicate<T> condition, BiFunction<T, $, $> processor) {
+        return $if(val, condition, e -> processor.apply(e, $.$_()).$$());
+    }
+
+    public <E, C extends Iterable<E>> $ $for(C val,
+                                             String separator,
+                                             BiFunction<E, Integer, BindSql> itemMapper) {
+        return $for(val, null, e -> e, separator, itemMapper);
+    }
+
+    public <E, C extends Iterable<E>> $ $for$(C val,
+                                              String separator,
+                                              BiFunction<E, $, $> itemMapper) {
+        return $for(val, separator, (e, i) -> itemMapper.apply(e, $.$_()).$$());
+    }
+
+    public <E, C extends Iterable<E>> $ $for(C val, Predicate<C> condition,
+                                             String separator,
+                                             BiFunction<E, Integer, BindSql> itemMapper) {
+        return $for(val, condition, e -> e, separator, itemMapper);
+    }
+
+    public <E, C extends Iterable<E>> $ $for$(C val, Predicate<C> condition,
+                                              String separator,
+                                              BiFunction<E, $, $> itemMapper) {
+        return $for(val, condition, separator, (e, i) -> itemMapper.apply(e, $.$_()).$$());
+    }
+
+    public <E, C extends Iterable<E>> $ $for(C val, Predicate<C> condition,
+                                             Function<C, BindSql> separator,
+                                             BiFunction<E, Integer, BindSql> itemMapper) {
+        return $for(val, condition, e -> e, separator, itemMapper);
+    }
+
+    public <E, C extends Iterable<E>> $ $for$(C val, Predicate<C> condition,
+                                              BiFunction<C, $, $> separator,
+                                              BiFunction<E, $, $> itemMapper) {
+        return $for(val, condition, (separator == null ? null : e -> separator.apply(e, $.$_()).$$()),
+                (e, i) -> itemMapper.apply(e, $.$_()).$$());
+    }
+
+    public <T, E, C extends Iterable<E>> $ $for(T val, Predicate<T> condition,
+                                                Function<T, C> iterableMapper,
+                                                String separator,
+                                                BiFunction<E, Integer, BindSql> itemMapper) {
+        return $for(val, condition, iterableMapper,
+                e -> (separator == null ? null : new BindSql(separator)),
+                itemMapper);
+    }
+
+    public <T, E, C extends Iterable<E>> $ $for$(T val, Predicate<T> condition,
+                                                 Function<T, C> iterableMapper,
+                                                 String separator,
+                                                 BiFunction<E, $, $> itemMapper) {
+        return $for(val, condition, iterableMapper, separator, (e, i) -> itemMapper.apply(e, $.$_()).$$());
+    }
+
+    public <T, E, C extends Iterable<E>> $ $for(T val, Predicate<T> condition,
+                                                Function<T, C> iterableMapper,
+                                                Function<T, BindSql> separator,
+                                                BiFunction<E, Integer, BindSql> itemMapper) {
+        if (condition != null && !condition.test(val)) {
+            return this;
+        }
+        C col = iterableMapper.apply(val);
+        int i = 0;
+        for (E item : col) {
+            BindSql sql = itemMapper.apply(item, i);
+            if (sql == null) {
+                continue;
+            }
+            if (i > 0) {
+                if (separator != null) {
+                    BindSql sep = separator.apply(val);
+                    if (sep != null) {
+                        this.$(sep);
+                    }
+                }
+            }
+            this.$(sql);
+            i++;
+        }
         return this;
     }
 
-    public <E, C extends Collection<E>> $ $in(String name, C col, Predicate<C> filter) {
-        return $trim(col, filter,
-                e -> new BindSql(name + " in ("),
-                e -> new BindSql(")"),
-                null, null,
-                v -> $.$().$foreach(v, filter,
-                        e -> e,
-                        e -> COMMA,
-                        (e, i) -> $.$$("?", e)).$$());
+    public <T, E, C extends Iterable<E>> $ $for$(T val, Predicate<T> condition,
+                                                 Function<T, C> iterableMapper,
+                                                 BiFunction<T, $, $> separator,
+                                                 BiFunction<E, $, $> itemMapper) {
+        return $for(val, condition, iterableMapper,
+                (separator == null ? null : e -> separator.apply(e, $.$_()).$$()),
+                (e, i) -> itemMapper.apply(e, $.$_()).$$());
     }
 
-    public <T> $ $like(String name, T val, Predicate<T> filter) {
-        return $(val, filter, name + " like ?", val);
+    public $ $trim(String prefix,
+                   String suffix,
+                   String[] trimPrefix,
+                   String[] trimSuffix,
+                   Supplier<BindSql> innerMapper) {
+        return $trim(null, null,
+                prefix, suffix,
+                trimPrefix, trimSuffix,
+                e -> innerMapper.get());
     }
 
-    public <T> $ $eq(String name, T val, Predicate<T> filter) {
-        return $(val, filter, name + " = ?", val);
+    public $ $trim$(String prefix,
+                    String suffix,
+                    String[] trimPrefix,
+                    String[] trimSuffix,
+                    Function<$, $> innerMapper) {
+        return $trim(prefix, suffix,
+                trimPrefix, trimSuffix,
+                () -> innerMapper.apply($.$_()).$$());
     }
 
-    public <T> $ $gt(String name, T val, Predicate<T> filter) {
-        return $(val, filter, name + " > ?", val);
+    public $ $trim(String prefix,
+                   String suffix,
+                   List<String> trimPrefix,
+                   List<String> trimSuffix,
+                   Supplier<BindSql> innerMapper) {
+        return $trim(null, null,
+                prefix, suffix,
+                trimPrefix, trimSuffix,
+                e -> innerMapper.get());
     }
 
-    public <T> $ $lt(String name, T val, Predicate<T> filter) {
-        return $(val, filter, name + " < ?", val);
+    public $ $trim$(String prefix,
+                    String suffix,
+                    List<String> trimPrefix,
+                    List<String> trimSuffix,
+                    Function<$, $> innerMapper) {
+        return $trim(prefix, suffix,
+                trimPrefix, trimSuffix,
+                () -> innerMapper.apply($.$_()).$$());
     }
 
-    public <T> $ $gte(String name, T val, Predicate<T> filter) {
-        return $(val, filter, name + " >= ?", val);
+    public $ $trim(Supplier<BindSql> prefix,
+                   Supplier<BindSql> suffix,
+                   Supplier<List<String>> trimPrefix,
+                   Supplier<List<String>> trimSuffix,
+                   Supplier<BindSql> innerMapper) {
+        return $trim(null, null,
+                e -> prefix.get(), e -> suffix.get(),
+                e -> trimPrefix.get(), e -> trimSuffix.get(),
+                e -> innerMapper.get());
     }
 
-    public <T> $ $lte(String name, T val, Predicate<T> filter) {
-        return $(val, filter, name + " <= ?", val);
+    public $ $trim$(Function<$, $> prefix,
+                    Function<$, $> suffix,
+                    Supplier<List<String>> trimPrefix,
+                    Supplier<List<String>> trimSuffix,
+                    Function<$, $> innerMapper) {
+        return $trim((prefix == null ? null : () -> prefix.apply($.$_()).$$()),
+                (suffix == null ? null : () -> suffix.apply($.$_()).$$()),
+                trimPrefix, trimSuffix,
+                () -> innerMapper.apply($.$_()).$$());
     }
 
-    public <T> $ $neq(String name, T val, Predicate<T> filter) {
-        return $(val, filter, name + " != ?", val);
+    public <T> $ $trim(T val, Predicate<T> condition,
+                       String prefix,
+                       String suffix,
+                       String[] trimPrefix,
+                       String[] trimSuffix,
+                       Function<T, BindSql> innerMapper) {
+        return $trim(val, condition,
+                e -> (prefix == null ? null : new BindSql(prefix)),
+                e -> (suffix == null ? null : new BindSql(suffix)),
+                e -> (trimPrefix == null || trimPrefix.length == 0 ? null : array2list(trimPrefix)),
+                e -> (trimSuffix == null || trimSuffix.length == 0 ? null : array2list(trimSuffix)),
+                innerMapper);
     }
 
-    public <T> $ $isNull(String name, T val, Predicate<T> filter) {
-        return $(val, filter, name + " is null");
+    public <T> $ $trim$(T val, Predicate<T> condition,
+                        String prefix,
+                        String suffix,
+                        String[] trimPrefix,
+                        String[] trimSuffix,
+                        BiFunction<T, $, $> innerMapper) {
+        return $trim(val, condition,
+                prefix, suffix,
+                trimPrefix, trimSuffix,
+                e -> innerMapper.apply(e, $.$_()).$$());
     }
 
-    public <T> $ $isNotNull(String name, T val, Predicate<T> filter) {
-        return $(val, filter, name + " is not null");
+    public <T> $ $trim(T val, Predicate<T> condition,
+                       String prefix,
+                       String suffix,
+                       List<String> trimPrefix,
+                       List<String> trimSuffix,
+                       Function<T, BindSql> innerMapper) {
+        return $trim(val, condition,
+                e -> (prefix == null ? null : new BindSql(prefix)),
+                e -> (suffix == null ? null : new BindSql(suffix)),
+                e -> (trimPrefix),
+                e -> (trimSuffix),
+                innerMapper);
     }
 
-    public <T> $ $eqNull(String name, T val, Predicate<T> filter) {
-        return $(val, filter, name + " = null");
+    public <T> $ $trim$(T val, Predicate<T> condition,
+                        String prefix,
+                        String suffix,
+                        List<String> trimPrefix,
+                        List<String> trimSuffix,
+                        BiFunction<T, $, $> innerMapper) {
+        return $trim(val, condition,
+                prefix, suffix,
+                trimPrefix, trimSuffix,
+                e -> innerMapper.apply(e, $.$_()).$$());
     }
 
-    public <T> $ $neqNull(String name, T val, Predicate<T> filter) {
-        return $(val, filter, name + " != null");
-    }
-
-    public <T> $ $where(T val, Predicate<T> filter,
-                        Function<T, BindSql> inner) {
-        return $trim(val, filter,
-                e -> WHERE, null,
-                e -> Arrays.asList("and", "or", "AND", "OR"),
-                null, inner);
-    }
-
-    public <T> $ $exists(T val, Predicate<T> filter,
-                         Function<T, BindSql> inner) {
-        return $trim(val, filter,
-                e -> new BindSql("exists ("),
-                e -> new BindSql(")"),
-                e -> Arrays.asList("and", "or", "AND", "OR"),
-                null, inner);
-    }
-
-    public <T> $ $set(T val, Predicate<T> filter,
-                      Function<T, BindSql> inner) {
-        return $trim(val, filter,
-                e -> SET, null,
-                e -> Arrays.asList(","),
-                e -> Arrays.asList(","),
-                inner);
-    }
-
-    public <T> $ $cols(T val, Predicate<T> filter,
-                       Function<T, BindSql> inner) {
-        return $trim(val, filter,
-                null, null,
-                e -> Arrays.asList(","),
-                e -> Arrays.asList(","),
-                inner);
-    }
-
-    public <T> $ $bracket(T val, Predicate<T> filter,
-                          Function<T, BindSql> inner) {
-        return $trim(val, filter,
-                e -> new BindSql("("),
-                e -> new BindSql(")"),
-                null,
-                null,
-                inner);
-    }
-
-    public <T> $ $and(T val, Predicate<T> filter,
-                      Function<T, BindSql> inner) {
-        return $trim(val, filter,
-                e -> new BindSql("and ("),
-                e -> new BindSql(")"),
-                e -> Arrays.asList("and", "or", "AND", "OR"),
-                null, inner);
-    }
-
-    public <T> $ $or(T val, Predicate<T> filter,
-                     Function<T, BindSql> inner) {
-        return $trim(val, filter,
-                e -> new BindSql("or ("),
-                e -> new BindSql(")"),
-                e -> Arrays.asList("and", "or", "AND", "OR"),
-                null, inner);
-    }
-
-    public <T> $ $trim(T val, Predicate<T> filter,
+    public <T> $ $trim(T val, Predicate<T> condition,
                        Function<T, BindSql> prefix,
                        Function<T, BindSql> suffix,
                        Function<T, List<String>> trimPrefix,
                        Function<T, List<String>> trimSuffix,
-                       Function<T, BindSql> inner
-    ) {
-        if (filter == null || filter.test(val)) {
-            BindSql sql = inner.apply(val);
-            if (sql == null) {
-                return this;
-            }
-            if (trimPrefix != null) {
-                String str = sql.getSql().trim();
-                List<String> trims = trimPrefix.apply(val);
-                if (trims != null) {
-                    while (true) {
-                        boolean replace = false;
-                        str = str.trim();
-                        for (String trim : trims) {
-                            if (str.startsWith(trim)) {
-                                str = str.substring(trim.length());
-                                replace = true;
-                                break;
-                            }
-                        }
-                        if (!replace) {
-                            break;
-                        }
-                    }
-
-                }
-                sql.setSql(str);
-            }
-            if (trimSuffix != null) {
-                String str = sql.getSql().trim();
-                List<String> trims = trimSuffix.apply(val);
-                if (trims != null) {
-                    while (true) {
-                        boolean replace = false;
-                        str = str.trim();
-                        for (String trim : trims) {
-                            if (str.endsWith(trim)) {
-                                str = str.substring(0, str.length() - trim.length());
-                                replace = false;
-                                break;
-                            }
-                        }
-                        if (!replace) {
-                            break;
-                        }
+                       Function<T, BindSql> innerMapper) {
+        if (condition != null && !condition.test(val)) {
+            return this;
+        }
+        BindSql sql = innerMapper.apply(val);
+        if (sql == null) {
+            return this;
+        }
+        if (trimPrefix != null) {
+            List<String> list = trimPrefix.apply(val);
+            if (list != null) {
+                String str = sql.getSql();
+                for (String item : list) {
+                    str = str.trim();
+                    if (str.startsWith(item)) {
+                        str = str.substring(item.length());
+                        break;
                     }
                 }
                 sql.setSql(str);
             }
-            if ("".equals(sql.getSql().trim())) {
-                return this;
-            }
-            if (prefix != null) {
-                BindSql pre = prefix.apply(val);
-                if (pre != null) {
-                    this.list.add(pre);
+        }
+        if (trimSuffix != null) {
+            List<String> list = trimSuffix.apply(val);
+            if (list != null) {
+                String str = sql.getSql();
+                for (String item : list) {
+                    str = str.trim();
+                    if (str.endsWith(item)) {
+                        str = str.substring(0, str.length() - item.length());
+                        break;
+                    }
                 }
+                sql.setSql(str);
             }
-            this.list.add(sql);
-            if (suffix != null) {
-                BindSql suf = suffix.apply(val);
-                if (suf != null) {
-                    this.list.add(suf);
-                }
+        }
+        sql.setSql(sql.getSql().trim());
+        if ("".equals(sql.getSql())) {
+            return this;
+        }
+        if (prefix != null) {
+            BindSql pre = prefix.apply(val);
+            if (pre != null) {
+                this.$(pre);
+            }
+        }
+        this.$(sql);
+        if (suffix != null) {
+            BindSql suf = suffix.apply(val);
+            if (suf != null) {
+                this.$(suf);
             }
         }
         return this;
     }
 
+    public <T> $ $trim$(T val, Predicate<T> condition,
+                        BiFunction<T, $, $> prefix,
+                        BiFunction<T, $, $> suffix,
+                        Function<T, List<String>> trimPrefix,
+                        Function<T, List<String>> trimSuffix,
+                        BiFunction<T, $, $> innerMapper) {
+        return $trim(val, condition,
+                (prefix == null ? null : e -> prefix.apply(e, $.$_()).$$()),
+                (suffix == null ? null : e -> suffix.apply(e, $.$_()).$$()),
+                trimPrefix, trimSuffix,
+                e -> innerMapper.apply(e, $.$_()).$$());
+    }
 
-    public <T, E, C extends Iterable<E>> $ $foreach(T val, Predicate<T> filter,
-                                                    Function<T, C> iterable,
+    public <E, C extends Iterable<E>> $ $foreach(C val, Predicate<C> condition,
+                                                 String prefix,
+                                                 String suffix,
+                                                 String[] trimPrefix,
+                                                 String[] trimSuffix,
+                                                 String separator,
+                                                 BiFunction<E, Integer, BindSql> itemMapper) {
+        return $trim(val, condition,
+                prefix, suffix,
+                trimPrefix, trimSuffix,
+                e -> $.$_().$for(val, condition,
+                        separator,
+                        itemMapper).$$()
+        );
+    }
+
+    public <E, C extends Iterable<E>> $ $foreach$(C val, Predicate<C> condition,
+                                                  String prefix,
+                                                  String suffix,
+                                                  String[] trimPrefix,
+                                                  String[] trimSuffix,
+                                                  String separator,
+                                                  BiFunction<E, $, $> itemMapper) {
+        return $foreach(val, condition,
+                prefix, suffix,
+                trimPrefix, trimSuffix,
+                separator, (e, i) -> itemMapper.apply(e, $.$_()).$$());
+    }
+
+    public <E, C extends Iterable<E>> $ $foreach(C val, Predicate<C> condition,
+                                                 String prefix,
+                                                 String suffix,
+                                                 List<String> trimPrefix,
+                                                 List<String> trimSuffix,
+                                                 String separator,
+                                                 BiFunction<E, Integer, BindSql> itemMapper) {
+        return $trim(val, condition,
+                prefix, suffix,
+                trimPrefix, trimSuffix,
+                e -> $.$_().$for(val, condition,
+                        separator,
+                        itemMapper).$$()
+        );
+    }
+
+    public <E, C extends Iterable<E>> $ $foreach$(C val, Predicate<C> condition,
+                                                  String prefix,
+                                                  String suffix,
+                                                  List<String> trimPrefix,
+                                                  List<String> trimSuffix,
+                                                  String separator,
+                                                  BiFunction<E, $, $> itemMapper) {
+        return $foreach(val, condition,
+                prefix, suffix,
+                trimPrefix, trimSuffix,
+                separator, (e, i) -> itemMapper.apply(e, $.$_()).$$());
+    }
+
+    public <T, E, C extends Iterable<E>> $ $foreach(T val, Predicate<T> condition,
+                                                    String prefix,
+                                                    String suffix,
+                                                    List<String> trimPrefix,
+                                                    List<String> trimSuffix,
+                                                    Function<T, C> iterableMapper,
+                                                    String separator,
+                                                    BiFunction<E, Integer, BindSql> itemMapper) {
+        return $trim(val, condition,
+                prefix, suffix,
+                trimPrefix, trimSuffix,
+                e -> $.$_().$for(val, condition,
+                        iterableMapper,
+                        separator,
+                        itemMapper).$$()
+        );
+    }
+
+    public <T, E, C extends Iterable<E>> $ $foreach$(T val, Predicate<T> condition,
+                                                     String prefix,
+                                                     String suffix,
+                                                     List<String> trimPrefix,
+                                                     List<String> trimSuffix,
+                                                     Function<T, C> iterableMapper,
+                                                     String separator,
+                                                     BiFunction<E, $, $> itemMapper) {
+        return $foreach(val, condition,
+                prefix, suffix,
+                trimPrefix, trimSuffix,
+                iterableMapper, separator,
+                (e, i) -> itemMapper.apply(e, $.$_()).$$());
+    }
+
+    public <T, E, C extends Iterable<E>> $ $foreach(T val, Predicate<T> condition,
+                                                    Function<T, BindSql> prefix,
+                                                    Function<T, BindSql> suffix,
+                                                    Function<T, List<String>> trimPrefix,
+                                                    Function<T, List<String>> trimSuffix,
+                                                    Function<T, C> iterableMapper,
                                                     Function<T, BindSql> separator,
-                                                    BiFunction<E, Integer, BindSql> item) {
-        if (filter == null || filter.test(val)) {
+                                                    BiFunction<E, Integer, BindSql> itemMapper) {
+        return $trim(val, condition,
+                prefix, suffix,
+                trimPrefix, trimSuffix,
+                e -> $.$_()
+                        .$for(val, condition,
+                                iterableMapper,
+                                separator,
+                                itemMapper)
+                        .$$());
+    }
 
-            int i = 0;
-            boolean isFirst = true;
-            C col = iterable.apply(val);
-            List<BindSql> tmp = new ArrayList<>();
-            for (E iter : col) {
-                BindSql sql = item.apply(iter, i);
-                if (sql == null) {
-                    i++;
-                    continue;
-                }
-                if (!isFirst) {
-                    if (separator != null) {
-                        BindSql sep = separator.apply(val);
-                        tmp.add(sep);
-                    }
-                }
-                tmp.add(sql);
-                isFirst = false;
-                i++;
-            }
-            if (!tmp.isEmpty()) {
-                $ begin = $.$();
-                for (BindSql iter : tmp) {
-                    begin.$(iter);
-                }
-                BindSql sql = begin.$$();
-                this.list.add(sql);
-            }
-        }
+    public <T, E, C extends Iterable<E>> $ $foreach$(T val, Predicate<T> condition,
+                                                     BiFunction<T, $, $> prefix,
+                                                     BiFunction<T, $, $> suffix,
+                                                     Function<T, List<String>> trimPrefix,
+                                                     Function<T, List<String>> trimSuffix,
+                                                     Function<T, C> iterableMapper,
+                                                     BiFunction<T, $, $> separator,
+                                                     BiFunction<E, $, $> itemMapper) {
+        return $foreach(val, condition,
+                (prefix == null ? null : e -> prefix.apply(e, $.$_()).$$()),
+                (suffix == null ? null : e -> suffix.apply(e, $.$_()).$$()),
+                trimPrefix, trimSuffix,
+                iterableMapper,
+                (separator == null ? null : e -> separator.apply(e, $.$_()).$$()),
+                (e, i) -> itemMapper.apply(e, $.$_()).$$());
+    }
+
+    public $ $sp() {
+        this.sqls.add(new BindSql(" "));
         return this;
     }
 
+    public $ $ln() {
+        this.sqls.add(new BindSql("\n"));
+        return this;
+    }
+
+    public $ $tb() {
+        this.sqls.add(new BindSql("\t"));
+        return this;
+    }
+
+    public $ $cm(){
+        this.sqls.add(new BindSql(","));
+        return this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    public $ $val(Object val) {
+        return $("?", val);
+    }
+
+    public $ $select(Function<$, BindSql> innerMapper) {
+        return select()
+                .$comma(e -> innerMapper.apply($.$_().$sepComma()));
+    }
+
+    public $ $select$(Function<$, $> innerMapper) {
+        return $select(e -> innerMapper.apply(e).$$());
+    }
+
+    public $ $from(String name) {
+        return $from(name, null);
+    }
+
+    public $ $from(String name, String alias) {
+        if (alias != null && !"".equals(alias)) {
+            name = name + " " + alias;
+        }
+        return from().$(name);
+    }
+
+    public <T> $ $from(T val, Function<T, BindSql> tableMapper, Function<T, String> aliasMapper) {
+        return $trim(val, null,
+                e -> new BindSql("from ("),
+                e -> {
+                    String suf = ")";
+                    if (aliasMapper != null) {
+                        String alias = aliasMapper.apply(e);
+                        if (alias != null && !"".equals(alias)) {
+                            suf += " " + alias;
+                        }
+                    }
+                    return new BindSql(suf);
+                },
+                null,
+                null,
+                tableMapper);
+    }
+
+    public <T> $ $from$(T val, BiFunction<T, $, $> tableMapper, Function<T, String> aliasMapper) {
+        return $from(val, e -> tableMapper.apply(e, $.$_()).$$(), aliasMapper);
+    }
+
+    public $ $join(String name) {
+        return $join(name, null);
+    }
+
+    public $ $join(String name, String alias) {
+        if (alias != null && !"".equals(alias)) {
+            name = name + " " + alias;
+        }
+        return join().$(name);
+    }
+
+    public <T> $ $join(T val, Function<T, BindSql> tableMapper, Function<T, String> aliasMapper) {
+        return $trim(val, null,
+                e -> new BindSql("join ("),
+                e -> {
+                    String suf = ")";
+                    if (aliasMapper != null) {
+                        String alias = aliasMapper.apply(e);
+                        if (alias != null && !"".equals(alias)) {
+                            suf += " " + alias;
+                        }
+                    }
+                    return new BindSql(suf);
+                },
+                null,
+                null,
+                tableMapper);
+    }
+
+    public <T> $ $join$(T val, BiFunction<T, $, $> tableMapper, Function<T, String> aliasMapper) {
+        return $join(val, e -> tableMapper.apply(e, $.$_()).$$(), aliasMapper);
+    }
+
+    public $ $where(Function<$, BindSql> innerMapper) {
+        return $where(null, null, v -> innerMapper.apply($.$_()));
+    }
+
+    public $ $where(Supplier<BindSql> innerMapper) {
+        return $where(null, null, v -> innerMapper.get());
+    }
+
+    public $ $where$(Function<$, $> innerMapper) {
+        return $where(null, null, e -> innerMapper.apply($.$_()).$$());
+    }
+
+    public <T> $ $where(T val, Predicate<T> condition,
+                        Function<T, BindSql> innerMapper) {
+        return $trim(val, condition,
+                "where", null,
+                Arrays.asList("and", "or", "AND", "OR"), null,
+                innerMapper);
+    }
+
+    public <T> $ $where$(T val, Predicate<T> condition,
+                         BiFunction<T, $, $> innerMapper) {
+        return $where(val, condition, e -> innerMapper.apply(e, $.$_()).$$());
+    }
+
+    public $ $arr$(Function<$, $> innerMapper) {
+        return $comma$(e -> innerMapper.apply($.$_().$sepComma()));
+    }
+
+    public $ $vals$(Function<$, $> innerMapper) {
+        return $bracket$(s -> s.$comma$(e -> innerMapper.apply($.$_().$sepComma())));
+    }
+
+    public $ $values$(Function<$, $> innerMapper) {
+        return values().$bracket$(s -> s.$comma$(e -> innerMapper.apply($.$_().$sepComma())));
+    }
+
+    public <T> $ $update(String name) {
+        return $update(name, v -> v);
+    }
+
+    public <T> $ $update(T val, Function<T, String> nameMapper) {
+        return update().$(nameMapper.apply(val));
+    }
+
+    public $ $set(Function<$, BindSql> innerMapper) {
+        return $set(null, null, e -> innerMapper.apply($.$_().$sepComma()));
+    }
+
+    public $ $set(Supplier<BindSql> innerMapper) {
+        return $set(null, null, e -> innerMapper.get());
+    }
+
+    public $ $set$(Function<$, $> innerMapper) {
+        return $set(null, null, e -> innerMapper.apply($.$_().$sepComma()).$$());
+    }
+
+    public <T> $ $set(T val, Predicate<T> condition,
+                      Function<T, BindSql> innerMapper) {
+        return $trim(val, condition,
+                "set", null,
+                Arrays.asList(","),
+                Arrays.asList(","),
+                innerMapper);
+    }
+
+    public <T> $ $set$(T val, Predicate<T> condition,
+                       BiFunction<T, $, $> innerMapper) {
+        return $set(val, condition, e -> innerMapper.apply(e, $.$_().$sepComma()).$$());
+    }
+
+    public $ $comma(Function<$, BindSql> innerMapper) {
+        return $comma(null, null, e -> innerMapper.apply($.$_()));
+    }
+
+    public $ $comma$(Function<$, $> innerMapper) {
+        return $comma(null, null, e -> innerMapper.apply($.$_()).$$());
+    }
+
+    public $ $comma(Supplier<BindSql> innerMapper) {
+        return $comma(null, null, e -> innerMapper.get());
+    }
+
+    public <T> $ $comma(T val, Predicate<T> condition,
+                        Function<T, BindSql> innerMapper) {
+        return $trim(val, condition,
+                null, null,
+                Arrays.asList(","),
+                Arrays.asList(","),
+                innerMapper);
+    }
+
+    public <T> $ $comma$(T val, Predicate<T> condition,
+                         BiFunction<T, $, $> innerMapper) {
+        return $comma(val, condition, e -> innerMapper.apply(e, $.$_()).$$());
+    }
+
+    public $ $bracket(Function<$, BindSql> innerMapper) {
+        return $bracket(null, null, e -> innerMapper.apply($.$_()));
+    }
+
+    public $ $bracket$(Function<$, $> innerMapper) {
+        return $bracket(null, null, e -> innerMapper.apply($.$_()).$$());
+    }
+
+    public $ $bracket(Supplier<BindSql> innerMapper) {
+        return $bracket(null, null, e -> innerMapper.get());
+    }
+
+    public <T> $ $bracket(T val, Predicate<T> condition,
+                          Function<T, BindSql> innerMapper) {
+        return $trim(val, condition,
+                "(", ")",
+                new String[0],
+                new String[0],
+                innerMapper);
+    }
+
+    public <T> $ $bracket$(T val, Predicate<T> condition,
+                           BiFunction<T, $, $> innerMapper) {
+        return $bracket(val, condition, e -> innerMapper.apply(e, $.$_()).$$());
+    }
+
+    public $ $and(Function<$, BindSql> innerMapper) {
+        return $and(null, null, e -> innerMapper.apply($.$_()));
+    }
+
+    public $ $and$(Function<$, $> innerMapper) {
+        return $and(null, null, e -> innerMapper.apply($.$_()).$$());
+    }
+
+    public $ $and(Supplier<BindSql> innerMapper) {
+        return $and(null, null, e -> innerMapper.get());
+    }
+
+    public <T> $ $and(T val, Predicate<T> condition,
+                      Function<T, BindSql> innerMapper) {
+        return $trim(val, condition,
+                "and (", ")",
+                Arrays.asList("and", "or", "AND", "OR"),
+                Arrays.asList("and", "or", "AND", "OR"),
+                innerMapper);
+    }
+
+    public <T> $ $and$(T val, Predicate<T> condition,
+                       BiFunction<T, $, $> innerMapper) {
+        return $and(val, condition,
+                e -> innerMapper.apply(e, $.$_()).$$()
+        );
+    }
+
+    public $ $or(Function<$, BindSql> innerMapper) {
+        return $and(null, null, e -> innerMapper.apply($.$_()));
+    }
+
+    public $ $or$(Function<$, $> innerMapper) {
+        return $and(null, null, e -> innerMapper.apply($.$_()).$$());
+    }
+
+    public $ $or(Supplier<BindSql> innerMapper) {
+        return $and(null, null, e -> innerMapper.get());
+    }
+
+    public <T> $ $or(T val, Predicate<T> condition,
+                     Function<T, BindSql> innerMapper) {
+        return $trim(val, condition,
+                "or (", ")",
+                Arrays.asList("and", "or", "AND", "OR"),
+                Arrays.asList("and", "or", "AND", "OR"),
+                innerMapper);
+    }
+
+    public <T> $ $or$(T val, Predicate<T> condition,
+                      BiFunction<T, $, $> innerMapper) {
+        return $or(val, condition, e -> innerMapper.apply(e, $.$_()).$$());
+    }
+
+    public static String prefixColumnName(String prefix, String column) {
+        if (prefix != null && !"".equals(prefix)) {
+            if (prefix.endsWith(".")) {
+                column = prefix + column;
+            } else {
+                column = prefix + "." + column;
+            }
+        }
+        return column;
+    }
+
+    public $ $col(String prefix, String column) {
+        return this.$col(prefix, column, null);
+    }
+
+    public $ $col(String prefix, String column, String asName) {
+        column = prefixColumnName(prefix, column);
+        if (asName != null && !"".equals(asName)) {
+            column += " as " + asName;
+        }
+        return this.$(column);
+    }
+
+    public <T> $ $eq(String column, T val) {
+        return $eq(null, column, val);
+    }
+
+    public <T> $ $eq(String prefix, String column, T val) {
+        return $eq(prefix, column, val, null);
+    }
+
+    public <T> $ $eq(String prefix, String column, T val, Predicate<T> condition) {
+        return $if(val, condition, prefixColumnName(prefix, column) + " = ?", val);
+    }
+
+    public <T> $ $gt(String column, T val) {
+        return $gt(null, column, val);
+    }
+
+    public <T> $ $gt(String prefix, String column, T val) {
+        return $gt(prefix, column, val, null);
+    }
+
+    public <T> $ $gt(String prefix, String column, T val, Predicate<T> condition) {
+        return $if(val, condition, prefixColumnName(prefix, column) + " > ?", val);
+    }
+
+    public <T> $ $lt(String column, T val) {
+        return $lt(null, column, val);
+    }
+
+    public <T> $ $lt(String prefix, String column, T val) {
+        return $lt(prefix, column, val, null);
+    }
+
+    public <T> $ $lt(String prefix, String column, T val, Predicate<T> condition) {
+        return $if(val, condition, prefixColumnName(prefix, column) + " < ?", val);
+    }
+
+    public <T> $ $gte(String column, T val) {
+        return $gte(null, column, val);
+    }
+
+    public <T> $ $gte(String prefix, String column, T val) {
+        return $gte(prefix, column, val, null);
+    }
+
+    public <T> $ $gte(String prefix, String column, T val, Predicate<T> condition) {
+        return $if(val, condition, prefixColumnName(prefix, column) + " >= ?", val);
+    }
+
+    public <T> $ $lte(String column, T val) {
+        return $lte(null, column, val);
+    }
+
+    public <T> $ $lte(String prefix, String column, T val) {
+        return $lte(prefix, column, val, null);
+    }
+
+    public <T> $ $lte(String prefix, String column, T val, Predicate<T> condition) {
+        return $if(val, condition, prefixColumnName(prefix, column) + " <= ?", val);
+    }
+
+    public <T> $ $neq(String column, T val) {
+        return $neq(null, column, val);
+    }
+
+    public <T> $ $neq(String prefix, String column, T val) {
+        return $neq(prefix, column, val, null);
+    }
+
+    public <T> $ $neq(String prefix, String column, T val, Predicate<T> condition) {
+        return $if(val, condition, prefixColumnName(prefix, column) + " != ?", val);
+    }
+
+    public <T> $ $like(String column, T val) {
+        return $like(null, column, val);
+    }
+
+    public <T> $ $like(String prefix, String column, T val) {
+        return $like(prefix, column, val, null);
+    }
+
+    public <T> $ $like(String prefix, String column, T val, Predicate<T> condition) {
+        return $if(val, condition, prefixColumnName(prefix, column) + " like ?", "?" + val + "?");
+    }
+
+    public <E, C extends Iterable<E>> $ $in(String column, C val) {
+        return $in(null, column, val);
+    }
+
+    public <E, C extends Iterable<E>> $ $in(String prefix, String column, C val) {
+        return $in(prefix, column, val, e -> e, null);
+    }
+
+    public <E, C extends Iterable<E>> $ $in(String prefix, String column, C val,
+                                            Predicate<C> condition) {
+        return $in(prefix, column, val, e -> e, condition);
+    }
+
+    public <T, E, C extends Iterable<E>> $ $in(String prefix, String column, T val,
+                                               Function<T, C> iterableMapper,
+                                               Predicate<T> condition) {
+        return $foreach(val, condition,
+                prefixColumnName(prefix, column) + " in (",
+                ")",
+                null,
+                null,
+                iterableMapper,
+                ",",
+                (e, i) -> new BindSql("?", Arrays.asList(e))
+        );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    public static final BindSql WITH = new BindSql("with");
     public static final BindSql SELECT = new BindSql("select");
-    public static final BindSql FROM = new BindSql("from");
-    public static final BindSql JOIN = new BindSql("join");
-    public static final BindSql ON = new BindSql("on");
-    public static final BindSql LEFT = new BindSql("left");
-    public static final BindSql RIGHT = new BindSql("right");
-    public static final BindSql INNER = new BindSql("inner");
-    public static final BindSql WHERE = new BindSql("where");
-    public static final BindSql AND = new BindSql("and");
-    public static final BindSql OR = new BindSql("or");
-    public static final BindSql GROUP = new BindSql("group");
-    public static final BindSql BY = new BindSql("by");
-    public static final BindSql HAVING = new BindSql("having");
-    public static final BindSql ORDER = new BindSql("order");
-    public static final BindSql LIMIT = new BindSql("limit");
     public static final BindSql AS = new BindSql("as");
-    public static final BindSql IS = new BindSql("is");
-    public static final BindSql NULL = new BindSql("null");
-    public static final BindSql NOT = new BindSql("not");
-    public static final BindSql LIKE = new BindSql("like");
-    public static final BindSql IN = new BindSql("in");
-    public static final BindSql EXISTS = new BindSql("exists");
-
-    public static final BindSql CREATE = new BindSql("create");
-    public static final BindSql TABLE = new BindSql("table");
-    public static final BindSql PRIMARY = new BindSql("primary");
-    public static final BindSql KEY = new BindSql("key");
-    public static final BindSql FOREIGN = new BindSql("foreign");
-    public static final BindSql REFERENCES = new BindSql("references");
-    public static final BindSql UNIQUE = new BindSql("unique");
-    public static final BindSql INDEX = new BindSql("index");
-    public static final BindSql VIEW = new BindSql("view");
-
-    public static final BindSql UPDATE = new BindSql("update");
-    public static final BindSql SET = new BindSql("set");
-    public static final BindSql DELETE = new BindSql("delete");
-    public static final BindSql INSERT = new BindSql("insert");
-    public static final BindSql INTO = new BindSql("into");
-    public static final BindSql VALUES = new BindSql("values");
-    public static final BindSql UNION = new BindSql("union");
-    public static final BindSql ALL = new BindSql("all");
-    public static final BindSql DISTINCT = new BindSql("distinct");
-    public static final BindSql TOP = new BindSql("top");
-    public static final BindSql ASC = new BindSql("asc");
-    public static final BindSql DESC = new BindSql("desc");
-
     public static final BindSql CASE = new BindSql("case");
     public static final BindSql WHEN = new BindSql("when");
     public static final BindSql THEN = new BindSql("then");
     public static final BindSql ELSE = new BindSql("else");
     public static final BindSql END = new BindSql("end");
-
-
+    public static final BindSql FROM = new BindSql("from");
+    public static final BindSql JOIN = new BindSql("join");
+    public static final BindSql INNER = new BindSql("inner");
+    public static final BindSql LEFT = new BindSql("left");
+    public static final BindSql RIGHT = new BindSql("right");
+    public static final BindSql ON = new BindSql("on");
+    public static final BindSql WHERE = new BindSql("where");
+    public static final BindSql AND = new BindSql("and");
+    public static final BindSql OR = new BindSql("or");
+    public static final BindSql LIKE = new BindSql("like");
+    public static final BindSql IN = new BindSql("in");
     public static final BindSql EQ = new BindSql("=");
     public static final BindSql GT = new BindSql(">");
     public static final BindSql LT = new BindSql("<");
     public static final BindSql GTE = new BindSql(">=");
     public static final BindSql LTE = new BindSql("<=");
     public static final BindSql NEQ = new BindSql("!=");
+    public static final BindSql GROUP = new BindSql("group");
+    public static final BindSql BY = new BindSql("by");
+    public static final BindSql HAVING = new BindSql("having");
+    public static final BindSql ORDER = new BindSql("order");
+    public static final BindSql ASC = new BindSql("asc");
+    public static final BindSql DESC = new BindSql("desc");
+    public static final BindSql LIMIT = new BindSql("limit");
+    public static final BindSql INSERT = new BindSql("insert");
+    public static final BindSql INTO = new BindSql("into");
+    public static final BindSql VALUES = new BindSql("values");
+    public static final BindSql UNION = new BindSql("union");
+    public static final BindSql ALL = new BindSql("all");
+    public static final BindSql UPDATE = new BindSql("update");
+    public static final BindSql SET = new BindSql("set");
+    public static final BindSql DELETE = new BindSql("delete");
+    public static final BindSql CREATE = new BindSql("create");
+    public static final BindSql TABLE = new BindSql("table");
+    public static final BindSql VIEW = new BindSql("view");
+    public static final BindSql INDEX = new BindSql("index");
+    public static final BindSql DROP = new BindSql("drop");
 
-    public static final BindSql IS_NULL = new BindSql("is null");
-    public static final BindSql IS_NOT_NULL = new BindSql("is not null");
-
-    public static final BindSql EQ_NULL = new BindSql("= null");
-    public static final BindSql NEQ_NULL = new BindSql("!= null");
-
-    public static final BindSql DOT = new BindSql(".");
-    public static final BindSql COMMA = new BindSql(",");
-    public static final BindSql LINE = new BindSql("\n");
-    public static final BindSql SPACE = new BindSql(" ");
+    public $ with() {
+        return $(WITH);
+    }
 
     public $ select() {
-        this.list.add(SELECT);
-        return this;
-    }
-
-    public $ from() {
-        this.list.add(FROM);
-        return this;
-    }
-
-    public $ join() {
-        this.list.add(JOIN);
-        return this;
-    }
-
-    public $ on() {
-        this.list.add(ON);
-        return this;
-    }
-
-    public $ left() {
-        this.list.add(LEFT);
-        return this;
-    }
-
-    public $ right() {
-        this.list.add(RIGHT);
-        return this;
-    }
-
-    public $ inner() {
-        this.list.add(INNER);
-        return this;
-    }
-
-    public $ where() {
-        this.list.add(WHERE);
-        return this;
-    }
-
-    public $ and() {
-        this.list.add(AND);
-        return this;
-    }
-
-    public $ or() {
-        this.list.add(OR);
-        return this;
-    }
-
-    public $ group() {
-        this.list.add(GROUP);
-        return this;
-    }
-
-    public $ by() {
-        this.list.add(BY);
-        return this;
-    }
-
-    public $ having() {
-        this.list.add(HAVING);
-        return this;
-    }
-
-    public $ order() {
-        this.list.add(ORDER);
-        return this;
-    }
-
-    public $ limit() {
-        this.list.add(LIMIT);
-        return this;
+        return $(SELECT);
     }
 
     public $ as() {
-        this.list.add(AS);
-        return this;
-    }
-
-    public $ is() {
-        this.list.add(IS);
-        return this;
-    }
-
-    public $ $null() {
-        this.list.add(NULL);
-        return this;
-    }
-
-    public $ not() {
-        this.list.add(NOT);
-        return this;
-    }
-
-    public $ like() {
-        this.list.add(LIKE);
-        return this;
-    }
-
-    public $ in() {
-        this.list.add(IN);
-        return this;
-    }
-
-    public $ exists() {
-        this.list.add(EXISTS);
-        return this;
-    }
-
-    public $ create() {
-        this.list.add(CREATE);
-        return this;
-    }
-
-    public $ table() {
-        this.list.add(TABLE);
-        return this;
-    }
-
-    public $ primary() {
-        this.list.add(PRIMARY);
-        return this;
-    }
-
-    public $ key() {
-        this.list.add(KEY);
-        return this;
-    }
-
-    public $ foreign() {
-        this.list.add(FOREIGN);
-        return this;
-    }
-
-    public $ references() {
-        this.list.add(REFERENCES);
-        return this;
-    }
-
-    public $ unique() {
-        this.list.add(UNIQUE);
-        return this;
-    }
-
-    public $ index() {
-        this.list.add(INDEX);
-        return this;
-    }
-
-    public $ view() {
-        this.list.add(VIEW);
-        return this;
-    }
-
-    public $ update() {
-        this.list.add(UPDATE);
-        return this;
-    }
-
-    public $ set() {
-        this.list.add(SET);
-        return this;
-    }
-
-    public $ delete() {
-        this.list.add(DELETE);
-        return this;
-    }
-
-    public $ insert() {
-        this.list.add(INSERT);
-        return this;
-    }
-
-    public $ into() {
-        this.list.add(INTO);
-        return this;
-    }
-
-    public $ values() {
-        this.list.add(VALUES);
-        return this;
-    }
-
-    public $ union() {
-        this.list.add(UNION);
-        return this;
-    }
-
-    public $ all() {
-        this.list.add(ALL);
-        return this;
-    }
-
-    public $ distinct() {
-        this.list.add(DISTINCT);
-        return this;
-    }
-
-    public $ top() {
-        this.list.add(TOP);
-        return this;
-    }
-
-    public $ asc() {
-        this.list.add(ASC);
-        return this;
-    }
-
-    public $ desc() {
-        this.list.add(DESC);
-        return this;
+        return $(AS);
     }
 
     public $ $case() {
-        this.list.add(CASE);
-        return this;
+        return $(CASE);
     }
 
     public $ when() {
-        this.list.add(WHEN);
-        return this;
+        return $(WHEN);
     }
 
     public $ then() {
-        this.list.add(THEN);
-        return this;
+        return $(THEN);
     }
 
     public $ $else() {
-        this.list.add(ELSE);
-        return this;
-    }
-
-    public $ eq() {
-        this.list.add(EQ);
-        return this;
-    }
-
-    public $ gt() {
-        this.list.add(GT);
-        return this;
-    }
-
-    public $ lt() {
-        this.list.add(LT);
-        return this;
-    }
-
-    public $ gte() {
-        this.list.add(GTE);
-        return this;
-    }
-
-    public $ lte() {
-        this.list.add(LTE);
-        return this;
-    }
-
-    public $ neq() {
-        this.list.add(NEQ);
-        return this;
-    }
-
-    public $ isNull() {
-        this.list.add(IS_NULL);
-        return this;
-    }
-
-    public $ isNotNull() {
-        this.list.add(IS_NOT_NULL);
-        return this;
-    }
-
-    public $ eqNull() {
-        this.list.add(EQ_NULL);
-        return this;
-    }
-
-    public $ neqNull() {
-        this.list.add(NEQ_NULL);
-        return this;
+        return $(ELSE);
     }
 
     public $ end() {
-        this.list.add(END);
-        return this;
+        return $(END);
     }
 
-    public $ dot() {
-        this.list.add(DOT);
-        return this;
+    public $ from() {
+        return $(FROM);
     }
 
-    public $ comma() {
-        this.list.add(COMMA);
-        return this;
+    public $ join() {
+        return $(JOIN);
     }
 
-    public $ line() {
-        this.list.add(LINE);
-        return this;
+    public $ inner() {
+        return $(INNER);
     }
 
-    public $ space() {
-        this.list.add(SPACE);
-        return this;
+    public $ left() {
+        return $(LEFT);
     }
 
+    public $ right() {
+        return $(RIGHT);
+    }
 
+    public $ on() {
+        return $(ON);
+    }
+
+    public $ where() {
+        return $(WHERE);
+    }
+
+    public $ and() {
+        return $(AND);
+    }
+
+    public $ or() {
+        return $(OR);
+    }
+
+    public $ like() {
+        return $(LIKE);
+    }
+
+    public $ in() {
+        return $(IN);
+    }
+
+    public $ eq() {
+        return $(EQ);
+    }
+
+    public $ gt() {
+        return $(GT);
+    }
+
+    public $ lt() {
+        return $(LT);
+    }
+
+    public $ gte() {
+        return $(GTE);
+    }
+
+    public $ lte() {
+        return $(LTE);
+    }
+
+    public $ neq() {
+        return $(NEQ);
+    }
+
+    public $ group() {
+        return $(GROUP);
+    }
+
+    public $ by() {
+        return $(BY);
+    }
+
+    public $ having() {
+        return $(HAVING);
+    }
+
+    public $ order() {
+        return $(ORDER);
+    }
+
+    public $ asc() {
+        return $(ASC);
+    }
+
+    public $ desc() {
+        return $(DESC);
+    }
+
+    public $ limit() {
+        return $(LIMIT);
+    }
+
+    public $ insert() {
+        return $(INSERT);
+    }
+
+    public $ into() {
+        return $(INTO);
+    }
+
+    public $ values() {
+        return $(VALUES);
+    }
+
+    public $ union() {
+        return $(UNION);
+    }
+
+    public $ all() {
+        return $(ALL);
+    }
+
+    public $ update() {
+        return $(UPDATE);
+    }
+
+    public $ set() {
+        return $(SET);
+    }
+
+    public $ delete() {
+        return $(DELETE);
+    }
+
+    public $ create() {
+        return $(CREATE);
+    }
+
+    public $ table() {
+        return $(TABLE);
+    }
+
+    public $ view() {
+        return $(VIEW);
+    }
+
+    public $ index() {
+        return $(INDEX);
+    }
+
+    public $ drop() {
+        return $(DROP);
+    }
 }
