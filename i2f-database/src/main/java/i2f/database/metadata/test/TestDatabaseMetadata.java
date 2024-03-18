@@ -1,14 +1,8 @@
 package i2f.database.metadata.test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import i2f.database.jdbc.JdbcResolver;
 import i2f.database.jdbc.data.QueryResult;
 import i2f.database.metadata.DatabaseMetadataProvider;
-import i2f.database.metadata.impl.gbase.GbaseDatabaseMetadataProvider;
-import i2f.database.metadata.impl.mysql.MysqlDatabaseMetadataProvider;
-import i2f.database.metadata.impl.oracle.OracleDatabaseMetadataProvider;
-import i2f.database.metadata.impl.postgresql.PostgreSqlDatabaseMetadataProvider;
-import i2f.database.metadata.impl.sqlite3.Sqlite3DatabaseMetadataProvider;
 
 import java.sql.*;
 import java.util.*;
@@ -19,14 +13,9 @@ import java.util.*;
  * @desc
  */
 public class TestDatabaseMetadata {
-    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public static String json(Object obj) {
-        try {
-            return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage(), e);
-        }
+    public static String stringify(Object obj) {
+        return String.valueOf(obj);
     }
 
     public static void main(String[] args) throws Exception {
@@ -53,7 +42,7 @@ public class TestDatabaseMetadata {
         Class.forName("org.postgresql.Driver");
 
         Connection conn=DriverManager.getConnection("jdbc:postgresql://localhost:5432/test_db",
-                "postgres","ltb12315");
+                "postgres","123456");
 
         DatabaseMetadataProvider provider=DatabaseMetadataProvider.findProvider(conn);
 
@@ -74,19 +63,19 @@ public class TestDatabaseMetadata {
         System.out.println(metaData.getDriverVersion());
 
         System.out.println("-------------------------schemas------------------------------");
-        System.out.println(json(provider.getSchemas(conn)));
+        System.out.println(stringify(provider.getSchemas(conn)));
 
         System.out.println("--------------------------catalogs-----------------------------");
-        System.out.println(json(provider.getCatalogs(conn)));
+        System.out.println(stringify(provider.getCatalogs(conn)));
 
         System.out.println("--------------------------databases-----------------------------");
-        System.out.println(json(provider.getDatabases(conn)));
+        System.out.println(stringify(provider.getDatabases(conn)));
 
         System.out.println("--------------------------tables-----------------------------");
-        System.out.println(json(provider.getTables(conn,"test_db")));
+        System.out.println(stringify(provider.getTables(conn,"test_db")));
 
         System.out.println("---------------------table info----------------------------------");
-        System.out.println(json(provider.getTableInfo(conn,"test_db","sys_user")));
+        System.out.println(stringify(provider.getTableInfo(conn,"test_db","sys_user")));
 
         String sql="SELECT col.table_name, col.column_name, col.ordinal_position, d.description, \n" +
                 "col.table_catalog,col.table_schema, \n" +
@@ -105,7 +94,7 @@ public class TestDatabaseMetadata {
         stat.setString(2, "sys_user");
 
         System.out.println("-------------------------------------------------------");
-        System.out.println(json(JdbcResolver.parseResultSet(stat.executeQuery())));
+        System.out.println(stringify(JdbcResolver.parseResultSet(stat.executeQuery())));
         stat.close();
 
 
@@ -136,19 +125,19 @@ public class TestDatabaseMetadata {
         System.out.println(metaData.getDriverVersion());
 
         System.out.println("-------------------------schemas------------------------------");
-        System.out.println(json(provider.getSchemas(conn)));
+        System.out.println(stringify(provider.getSchemas(conn)));
 
         System.out.println("--------------------------catalogs-----------------------------");
-        System.out.println(json(provider.getCatalogs(conn)));
+        System.out.println(stringify(provider.getCatalogs(conn)));
 
         System.out.println("--------------------------databases-----------------------------");
-        System.out.println(json(provider.getDatabases(conn)));
+        System.out.println(stringify(provider.getDatabases(conn)));
 
         System.out.println("--------------------------tables-----------------------------");
-        System.out.println(json(provider.getTables(conn,null)));
+        System.out.println(stringify(provider.getTables(conn,null)));
 
         System.out.println("---------------------table info----------------------------------");
-        System.out.println(json(provider.getTableInfo(conn,null,"ce_dict")));
+        System.out.println(stringify(provider.getTableInfo(conn,null,"ce_dict")));
 
         if(true){
             String sql="PRAGMA table_info("+"sys_user"+")";
@@ -156,7 +145,7 @@ public class TestDatabaseMetadata {
             PreparedStatement stat = conn.prepareStatement(sql);
 
             System.out.println("-------------------------------------------------------");
-            System.out.println(json(JdbcResolver.parseResultSet(stat.executeQuery())));
+            System.out.println(stringify(JdbcResolver.parseResultSet(stat.executeQuery())));
             stat.close();
         }
 
@@ -171,7 +160,7 @@ public class TestDatabaseMetadata {
             QueryResult rs = JdbcResolver.parseResultSet(stat.executeQuery());
             stat.close();
 
-            System.out.println(json(rs));
+            System.out.println(stringify(rs));
         }
 
 
@@ -182,7 +171,7 @@ public class TestDatabaseMetadata {
         Class.forName("com.mysql.cj.jdbc.Driver");
 
         Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/i2f_proj?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false",
-                "root", "ltb12315");
+                "root", "123456");
 
 
         DatabaseMetadataProvider provider=DatabaseMetadataProvider.findProvider(conn);
@@ -204,19 +193,19 @@ public class TestDatabaseMetadata {
         System.out.println(metaData.getDriverVersion());
 
         System.out.println("-------------------------schemas------------------------------");
-        System.out.println(json(provider.getSchemas(conn)));
+        System.out.println(stringify(provider.getSchemas(conn)));
 
         System.out.println("--------------------------catalogs-----------------------------");
-        System.out.println(json(provider.getCatalogs(conn)));
+        System.out.println(stringify(provider.getCatalogs(conn)));
 
         System.out.println("--------------------------databases-----------------------------");
-        System.out.println(json(provider.getDatabases(conn)));
+        System.out.println(stringify(provider.getDatabases(conn)));
 
         System.out.println("--------------------------tables-----------------------------");
-        System.out.println(json(provider.getTables(conn,"i2f_proj")));
+        System.out.println(stringify(provider.getTables(conn,"i2f_proj")));
 
         System.out.println("---------------------table info----------------------------------");
-        System.out.println(json(provider.getTableInfo(conn,"i2f_proj","sys_user")));
+        System.out.println(stringify(provider.getTableInfo(conn,"i2f_proj","sys_user")));
 
         String sql = "select *\n" +
                 "from information_schema.COLUMNS\n" +
@@ -229,7 +218,7 @@ public class TestDatabaseMetadata {
         stat.setString(2, "sys_user");
 
         System.out.println("-------------------------------------------------------");
-        System.out.println(json(JdbcResolver.parseResultSet(stat.executeQuery())));
+        System.out.println(stringify(JdbcResolver.parseResultSet(stat.executeQuery())));
         stat.close();
 
 
@@ -239,8 +228,8 @@ public class TestDatabaseMetadata {
     public static void parseGbase() throws Exception {
         Class.forName("com.gbase.jdbc.Driver");
 
-        Connection conn = DriverManager.getConnection("jdbc:gbase://10.1.12.107:5258/spsv_dev",
-                "seds_dev", "4OXdKZ0L");
+        Connection conn = DriverManager.getConnection("jdbc:gbase://localhost:5258/test_db",
+                "test_db", "123456");
 
 
         DatabaseMetadataProvider provider=DatabaseMetadataProvider.findProvider(conn);
@@ -262,19 +251,19 @@ public class TestDatabaseMetadata {
         System.out.println(metaData.getDriverVersion());
 
         System.out.println("-------------------------schemas------------------------------");
-        System.out.println(json(provider.getSchemas(conn)));
+        System.out.println(stringify(provider.getSchemas(conn)));
 
         System.out.println("--------------------------catalogs-----------------------------");
-        System.out.println(json(provider.getCatalogs(conn)));
+        System.out.println(stringify(provider.getCatalogs(conn)));
 
         System.out.println("--------------------------databases-----------------------------");
-        System.out.println(json(provider.getDatabases(conn)));
+        System.out.println(stringify(provider.getDatabases(conn)));
 
         System.out.println("--------------------------tables-----------------------------");
-        System.out.println(json(provider.getTables(conn,"spsv_dev")));
+        System.out.println(stringify(provider.getTables(conn,"spsv_dev")));
 
         System.out.println("---------------------table info----------------------------------");
-        System.out.println(json(provider.getTableInfo(conn,"spsv_dev","sys_config_item")));
+        System.out.println(stringify(provider.getTableInfo(conn,"spsv_dev","sys_config_item")));
 
         String sql = "select *\n" +
                 "from information_schema.COLUMNS\n" +
@@ -287,7 +276,7 @@ public class TestDatabaseMetadata {
         stat.setString(2, "dwd_uuser");
 
         System.out.println("-------------------------------------------------------");
-        System.out.println(json(JdbcResolver.parseResultSet(stat.executeQuery())));
+        System.out.println(stringify(JdbcResolver.parseResultSet(stat.executeQuery())));
         stat.close();
 
 
@@ -298,8 +287,8 @@ public class TestDatabaseMetadata {
 
         Class.forName("oracle.jdbc.OracleDriver");
 
-        Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@10.1.12.67:1521/orcl",
-                "spsv_dev", "newland123");
+        Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521/orcl",
+                "test_db", "123456");
 
         DatabaseMetadataProvider provider=DatabaseMetadataProvider.findProvider(conn);
 
@@ -320,19 +309,19 @@ public class TestDatabaseMetadata {
         System.out.println(metaData.getDriverVersion());
 
         System.out.println("-------------------------schemas------------------------------");
-        System.out.println(json(provider.getSchemas(conn)));
+        System.out.println(stringify(provider.getSchemas(conn)));
 
         System.out.println("--------------------------catalogs-----------------------------");
-        System.out.println(json(provider.getCatalogs(conn)));
+        System.out.println(stringify(provider.getCatalogs(conn)));
 
         System.out.println("--------------------------databases-----------------------------");
-        System.out.println(json(provider.getDatabases(conn)));
+        System.out.println(stringify(provider.getDatabases(conn)));
 
         System.out.println("--------------------------tables-----------------------------");
-        System.out.println(json(provider.getTables(conn,"SPSV_DEV")));
+        System.out.println(stringify(provider.getTables(conn,"SPSV_DEV")));
 
         System.out.println("---------------------table info----------------------------------");
-        System.out.println(json(provider.getTableInfo(conn,"SPSV_DEV","SPSV_ENTITY")));
+        System.out.println(stringify(provider.getTableInfo(conn,"SPSV_DEV","SPSV_ENTITY")));
 
         String sql = "SELECT a.* FROM ALL_COL_COMMENTS a\n" +
                 "\tLEFT JOIN ALL_TAB_COLUMNS b ON a.OWNER = b.OWNER AND a.TABLE_NAME =b.TABLE_NAME AND a.COLUMN_NAME =b.COLUMN_NAME \n" +
@@ -345,7 +334,7 @@ public class TestDatabaseMetadata {
         stat.setString(2, "SYS_USER");
 
         System.out.println("-------------------------------------------------------");
-        System.out.println(json(JdbcResolver.parseResultSet(stat.executeQuery())));
+        System.out.println(stringify(JdbcResolver.parseResultSet(stat.executeQuery())));
         stat.close();
 
 

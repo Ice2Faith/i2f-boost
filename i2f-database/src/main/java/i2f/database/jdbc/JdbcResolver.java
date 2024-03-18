@@ -3,11 +3,9 @@ package i2f.database.jdbc;
 import i2f.database.jdbc.data.BindSql;
 import i2f.database.jdbc.data.QueryColumn;
 import i2f.database.jdbc.data.QueryResult;
-import org.apache.poi.ss.formula.functions.T;
 
 import java.sql.*;
 import java.util.*;
-import java.util.function.Function;
 
 /**
  * @author Ice2Faith
