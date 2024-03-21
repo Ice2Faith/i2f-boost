@@ -1,6 +1,8 @@
 package i2f.database.metadata.impl.base;
 
 import i2f.database.jdbc.JdbcResolver;
+import i2f.database.jdbc.data.BindSql;
+import i2f.database.jdbc.data.QueryColumn;
 import i2f.database.jdbc.data.QueryResult;
 import i2f.database.jdbc.data.StdType;
 import i2f.database.metadata.DatabaseMetadataProvider;
@@ -8,7 +10,9 @@ import i2f.database.metadata.data.ColumnMeta;
 import i2f.database.metadata.data.IndexColumnMeta;
 import i2f.database.metadata.data.IndexMeta;
 import i2f.database.metadata.data.TableMeta;
-import org.apache.commons.collections4.map.HashedMap;
+import i2f.database.metadata.impl.mysql.MySqlType;
+import i2f.database.metadata.impl.oracle.OracleType;
+import i2f.database.metadata.impl.postgresql.PostgreSqlType;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -184,7 +188,7 @@ public abstract class BaseDatabaseMetadataProvider implements DatabaseMetadataPr
     }
 
     public Map<String,String> getTablesCommentMap(Connection conn,String database) throws SQLException {
-        Map<String,String> map=new HashedMap<>();
+        Map<String,String> map=new HashMap<>();
         QueryResult queryResult = getTablesComment(conn, database);
         for (Map<String, Object> row : queryResult.getRows()) {
             String name = extractTablesCommentTableName(row);
@@ -370,7 +374,7 @@ public abstract class BaseDatabaseMetadataProvider implements DatabaseMetadataPr
     }
 
     public Map<String, String> getColumnsCommentMap(Connection conn, String database, String table) throws SQLException {
-        Map<String,String> map=new HashedMap<>();
+        Map<String,String> map=new HashMap<>();
         QueryResult queryResult = getColumnsComment(conn, database,table);
         for (Map<String, Object> row : queryResult.getRows()) {
             String name = extractColumnsCommentColumnName(row);
@@ -436,6 +440,117 @@ public abstract class BaseDatabaseMetadataProvider implements DatabaseMetadataPr
                 break;
         }
         return "";
+    }
+
+    @Override
+    public TableMeta getTableInfoByQuery(QueryResult result) throws SQLException {
+        TableMeta ret=new TableMeta();
+        ret.setColumns(new ArrayList<>());
+
+        Map<String, StdType> typeMap = new HashMap<>();
+        for (PostgreSqlType item : PostgreSqlType.values()) {
+            typeMap.put(item.text(), item.stdType());
+        }
+        for (OracleType item : OracleType.values()) {
+            typeMap.put(item.text(), item.stdType());
+        }
+        for (MySqlType item : MySqlType.values()) {
+            typeMap.put(item.text(), item.stdType());
+        }
+
+        for (QueryColumn column : result.getColumns()) {
+            ColumnMeta meta=new ColumnMeta();
+            meta.setIndex(column.getIndex());
+            meta.setName(column.getName());
+            meta.setType(column.getTypeName());
+            if (meta.getType() != null) {
+                meta.setType(meta.getType().split("\\(", 2)[0]);
+            }
+            meta.setComment(null);
+
+            meta.setPrecision(column.getPrecision());
+            meta.setScale(column.getScale());
+
+            meta.setNullable(column.isNullable());
+            meta.setAutoIncrement(column.isAutoIncrement());
+            meta.setGenerated(false);
+            meta.setDefaultValue(null);
+
+
+
+            StdType type = StdType.VARCHAR;
+            for (Map.Entry<String, StdType> entry : typeMap.entrySet()) {
+                if (entry.getKey().equalsIgnoreCase(meta.getType())) {
+                    type = entry.getValue();
+                    break;
+                }
+            }
+
+            String columnType = meta.getType();
+
+            if (type.precision()) {
+                columnType += "(" + meta.getPrecision();
+                if (type.scale()) {
+                    columnType += "," + meta.getScale();
+                }
+                columnType += ")";
+            }
+
+            meta.setColumnType(columnType);
+
+            meta.setJavaType(type.javaType().getSimpleName());
+            meta.setJdbcType(type.jdbcType().getName());
+            meta.setStdType(type.text());
+            meta.setLooseJavaType(type.looseJavaType().getSimpleName());
+            meta.setLooseJdbcType(type.looseJdbcType().getName());
+
+            ret.getColumns().add(meta);
+        }
+
+        return ret;
+    }
+
+    @Override
+    public TableMeta getTableInfoByQuery(ResultSet rs) throws SQLException {
+        QueryResult result = JdbcResolver.parseResultSet(rs);
+        return getTableInfoByQuery(result);
+    }
+
+    @Override
+    public TableMeta getTableInfoByQuery(Connection conn, String table) throws SQLException {
+        if(table==null || "".equals(table)){
+            throw new SQLException("bad table name found is : "+ table);
+        }
+        if(!table.matches("[a-zA-Z0-9\\_\\-`\"\\.\\$]+")){
+            throw new SQLException("bad table name found is : "+ table);
+        }
+        String sql="select * from "+table + " where 1=2";
+        QueryResult rs = JdbcResolver.query(conn, new BindSql(sql));
+        TableMeta ret= getTableInfoByQuery(rs);
+        String tableName=table;
+        String schemaName=null;
+        int idx=table.indexOf(".");
+        if(idx>=0){
+            tableName=table.substring(idx+1);
+            schemaName=tableName.substring(0,idx);
+        }
+        if(tableName!=null){
+            if(tableName.startsWith("`")
+            || tableName.startsWith("\"")){
+                tableName=tableName.substring(1,tableName.length()-1);
+            }
+        }
+        if(schemaName!=null){
+            if(schemaName.startsWith("`")
+                    || schemaName.startsWith("\"")){
+                schemaName=schemaName.substring(1,schemaName.length()-1);
+            }
+        }
+        ret.setName(tableName);
+        ret.setSchema(schemaName);
+        ret.setCatalog(schemaName);
+        ret.setType("TABLE");
+        return ret;
     }
 
     @FunctionalInterface

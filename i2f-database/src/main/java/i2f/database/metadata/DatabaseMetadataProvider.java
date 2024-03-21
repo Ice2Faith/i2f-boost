@@ -1,5 +1,6 @@
 package i2f.database.metadata;
 
+import i2f.database.jdbc.data.QueryResult;
 import i2f.database.metadata.data.TableMeta;
 import i2f.database.metadata.impl.gbase.GbaseDatabaseMetadataProvider;
 import i2f.database.metadata.impl.mysql.MysqlDatabaseMetadataProvider;
@@ -9,6 +10,7 @@ import i2f.database.metadata.impl.sqlite3.Sqlite3DatabaseMetadataProvider;
 
 import java.sql.Connection;
 import java.sql.Driver;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,4 +76,9 @@ public interface DatabaseMetadataProvider {
 
     TableMeta getTableInfo(Connection conn,String database,String table) throws SQLException;
 
+    TableMeta getTableInfoByQuery(QueryResult result) throws SQLException;
+
+    TableMeta getTableInfoByQuery(ResultSet rs) throws SQLException;
+
+    TableMeta getTableInfoByQuery(Connection conn,String table) throws SQLException;
 }

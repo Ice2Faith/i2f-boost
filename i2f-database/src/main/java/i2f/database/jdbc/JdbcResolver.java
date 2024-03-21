@@ -6,6 +6,7 @@ import i2f.database.jdbc.data.QueryResult;
 
 import java.sql.*;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * @author Ice2Faith
@@ -265,6 +266,10 @@ public class JdbcResolver {
     }
 
     public static QueryResult parseResultSet(ResultSet rs) throws SQLException {
+        return parseResultSet(rs, null);
+    }
+
+    public static QueryResult parseResultSet(ResultSet rs, Function<String, String> columnNameMapper) throws SQLException {
         QueryResult ret = new QueryResult();
         List<QueryColumn> columns = new ArrayList<>();
         List<Map<String, Object>> rows = new LinkedList<>();
@@ -276,7 +281,11 @@ public class JdbcResolver {
         for (int i = 0; i < columnCount; i++) {
             QueryColumn col = new QueryColumn();
             col.setIndex(i);
-            col.setName(metaData.getColumnName(i + 1));
+            String colName=metaData.getColumnName(i + 1);
+            if(columnNameMapper!=null) {
+                colName=columnNameMapper.apply(colName);
+            }
+            col.setName(colName);
             col.setCatalog(metaData.getCatalogName(i + 1));
             col.setClazzName(metaData.getColumnClassName(i + 1));
             col.setDisplaySize(metaData.getColumnDisplaySize(i + 1));
