@@ -73,6 +73,7 @@
         <module>i2f-database</module>
         <module>i2f-query</module>
         <module>i2f-workflow</module>
+        <module>i2f-websocket</module>
 
     </modules>
 

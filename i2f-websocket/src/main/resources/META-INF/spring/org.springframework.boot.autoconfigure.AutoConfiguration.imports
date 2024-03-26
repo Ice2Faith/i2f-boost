@@ -1,0 +1,2 @@
+i2f.websocket.impl.JsonWebsocketConfigurer
+i2f.websocket.impl.TestWebsocketMessageHandler
