@@ -74,6 +74,7 @@
         <module>i2f-query</module>
         <module>i2f-workflow</module>
         <module>i2f-websocket</module>
+        <module>i2f-jce</module>
 
     </modules>
 
