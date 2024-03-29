@@ -42,177 +42,119 @@ public class FunctionalDelegator<U> {
         this.delegator = delegator;
     }
 
-    public U delegate(IFunctional val){
+    public U get(IFunctional val){
         return delegator.apply(val);
     }
 
     //////////////////////////////////////////////////////////////////////////////////
 
-    public U delegate(IVoidFunctional val){
+    public U get(IVoidFunctional val){
         return delegator.apply(val);
     }
 
     //////////////////////////////////////////////////////////////////////////////////
 
-    public U delegate(IConsumer val){
+    public U get(IConsumer val){
         return delegator.apply(val);
     }
 
-    public U delegate(IConsumer0 val){
+    public U get(IConsumer0 val){
         return delegator.apply(val);
     }
 
-    public<V1> U delegate(IConsumer1<V1> val){
+    public<V1> U get(IConsumer1<V1> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2> U delegate(IConsumer2<V1,V2> val){
+    public<V1,V2> U get(IConsumer2<V1,V2> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3> U delegate(IConsumer3<V1,V2,V3> val){
+    public<V1,V2,V3> U get(IConsumer3<V1,V2,V3> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4> U delegate(IConsumer4<V1,V2,V3,V4> val){
+    public<V1,V2,V3,V4> U get(IConsumer4<V1,V2,V3,V4> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5> U delegate(IConsumer5<V1,V2,V3,V4,V5> val){
+    public<V1,V2,V3,V4,V5> U get(IConsumer5<V1,V2,V3,V4,V5> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5,V6> U delegate(IConsumer6<V1,V2,V3,V4,V5,V6> val){
+    public<V1,V2,V3,V4,V5,V6> U get(IConsumer6<V1,V2,V3,V4,V5,V6> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5,V6,V7> U delegate(IConsumer7<V1,V2,V3,V4,V5,V6,V7> val){
+    public<V1,V2,V3,V4,V5,V6,V7> U get(IConsumer7<V1,V2,V3,V4,V5,V6,V7> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5,V6,V7,V8> U delegate(IConsumer8<V1,V2,V3,V4,V5,V6,V7,V8> val){
+    public<V1,V2,V3,V4,V5,V6,V7,V8> U get(IConsumer8<V1,V2,V3,V4,V5,V6,V7,V8> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5,V6,V7,V8,V9> U delegate(IConsumer9<V1,V2,V3,V4,V5,V6,V7,V8,V9> val){
+    public<V1,V2,V3,V4,V5,V6,V7,V8,V9> U get(IConsumer9<V1,V2,V3,V4,V5,V6,V7,V8,V9> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> U delegate(IConsumer10<V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> val){
-        return delegator.apply(val);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////
-
-    public U delegate(IIntFunctional val){
+    public<V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> U get(IConsumer10<V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> val){
         return delegator.apply(val);
     }
 
     //////////////////////////////////////////////////////////////////////////////////
 
-    public U delegate(IComparator val){
-        return delegator.apply(val);
-    }
-
-    public U delegate(IComparator0 val){
-        return delegator.apply(val);
-    }
-
-    public<V1> U delegate(IComparator1<V1> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2> U delegate(IComparator2<V1,V2> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3> U delegate(IComparator3<V1,V2,V3> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4> U delegate(IComparator4<V1,V2,V3,V4> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5> U delegate(IComparator5<V1,V2,V3,V4,V5> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5,V6> U delegate(IComparator6<V1,V2,V3,V4,V5,V6> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5,V6,V7> U delegate(IComparator7<V1,V2,V3,V4,V5,V6,V7> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5,V6,V7,V8> U delegate(IComparator8<V1,V2,V3,V4,V5,V6,V7,V8> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5,V6,V7,V8,V9> U delegate(IComparator9<V1,V2,V3,V4,V5,V6,V7,V8,V9> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> U delegate(IComparator10<V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> val){
+    public U get(IIntFunctional val){
         return delegator.apply(val);
     }
 
     //////////////////////////////////////////////////////////////////////////////////
 
-
-
-    public U delegate(IBoolFunctional val){
+    public U get(IComparator val){
         return delegator.apply(val);
     }
 
-    //////////////////////////////////////////////////////////////////////////////////
-
-    public U delegate(IPredicate val){
+    public U get(IComparator0 val){
         return delegator.apply(val);
     }
 
-    public U delegate(IPredicate0 val){
+    public<V1> U get(IComparator1<V1> val){
         return delegator.apply(val);
     }
 
-    public<V1> U delegate(IPredicate1<V1> val){
+    public<V1,V2> U get(IComparator2<V1,V2> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2> U delegate(IPredicate2<V1,V2> val){
+    public<V1,V2,V3> U get(IComparator3<V1,V2,V3> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3> U delegate(IPredicate3<V1,V2,V3> val){
+    public<V1,V2,V3,V4> U get(IComparator4<V1,V2,V3,V4> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4> U delegate(IPredicate4<V1,V2,V3,V4> val){
+    public<V1,V2,V3,V4,V5> U get(IComparator5<V1,V2,V3,V4,V5> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5> U delegate(IPredicate5<V1,V2,V3,V4,V5> val){
+    public<V1,V2,V3,V4,V5,V6> U get(IComparator6<V1,V2,V3,V4,V5,V6> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5,V6> U delegate(IPredicate6<V1,V2,V3,V4,V5,V6> val){
+    public<V1,V2,V3,V4,V5,V6,V7> U get(IComparator7<V1,V2,V3,V4,V5,V6,V7> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5,V6,V7> U delegate(IPredicate7<V1,V2,V3,V4,V5,V6,V7> val){
+    public<V1,V2,V3,V4,V5,V6,V7,V8> U get(IComparator8<V1,V2,V3,V4,V5,V6,V7,V8> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5,V6,V7,V8> U delegate(IPredicate8<V1,V2,V3,V4,V5,V6,V7,V8> val){
+    public<V1,V2,V3,V4,V5,V6,V7,V8,V9> U get(IComparator9<V1,V2,V3,V4,V5,V6,V7,V8,V9> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5,V6,V7,V8,V9> U delegate(IPredicate9<V1,V2,V3,V4,V5,V6,V7,V8,V9> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> U delegate(IPredicate10<V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> val){
+    public<V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> U get(IComparator10<V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> val){
         return delegator.apply(val);
     }
 
@@ -220,121 +162,57 @@ public class FunctionalDelegator<U> {
 
 
 
-
-    public U delegate(IObjectFunctional val){
+    public U get(IBoolFunctional val){
         return delegator.apply(val);
     }
 
     //////////////////////////////////////////////////////////////////////////////////
 
-    public U delegate(IFunction val){
+    public U get(IPredicate val){
         return delegator.apply(val);
     }
 
-    public<R> U delegate(IFunction0<R> val){
+    public U get(IPredicate0 val){
         return delegator.apply(val);
     }
 
-    public<R,V1> U delegate(IFunction1<R,V1> val){
+    public<V1> U get(IPredicate1<V1> val){
         return delegator.apply(val);
     }
 
-    public<R,V1,V2> U delegate(IFunction2<R,V1,V2> val){
+    public<V1,V2> U get(IPredicate2<V1,V2> val){
         return delegator.apply(val);
     }
 
-    public<R,V1,V2,V3> U delegate(IFunction3<R,V1,V2,V3> val){
+    public<V1,V2,V3> U get(IPredicate3<V1,V2,V3> val){
         return delegator.apply(val);
     }
 
-    public<R,V1,V2,V3,V4> U delegate(IFunction4<R,V1,V2,V3,V4> val){
+    public<V1,V2,V3,V4> U get(IPredicate4<V1,V2,V3,V4> val){
         return delegator.apply(val);
     }
 
-    public<R,V1,V2,V3,V4,V5> U delegate(IFunction5<R,V1,V2,V3,V4,V5> val){
+    public<V1,V2,V3,V4,V5> U get(IPredicate5<V1,V2,V3,V4,V5> val){
         return delegator.apply(val);
     }
 
-    public<R,V1,V2,V3,V4,V5,V6> U delegate(IFunction6<R,V1,V2,V3,V4,V5,V6> val){
+    public<V1,V2,V3,V4,V5,V6> U get(IPredicate6<V1,V2,V3,V4,V5,V6> val){
         return delegator.apply(val);
     }
 
-    public<R,V1,V2,V3,V4,V5,V6,V7> U delegate(IFunction7<R,V1,V2,V3,V4,V5,V6,V7> val){
+    public<V1,V2,V3,V4,V5,V6,V7> U get(IPredicate7<V1,V2,V3,V4,V5,V6,V7> val){
         return delegator.apply(val);
     }
 
-    public<R,V1,V2,V3,V4,V5,V6,V7,V8> U delegate(IFunction8<R,V1,V2,V3,V4,V5,V6,V7,V8> val){
+    public<V1,V2,V3,V4,V5,V6,V7,V8> U get(IPredicate8<V1,V2,V3,V4,V5,V6,V7,V8> val){
         return delegator.apply(val);
     }
 
-    public<R,V1,V2,V3,V4,V5,V6,V7,V8,V9> U delegate(IFunction9<R,V1,V2,V3,V4,V5,V6,V7,V8,V9> val){
+    public<V1,V2,V3,V4,V5,V6,V7,V8,V9> U get(IPredicate9<V1,V2,V3,V4,V5,V6,V7,V8,V9> val){
         return delegator.apply(val);
     }
 
-    public<R,V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> U delegate(IFunction10<R,V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> val){
-        return delegator.apply(val);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////
-
-
-    public U delegate(ICharFunction val){
-        return delegator.apply(val);
-    }
-
-    public U delegate(ICharFunction0 val){
-        return delegator.apply(val);
-    }
-
-    public<V1> U delegate(ICharFunction1<V1> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2> U delegate(ICharFunction2<V1,V2> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3> U delegate(ICharFunction3<V1,V2,V3> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4> U delegate(ICharFunction4<V1,V2,V3,V4> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5> U delegate(ICharFunction5<V1,V2,V3,V4,V5> val){
-        return delegator.apply(val);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////
-
-
-
-    public U delegate(IByteFunction val){
-        return delegator.apply(val);
-    }
-
-    public U delegate(IByteFunction0 val){
-        return delegator.apply(val);
-    }
-
-    public<V1> U delegate(IByteFunction1<V1> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2> U delegate(IByteFunction2<V1,V2> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3> U delegate(IByteFunction3<V1,V2,V3> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4> U delegate(IByteFunction4<V1,V2,V3,V4> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5> U delegate(IByteFunction5<V1,V2,V3,V4,V5> val){
+    public<V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> U get(IPredicate10<V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> val){
         return delegator.apply(val);
     }
 
@@ -343,31 +221,120 @@ public class FunctionalDelegator<U> {
 
 
 
-    public U delegate(IShortFunction val){
+    public U get(IObjectFunctional val){
         return delegator.apply(val);
     }
 
-    public U delegate(IShortFunction0 val){
+    //////////////////////////////////////////////////////////////////////////////////
+
+    public U get(IFunction val){
         return delegator.apply(val);
     }
 
-    public<V1> U delegate(IShortFunction1<V1> val){
+    public<R> U get(IFunction0<R> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2> U delegate(IShortFunction2<V1,V2> val){
+    public<R,V1> U get(IFunction1<R,V1> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3> U delegate(IShortFunction3<V1,V2,V3> val){
+    public<R,V1,V2> U get(IFunction2<R,V1,V2> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4> U delegate(IShortFunction4<V1,V2,V3,V4> val){
+    public<R,V1,V2,V3> U get(IFunction3<R,V1,V2,V3> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5> U delegate(IShortFunction5<V1,V2,V3,V4,V5> val){
+    public<R,V1,V2,V3,V4> U get(IFunction4<R,V1,V2,V3,V4> val){
+        return delegator.apply(val);
+    }
+
+    public<R,V1,V2,V3,V4,V5> U get(IFunction5<R,V1,V2,V3,V4,V5> val){
+        return delegator.apply(val);
+    }
+
+    public<R,V1,V2,V3,V4,V5,V6> U get(IFunction6<R,V1,V2,V3,V4,V5,V6> val){
+        return delegator.apply(val);
+    }
+
+    public<R,V1,V2,V3,V4,V5,V6,V7> U get(IFunction7<R,V1,V2,V3,V4,V5,V6,V7> val){
+        return delegator.apply(val);
+    }
+
+    public<R,V1,V2,V3,V4,V5,V6,V7,V8> U get(IFunction8<R,V1,V2,V3,V4,V5,V6,V7,V8> val){
+        return delegator.apply(val);
+    }
+
+    public<R,V1,V2,V3,V4,V5,V6,V7,V8,V9> U get(IFunction9<R,V1,V2,V3,V4,V5,V6,V7,V8,V9> val){
+        return delegator.apply(val);
+    }
+
+    public<R,V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> U get(IFunction10<R,V1,V2,V3,V4,V5,V6,V7,V8,V9,V10> val){
+        return delegator.apply(val);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+
+    public U get(ICharFunction val){
+        return delegator.apply(val);
+    }
+
+    public U get(ICharFunction0 val){
+        return delegator.apply(val);
+    }
+
+    public<V1> U get(ICharFunction1<V1> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2> U get(ICharFunction2<V1,V2> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3> U get(ICharFunction3<V1,V2,V3> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4> U get(ICharFunction4<V1,V2,V3,V4> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4,V5> U get(ICharFunction5<V1,V2,V3,V4,V5> val){
+        return delegator.apply(val);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+
+
+    public U get(IByteFunction val){
+        return delegator.apply(val);
+    }
+
+    public U get(IByteFunction0 val){
+        return delegator.apply(val);
+    }
+
+    public<V1> U get(IByteFunction1<V1> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2> U get(IByteFunction2<V1,V2> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3> U get(IByteFunction3<V1,V2,V3> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4> U get(IByteFunction4<V1,V2,V3,V4> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4,V5> U get(IByteFunction5<V1,V2,V3,V4,V5> val){
         return delegator.apply(val);
     }
 
@@ -376,64 +343,31 @@ public class FunctionalDelegator<U> {
 
 
 
-    public U delegate(ILongFunction val){
+    public U get(IShortFunction val){
         return delegator.apply(val);
     }
 
-    public U delegate(ILongFunction0 val){
+    public U get(IShortFunction0 val){
         return delegator.apply(val);
     }
 
-    public<V1> U delegate(ILongFunction1<V1> val){
+    public<V1> U get(IShortFunction1<V1> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2> U delegate(ILongFunction2<V1,V2> val){
+    public<V1,V2> U get(IShortFunction2<V1,V2> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3> U delegate(ILongFunction3<V1,V2,V3> val){
+    public<V1,V2,V3> U get(IShortFunction3<V1,V2,V3> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4> U delegate(ILongFunction4<V1,V2,V3,V4> val){
+    public<V1,V2,V3,V4> U get(IShortFunction4<V1,V2,V3,V4> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5> U delegate(ILongFunction5<V1,V2,V3,V4,V5> val){
-        return delegator.apply(val);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-    public U delegate(IFloatFunction val){
-        return delegator.apply(val);
-    }
-
-    public U delegate(IFloatFunction0 val){
-        return delegator.apply(val);
-    }
-
-    public<V1> U delegate(IFloatFunction1<V1> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2> U delegate(IFloatFunction2<V1,V2> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3> U delegate(IFloatFunction3<V1,V2,V3> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4> U delegate(IFloatFunction4<V1,V2,V3,V4> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5> U delegate(IFloatFunction5<V1,V2,V3,V4,V5> val){
+    public<V1,V2,V3,V4,V5> U get(IShortFunction5<V1,V2,V3,V4,V5> val){
         return delegator.apply(val);
     }
 
@@ -442,194 +376,31 @@ public class FunctionalDelegator<U> {
 
 
 
-    public U delegate(IDoubleFunction val){
+    public U get(ILongFunction val){
         return delegator.apply(val);
     }
 
-    public U delegate(IDoubleFunction0 val){
+    public U get(ILongFunction0 val){
         return delegator.apply(val);
     }
 
-    public<V1> U delegate(IDoubleFunction1<V1> val){
+    public<V1> U get(ILongFunction1<V1> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2> U delegate(IDoubleFunction2<V1,V2> val){
+    public<V1,V2> U get(ILongFunction2<V1,V2> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3> U delegate(IDoubleFunction3<V1,V2,V3> val){
+    public<V1,V2,V3> U get(ILongFunction3<V1,V2,V3> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4> U delegate(IDoubleFunction4<V1,V2,V3,V4> val){
+    public<V1,V2,V3,V4> U get(ILongFunction4<V1,V2,V3,V4> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5> U delegate(IDoubleFunction5<V1,V2,V3,V4,V5> val){
-        return delegator.apply(val);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////
-
-
-    public U delegate(IArrayFunction val){
-        return delegator.apply(val);
-    }
-
-
-
-    public U delegate(IIntArrayFunction val){
-        return delegator.apply(val);
-    }
-
-    public U delegate(IIntArrayFunction0 val){
-        return delegator.apply(val);
-    }
-
-    public<V1> U delegate(IIntArrayFunction1<V1> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2> U delegate(IIntArrayFunction2<V1,V2> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3> U delegate(IIntArrayFunction3<V1,V2,V3> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4> U delegate(IIntArrayFunction4<V1,V2,V3,V4> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5> U delegate(IIntArrayFunction5<V1,V2,V3,V4,V5> val){
-        return delegator.apply(val);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////
-
-
-
-    public U delegate(IObjectArrayFunction val){
-        return delegator.apply(val);
-    }
-
-    public<T> U delegate(IObjectArrayFunction0<T> val){
-        return delegator.apply(val);
-    }
-
-    public<T,V1> U delegate(IObjectArrayFunction1<T,V1> val){
-        return delegator.apply(val);
-    }
-
-    public<T,V1,V2> U delegate(IObjectArrayFunction2<T,V1,V2> val){
-        return delegator.apply(val);
-    }
-
-    public<T,V1,V2,V3> U delegate(IObjectArrayFunction3<T,V1,V2,V3> val){
-        return delegator.apply(val);
-    }
-
-    public<T,V1,V2,V3,V4> U delegate(IObjectArrayFunction4<T,V1,V2,V3,V4> val){
-        return delegator.apply(val);
-    }
-
-    public<T,V1,V2,V3,V4,V5> U delegate(IObjectArrayFunction5<T,V1,V2,V3,V4,V5> val){
-        return delegator.apply(val);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////
-
-    public U delegate(ILongArrayFunction val){
-        return delegator.apply(val);
-    }
-
-    public U delegate(ILongArrayFunction0 val){
-        return delegator.apply(val);
-    }
-
-    public<V1> U delegate(ILongArrayFunction1<V1> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2> U delegate(ILongArrayFunction2<V1,V2> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3> U delegate(ILongArrayFunction3<V1,V2,V3> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4> U delegate(ILongArrayFunction4<V1,V2,V3,V4> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5> U delegate(ILongArrayFunction5<V1,V2,V3,V4,V5> val){
-        return delegator.apply(val);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////
-
-
-
-    public U delegate(IDoubleArrayFunction val){
-        return delegator.apply(val);
-    }
-
-    public U delegate(IDoubleArrayFunction0 val){
-        return delegator.apply(val);
-    }
-
-    public<V1> U delegate(IDoubleArrayFunction1<V1> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2> U delegate(IDoubleArrayFunction2<V1,V2> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3> U delegate(IDoubleArrayFunction3<V1,V2,V3> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4> U delegate(IDoubleArrayFunction4<V1,V2,V3,V4> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5> U delegate(IDoubleArrayFunction5<V1,V2,V3,V4,V5> val){
-        return delegator.apply(val);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////
-
-
-
-    public U delegate(ICharArrayFunction val){
-        return delegator.apply(val);
-    }
-
-    public U delegate(ICharArrayFunction0 val){
-        return delegator.apply(val);
-    }
-
-    public<V1> U delegate(ICharArrayFunction1<V1> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2> U delegate(ICharArrayFunction2<V1,V2> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3> U delegate(ICharArrayFunction3<V1,V2,V3> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4> U delegate(ICharArrayFunction4<V1,V2,V3,V4> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5> U delegate(ICharArrayFunction5<V1,V2,V3,V4,V5> val){
+    public<V1,V2,V3,V4,V5> U get(ILongFunction5<V1,V2,V3,V4,V5> val){
         return delegator.apply(val);
     }
 
@@ -638,63 +409,31 @@ public class FunctionalDelegator<U> {
 
 
 
-    public U delegate(IBoolArrayFunction val){
+    public U get(IFloatFunction val){
         return delegator.apply(val);
     }
 
-    public U delegate(IBoolArrayFunction0 val){
+    public U get(IFloatFunction0 val){
         return delegator.apply(val);
     }
 
-    public<V1> U delegate(IBoolArrayFunction1<V1> val){
+    public<V1> U get(IFloatFunction1<V1> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2> U delegate(IBoolArrayFunction2<V1,V2> val){
+    public<V1,V2> U get(IFloatFunction2<V1,V2> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3> U delegate(IBoolArrayFunction3<V1,V2,V3> val){
+    public<V1,V2,V3> U get(IFloatFunction3<V1,V2,V3> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4> U delegate(IBoolArrayFunction4<V1,V2,V3,V4> val){
+    public<V1,V2,V3,V4> U get(IFloatFunction4<V1,V2,V3,V4> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5> U delegate(IBoolArrayFunction5<V1,V2,V3,V4,V5> val){
-        return delegator.apply(val);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////
-
-
-
-    public U delegate(IShortArrayFunction val){
-        return delegator.apply(val);
-    }
-
-    public U delegate(IShortArrayFunction0 val){
-        return delegator.apply(val);
-    }
-
-    public<V1> U delegate(IShortArrayFunction1<V1> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2> U delegate(IShortArrayFunction2<V1,V2> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3> U delegate(IShortArrayFunction3<V1,V2,V3> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4> U delegate(IShortArrayFunction4<V1,V2,V3,V4> val){
-        return delegator.apply(val);
-    }
-
-    public<V1,V2,V3,V4,V5> U delegate(IShortArrayFunction5<V1,V2,V3,V4,V5> val){
+    public<V1,V2,V3,V4,V5> U get(IFloatFunction5<V1,V2,V3,V4,V5> val){
         return delegator.apply(val);
     }
 
@@ -703,62 +442,323 @@ public class FunctionalDelegator<U> {
 
 
 
-    public U delegate(IByteArrayFunction val){
+    public U get(IDoubleFunction val){
         return delegator.apply(val);
     }
 
-    public U delegate(IByteArrayFunction0 val){
+    public U get(IDoubleFunction0 val){
         return delegator.apply(val);
     }
 
-    public<V1> U delegate(IByteArrayFunction1<V1> val){
+    public<V1> U get(IDoubleFunction1<V1> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2> U delegate(IByteArrayFunction2<V1,V2> val){
+    public<V1,V2> U get(IDoubleFunction2<V1,V2> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3> U delegate(IByteArrayFunction3<V1,V2,V3> val){
+    public<V1,V2,V3> U get(IDoubleFunction3<V1,V2,V3> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4> U delegate(IByteArrayFunction4<V1,V2,V3,V4> val){
+    public<V1,V2,V3,V4> U get(IDoubleFunction4<V1,V2,V3,V4> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5> U delegate(IByteArrayFunction5<V1,V2,V3,V4,V5> val){
+    public<V1,V2,V3,V4,V5> U get(IDoubleFunction5<V1,V2,V3,V4,V5> val){
         return delegator.apply(val);
     }
 
     //////////////////////////////////////////////////////////////////////////////////
 
 
-    public U delegate(IFloatArrayFunction val){
+    public U get(IArrayFunction val){
         return delegator.apply(val);
     }
 
-    public U delegate(IFloatArrayFunction0 val){
+
+
+    public U get(IIntArrayFunction val){
         return delegator.apply(val);
     }
 
-    public<V1> U delegate(IFloatArrayFunction1<V1> val){
+    public U get(IIntArrayFunction0 val){
         return delegator.apply(val);
     }
 
-    public<V1,V2> U delegate(IFloatArrayFunction2<V1,V2> val){
+    public<V1> U get(IIntArrayFunction1<V1> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3> U delegate(IFloatArrayFunction3<V1,V2,V3> val){
+    public<V1,V2> U get(IIntArrayFunction2<V1,V2> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4> U delegate(IFloatArrayFunction4<V1,V2,V3,V4> val){
+    public<V1,V2,V3> U get(IIntArrayFunction3<V1,V2,V3> val){
         return delegator.apply(val);
     }
 
-    public<V1,V2,V3,V4,V5> U delegate(IFloatArrayFunction5<V1,V2,V3,V4,V5> val){
+    public<V1,V2,V3,V4> U get(IIntArrayFunction4<V1,V2,V3,V4> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4,V5> U get(IIntArrayFunction5<V1,V2,V3,V4,V5> val){
+        return delegator.apply(val);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+
+
+    public U get(IObjectArrayFunction val){
+        return delegator.apply(val);
+    }
+
+    public<T> U get(IObjectArrayFunction0<T> val){
+        return delegator.apply(val);
+    }
+
+    public<T,V1> U get(IObjectArrayFunction1<T,V1> val){
+        return delegator.apply(val);
+    }
+
+    public<T,V1,V2> U get(IObjectArrayFunction2<T,V1,V2> val){
+        return delegator.apply(val);
+    }
+
+    public<T,V1,V2,V3> U get(IObjectArrayFunction3<T,V1,V2,V3> val){
+        return delegator.apply(val);
+    }
+
+    public<T,V1,V2,V3,V4> U get(IObjectArrayFunction4<T,V1,V2,V3,V4> val){
+        return delegator.apply(val);
+    }
+
+    public<T,V1,V2,V3,V4,V5> U get(IObjectArrayFunction5<T,V1,V2,V3,V4,V5> val){
+        return delegator.apply(val);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+    public U get(ILongArrayFunction val){
+        return delegator.apply(val);
+    }
+
+    public U get(ILongArrayFunction0 val){
+        return delegator.apply(val);
+    }
+
+    public<V1> U get(ILongArrayFunction1<V1> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2> U get(ILongArrayFunction2<V1,V2> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3> U get(ILongArrayFunction3<V1,V2,V3> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4> U get(ILongArrayFunction4<V1,V2,V3,V4> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4,V5> U get(ILongArrayFunction5<V1,V2,V3,V4,V5> val){
+        return delegator.apply(val);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+
+
+    public U get(IDoubleArrayFunction val){
+        return delegator.apply(val);
+    }
+
+    public U get(IDoubleArrayFunction0 val){
+        return delegator.apply(val);
+    }
+
+    public<V1> U get(IDoubleArrayFunction1<V1> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2> U get(IDoubleArrayFunction2<V1,V2> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3> U get(IDoubleArrayFunction3<V1,V2,V3> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4> U get(IDoubleArrayFunction4<V1,V2,V3,V4> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4,V5> U get(IDoubleArrayFunction5<V1,V2,V3,V4,V5> val){
+        return delegator.apply(val);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+
+
+    public U get(ICharArrayFunction val){
+        return delegator.apply(val);
+    }
+
+    public U get(ICharArrayFunction0 val){
+        return delegator.apply(val);
+    }
+
+    public<V1> U get(ICharArrayFunction1<V1> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2> U get(ICharArrayFunction2<V1,V2> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3> U get(ICharArrayFunction3<V1,V2,V3> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4> U get(ICharArrayFunction4<V1,V2,V3,V4> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4,V5> U get(ICharArrayFunction5<V1,V2,V3,V4,V5> val){
+        return delegator.apply(val);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+    public U get(IBoolArrayFunction val){
+        return delegator.apply(val);
+    }
+
+    public U get(IBoolArrayFunction0 val){
+        return delegator.apply(val);
+    }
+
+    public<V1> U get(IBoolArrayFunction1<V1> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2> U get(IBoolArrayFunction2<V1,V2> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3> U get(IBoolArrayFunction3<V1,V2,V3> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4> U get(IBoolArrayFunction4<V1,V2,V3,V4> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4,V5> U get(IBoolArrayFunction5<V1,V2,V3,V4,V5> val){
+        return delegator.apply(val);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+
+
+    public U get(IShortArrayFunction val){
+        return delegator.apply(val);
+    }
+
+    public U get(IShortArrayFunction0 val){
+        return delegator.apply(val);
+    }
+
+    public<V1> U get(IShortArrayFunction1<V1> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2> U get(IShortArrayFunction2<V1,V2> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3> U get(IShortArrayFunction3<V1,V2,V3> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4> U get(IShortArrayFunction4<V1,V2,V3,V4> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4,V5> U get(IShortArrayFunction5<V1,V2,V3,V4,V5> val){
+        return delegator.apply(val);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+    public U get(IByteArrayFunction val){
+        return delegator.apply(val);
+    }
+
+    public U get(IByteArrayFunction0 val){
+        return delegator.apply(val);
+    }
+
+    public<V1> U get(IByteArrayFunction1<V1> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2> U get(IByteArrayFunction2<V1,V2> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3> U get(IByteArrayFunction3<V1,V2,V3> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4> U get(IByteArrayFunction4<V1,V2,V3,V4> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4,V5> U get(IByteArrayFunction5<V1,V2,V3,V4,V5> val){
+        return delegator.apply(val);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+
+    public U get(IFloatArrayFunction val){
+        return delegator.apply(val);
+    }
+
+    public U get(IFloatArrayFunction0 val){
+        return delegator.apply(val);
+    }
+
+    public<V1> U get(IFloatArrayFunction1<V1> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2> U get(IFloatArrayFunction2<V1,V2> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3> U get(IFloatArrayFunction3<V1,V2,V3> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4> U get(IFloatArrayFunction4<V1,V2,V3,V4> val){
+        return delegator.apply(val);
+    }
+
+    public<V1,V2,V3,V4,V5> U get(IFloatArrayFunction5<V1,V2,V3,V4,V5> val){
         return delegator.apply(val);
     }
 

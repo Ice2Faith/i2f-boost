@@ -17,13 +17,13 @@ public class TestFunctional {
 
     public static void main(String[] args) throws Exception {
 
-        System.out.println(Lambdas.METHOD.delegate(TestFunctional::consumer));
-        System.out.println(Lambdas.METHOD.delegate(TestFunctional::consumerInt));
-        System.out.println(Lambdas.METHOD.delegate(TestFunctional::consumerException));
-        System.out.println(Lambdas.METHOD.delegate(TestFunctional::consumerIoException));
-        System.out.println(Lambdas.METHOD.delegate(TestFunctional::consumerMulException));
-        System.out.println(Lambdas.METHOD.delegate(TestFunctional::predicate));
-        System.out.println(Lambdas.METHOD.delegate(TestFunctional::supplier));
+        System.out.println(Lambdas.METHOD.get(TestFunctional::consumer));
+        System.out.println(Lambdas.METHOD.get(TestFunctional::consumerInt));
+        System.out.println(Lambdas.METHOD.get(TestFunctional::consumerException));
+        System.out.println(Lambdas.METHOD.get(TestFunctional::consumerIoException));
+        System.out.println(Lambdas.METHOD.get(TestFunctional::consumerMulException));
+        System.out.println(Lambdas.METHOD.get(TestFunctional::predicate));
+        System.out.println(Lambdas.METHOD.get(TestFunctional::supplier));
 
         testConsumer(TestFunctional::consumer);
 
