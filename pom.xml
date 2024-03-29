@@ -78,6 +78,7 @@
         <module>i2f-functional</module>
         <module>i2f-lambda</module>
         <module>i2f-trace</module>
+        <module>i2f-clock</module>
 
     </modules>
 

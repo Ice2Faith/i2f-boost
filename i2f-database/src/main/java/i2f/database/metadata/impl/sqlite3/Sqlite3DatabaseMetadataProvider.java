@@ -1,7 +1,5 @@
 package i2f.database.metadata.impl.sqlite3;
 
-import ch.qos.logback.core.pattern.util.AsIsEscapeUtil;
-import com.alibaba.druid.sql.ast.SQLExprComparor;
 import i2f.database.jdbc.JdbcResolver;
 import i2f.database.jdbc.data.QueryResult;
 import i2f.database.jdbc.data.StdType;
@@ -10,7 +8,6 @@ import i2f.database.metadata.data.IndexColumnMeta;
 import i2f.database.metadata.data.IndexMeta;
 import i2f.database.metadata.data.TableMeta;
 import i2f.database.metadata.impl.base.BaseDatabaseMetadataProvider;
-import i2f.database.metadata.impl.mysql.MySqlType;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
