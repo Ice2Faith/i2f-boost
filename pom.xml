@@ -75,6 +75,9 @@
         <module>i2f-workflow</module>
         <module>i2f-websocket</module>
         <module>i2f-jce</module>
+        <module>i2f-functional</module>
+        <module>i2f-lambda</module>
+        <module>i2f-trace</module>
 
     </modules>
 
