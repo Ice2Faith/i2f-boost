@@ -8,7 +8,6 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.server.RequestPath;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -16,9 +15,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.net.URI;
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author ltb
@@ -36,7 +36,12 @@ public class RequestLogGlobalFilter implements GlobalFilter, Ordered {
 
     private boolean showQuerys = false;
 
+    private boolean showStatistic = false;
+
     public static final String EXCHANGE_BEGIN_TIME_KEY = "exchangeBeginTime";
+
+    protected ConcurrentHashMap<String, TimeStatistic> pathTimeStatMap = new ConcurrentHashMap<>();
+    protected ConcurrentHashMap<String, TimeStatistic> ipTimeStatMap = new ConcurrentHashMap<>();
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -45,14 +50,17 @@ public class RequestLogGlobalFilter implements GlobalFilter, Ordered {
 
 
         exchange.getAttributes().put(EXCHANGE_BEGIN_TIME_KEY, System.currentTimeMillis());
+        InetSocketAddress remote = request.getRemoteAddress();
+        String addr = remote == null ? "unknown" : remote.getAddress().getHostAddress();
+
+        String path = request.getPath().toString();
 
 
-        RequestPath path = request.getPath();
         StringBuilder builder = new StringBuilder();
         builder.append("\n-----------global filter begin------------").append("\n");
         builder.append("request path:" + path).append("\n");
-
         builder.append("request method:" + request.getMethod().name()).append("\n");
+        builder.append("from addr:" + addr).append("\n");
         if (showHeaders) {
             builder.append("request header:").append("\n");
             HttpHeaders headers = request.getHeaders();
@@ -81,7 +89,22 @@ public class RequestLogGlobalFilter implements GlobalFilter, Ordered {
             if (beginTime == null) {
                 return;
             }
-            builder.append("process time:\t" + (System.currentTimeMillis() - beginTime) + "ms").append("\n");
+            long ts = System.currentTimeMillis();
+            long diff = (ts - beginTime);
+            builder.append("process time:\t" + diff + "ms").append("\n");
+            if (showStatistic) {
+                pathTimeStatMap.computeIfAbsent(path, (key) -> {
+                    return new TimeStatistic();
+                });
+                pathTimeStatMap.get(path).add(diff);
+
+                ipTimeStatMap.computeIfAbsent(addr, (key) -> {
+                    return new TimeStatistic();
+                });
+                ipTimeStatMap.get(addr).add(diff);
+                builder.append("path time:\t" + pathTimeStatMap.get(path).formatString()).append("\n");
+                builder.append("addr time:\t" + ipTimeStatMap.get(addr).formatString()).append("\n");
+            }
             builder.append("-----------global filter end------------").append("\n");
 
             log.info(builder.toString());
@@ -93,4 +116,3 @@ public class RequestLogGlobalFilter implements GlobalFilter, Ordered {
         return -1;
     }
 }
-
