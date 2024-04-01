@@ -6,6 +6,7 @@ import org.springframework.boot.SpringBootVersion;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationPreparedEvent;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -46,9 +47,9 @@ public class WarBootApplication extends SpringBootServletInitializer {
             builder.web(WebApplicationType.NONE);
         }
         builder.sources(mainClass)
-                .listeners(new ApplicationListener<ApplicationPreparedEvent>() {
+                .listeners(new ApplicationListener<ApplicationStartedEvent>() {
                     @Override
-                    public void onApplicationEvent(ApplicationPreparedEvent event) {
+                    public void onApplicationEvent(ApplicationStartedEvent event) {
                         ConfigurableApplicationContext application = event.getApplicationContext();
                         String banner = getBootstrapBanner(webType, application, mainClass);
                         log.warn(banner);

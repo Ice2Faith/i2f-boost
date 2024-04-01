@@ -1,0 +1,51 @@
+# spring cloud 内置的一个简单的服务发现组件
+# 是 spring cloud 中默认实现的
+# 在 spring cloud 环境中即可，也就是说可以在 gateway 等 springcloud 生态中使用
+# 缺点就是这个因为是本地的简单配置，没有一个注册中心
+# 因此，这个配置需要复制到每个服务上
+spring:
+  cloud:
+    discovery:
+      client:
+        simple:
+          instances:
+            # 定义负载均衡实例
+            sys:
+              - uri: http://localhost:8080
+              - uri: http://localhost:8081
+            file:
+              - uri: http://localhost:9091
+            log:
+              - uri: http://localhost:10240
+    # 禁用 ribbon，使用 loadbalancer
+    loadbalancer:
+      ribbon:
+        enabled: false
+    # gateway 路由配置
+    gateway:
+      # 仅使用本地路由策略，不使用注册中心服务发现
+      discovery:
+        locator:
+          enabled: true
+      #  路由规则
+      routes:
+        # 定义每个服务，由于没有注册中心，因此ID无意义，唯一即可
+        - id: sys
+          # 转发地址，这里使用了上面定义的服务发现 sys
+          uri: lb://sys
+          predicates:
+            # 断言规则，使用path断言，以指定前缀开头
+            - Path=/gateway/sys/**
+          filters:
+            # 上面的前缀时2层，去除这个前缀
+            - StripPrefix=2
+        # 定义每个服务，由于没有注册中心，因此ID无意义，唯一即可
+        - id: sys
+          # 转发地址，这里则直接指向
+          uri: http://localhost:7799/
+          predicates:
+            # 断言规则，使用path断言，以指定前缀开头
+            - Path=/gateway/test/**
+          filters:
+            # 上面的前缀时2层，去除这个前缀
+            - StripPrefix=2
