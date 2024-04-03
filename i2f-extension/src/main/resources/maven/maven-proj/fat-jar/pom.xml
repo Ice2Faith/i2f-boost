@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 指定以来的父工程 -->
+    <parent>
+        <groupId>i2f</groupId>
+        <artifactId>maven-proj</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <!-- 本应用打包为jar -->
+    <packaging>jar</packaging>
+
+    <!-- 本工程坐标及描述 -->
+    <artifactId>fat-jar</artifactId>
+    <description>sprintboot 默认的 fat-jar 打包方式</description>
+
+    <!-- 父工程重定义通用信息 -->
+    <properties>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <!-- 本工程的依赖 -->
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+
+        <!-- spring-boot-devtools -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional> <!-- 表示依赖不会传递 -->
+        </dependency>
+
+        <!-- 本地jar放到本项目根路径下的方式 -->
+        <dependency>
+            <groupId>i2f</groupId>
+            <artifactId>i2f-core</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <!-- 注意，本地jar的jar包名字，需要添加到下面的Class-Path节点上，否则打包之后缺少依赖启动不了 -->
+            <systemPath>${pom.basedir}/lib/i2f-core-1.0.jar</systemPath>
+        </dependency>
+
+        <!-- 本地jar放到项目中的resources下的方式 -->
+        <dependency>
+            <groupId>i2f</groupId>
+            <artifactId>i2f-j2ee</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <!-- 注意，本地jar的jar包名字，需要添加到下面的Class-Path节点上，否则打包之后缺少依赖启动不了 -->
+            <systemPath>${pom.basedir}/src/main/resources/lib/i2f-j2ee-1.0.jar</systemPath>
+        </dependency>
+
+        <!-- 本地jar放到父工程下的方式 -->
+        <dependency>
+            <groupId>i2f</groupId>
+            <artifactId>i2f-spring</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <!-- 注意，本地jar的jar包名字，需要添加到下面的Class-Path节点上，否则打包之后缺少依赖启动不了 -->
+            <systemPath>${pom.basedir}/../lib/i2f-spring-1.0.jar</systemPath>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <!-- 指定资源路径，部分项目的xml写在java路径中，需要包含进来 -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.json</include>
+                    <include>**/*.ftl</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <!-- 规定java版本等信息，防止每次都要设置jdk版本和编码 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArgument>-parameters</compilerArgument>
+                    <compilerArgs>
+                        <arg>-Xlint:unchecked</arg>
+                        <arg>-Xlint:deprecation</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
+            <!-- springboot 默认的打包方式 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 包含系统依赖 -->
+                    <includeSystemScope>true</includeSystemScope>
+                </configuration>
+            </plugin>
+        </plugins>
+
+
+    </build>
+
+</project>
