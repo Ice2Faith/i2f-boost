@@ -34,11 +34,13 @@ import java.util.ServiceLoader;
  */
 public class WarBootApplication extends SpringBootServletInitializer {
 
-    protected static Logger log= LoggerFactory.getLogger(WarBootApplication.class);
+    protected static Logger log = LoggerFactory.getLogger(WarBootApplication.class);
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-        return builder.sources(this.getClass());
+        Slf4jPrintStream.redirectSysoutSyserr();
+        return builder.sources(this.getClass())
+                .listeners(getStartedListener(null,this.getClass()));
     }
 
     public static void startup(Class mainClass, String[] args) {
@@ -53,17 +55,20 @@ public class WarBootApplication extends SpringBootServletInitializer {
             builder.web(WebApplicationType.NONE);
         }
         builder.sources(mainClass)
-                .listeners(new ApplicationListener<ApplicationStartedEvent>() {
-                    @Override
-                    public void onApplicationEvent(ApplicationStartedEvent event) {
-                        ConfigurableApplicationContext application = event.getApplicationContext();
-                        String banner = getBootstrapBanner(webType, application, mainClass);
-                        log.warn(banner);
-                    }
-                })
+                .listeners(getStartedListener(webType,mainClass))
                 .run(args);
     }
 
+    public static ApplicationListener<ApplicationStartedEvent> getStartedListener(WebApplicationType webType, Class mainClass){
+        return new ApplicationListener<ApplicationStartedEvent>() {
+            @Override
+            public void onApplicationEvent(ApplicationStartedEvent event) {
+                ConfigurableApplicationContext application = event.getApplicationContext();
+                String banner = getBootstrapBanner(webType, application, mainClass);
+                log.warn(banner);
+            }
+        };
+    }
 
     public static String getBootstrapBanner(WebApplicationType webType, ConfigurableApplicationContext application, Class<?> mainClass) {
         Environment env = application.getEnvironment();
@@ -74,11 +79,11 @@ public class WarBootApplication extends SpringBootServletInitializer {
                 .append("\tprocess:\t").append("PID:").append(getPid()).append(" | ").append("User:").append(getStartUser()).append("\n")
                 .append("\tversion:\t").append("SpringBoot:").append(SpringBootVersion.getVersion()).append(" | ").append("Spring:").append(SpringVersion.getVersion()).append("\n");
         RuntimeMXBean runtimeMXBean = getRuntimeMXBean();
-        if(runtimeMXBean!=null){
+        if (runtimeMXBean != null) {
             long startTime = runtimeMXBean.getStartTime();
             long uptime = runtimeMXBean.getUptime();
-            long currTime=System.currentTimeMillis();
-            long diffStart=currTime-startTime;
+            long currTime = System.currentTimeMillis();
+            long diffStart = currTime - startTime;
             builder.append("\ttime   :\t").append("start:").append(diffStart)
                     .append(" | ").append("up:").append(uptime).append("\n");
         }
@@ -182,7 +187,7 @@ public class WarBootApplication extends SpringBootServletInitializer {
                     .append("\n");
         }
         ServiceLoader<Driver> drivers = ServiceLoader.load(Driver.class);
-        if(drivers!=null){
+        if (drivers != null) {
             builder.append("\tjdbc:\n");
             for (Driver driver : drivers) {
                 builder.append("\t\t").append(driver.getClass().getName()).append("\n");
@@ -190,15 +195,15 @@ public class WarBootApplication extends SpringBootServletInitializer {
         }
 
         ServiceLoader<Provider> providers = ServiceLoader.load(Provider.class);
-        if(providers!=null){
+        if (providers != null) {
             builder.append("\tjce:\n");
             for (Provider provider : providers) {
-                builder.append("\t\t").append(String.format("%-6s",provider.getName())).append(":").append(provider.getClass().getName()).append("\n");
+                builder.append("\t\t").append(String.format("%-6s", provider.getName())).append(":").append(provider.getClass().getName()).append("\n");
             }
         }
 
         ServiceLoader<IIOServiceProvider> ios = ServiceLoader.load(IIOServiceProvider.class);
-        if(ios!=null){
+        if (ios != null) {
             builder.append("\tio:\n");
             for (IIOServiceProvider io : ios) {
                 builder.append("\t\t").append(io.getClass().getName()).append("\n");
