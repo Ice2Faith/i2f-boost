@@ -1,11 +1,11 @@
 package i2f.springboot.application;
 
 import i2f.spring.slf4j.Slf4jPrintStream;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringBootVersion;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.event.ApplicationPreparedEvent;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ApplicationListener;
@@ -13,13 +13,17 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.SpringVersion;
 import org.springframework.core.env.Environment;
 
+import javax.imageio.spi.IIOServiceProvider;
 import java.lang.management.*;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.security.Provider;
+import java.sql.Driver;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.ServiceLoader;
 
 /**
  * @author ltb
@@ -28,8 +32,10 @@ import java.util.List;
  * 在war包中启动，pom.xml需要starter-web排除tomcat
  * 另外打包方式改为war
  */
-@Slf4j
 public class WarBootApplication extends SpringBootServletInitializer {
+
+    protected static Logger log= LoggerFactory.getLogger(WarBootApplication.class);
+
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
         return builder.sources(this.getClass());
@@ -67,13 +73,22 @@ public class WarBootApplication extends SpringBootServletInitializer {
                 .append("\tapp    :\t").append(env.getProperty("spring.application.name")).append(" | ").append(env.getProperty("spring.profiles.active")).append("\n")
                 .append("\tprocess:\t").append("PID:").append(getPid()).append(" | ").append("User:").append(getStartUser()).append("\n")
                 .append("\tversion:\t").append("SpringBoot:").append(SpringBootVersion.getVersion()).append(" | ").append("Spring:").append(SpringVersion.getVersion()).append("\n");
-        if(isDebug()){
+        RuntimeMXBean runtimeMXBean = getRuntimeMXBean();
+        if(runtimeMXBean!=null){
+            long startTime = runtimeMXBean.getStartTime();
+            long uptime = runtimeMXBean.getUptime();
+            long currTime=System.currentTimeMillis();
+            long diffStart=currTime-startTime;
+            builder.append("\ttime   :\t").append("start:").append(diffStart)
+                    .append(" | ").append("up:").append(uptime).append("\n");
+        }
+        if (isDebug()) {
             builder.append("\tdebug  :\t").append(true).append("\n");
         }
-        if(isAgent()){
+        if (isAgent()) {
             builder.append("\tagent  :\t").append(true).append("\n");
         }
-        if(isNoVerify()){
+        if (isNoVerify()) {
             builder.append("\tverify :\t").append(false).append("\n");
         }
         if (webType != null) {
@@ -124,20 +139,20 @@ public class WarBootApplication extends SpringBootServletInitializer {
         }
 
         ClassLoadingMXBean classLoadingMXBean = ManagementFactory.getClassLoadingMXBean();
-        if(classLoadingMXBean!=null){
+        if (classLoadingMXBean != null) {
             builder.append("\tclasses:\t")
                     .append("Loaded:").append(classLoadingMXBean.getLoadedClassCount()).append(" | ")
                     .append("TotalLoaded:").append(classLoadingMXBean.getTotalLoadedClassCount()).append(" | ")
                     .append("Unloaded:").append(classLoadingMXBean.getUnloadedClassCount()).append("\n");
         }
         CompilationMXBean compilationMXBean = ManagementFactory.getCompilationMXBean();
-        if(classLoadingMXBean!=null){
+        if (classLoadingMXBean != null) {
             builder.append("\tcompile:\t")
                     .append("Name:").append(compilationMXBean.getName()).append(" | ")
                     .append("TotalTime:").append(compilationMXBean.getTotalCompilationTime()).append("\n");
         }
         ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
-        if(threadMXBean!=null){
+        if (threadMXBean != null) {
             builder.append("\tthread :\t")
                     .append("All:").append(threadMXBean.getThreadCount()).append(" | ")
                     .append("Daemon:").append(threadMXBean.getDaemonThreadCount()).append(" | ")
@@ -145,7 +160,7 @@ public class WarBootApplication extends SpringBootServletInitializer {
                     .append("Started:").append(threadMXBean.getTotalStartedThreadCount()).append("\n");
         }
         Thread thread = Thread.currentThread();
-        if(thread!=null){
+        if (thread != null) {
             builder.append("\tcurrent:\t")
                     .append("Group:").append(thread.getThreadGroup()).append(" | ")
                     .append("Name:").append(thread.getName()).append(" | ")
@@ -153,10 +168,10 @@ public class WarBootApplication extends SpringBootServletInitializer {
                     .append("Priority:").append(thread.getPriority()).append("\n");
             builder.append("\tloaders:\n");
             ClassLoader classLoader = thread.getContextClassLoader();
-            while(classLoader!=null){
+            while (classLoader != null) {
                 String name = classLoader.getClass().getName();
                 builder.append("\t\t").append(name).append("\n");
-                classLoader=classLoader.getParent();
+                classLoader = classLoader.getParent();
             }
         }
         builder.append("\tgc     :\n");
@@ -165,6 +180,29 @@ public class WarBootApplication extends SpringBootServletInitializer {
                     .append(" | ").append("Count:").append(collectorMXBean.getCollectionCount())
                     .append(" | ").append("Time:").append(collectorMXBean.getCollectionTime())
                     .append("\n");
+        }
+        ServiceLoader<Driver> drivers = ServiceLoader.load(Driver.class);
+        if(drivers!=null){
+            builder.append("\tjdbc:\n");
+            for (Driver driver : drivers) {
+                builder.append("\t\t").append(driver.getClass().getName()).append("\n");
+            }
+        }
+
+        ServiceLoader<Provider> providers = ServiceLoader.load(Provider.class);
+        if(providers!=null){
+            builder.append("\tjce:\n");
+            for (Provider provider : providers) {
+                builder.append("\t\t").append(String.format("%-6s",provider.getName())).append(":").append(provider.getClass().getName()).append("\n");
+            }
+        }
+
+        ServiceLoader<IIOServiceProvider> ios = ServiceLoader.load(IIOServiceProvider.class);
+        if(ios!=null){
+            builder.append("\tio:\n");
+            for (IIOServiceProvider io : ios) {
+                builder.append("\t\t").append(io.getClass().getName()).append("\n");
+            }
         }
 
         Runtime runtime = Runtime.getRuntime();
@@ -185,19 +223,19 @@ public class WarBootApplication extends SpringBootServletInitializer {
         return ManagementFactory.getRuntimeMXBean();
     }
 
-    public static String getPid(){
+    public static String getPid() {
         String name = getRuntimeMXBean().getName();
-        String[] arr = name.split("@",2);
-        if(arr.length==2){
+        String[] arr = name.split("@", 2);
+        if (arr.length == 2) {
             return arr[0];
         }
         return "-1";
     }
 
-    public static String getStartUser(){
+    public static String getStartUser() {
         String name = getRuntimeMXBean().getName();
-        String[] arr = name.split("@",2);
-        if(arr.length==2){
+        String[] arr = name.split("@", 2);
+        if (arr.length == 2) {
             return arr[1];
         }
         return "";
@@ -213,7 +251,7 @@ public class WarBootApplication extends SpringBootServletInitializer {
         return false;
     }
 
-    public static boolean isAgent(){
+    public static boolean isAgent() {
         List<String> args = ManagementFactory.getRuntimeMXBean().getInputArguments();
         for (String arg : args) {
             if (arg.startsWith("-javaagent:")) {
@@ -223,7 +261,7 @@ public class WarBootApplication extends SpringBootServletInitializer {
         return false;
     }
 
-    public static boolean isNoVerify(){
+    public static boolean isNoVerify() {
         List<String> args = ManagementFactory.getRuntimeMXBean().getInputArguments();
         for (String arg : args) {
             if ("-noverify".equals(arg) || "-Xverify:none".equals(arg)) {
