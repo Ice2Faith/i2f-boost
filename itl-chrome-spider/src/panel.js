@@ -393,6 +393,167 @@ function responseBodyMatcher(url, headers, res) {
 }
 
 
+// 解析哔哩哔哩收藏视频
+function parseBilibiliFavVideo(url, headers, res) {
+    let ret = [];
+
+    // 哩哔哩视频
+    // 收藏列表相关
+    const catchUrl = '/fav/resource/list';
+    if (url.indexOf(catchUrl) < 0) {
+        return ret;
+    }
+
+    if (!$("#ckbBilibiliFavList").prop('checked')) {
+        return ret;
+    }
+
+    if (!res.data) {
+        return ret;
+    }
+
+
+    if (!res.data.medias) {
+        return ret;
+    }
+
+    let medias = res.data.medias
+
+    if (!medias || medias.length == 0) {
+        return
+    }
+
+    for (let i = 0; i < medias.length; i++) {
+        let doc = {
+            type: 'video',
+            url: null,
+            title: null,
+            img: null,
+            authorName: null,
+            authorAvatar: null,
+            authorId: null,
+            authorHome: null,
+        };
+        let item = medias[i];
+        if (!item) {
+            continue;
+        }
+        if (!item.bvid) {
+            continue;
+        }
+        if (!item.cover) {
+            continue;
+        }
+
+        doc.url = 'https://www.bilibili.com/video/'+item.bvid;
+        doc.title = item.title;
+        if (doc.title && doc.title != "") {
+            doc.filename = safeFileName(doc.title) + '.mp4';
+        } else {
+            doc.filename = 'download.mp4';
+        }
+        doc.img = item.cover;
+        if (item.upper) {
+            doc.authorName = item.upper.name;
+            doc.authorAvatar=item.upper.face
+            doc.authorId = item.upper.mid;
+            doc.authorHome = 'https://space.bilibili.com/'+item.upper.mid+'/video';
+        }
+
+        ret.push(doc);
+    }
+
+    return ret;
+}
+
+let bilibiliCurrentUserInfo={}
+// 解析哔哩哔哩视频
+function parseBilibiliVideo(url, headers, res) {
+    let ret = [];
+
+    let currentUserInfoUrl='/space/wbi/acc/info'
+    if(url.indexOf(currentUserInfoUrl)>=0){
+        if(res.data){
+            bilibiliCurrentUserInfo=res.data
+        }
+        return ret
+    }
+
+    // 哩哔哩视频
+    // 个人主页相关列表
+    const catchUrl = '/space/wbi/arc/search';
+    if (url.indexOf(catchUrl) < 0) {
+        return ret;
+    }
+
+    if (!$("#ckbBilibiliUserHome").prop('checked')) {
+        return ret;
+    }
+
+    if (!res.data) {
+        return ret;
+    }
+
+
+    if (!res.data.list) {
+        return ret;
+    }
+
+    let vlist = res.data.list.vlist
+
+    if (!vlist || vlist.length == 0) {
+        return
+    }
+
+    for (let i = 0; i < vlist.length; i++) {
+        let doc = {
+            type: 'video',
+            url: null,
+            title: null,
+            img: null,
+            authorName: null,
+            authorAvatar: null,
+            authorId: null,
+            authorHome: null,
+        };
+        let item = vlist[i];
+        if (!item) {
+            continue;
+        }
+        if (!item.aid) {
+            continue;
+        }
+        if (!item.bvid) {
+            continue;
+        }
+        if (!item.pic) {
+            continue;
+        }
+
+        doc.url = 'https://www.bilibili.com/video/'+item.bvid;
+        doc.title = item.title;
+        if (doc.title && doc.title != "") {
+            doc.filename = safeFileName(doc.title) + '.mp4';
+        } else {
+            doc.filename = 'download.mp4';
+        }
+        doc.img = item.pic;
+        if (item.author) {
+            doc.authorName = item.author;
+            doc.authorAvatar=bilibiliCurrentUserInfo.face
+            if(item.meta){
+                doc.authorId = item.meta.mid;
+                doc.authorHome = 'https://space.bilibili.com/'+item.meta.mid+'/video';
+            }
+        }
+
+        ret.push(doc);
+    }
+
+    return ret;
+}
+
+
 // 解析快手视频
 function parseKuaishouVideo(url, headers, res) {
     let ret = [];
@@ -464,7 +625,7 @@ function parseKuaishouVideo(url, headers, res) {
 
         doc.url = curr.url;
         doc.title = item.photo.caption;
-        if (doc.filename && doc.filename != "") {
+        if (doc.title && doc.title != "") {
             doc.filename = safeFileName(doc.title) + '.mp4';
         } else {
             doc.filename = 'download.mp4';
@@ -555,7 +716,7 @@ function parseToutiaoVideo(url, headers, res) {
 
         doc.url = item.video.play_addr.url_list[0];
         doc.title = item.title;
-        if (doc.filename && doc.filename != "") {
+        if (doc.title && doc.title != "") {
             doc.filename = safeFileName(doc.title) + '.mp4';
         } else {
             doc.filename = 'download.mp4';
@@ -651,7 +812,7 @@ function parseTiktokVideo(url, headers, res) {
 
         doc.url = item.video.play_addr.url_list[0];
         doc.title = item.desc;
-        if (doc.filename && doc.filename != "") {
+        if (doc.title && doc.title != "") {
             doc.filename = safeFileName(doc.title) + '.mp4';
         } else {
             doc.filename = 'download.mp4';
@@ -883,6 +1044,7 @@ function parseCommonResources(url, headers, suffixArr = [], contentTypeArr = [])
 
 // 在新页签中打开窗口
 function openInNewTab(url) {
+    debugger
     window.open(url);
 }
 
@@ -921,8 +1083,8 @@ function renderVideos(list) {
             '            <div class="box-author" >' +
             (purityMode ? '' :
                     '                <img class="box-avatar" src="' + item.authorAvatar + '"/>' +
-                    '                <div class="box-nickname active" onclick="openInNewTab(\'' + item.authorHome + '\')">' +
-                    '                   ' + item.authorName + ' ' +
+                    '                <div class="box-nickname active">' +
+                    '                   <a target="_blank" href="' + item.authorHome + '">' + item.authorName + '</a>' +
                     '                </div>'
             ) +
             '                <div class="btn-download downloadClass" url="' + item.url + '" name="' + item.filename + '">' +
@@ -1083,6 +1245,13 @@ chrome.devtools.network.onRequestFinished.addListener(async (...args) => {
 
         let kuaisouList = parseKuaishouVideo(url, responseHeader, respObj);
         mergeIntoList(kuaisouList, contentList)
+
+        let bilibiliList= parseBilibiliVideo(url,responseHeader,respObj);
+        mergeIntoList(bilibiliList,contentList)
+
+        let bilibiliFavList= parseBilibiliFavVideo(url,responseHeader,respObj);
+        mergeIntoList(bilibiliFavList,contentList)
+
 
         renderVideos(contentList);
 

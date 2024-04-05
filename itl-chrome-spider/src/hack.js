@@ -273,15 +273,9 @@ function forceHackInit() {
 
 	$("#hackEditable").click(function () {
 		if ($(this).prop('checked')) {
-            document.body.contentEditable = true;
-            let doms = document.querySelectorAll('*');
-            for (let i = 0; i < doms.length; i++) {
-                let element = doms[i];
-                let clone = element.cloneNode(true);
-                element.parentNode.replaceChild(clone, element);
-            }
-            console.log('content editable!');
-        } else {
+			document.body.contentEditable = true;
+			console.log('content editable!');
+		} else {
 			document.body.contentEditable = 'inherit';
 			console.log('content inherit!');
 		}
