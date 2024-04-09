@@ -35,6 +35,9 @@
 <span class="btn-foo-circle btn-kuaishou-web">
         <a target="_blank" href="https://www.kuaishou.com/">快</a>
     </span>
+<span class="btn-foo-circle btn-bilibili-web">
+        <a target="_blank" href="https://www.bilibili.com/">哔</a>
+    </span>
 
 <textarea style="display:none;z-index: 1;" id="downUrls" rows="2"></textarea>
 <div class="card help-tips">
@@ -183,6 +186,20 @@
         <div class="box-checkbox">
             <div>个人主页</div>
             <input id="ckbKuaishouUserHome" type="checkbox"/>
+        </div>
+    </div>
+    <div class="card">
+        <!-- bilibili -->
+        <div class="box-checkbox btn-bilibili-web">
+            <div>哔哩哔哩</div>
+        </div>
+        <div class="box-checkbox">
+            <div>TA的视频</div>
+            <input id="ckbBilibiliUserHome" type="checkbox"/>
+        </div>
+        <div class="box-checkbox">
+            <div>收藏视频</div>
+            <input id="ckbBilibiliFavList" type="checkbox"/>
         </div>
     </div>
     <div class="card">
@@ -392,6 +409,17 @@
 
     .btn-kuaishou-web a {
         color: #fca926 !important;
+    }
+
+    .btn-bilibili-web {
+        right: 5px;
+        bottom: calc(56px * 8);
+        font-size: 22px;
+        color: hotpink !important;
+    }
+
+    .btn-bilibili-web a {
+        color: hotpink !important;
     }
 
     .btn-foo-circle:hover {
