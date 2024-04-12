@@ -126,6 +126,14 @@ JMX_PORT=9440
 # 如果出现visualvm连接不上，则这里设置为主机的IP地址
 JMX_HOST=
 
+
+# 是否开启xrebel分析代理
+ENABLE_XREBEL=$BOOL_FALSE
+# xrebel的agent的jar名称，这里是固定的，不用更改
+XREBEL_AGENT_JAR=xrebel.jar
+# 需要为完整路径，因为agent的依赖包需要通过完整路径的方式才能找到
+XREBEL_AGEN_PATH=/home/xrebel/agent
+
 # 是否开启Skywalking链路追踪
 ENABLE_SKYWALKING=$BOOL_FALSE
 # skywalking的agent的jar名称，这里是固定的，不用更改
@@ -427,6 +435,26 @@ function prepareJmxCfg(){
     JVM_OPTS="${JVM_OPTS} -Djava.rmi.server.hostname=${JMX_HOST}"
   fi
 }
+
+# 准备xrebel的启动参数
+# -javaagent:/home/xrebel/agent/xrebel.jar
+function prepareXrebelCfg(){
+  if [ ! -d "${XREBEL_AGENT_PATH}" ];then
+    echo xrebel config fail, cause by xrebel agent path ${XREBEL_AGENT_PATH} not exists.
+    return
+  fi
+
+  _p_xrebel_agent_jar_full_path=$XREBEL_AGENT_PATH/$XREBEL_AGENT_JAR
+  if [ ! -f "${_p_xrebel_agent_jar_full_path}" ];then
+    echo xrebel config fail, cause by xrebel agent jar ${_p_xrebel_agent_jar_full_path} not exists.
+    return
+  fi
+
+  _p_xrebel_args="-javaagent:${_p_xrebel_agent_jar_full_path}"
+
+  JVM_OPTS="${JVM_OPTS} ${_p_xrebel_args}"
+}
+
 # 准备skywalking的启动参数
 # -javaagent:/home/skywalking/agent/skywalking-agent.jar=agent.service_name=appname,collector.backend_service=127.0.0.1:11800
 function prepareSkywalkingCfg(){
@@ -478,6 +506,10 @@ function prepareJvmOpts() {
 
     if [ $ENABLE_SKYWALKING == $BOOL_TRUE ];then
        prepareSkywalkingCfg
+    fi
+
+    if [ $ENABLE_XREBEL == $BOOL_TRUE ];then
+      prepareXrebelCfg
     fi
 }
 
