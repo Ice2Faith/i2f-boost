@@ -136,3 +136,39 @@ mvn help:system
 - 覆盖配置文件用我们自己的
 - 辅助本地仓库路径，也用我们自己的
 - 重新运行import导入包即可
+
+## 在命令行中使用
+- 注意，以下操作，需要在当前目录中存在 pom.xml 文件
+- 也就是maven项目中，存在子模块的，只要存在这个文件即可
+- 不过一般建议在父工程中执行命令，防止在子模块中出现找不到依赖的情况
+- 清空
+```bash
+mvn clean
+```
+- 打包
+```bash
+mvn package
+```
+- 打包跳过测试
+```
+mvn package -DskipTests -Dmaven.test.skip=true
+```
+- 清空并打包
+```bash
+mvn clean package
+```
+- 清空并打包跳过测试
+```
+mvn clean package -DskipTests -Dmaven.test.skip=true
+```
+- 将jar安装到本地仓库
+```bash
+mvn install:install-file -DgroupId=com.xxx -DartifactId=xxx -Dversion=1.0 -Dpackaging=jar -Dfile=xxx-1.0.jar
+```
+- 在windows中，执行多条mvn时，因为mvn自动退出命令行
+- 导致只会执行一条mvn命令
+- 因此，使用call解决即可
+```bash
+call mvn clean
+```
+
