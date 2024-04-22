@@ -80,6 +80,7 @@
         <module>i2f-trace</module>
         <module>i2f-clock</module>
         <module>i2f-bql</module>
+        <module>i2f-container</module>
 
     </modules>
 
