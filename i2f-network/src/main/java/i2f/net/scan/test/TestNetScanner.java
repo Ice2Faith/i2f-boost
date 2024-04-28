@@ -1,4 +1,6 @@
-package i2f.net.scan;
+package i2f.net.scan.test;
+
+import i2f.net.scan.NetScanner;
 
 import java.net.InetAddress;
 import java.util.Map;

@@ -106,9 +106,9 @@ exit
 ## 使用
 - 远程复制
 ```shell script
-scp [目标主机免密用户]@[远程主机]:[远程主机路径] [本机路径]
+scp [本机路径] [目标主机免密用户]@[远程主机]:[远程主机路径] 
 
-scp root@192.168.1.100:/root/apps/ /root/apps/app.jar
+scp /root/apps/app.jar root@192.168.1.100:/root/apps/
 ```
 
 ## 多台主机同步操作
