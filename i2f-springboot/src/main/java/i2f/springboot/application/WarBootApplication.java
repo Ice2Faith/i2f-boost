@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 /**
- * @author ltb
+ * @author Ice2Faith
  * @date 2022/4/14 18:36
  * @desc 继承 SpringBootServletInitializer 并重写configure方法，使得指向类指向启动类，则可以再war包中启动
  * 在war包中启动，pom.xml需要starter-web排除tomcat
@@ -105,11 +105,14 @@ public class WarBootApplication extends SpringBootServletInitializer {
                 String ip = InetAddress.getLocalHost().getHostAddress();
                 String port = env.getProperty("server.port");
                 String contextPath = env.getProperty("server.servlet.context-path");
-                if (contextPath != null && !"".equals(contextPath)) {
-                    contextPath = contextPath + "/";
-                }
                 if (contextPath == null) {
                     contextPath = "";
+                }
+                if(contextPath.endsWith("/")){
+                    contextPath=contextPath.substring(0,contextPath.length()-1);
+                }
+                if(!"".equals(contextPath) && !contextPath.startsWith("/")){
+                    contextPath="/"+contextPath;
                 }
 
 
@@ -196,16 +199,24 @@ public class WarBootApplication extends SpringBootServletInitializer {
 
         ServiceLoader<Provider> providers = ServiceLoader.load(Provider.class);
         if (providers != null) {
-            builder.append("\tjce:\n");
+            boolean isFirst=true;
             for (Provider provider : providers) {
+                if(isFirst){
+                    builder.append("\tjce:\n");
+                }
+                isFirst=false;
                 builder.append("\t\t").append(String.format("%-6s", provider.getName())).append(":").append(provider.getClass().getName()).append("\n");
             }
         }
 
         ServiceLoader<IIOServiceProvider> ios = ServiceLoader.load(IIOServiceProvider.class);
         if (ios != null) {
-            builder.append("\tio:\n");
+            boolean isFirst=true;
             for (IIOServiceProvider io : ios) {
+                if(isFirst){
+                    builder.append("\tio:\n");
+                }
+                isFirst=false;
                 builder.append("\t\t").append(io.getClass().getName()).append("\n");
             }
         }

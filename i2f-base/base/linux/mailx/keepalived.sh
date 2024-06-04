@@ -34,6 +34,9 @@ VERIFY_HOST=localhost
 BASH_START="./start.sh"
 # 停止脚本
 BASH_STOP="./stop.sh"
+# 强杀脚本，将会在最后1次尝试时使用强杀
+# 这样可以避免正常的停止脚本无法停止的问题
+BASH_KILL="./jarctrl.sh stop"
 
 # 日志文件
 LOG_FILE="./log.keepalived"
@@ -99,9 +102,9 @@ function findPidByName() {
 function findPidByPidFile() {
   _p_file_name=$_func_arg1
   _func_ret=
-  
+
   _p_pid=
-  
+
   _p_chk_pid=`cat ${_p_file_name} | head -1 | awk '{print $1}'`
   if [[ -n "${_p_chk_pid}" ]]; then
     _p_pid=`ps -ef | grep -v grep | awk '{print $2}' | grep ${_p_chk_pid}`
@@ -205,11 +208,11 @@ function tinyLogFile(){
 function alarmFailKeepAlived(){
     _p_log_out="################# alarm #######################"
     logInfo
-    
+
     if [[ -z "${SERVER_NAME}" ]]; then
         SERVER_NAME=`hostname`
     fi
-    
+
     ThisName=`basename $0`
     TimeNow=$(date "+%Y-%m-%d %H:%M:%S")
 
@@ -230,7 +233,7 @@ function alarmFailKeepAlived(){
     do
       _p_log_out="alarm mail to [${item}] ..."
       logInfo
-      
+
       echo -e "\
 your application $ALARM_APP_NAME on $SERVER_NAME has died at $TimeNow, please check it!
 
@@ -275,19 +278,26 @@ function keepalivedMain(){
     if [[ -n "${WORK_DIR}" ]]; then
       cd "${WORK_DIR}"
     fi
-    
+
     _p_log_out="-------------- keepalived -------------------"
     logInfo
-    
+
     # 减少日志文件大小
     tinyLogFile
 
+    _p_last_count=`expr ${FAIL_MAX_COUNT} - 1`
     # 开始循环检测
     CURR_FAIL_COUNT=0
     for ((i=0;i<$FAIL_MAX_COUNT;i++))
     do
       CHK_RESULT=$BOOL_TRUE
-      
+
+      # 是否最后一次检测
+      _p_last_once=$BOOL_FALSE
+      if [ $i == $_p_last_count ];then
+        _p_last_once=$BOOL_TRUE
+      fi
+
       # 判断端口是否占用
       if [[ -n "${VERIFY_PORT}" ]]; then
         if [ $CHK_RESULT == $BOOL_TRUE ];then
@@ -305,7 +315,7 @@ function keepalivedMain(){
            fi
         fi
       fi
-      
+
       # 判断进程名称是否存活
       if [[ -n "${VERIFY_PROCESS_NAME}" ]]; then
         if [ $CHK_RESULT == $BOOL_TRUE ];then
@@ -323,7 +333,7 @@ function keepalivedMain(){
            fi
         fi
       fi
-      
+
       # 判断进程PID文件的进程是否存活
       if [[ -n "${VERIFY_PID_FILE}" ]]; then
         if [ $CHK_RESULT == $BOOL_TRUE ];then
@@ -341,7 +351,7 @@ function keepalivedMain(){
            fi
         fi
       fi
-      
+
       # 判断进程PID是否存活
       if [[ -n "${VERIFY_PID}" ]]; then
         if [ $CHK_RESULT == $BOOL_TRUE ];then
@@ -359,7 +369,7 @@ function keepalivedMain(){
            fi
         fi
       fi
-      
+
       # 判断HTTP链接是否可以连通
       if [[ -n "${VERIFY_HTTP_URL}" ]]; then
         if [ $CHK_RESULT == $BOOL_TRUE ];then
@@ -377,7 +387,7 @@ function keepalivedMain(){
            fi
         fi
       fi
-      
+
       # 判断Sock是否可以连通
       if [[ -n "${VERIFY_SOCK_HOST}" ]]; then
           if [[ -n "${VERIFY_SOCK_PORT}" ]]; then
@@ -398,7 +408,7 @@ function keepalivedMain(){
             fi
           fi
       fi
-      
+
       # 判断主机是否可以连通
       if [[ -n "${VERIFY_HOST}" ]]; then
         if [ $CHK_RESULT == $BOOL_TRUE ];then
@@ -420,28 +430,44 @@ function keepalivedMain(){
            fi
         fi
       fi
-      
+
       # 如果检测通过，则退出
       if [ $CHK_RESULT == $BOOL_TRUE ];then
            _p_log_out="verify success."
            logInfo
            exit 0
       fi
-      
+
       # 检测失败，则尝试重新启动
       if [ $CHK_RESULT == $BOOL_FALSE ];then
         CURR_FAIL_COUNT=`expr ${CURR_FAIL_COUNT} + 1`
         _p_log_out="verify failure,retry count ${CURR_FAIL_COUNT} ..."
         logWarn
-        if [[ -n "${BASH_STOP}" ]]; then
-            _p_log_out="stop shell exec ..."
-            logInfo
-            if [[ -n "${LOG_FILE}" ]]; then
-                nohup bash -c "$BASH_STOP" 2>&1 >> $LOG_FILE &
-            else
-                nohup bash -c "$BASH_STOP" 2>&1 &
-            fi
-            sleep $STOP_SLEEP
+        _p_kill_flag=$BOOL_FALSE
+       if [ $_p_last_once == $BOOL_TRUE ];then
+           if [[ -n "${BASH_KILL}" ]]; then
+             _p_log_out="kill shell exec ..."
+             logInfo
+             if [[ -n "${LOG_FILE}" ]]; then
+                 nohup bash -c "$BASH_KILL" 2>&1 >> $LOG_FILE &
+             else
+                 nohup bash -c "$BASH_KILL" 2>&1 &
+             fi
+             _p_kill_flag=$BOOL_TRUE
+             sleep $STOP_SLEEP
+          fi
+        fi
+        if [ $_p_kill_flag == $BOOL_FALSE ];then
+          if [[ -n "${BASH_STOP}" ]]; then
+              _p_log_out="stop shell exec ..."
+              logInfo
+              if [[ -n "${LOG_FILE}" ]]; then
+                  nohup bash -c "$BASH_STOP" 2>&1 >> $LOG_FILE &
+              else
+                  nohup bash -c "$BASH_STOP" 2>&1 &
+              fi
+              sleep $STOP_SLEEP
+          fi
         fi
         _p_log_out="start shell exec ..."
         logInfo
@@ -455,7 +481,7 @@ function keepalivedMain(){
         sleep $FAIL_SLEEP
       fi
     done
-    
+
     # 如果程序走到这里，说明保活失败了
     if [ $CURR_FAIL_COUNT == $FAIL_MAX_COUNT ];then
       _p_log_out="verify failure, alarm sending ..."
