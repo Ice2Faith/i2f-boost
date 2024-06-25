@@ -25,6 +25,12 @@
 ```
 cd nacos/bin
 ```
+- 以单机模式启动
+```
+./startup.sh -m standalone
+```
+- 也可以修改启动脚本为永久单机模式
+- 如下为修改方式
 - 编辑启动脚本
 ```
 vi starup.sh
@@ -71,15 +77,15 @@ vi application.properties
 ```
 #*************** Config Module Related Configurations ***************#
 ### If use MySQL as datasource:
-# spring.datasource.platform=mysql
+spring.datasource.platform=mysql
 
 ### Count of DB:
-# db.num=1
+db.num=1
 
 ### Connect URL of DB:
-# db.url.0=jdbc:mysql://127.0.0.1:3306/nacos?characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useUnicode=true&useSSL=false&serverTimezone=UTC
-# db.user.0=nacos
-# db.password.0=nacos
+db.url.0=jdbc:mysql://127.0.0.1:3306/nacos?characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useUnicode=true&useSSL=false&serverTimezone=UTC&allowPublicKeyReetrieval=true
+db.user.0=nacos
+db.password.0=nacos
 ```
 - 同时，需要对应的建库建表，这个建表脚本在nacos-server中有给出
 
@@ -91,6 +97,29 @@ vi application.properties
 #spring.security.enabled=false
 
 nacos.core.auth.enabled=false
+```
+- 在高版本中，还要设置如下信息
+```
+# 使用默认nacos鉴权
+nacos.core.auth.system.type=nacos
+
+# 开启鉴权
+nacos.core.auth.enabled=true
+
+# 开启鉴权缓存
+nacos.core.auth.caching.enabled=true
+
+# 关闭userAgent鉴权，这是老版本默认的方式
+nacos.core.auth.enable.userAgentAuthWhite=false
+
+# 修改集群的鉴权秘钥，任意字符串，整个集群内一致，即可
+# 秘钥可以是随机字符串，key和value都可以是任意字符串
+nacos.core.auth.server.identity.key=nacos
+nacos.core.auth.server.identity.value=123456
+
+# 鉴权的秘钥，要求为base64编码，并且原始长度大于32字节
+# 可以在浏览器控制台中使用 btoa('123456') 函数编码为base64的结果，也就是说，这里的 '123456' 长度需要大于32字节
+nacos.core.auth.plugin.nacos.token.secret.key=TmFjb3NAMjAyNC9TZWNyZXRLZXkldEhVJllUeWpIR0ZSJV4mVXRyckZHSFU4KElKSFkoSUpVJjVURyVeJipoYg==
 ```
 
 ### 集群部署
